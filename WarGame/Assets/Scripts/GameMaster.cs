@@ -17,9 +17,16 @@ public class GameMaster : MonoBehaviour
     private bool isTipping;
 
     [Header("Purchase GUIs")]
-    public UnitPurchaseGUIVariables machineGunners;
-    public UnitPurchaseGUIVariables bazookamen;
-    public UnitPurchaseGUIVariables riflemen;
+
+    public UnitPurchaseGUIVariables riflemanPurchase;
+    public UnitPurchaseGUIVariables machineGunnerPurchase;
+    public UnitPurchaseGUIVariables bazookamanPurchase;
+    public UnitPurchaseGUIVariables lightTankPurchase;
+    public UnitPurchaseGUIVariables mediumTankPurchase;
+    public UnitPurchaseGUIVariables heavyTankPurchase;
+    public UnitPurchaseGUIVariables lightFighterPurchase;
+    public UnitPurchaseGUIVariables mediumFighterPurchase;
+    public UnitPurchaseGUIVariables bomberPurchase;
 
     private Camera cam;
     private UnitPurchaseGUIVariables selectedWorldUI;
@@ -30,9 +37,18 @@ public class GameMaster : MonoBehaviour
         isTipping = false;
         state = new PlayerState(new ulong[9], new ulong[] { 1000, 1000, 1000, 1000 }, new uint[1]);
         SetGUIContents();
-        machineGunners.Initialize(new Cost(100, 0, 300, 0, 0, "machineGunner"));
-        bazookamen.Initialize(new Cost(300, 0, 150, 0, 0, "bazookaman"));
-        riflemen.Initialize(new Cost(50, 0, 10, 0, 0, "rifleman"));
+
+        riflemanPurchase.Initialize(new Cost(50, 0, 10, 0, 0, "rifleman"));
+        machineGunnerPurchase.Initialize(new Cost(100, 0, 300, 0, 0, "machineGunner"));
+        bazookamanPurchase.Initialize(new Cost(300, 0, 150, 0, 0, "bazookaman"));
+
+        lightTankPurchase.Initialize(new Cost(200, 200, 300, 0, 0, "lightTank"));
+        mediumTankPurchase.Initialize(new Cost(200, 300, 600, 0, 0, "mediumTank"));
+        heavyTankPurchase.Initialize(new Cost(400, 400, 900, 0, 0, "heavyTank"));
+
+        lightFighterPurchase.Initialize(new Cost(1000, 400, 150, 0, 0, "lightFigther"));
+        mediumFighterPurchase.Initialize(new Cost(2000, 600, 250, 0, 0, "mediumFighter"));
+        bomberPurchase.Initialize(new Cost(4000, 1000, 500, 0, 0, "bomber"));
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
     }
 
@@ -40,11 +56,12 @@ public class GameMaster : MonoBehaviour
     {
         ToolTip();
         Typing();
+        WorldButtonCheck();
     }
 
     void FixedUpdate()
     {
-        WorldButtonCheck();
+        
     }
 
     void Typing()

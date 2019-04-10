@@ -10,14 +10,14 @@ namespace ClientSide
         public ulong amount;
         public string type;
 
-        public Cost(ulong w, ulong o, ulong m, ulong c, ulong a, string t)
+        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, ulong _amount, string _type)
         {
-            warbucks = w;
-            oil = o;
-            metal = m;
-            concrete = c;
-            amount = a;
-            type = t;
+            warbucks = _warbucks;
+            oil = _oil;
+            metal = _metal;
+            concrete = _concrete;
+            amount = _amount;
+            type = _type;
         }
     }
 
