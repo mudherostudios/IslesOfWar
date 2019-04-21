@@ -21,6 +21,35 @@ namespace ClientSide
         }
     }
 
+    public class WorldState
+    {
+        public ulong warbucksPool, oilPool, metalPool, concretePool;
+        public ulong warbucksContributed, oilContributed, metalContributed, concreteContributed;
+        public ulong warbucksTotalContributions, oilTotalContributions, metalTotalContributions, concreteTotalContributions;
+        public float poolTimer, timeRecieved;
+
+        public WorldState(ulong[] pools, ulong[] contributed, ulong[] contributions, float timer)
+        {
+            warbucksPool = pools[0];
+            oilPool = pools[1];
+            metalPool = pools[2];
+            concretePool = pools[3];
+
+            warbucksContributed = contributed[0];
+            oilContributed = contributed[1];
+            metalContributed = contributed[2];
+            concreteContributed = contributed[3];
+
+            warbucksTotalContributions = contributions[0];
+            oilTotalContributions = contributions[1];
+            metalTotalContributions = contributions[2];
+            concreteTotalContributions = contributions[3];
+
+            poolTimer = timer;
+            timeRecieved = Time.time;
+        }
+    }
+
     public class PlayerState 
     {
         public ulong riflemen, machineGunners, bazookas;
@@ -46,6 +75,7 @@ namespace ClientSide
             metal = resourceCounts[2];
             concrete = resourceCounts[3];
 
+            //Don't remember wtf I was thinking for this one.
             islands = islandCounts;
         }
     }

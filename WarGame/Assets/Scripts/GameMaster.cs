@@ -18,18 +18,21 @@ public class GameMaster : MonoBehaviour
 
     [Header("Purchase GUIs")]
 
-    public UnitPurchaseGUIVariables riflemanPurchase;
-    public UnitPurchaseGUIVariables machineGunnerPurchase;
-    public UnitPurchaseGUIVariables bazookamanPurchase;
-    public UnitPurchaseGUIVariables lightTankPurchase;
-    public UnitPurchaseGUIVariables mediumTankPurchase;
-    public UnitPurchaseGUIVariables heavyTankPurchase;
-    public UnitPurchaseGUIVariables lightFighterPurchase;
-    public UnitPurchaseGUIVariables mediumFighterPurchase;
-    public UnitPurchaseGUIVariables bomberPurchase;
+    public UnitPurchase riflemanPurchase;
+    public UnitPurchase machineGunnerPurchase;
+    public UnitPurchase bazookamanPurchase;
+    public UnitPurchase lightTankPurchase;
+    public UnitPurchase mediumTankPurchase;
+    public UnitPurchase heavyTankPurchase;
+    public UnitPurchase lightFighterPurchase;
+    public UnitPurchase mediumFighterPurchase;
+    public UnitPurchase bomberPurchase;
 
     private Camera cam;
-    private UnitPurchaseGUIVariables selectedWorldUI;
+    private Transform selectedWorldUI;
+    private UnitPurchase selectedUnitPurchase;
+    private PoolContribute selectedPoolContribute;
+    private WorldGUI selectedBaseGUI;
     private bool isTyping;
 
     void Start()
@@ -57,6 +60,8 @@ public class GameMaster : MonoBehaviour
         ToolTip();
         Typing();
         WorldButtonCheck();
+
+        UpdateTimers();
     }
 
     void FixedUpdate()
@@ -64,14 +69,25 @@ public class GameMaster : MonoBehaviour
         
     }
 
+    void UpdateTimers()
+    {
+        if (selectedPoolContribute != null)
+            selectedPoolContribute.UpdateTimer();
+    }
+
     void Typing()
     {
         if (isTyping)
         {
-            selectedWorldUI.AddCharacter(Input.inputString);
+            selectedBaseGUI.AddCharacter(Input.inputString);
 
             if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
-                selectedWorldUI.DeleteCharacter();
+                selectedBaseGUI.DeleteCharacter();
+
+            if (selectedUnitPurchase != null)
+                selectedUnitPurchase.UpdateAllStats();
+            else if (selectedPoolContribute != null)
+                selectedPoolContribute.UpdateAllStats();
         }
     }
 
@@ -81,21 +97,28 @@ public class GameMaster : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            
 
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.transform.tag == "WorldButton")
                 {
-                    WorldButton button = hit.transform.GetComponent<WorldButton>();
-                    selectedWorldUI = button.parent;
+                    if (selectedWorldUI != null && selectedWorldUI.gameObject.activeSelf)
+                        selectedWorldUI.gameObject.SetActive(false);
 
+                    WorldButton button = hit.transform.GetComponent<WorldButton>();
+                    selectedWorldUI = button.logicParent;
+                    selectedBaseGUI = selectedWorldUI.GetComponent<WorldGUI>();
+                    selectedUnitPurchase = selectedWorldUI.GetComponent<UnitPurchase>();
+                    selectedPoolContribute = selectedWorldUI.GetComponent<PoolContribute>();
+                    
                     if (button.buttonType == "InputField")
                     {
                         isTyping = true;
                     }
                     else if (button.buttonType == "PurchaseButton")
                     {
-                        Purchase(selectedWorldUI.TryPurchase());
+                        Purchase(selectedUnitPurchase.TryPurchase());
                     }
                     else if (button.buttonType == "MenuRevealer")
                     {
@@ -104,13 +127,18 @@ public class GameMaster : MonoBehaviour
                         else
                             selectedWorldUI.gameObject.SetActive(true);
 
-                        selectedWorldUI.Reset(true);
+                        selectedUnitPurchase.Reset(true);
                     }
                 }
                 else
                 {
+                    selectedWorldUI.gameObject.SetActive(false);
                     isTyping = false;
                 }
+            }
+            else
+            {
+                selectedWorldUI.gameObject.SetActive(false);
             }
         }
     }
