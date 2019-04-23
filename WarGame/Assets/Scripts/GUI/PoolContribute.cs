@@ -4,7 +4,7 @@ using UnityEngine;
 using ClientSide;
 using TMPro;
 
-public class PoolContribute : WorldGUI
+public class PoolContribute: WorldGUI
 {
     public int poolType;
     public TextMeshPro[] resourceModifiers;
@@ -13,17 +13,21 @@ public class PoolContribute : WorldGUI
     public TextMeshPro poolTimer;
     public TextMeshPro poolOwnership;
 
-    private ulong oilAmount, metalAmount, concreteAmount;
     private double[] modifiers;
     private string[] strModifiers;
     private ulong pool, poolContributions, poolContributed;
     private int hours, minutes;
-    private float seconds;
+    private float seconds, lastTime;
+    private string poolStrType;
     private WorldState state;
 
     public void Initialize(WorldState _state)
     {
         state = _state;
+        lastTime = state.timeRecieved;
+        fields = new string[] { "", "", "" };
+        fieldAmounts = new ulong[] { 0, 0, 0 };
+        
 
         modifiers = new double[3];
         strModifiers = new string[3];
@@ -34,6 +38,7 @@ public class PoolContribute : WorldGUI
             modifiers[0] = ((double)((tempPools[1] / 2) + (tempPools[2] / 2)) / tempPools[0]);
             modifiers[1] = ((double)((tempPools[0] / 2) + (tempPools[2] / 2)) / tempPools[1]);
             modifiers[2] = ((double)((tempPools[0] / 2) + (tempPools[1] / 2)) / tempPools[2]);
+            poolStrType = "warbucksPool";
         }
         else
         {
@@ -44,30 +49,31 @@ public class PoolContribute : WorldGUI
             {
                 tempTypeA = 1;
                 tempTypeB = 2;
+                poolStrType = "oilPool";
             }
             else if (poolType == 2)
             {
                 tempTypeA = 0;
                 tempTypeB = 2;
+                poolStrType = "metalPool";
             }
             else if (poolType == 3)
             {
                 tempTypeA = 0;
                 tempTypeB = 1;
+                poolStrType = "concretePool";
             }
 
             modifiers[poolType - 1] = 0;
-            modifiers[tempTypeA] = tempPools[tempTypeB] / tempPools[tempTypeA];
-            modifiers[tempTypeB] = tempPools[tempTypeA] / tempPools[tempTypeB];
+            modifiers[tempTypeA] = (double)tempPools[tempTypeB] / tempPools[tempTypeA];
+            modifiers[tempTypeB] = (double)tempPools[tempTypeA] / tempPools[tempTypeB];
         }
 
         strModifiers[0] = string.Format("x {0:0.000}", modifiers[0]);
         strModifiers[1] = string.Format("x {0:0.000}", modifiers[1]);
         strModifiers[2] = string.Format("x {0:0.000}", modifiers[2]);
 
-        oilAmount = 0;
-        metalAmount = 0;
-        concreteAmount = 0;
+        
 
         switch(poolType)
         {
@@ -105,13 +111,31 @@ public class PoolContribute : WorldGUI
         UpdateTimer();
     }
 
+    public Cost TrySend()
+    {
+        ulong oil = 0;
+        ulong metal = 0;
+        ulong concrete = 0;
+        ulong.TryParse(tradeAmounts[0].text, out oil);
+        ulong.TryParse(tradeAmounts[1].text, out metal);
+        ulong.TryParse(tradeAmounts[2].text, out concrete);
+        ulong contributions = (ulong)((oil * modifiers[0]) + (metal * modifiers[1]) +(concrete * modifiers[2]));
+
+        Cost cost = new Cost(0, oil, metal, concrete, contributions, poolStrType);
+        Reset();
+        return cost;
+    }
+
     public void UpdateTimer()
     {
-        state.poolTimer = Time.time - state.timeRecieved;
+        state.poolTimer -= Time.time - lastTime;
+        lastTime = Time.time;
+
         seconds = state.poolTimer % 60;
         minutes = (int)((state.poolTimer - seconds)/60) % 60;
         hours = (int)(state.poolTimer - seconds - (minutes * 60))/(3600);
-        poolTimer.text = string.Format("{0:00}:{1:00}:{2:0.00}", hours, minutes, seconds);
+
+        poolTimer.text = string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
     }
 
     public void UpdateAllStats()
@@ -121,8 +145,9 @@ public class PoolContribute : WorldGUI
             poolFormat = "G2";
         poolAmount.text = pool.ToString(poolFormat);
 
-        ulong possiblePoints = (ulong)((modifiers[0] * oilAmount) + (modifiers[1] * metalAmount) + (modifiers[2] * concreteAmount));
-        float ownership = (float)(possiblePoints+poolContributed) / poolContributions;
+        ulong possiblePoints = (ulong)((modifiers[0] * fieldAmounts[0]) + (modifiers[1] * fieldAmounts[1]) + (modifiers[2] * fieldAmounts[2]));
+        ulong totalPoints = possiblePoints + poolContributions;
+        double ownership = ((double)(possiblePoints+poolContributed) / (totalPoints)) * 100;  
         poolOwnership.text = string.Format("%{0:00.000}", ownership);
 
         resourceModifiers[0].text = strModifiers[0];
@@ -133,15 +158,22 @@ public class PoolContribute : WorldGUI
         string metalFormat = "";
         string concreteFormat = "";
 
-        if (oilAmount > 1000000000)
+        if (fieldAmounts[0] > 1000000000)
             oilFormat = "G2";
-        if (metalAmount > 1000000000)
+        if (fieldAmounts[1] > 1000000000)
             metalFormat = "G2";
-        if (concreteAmount > 1000000000)
+        if (fieldAmounts[2] > 1000000000)
             concreteFormat = "G2";
 
-        tradeAmounts[0].text = oilAmount.ToString(oilFormat);
-        tradeAmounts[1].text = oilAmount.ToString(metalFormat);
-        tradeAmounts[2].text = oilAmount.ToString(concreteFormat);
+        tradeAmounts[0].text = fieldAmounts[0].ToString(oilFormat);
+        tradeAmounts[1].text = fieldAmounts[1].ToString(metalFormat);
+        tradeAmounts[2].text = fieldAmounts[2].ToString(concreteFormat);
+    }
+
+    public void Reset(WorldState _state)
+    {
+        Reset();
+        Initialize(_state);
+        UpdateAllStats();
     }
 }

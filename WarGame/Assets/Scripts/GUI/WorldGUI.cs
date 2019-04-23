@@ -4,32 +4,35 @@ using UnityEngine;
 
 public class WorldGUI : MonoBehaviour
 {
-    protected ulong amount;
-    protected string strAmount;
+    protected ulong[] fieldAmounts;
+    protected string[] fields;
 
-    public void AddCharacter(string str)
+    public void AddCharacter(string str, int ID)
     {
-        if (strAmount.Length < 10 && "0123456789".Contains(str))
+        if (fields[ID].Length < 10 && "0123456789".Contains(str))
         {
-            strAmount += str;
-            ulong temp = 1;
-            ulong.TryParse(strAmount, out temp);
-            amount = temp;
+            fields[ID] += str;
+            ulong temp = 0;
+            ulong.TryParse(fields[ID], out temp);
+            fieldAmounts[ID] = temp;
         }
     }
 
-    public void DeleteCharacter()
+    public void DeleteCharacter(int ID)
     {
-        if (strAmount.Length > 0)
-            strAmount = strAmount.Remove(strAmount.Length - 1);
+        if (fields[ID].Length > 0)
+            fields[ID] = fields[ID].Remove(fields[ID].Length - 1);
 
-        if (strAmount.Length == 0)
-            amount = 1;
+        if (fields[ID].Length == 0)
+            fieldAmounts[ID] = 0;
     }
 
     public void Reset()
     {
-        strAmount = "";
-        amount = 1;
+        for(int i = 0; i < fields.Length; i++)
+        {
+            fields[i] = "0";
+            fieldAmounts[i] = 0;
+        }
     }
 }

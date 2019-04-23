@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 8827953702015469967}
   m_Layer: 0
   m_Name: Send
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -537,8 +537,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 0}
-  buttonType: 
+  logicParent: {fileID: 1546954449785841797}
+  buttonType: PoolSend
+  fieldID: -1
 --- !u!1 &1482178803541843802
 GameObject:
   m_ObjectHideFlags: 0
@@ -1940,7 +1941,7 @@ GameObject:
   - component: {fileID: 8392450120409136742}
   m_Layer: 0
   m_Name: Input
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2260,8 +2261,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 0}
+  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  fieldID: 1
 --- !u!1 &4778023611689547127
 GameObject:
   m_ObjectHideFlags: 0
@@ -2558,7 +2560,7 @@ GameObject:
   - component: {fileID: 4579955575722058815}
   m_Layer: 0
   m_Name: Input
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2878,8 +2880,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 0}
+  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  fieldID: 2
 --- !u!1 &5860104331285702588
 GameObject:
   m_ObjectHideFlags: 0
@@ -3057,7 +3060,7 @@ GameObject:
   - component: {fileID: 4101413401290818734}
   m_Layer: 0
   m_Name: Input
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3377,8 +3380,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 0}
+  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  fieldID: 0
 --- !u!1 &7489641895512658005
 GameObject:
   m_ObjectHideFlags: 0
@@ -3719,6 +3723,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1546954449785841797}
+  - component: {fileID: 8330714224995309953}
   m_Layer: 0
   m_Name: PoolUI
   m_TagString: Untagged
@@ -3746,6 +3751,30 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8330714224995309953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7787516070382661305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6416184b818ede458eefaea6415d290, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolType: 0
+  resourceModifiers:
+  - {fileID: 1695416402001244647}
+  - {fileID: 4047702034455364788}
+  - {fileID: 4984851170560953308}
+  tradeAmounts:
+  - {fileID: 2442267051205301743}
+  - {fileID: 5276058044102936786}
+  - {fileID: 6569527833499959981}
+  poolAmount: {fileID: 6864042170493490707}
+  poolTimer: {fileID: 7436161518770685365}
+  poolOwnership: {fileID: 1756403432439452714}
 --- !u!1 &8281575416609727137
 GameObject:
   m_ObjectHideFlags: 0

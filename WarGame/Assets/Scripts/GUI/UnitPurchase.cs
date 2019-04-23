@@ -13,14 +13,14 @@ public class UnitPurchase: WorldGUI
     public void Initialize(Cost cost)
     {
         unitCost = cost;
-        strAmount = "";
-        amount = 1;
+        fields = new string[] { "" };
+        fieldAmounts = new ulong[] { 0 };
         UpdateAllStats();
     }
 
     public Cost TryPurchase()
     {
-        unitCost.amount = amount;
+        unitCost.amount = fieldAmounts[0];
         Reset(false);
         return unitCost;
     }
@@ -40,10 +40,10 @@ public class UnitPurchase: WorldGUI
         string formatO = "";
         string formatM = "";
         string formatC = "";
-        ulong warbucks = amount * unitCost.warbucks;
-        ulong oil = amount * unitCost.oil;
-        ulong metal = amount * unitCost.metal;
-        ulong concrete = amount * unitCost.concrete;
+        ulong warbucks = fieldAmounts[0] * unitCost.warbucks;
+        ulong oil = fieldAmounts[0] * unitCost.oil;
+        ulong metal = fieldAmounts[0] * unitCost.metal;
+        ulong concrete = fieldAmounts[0] * unitCost.concrete;
 
         if (warbucks > 10000)
             formatW = "G2";
@@ -58,6 +58,6 @@ public class UnitPurchase: WorldGUI
         resourceCosts[1].text = oil.ToString(formatO);
         resourceCosts[2].text = metal.ToString(formatM);
         resourceCosts[3].text = concrete.ToString(formatC);
-        purchaseAmount.text = amount.ToString();
+        purchaseAmount.text = fieldAmounts[0].ToString();
     }
 }
