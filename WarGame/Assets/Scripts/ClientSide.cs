@@ -4,6 +4,22 @@ using UnityEngine;
 
 namespace ClientSide
 {
+    public struct Island
+    {
+        public string features, collectors;
+
+        public Island(string _features, string _collectors)
+        {
+            features = _features;
+            collectors = _collectors;
+        }
+
+        public int totalTiles
+        {
+            get { return features.Length; }
+        }
+    }
+
     public struct Cost
     {
         public ulong warbucks, oil, metal, concrete;
