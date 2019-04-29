@@ -5,12 +5,15 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class OrbitalFocusCam : MonoBehaviour
 {
-    public Transform focalTarget;
+    public Transform focalTarget, observePoint;
     public Camera cam;
-    public float rotationSpeed, camDistance, lerpSpeed, deltaSensitivity;
-    private bool hasMoved, tracking, centered;
+    public float rotationSpeed, camDistance, lerpSpeed, rotLerpSpeed, deltaSensitivity;
+    public bool exploring;
+
+    private bool observing, hasMoved, tracking, centered;
     private Vector3 lastMouse, lastPos;
-    private float startTime, moveDistance;
+    private Quaternion lastRot;
+    private float startTime, moveDistance, rotateAngle;
     private DepthOfField dof;
     private PostProcessVolume ppVolume;
 
@@ -19,8 +22,10 @@ public class OrbitalFocusCam : MonoBehaviour
         ppVolume = cam.GetComponent<PostProcessVolume>();
         ppVolume.profile.TryGetSettings(out dof);
         dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
+        exploring = false;
         hasMoved = false;
         tracking = false;
+        observing = true;
         centered = true;
         lastMouse = Vector3.zero;
         startTime = Time.time;
@@ -29,45 +34,68 @@ public class OrbitalFocusCam : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButton("Fire1"))
+        if (exploring)
         {
-            transform.Rotate(Vector3.up, rotationSpeed * Input.GetAxis("Mouse X"));
-        }
-
-        if (Input.GetButtonUp("Fire1"))
-        {
-            if (!hasMoved)
+            if (Input.GetButton("Fire1"))
             {
-                RaycastHit hit;
-                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-
-                bool didHit = Physics.Raycast(ray, out hit);
-
-                if(didHit)
-                {
-                    if (hit.transform != null && hit.transform != focalTarget)
-                    {
-                        focalTarget = hit.transform;
-                        lastPos = transform.position;
-                        centered = false;
-                        startTime = Time.time;
-                        moveDistance = Vector3.Distance(lastPos, focalTarget.position);
-                    }
-                }
+                transform.Rotate(Vector3.up, rotationSpeed * Input.GetAxis("Mouse X"));
             }
 
-            hasMoved = false;
-            tracking = false;
-        }
+            if (Input.GetButtonUp("Fire1"))
+            {
+                if (!hasMoved)
+                {
+                    RaycastHit hit;
+                    Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-        
+                    bool didHit = Physics.Raycast(ray, out hit);
+
+                    if (didHit)
+                    {
+                        if (hit.transform != null && hit.transform != focalTarget && hit.transform.tag == "WorldButton")
+                        {
+                            if (hit.transform.GetComponent<WorldButton>().buttonType == "IslandTile")
+                            {
+                                focalTarget = hit.transform;
+                                lastPos = transform.position;
+                                centered = false;
+                                startTime = Time.time;
+                                moveDistance = Vector3.Distance(lastPos, focalTarget.position);
+                            }
+                        }
+                    }
+                }
+
+                hasMoved = false;
+                tracking = false;
+            }
+        }
+        else
+        {
+            if (!observing)
+            {
+                float angleCovered = (Time.time - startTime) * rotLerpSpeed;
+                float fracRotation = angleCovered / rotateAngle;
+
+                transform.rotation = Quaternion.Lerp(lastRot, observePoint.rotation, fracRotation);
+
+                if (fracRotation >= 1.0f)
+                {
+                    observing = true;
+                }
+            }
+        }
 
         if (!centered)
         {
             dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
             float distCovered = (Time.time - startTime) * lerpSpeed;
             float fracJourney = distCovered / moveDistance;
-            transform.position = Vector3.Lerp(lastPos, focalTarget.position, fracJourney);
+
+            if(!exploring)
+                transform.position = Vector3.Lerp(lastPos, observePoint.position, fracJourney);
+            else
+                transform.position = Vector3.Lerp(lastPos, focalTarget.position, fracJourney);
 
             if (fracJourney >= 1.0f)
             {
@@ -94,6 +122,31 @@ public class OrbitalFocusCam : MonoBehaviour
             {
                 lastMouse = Input.mousePosition;
             }
+        }
+    }
+
+    public void ExploreMode(Transform explorationPoint, bool explore)
+    {
+        focalTarget = explorationPoint;
+        lastPos = transform.position;
+        lastRot = transform.rotation;
+        startTime = Time.time;
+        centered = false;
+        hasMoved = false;
+        tracking = false;
+
+        if (!explore)
+        {
+            moveDistance = Vector3.Distance(lastPos, observePoint.position);
+            rotateAngle = Quaternion.Angle(lastRot, observePoint.rotation);
+            exploring = false;
+            observing = false;
+        }
+        else
+        {
+            moveDistance = Vector3.Distance(lastPos, focalTarget.position);
+            exploring = true;
+            observing = false;
         }
     }
 }

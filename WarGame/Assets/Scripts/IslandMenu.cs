@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using ClientSide;
 using ServerSide;
 
@@ -11,6 +12,15 @@ public class IslandMenu : MonoBehaviour
     //2 = mountain
     public Island[] islands;
     public string[] tileVariations;
+
+    public Camera cam;
+    public OrbitalFocusCam orbital;
+    public Transform observationFocus;
+
+    [Header("GUI Update")]
+    public GameObject[] searchGUIElements;
+    public GameObject[] exploreGUIElements;
+    public Text islandName;
 
     [Header ("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -48,16 +58,47 @@ public class IslandMenu : MonoBehaviour
 
     public void Update()
     {
-        float leftDist = Vector3.Distance(currentIsland.transform.position, deleteLeft);
-        float rightDist = Vector3.Distance(currentIsland.transform.position, deleteRight);
-        if ( leftDist <= 1 || rightDist <= 1)
+        if (direction != 0)
         {
-            Destroy(currentIsland);
-            currentIsland = bufferedIsland;
-            currentStats = bufferedStats;
-            bufferedIsland = null;
-            bufferedStats = null;
+            float leftDist = Vector3.Distance(currentIsland.transform.position, deleteLeft);
+            float rightDist = Vector3.Distance(currentIsland.transform.position, deleteRight);
+
+            if (leftDist <= 1 || rightDist <= 1)
+            {
+                Destroy(currentIsland);
+                currentIsland = bufferedIsland;
+                currentStats = bufferedStats;
+                bufferedIsland = null;
+                bufferedStats = null;
+                direction = 0;
+            }
+
         }
+        else
+        {
+            if (Input.GetButtonUp("Fire1") && !orbital.exploring)
+            {
+                RaycastHit hit;
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+                bool didHit = Physics.Raycast(ray, out hit);
+
+                if (didHit && hit.transform.tag == "WorldButton")
+                {
+                    WorldButton tile = hit.transform.GetComponent<WorldButton>();
+                    orbital.ExploreMode(hit.transform, true);
+                    ToggleGUIElementsTo(searchGUIElements, false);
+                    ToggleGUIElementsTo(exploreGUIElements, true);
+                }
+            }
+        }
+    }
+
+    public void SearchIslands()
+    {
+        orbital.ExploreMode(observationFocus, false);
+        ToggleGUIElementsTo(searchGUIElements, true);
+        ToggleGUIElementsTo(exploreGUIElements, false);
     }
 
     public void RefreshIsland(int increment)
@@ -102,6 +143,8 @@ public class IslandMenu : MonoBehaviour
 
     public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
     {
+        islandName.text = island.name;
+
         for (int h = 0; h < island.totalTiles; h++)
         {
             int r = Mathf.FloorToInt(Random.Range(0, 6));
@@ -201,9 +244,18 @@ public class IslandMenu : MonoBehaviour
 
         for(int i = 0; i < count; i++)
         {
-            tempIslands[i] = new Island(generator.Generate(), "000000000000");
+            string island = generator.Generate();
+            tempIslands[i] = new Island("#"+island, island, "000000000000");
         }
 
         return tempIslands;
+    }
+
+    void ToggleGUIElementsTo(GameObject[] guiElements, bool active)
+    {
+        for (int e = 0; e < guiElements.Length; e++)
+        {
+            guiElements[e].SetActive(active);
+        }
     }
 }

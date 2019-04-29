@@ -88,7 +88,7 @@ Animator:
   m_GameObject: {fileID: 2623124548623271360}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 45e68753600a77f40b99a0e6a9d89c2c, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -877,9 +877,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5758450264219794165}
   - component: {fileID: 6220508960211963291}
+  - component: {fileID: 7074121400561416812}
   m_Layer: 0
   m_Name: HexBase_00
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -913,6 +914,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &7074121400561416812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4440445327560412707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 0
 --- !u!1 &5250172358652123756
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,9 +1016,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901103039875929}
   - component: {fileID: 4244855823646571575}
+  - component: {fileID: 7118540663291364761}
   m_Layer: 0
   m_Name: HexBase_13
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1036,6 +1053,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &7118540663291364761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026292241350543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 7
 --- !u!1 &5847026292523441345
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,9 +1078,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901103261165591}
   - component: {fileID: 4244855823330910073}
+  - component: {fileID: 299105124764165270}
   m_Layer: 0
   m_Name: HexBase_21
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1082,6 +1115,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &299105124764165270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026292523441345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 9
 --- !u!1 &5847026292861874062
 GameObject:
   m_ObjectHideFlags: 0
@@ -1092,9 +1140,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901103460129624}
   - component: {fileID: 4244855823261445174}
+  - component: {fileID: 8349906615615647539}
   m_Layer: 0
   m_Name: HexBase_11
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1128,6 +1177,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &8349906615615647539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026292861874062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 5
 --- !u!1 &5847026292897927567
 GameObject:
   m_ObjectHideFlags: 0
@@ -1138,9 +1202,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901103436686681}
   - component: {fileID: 4244855823237730871}
+  - component: {fileID: 766330406140770644}
   m_Layer: 0
   m_Name: HexBase_01
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1174,6 +1239,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &766330406140770644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026292897927567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 1
 --- !u!1 &5847026292911375339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,9 +1264,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901103439394621}
   - component: {fileID: 4244855823240757331}
+  - component: {fileID: 8936437092850873522}
   m_Layer: 0
   m_Name: HexBase_23
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1220,6 +1301,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &8936437092850873522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026292911375339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 11
 --- !u!1 &5847026293301023359
 GameObject:
   m_ObjectHideFlags: 0
@@ -1230,9 +1326,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901101959292585}
   - component: {fileID: 4244855824713388487}
+  - component: {fileID: 3903071986396238649}
   m_Layer: 0
   m_Name: HexBase_02
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1266,6 +1363,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &3903071986396238649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293301023359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 2
 --- !u!1 &5847026293631752207
 GameObject:
   m_ObjectHideFlags: 0
@@ -1276,9 +1388,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901102148594905}
   - component: {fileID: 4244855824634321847}
+  - component: {fileID: 4748881963942097796}
   m_Layer: 0
   m_Name: HexBase_22
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1312,6 +1425,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &4748881963942097796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293631752207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 10
 --- !u!1 &5847026293643021874
 GameObject:
   m_ObjectHideFlags: 0
@@ -1322,9 +1450,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901102158822116}
   - component: {fileID: 4244855824644541834}
+  - component: {fileID: 5709092565527090842}
   m_Layer: 0
   m_Name: HexBase_03
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1358,6 +1487,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &5709092565527090842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293643021874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 3
 --- !u!1 &5847026293781528672
 GameObject:
   m_ObjectHideFlags: 0
@@ -1368,9 +1512,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901102574023862}
   - component: {fileID: 4244855824254370776}
+  - component: {fileID: 2934700707745850729}
   m_Layer: 0
   m_Name: HexBase_20
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1404,6 +1549,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &2934700707745850729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293781528672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 8
 --- !u!1 &5847026293817748710
 GameObject:
   m_ObjectHideFlags: 0
@@ -1414,9 +1574,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901102537218096}
   - component: {fileID: 4244855824217386846}
+  - component: {fileID: 5991264414452980411}
   m_Layer: 0
   m_Name: HexBase_10
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1450,6 +1611,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &5991264414452980411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293817748710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 4
 --- !u!1 &5847026293820568924
 GameObject:
   m_ObjectHideFlags: 0
@@ -1460,9 +1636,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2544901102546977162}
   - component: {fileID: 4244855824227415780}
+  - component: {fileID: 4166529731082130548}
   m_Layer: 0
   m_Name: HexBase_12
-  m_TagString: Untagged
+  m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1496,6 +1673,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: c7e25efb5f41c0a44b64a42e7ae1536c, type: 3}
+--- !u!114 &4166529731082130548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5847026293820568924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logicParent: {fileID: 6300617430378523388}
+  buttonType: IslandTile
+  fieldID: 6
 --- !u!1 &6300617430378523379
 GameObject:
   m_ObjectHideFlags: 0

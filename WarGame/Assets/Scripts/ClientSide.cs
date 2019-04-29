@@ -6,10 +6,11 @@ namespace ClientSide
 {
     public struct Island
     {
-        public string features, collectors;
+        public string name, features, collectors;
 
-        public Island(string _features, string _collectors)
+        public Island(string _name, string _features, string _collectors)
         {
+            name = _name;
             features = _features;
             collectors = _collectors;
         }
