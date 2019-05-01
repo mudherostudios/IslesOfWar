@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using ClientSide;
 using ServerSide;
 
@@ -27,21 +28,24 @@ public class IslandMenu : MonoBehaviour
     public GameObject tileHolderPrefab;
     public Vector3 offset;
 
-    [Header("Instantiation")]
+    [Header("Main Generation")]
     public Vector3 generateCenter;
     public Vector3 genereateRotation;
     public int islandCount;
     public float islandChangeSpeed;
-
-    [Header("Deletion")]
     public Vector3 deleteLeft;
     public Vector3 deleteRight;
 
-    
+    [Header("Discovery Generation")]
+    public Transform[] spawnPositions;
+    public Vector3 maxPositionAdjustment;
+
     private int islandIndex;
     private GameObject currentIsland, bufferedIsland;
     private IslandStats currentStats, bufferedStats;
     private int direction;
+    private Island[] discoveredIslands;
+    private GameObject[] discoveredIslandObjects;
     
 
     public void Start()
@@ -53,7 +57,7 @@ public class IslandMenu : MonoBehaviour
 
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
-        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform);
+        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform, true);
     }
 
     public void Update()
@@ -76,25 +80,36 @@ public class IslandMenu : MonoBehaviour
         }
         else
         {
-            if (Input.GetButtonUp("Fire1") && !orbital.exploring)
+            if (Input.GetButtonUp("Fire1") && !orbital.exploring && !EventSystem.current.IsPointerOverGameObject())
             {
                 RaycastHit hit;
                 Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
                 bool didHit = Physics.Raycast(ray, out hit);
 
-                if (didHit && hit.transform.tag == "WorldButton")
+                if (didHit)
                 {
-                    WorldButton tile = hit.transform.GetComponent<WorldButton>();
-                    orbital.ExploreMode(hit.transform, true);
-                    ToggleGUIElementsTo(searchGUIElements, false);
-                    ToggleGUIElementsTo(exploreGUIElements, true);
+                    if (hit.transform.tag == "WorldButton")
+                    { 
+                        WorldButton button = hit.transform.GetComponent<WorldButton>();
+
+                        if (button.buttonType == "MenuRevealer")
+                        {
+                            button.logicParent.gameObject.SetActive(true);
+                        }
+                        else if (button.buttonType == "IslandTile")
+                        {
+                            orbital.ExploreMode(hit.transform, true);
+                            ToggleGUIElementsTo(searchGUIElements, false);
+                            ToggleGUIElementsTo(exploreGUIElements, true);
+                        }
+                    }
                 }
             }
         }
     }
 
-    public void SearchIslands()
+    public void IslandQueue()
     {
         orbital.ExploreMode(observationFocus, false);
         ToggleGUIElementsTo(searchGUIElements, true);
@@ -136,14 +151,15 @@ public class IslandMenu : MonoBehaviour
                 islandIndex = islandCount - 1;
             else
                 islandIndex += increment;
-
-            PlaceTiles(islands[islandIndex], bufferedStats, bufferedIsland.transform);
+            
+            PlaceTiles(islands[islandIndex], bufferedStats, bufferedIsland.transform, true);
         }
     }
 
-    public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
+    public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent, bool isKnown)
     {
-        islandName.text = island.name;
+        if(isKnown)
+            islandName.text = island.name;
 
         for (int h = 0; h < island.totalTiles; h++)
         {
@@ -154,56 +170,107 @@ public class IslandMenu : MonoBehaviour
 
             if (tileVariations[0].Contains(featString))
             {
-                tempTile = Instantiate(tilePrefabs[0], islandStats.hexTiles[h].position+offset, Quaternion.Euler(genereateRotation));
+                tempTile = Instantiate(tilePrefabs[0], islandStats.hexTiles[h].position+offset, tileParent.rotation);
             }
             else if (tileVariations[1].Contains(featString))
             {
-                tempTile = Instantiate(tilePrefabs[1], islandStats.hexTiles[h].position+offset, Quaternion.Euler(genereateRotation));
+                tempTile = Instantiate(tilePrefabs[1], islandStats.hexTiles[h].position+offset, tileParent.rotation);
             }
             else if (tileVariations[2].Contains(featString))
             {
-                tempTile = Instantiate(tilePrefabs[2], islandStats.hexTiles[h].position+offset, Quaternion.Euler(genereateRotation));
+                tempTile = Instantiate(tilePrefabs[2], islandStats.hexTiles[h].position+offset, tileParent.rotation);
             }
 
             tempTile.transform.Rotate(Vector3.up, 60 * r);
             tempTile.transform.SetParent(tileParent);
-            TurnOnResourcesAndCollectors(tempTile.GetComponent<TileStats>().resourceParents, tempTile.GetComponent<TileStats>().collectorParents, featString, collectorString);
+
+            if (isKnown)
+            {
+                TurnOnResourcesAndCollectors(tempTile.GetComponent<TileStats>().resourceParents, tempTile.GetComponent<TileStats>().collectorParents, featString, collectorString);
+            }
+            else
+            {
+                IslandStats parent = tileParent.GetComponent<IslandStats>();
+                parent.fogs[0].eulerAngles = new Vector3(0, Random.value * 360, 0);
+                parent.fogs[1].eulerAngles = new Vector3(0, Random.value * 360, 0);
+                parent.fogs[0].gameObject.SetActive(true);
+                parent.fogs[1].gameObject.SetActive(true);
+            }
         }
+    }
+
+    //Server Call
+    void DiscoverRandomIslands(int missionType)
+    {
+        IslandDiscovery discovery = new IslandDiscovery(new ulong[] { 100, 10000, 10 }, new float[] { 0.5f, 0.375f, 0.75f });
+
+        if (missionType == 0)
+            discoveredIslands = discovery.GetIslands(3);
+        else if(missionType == 1)
+            discoveredIslands = discovery.GetIslands(5);
+        else
+            discoveredIslands = discovery.GetIslands(1); //Just easy way of telling if its broken
+    }
+
+    public void GenerateDiscoveryIslands(int missionType)
+    {
+        DiscoverRandomIslands(missionType);
+        int count = 1;
+
+        if (missionType == 0)
+            count = 3;
+        else if (missionType == 1)
+            count = 5;
+
+        int discoveredIndex = 0;
+        discoveredIslandObjects = new GameObject[count];
+
+        for (int i = 0; i < count; i++, discoveredIndex++)
+        {
+            Vector3 pos = spawnPositions[i].position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f),0, Random.Range(-1.0f, 1.0f)));
+            Vector3 rot = new Vector3(0, Random.value*360, 0);
+            discoveredIslandObjects[discoveredIndex] = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x,rot.y,rot.z));
+            IslandStats stats = discoveredIslandObjects[discoveredIndex].transform.GetComponent<IslandStats>();
+            stats.animator.enabled = false;
+            PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
+        }
+        
     }
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
     {
         int r = GetConvertedType(type);
         int c = GetConvertedType(built);
+        GameObject resourceObject = null;
 
         if (r == 1 || r == 4 || r == 5  || r == 7)
         {
-            GameObject tileObject = resources[0];
+            resourceObject = resources[0];
 
             if (c == 1 || c == 4 || c == 5 || c == 7)
-                tileObject = collectors[0];
+                resourceObject = collectors[0];
 
-            ActivateRandomChild(tileObject.transform);
+            ActivateRandomChild(resourceObject.transform);
         }
 
         if (r == 2 || r == 4 || r == 6 || r == 7)
         {
-            GameObject tileObject = resources[0];
+            resourceObject = resources[1];
 
             if (c == 2 || c == 4 || c == 6 || c == 7)
-                tileObject = collectors[1];
-
-            ActivateRandomChild(resources[1].transform);
+                resourceObject = collectors[1];
+            
+            ActivateRandomChild(resourceObject.transform);
         }
 
         if (r == 3 || r == 5 || r == 6 || r == 7)
         {
-            GameObject tileObject = resources[0];
+            resourceObject = resources[2];
 
             if (c == 3 || c == 5 || c == 6 || c == 7)
-                tileObject = collectors[2];
+                resourceObject = collectors[2];
 
-            ActivateRandomChild(resources[2].transform);
+            ActivateRandomChild(resourceObject.transform);
         }
     }
 
@@ -237,6 +304,7 @@ public class IslandMenu : MonoBehaviour
         return converted;
     }
 
+    //Server Call
     Island[] GetRandomIslands(int count)
     {
         IslandGenerator generator = new IslandGenerator();
@@ -244,8 +312,13 @@ public class IslandMenu : MonoBehaviour
 
         for(int i = 0; i < count; i++)
         {
-            string island = generator.Generate();
-            tempIslands[i] = new Island("#"+island, island, "000000000000");
+            int type = Mathf.FloorToInt(Random.value * 3);
+            tempIslands[i] = generator.Generate(type, 0.5f);
+
+            if (type == 0 || type == 1)
+                tempIslands[i].name = "#" + tempIslands[i].name;
+            else if(type == 2)
+                tempIslands[i].name = "$" + tempIslands[i].name;
         }
 
         return tempIslands;

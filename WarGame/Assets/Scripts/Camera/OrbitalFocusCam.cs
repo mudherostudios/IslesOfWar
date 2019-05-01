@@ -7,13 +7,13 @@ public class OrbitalFocusCam : MonoBehaviour
 {
     public Transform focalTarget, observePoint;
     public Camera cam;
-    public float rotationSpeed, camDistance, lerpSpeed, rotLerpSpeed, deltaSensitivity;
+    public float rotationSpeed, camDistance, lerpSpeed, observeLerpSpeed, deltaSensitivity;
     public bool exploring;
 
     private bool observing, hasMoved, tracking, centered;
     private Vector3 lastMouse, lastPos;
     private Quaternion lastRot;
-    private float startTime, moveDistance, rotateAngle;
+    private float startTime;
     private DepthOfField dof;
     private PostProcessVolume ppVolume;
 
@@ -29,7 +29,6 @@ public class OrbitalFocusCam : MonoBehaviour
         centered = true;
         lastMouse = Vector3.zero;
         startTime = Time.time;
-        moveDistance = 0;
     }
 
     void Update()
@@ -60,7 +59,6 @@ public class OrbitalFocusCam : MonoBehaviour
                                 lastPos = transform.position;
                                 centered = false;
                                 startTime = Time.time;
-                                moveDistance = Vector3.Distance(lastPos, focalTarget.position);
                             }
                         }
                     }
@@ -74,8 +72,8 @@ public class OrbitalFocusCam : MonoBehaviour
         {
             if (!observing)
             {
-                float angleCovered = (Time.time - startTime) * rotLerpSpeed;
-                float fracRotation = angleCovered / rotateAngle;
+                float angleCovered = (Time.time - startTime);
+                float fracRotation = angleCovered / observeLerpSpeed;
 
                 transform.rotation = Quaternion.Lerp(lastRot, observePoint.rotation, fracRotation);
 
@@ -89,13 +87,19 @@ public class OrbitalFocusCam : MonoBehaviour
         if (!centered)
         {
             dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
-            float distCovered = (Time.time - startTime) * lerpSpeed;
-            float fracJourney = distCovered / moveDistance;
+            float timeTraversed = (Time.time - startTime);
+            float fracJourney = 0;
 
-            if(!exploring)
+            if (!exploring)
+            {
+                fracJourney = timeTraversed / observeLerpSpeed;
                 transform.position = Vector3.Lerp(lastPos, observePoint.position, fracJourney);
+            }
             else
+            {
+                fracJourney = timeTraversed / lerpSpeed;
                 transform.position = Vector3.Lerp(lastPos, focalTarget.position, fracJourney);
+            }
 
             if (fracJourney >= 1.0f)
             {
@@ -137,14 +141,11 @@ public class OrbitalFocusCam : MonoBehaviour
 
         if (!explore)
         {
-            moveDistance = Vector3.Distance(lastPos, observePoint.position);
-            rotateAngle = Quaternion.Angle(lastRot, observePoint.rotation);
             exploring = false;
             observing = false;
         }
         else
         {
-            moveDistance = Vector3.Distance(lastPos, focalTarget.position);
             exploring = true;
             observing = false;
         }
