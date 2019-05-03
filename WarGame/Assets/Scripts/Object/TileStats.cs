@@ -6,4 +6,5 @@ public class TileStats : MonoBehaviour
 {
     public GameObject[] resourceParents;
     public GameObject[] collectorParents;
+    public GameObject water;
 }

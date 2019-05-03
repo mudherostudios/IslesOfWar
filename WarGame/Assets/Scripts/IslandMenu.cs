@@ -195,6 +195,8 @@ public class IslandMenu : MonoBehaviour
                 parent.fogs[1].eulerAngles = new Vector3(0, Random.value * 360, 0);
                 parent.fogs[0].gameObject.SetActive(true);
                 parent.fogs[1].gameObject.SetActive(true);
+                if(tempTile.GetComponent<TileStats>().water != null)
+                    tempTile.GetComponent<TileStats>().water.SetActive(false);
             }
         }
     }
