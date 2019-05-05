@@ -6,13 +6,15 @@ using UnityEngine.Rendering.PostProcessing;
 public class OrbitalFocusCam : MonoBehaviour
 {
     public Transform focalTarget, observePoint;
+    public Vector3 exploreOffset;
+    public float exploreAngle;
     public Camera cam;
     public float rotationSpeed, camDistance, lerpSpeed, observeLerpSpeed, deltaSensitivity;
     public bool exploring;
 
-    private bool observing, hasMoved, tracking, centered;
-    private Vector3 lastMouse, lastPos;
-    private Quaternion lastRot;
+    private bool hasMoved, tracking, centered, offset;
+    private Vector3 lastMouse, lastPos, lastCamPos, camTargetPos;
+    private Quaternion lastRot, lastCamRot;
     private float startTime;
     private DepthOfField dof;
     private PostProcessVolume ppVolume;
@@ -25,8 +27,8 @@ public class OrbitalFocusCam : MonoBehaviour
         exploring = false;
         hasMoved = false;
         tracking = false;
-        observing = true;
         centered = true;
+        offset = false;
         lastMouse = Vector3.zero;
         startTime = Time.time;
     }
@@ -68,42 +70,42 @@ public class OrbitalFocusCam : MonoBehaviour
                 tracking = false;
             }
         }
-        else
-        {
-            if (!observing)
-            {
-                float angleCovered = (Time.time - startTime);
-                float fracRotation = angleCovered / observeLerpSpeed;
 
-                transform.rotation = Quaternion.Lerp(lastRot, observePoint.rotation, fracRotation);
-
-                if (fracRotation >= 1.0f)
-                {
-                    observing = true;
-                }
-            }
-        }
 
         if (!centered)
         {
             dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
             float timeTraversed = (Time.time - startTime);
             float fracJourney = 0;
-
+            
             if (!exploring)
             {
                 fracJourney = timeTraversed / observeLerpSpeed;
                 transform.position = Vector3.Lerp(lastPos, observePoint.position, fracJourney);
+                transform.rotation = Quaternion.Lerp(lastRot, Quaternion.Euler(0, observePoint.rotation.eulerAngles.y, 0), fracJourney);
+
+                if (!offset)
+                {
+                    cam.transform.localPosition = Vector3.Lerp(lastCamPos, Vector3.zero, fracJourney);
+                    cam.transform.localRotation = Quaternion.Lerp(lastCamRot, Quaternion.Euler(observePoint.eulerAngles.x,0,0), fracJourney);
+                }
             }
             else
             {
                 fracJourney = timeTraversed / lerpSpeed;
                 transform.position = Vector3.Lerp(lastPos, focalTarget.position, fracJourney);
+
+                if (!offset)
+                {
+                    cam.transform.localPosition = Vector3.Lerp(lastCamPos, exploreOffset, fracJourney);
+                    cam.transform.localRotation = Quaternion.Lerp(lastCamRot, Quaternion.Euler(25, 0, 0), fracJourney);
+                }
             }
 
             if (fracJourney >= 1.0f)
             {
                 centered = true;
+                offset = true;
             }
         }
     }
@@ -132,22 +134,40 @@ public class OrbitalFocusCam : MonoBehaviour
     public void ExploreMode(Transform explorationPoint, bool explore)
     {
         focalTarget = explorationPoint;
-        lastPos = transform.position;
-        lastRot = transform.rotation;
-        startTime = Time.time;
-        centered = false;
-        hasMoved = false;
-        tracking = false;
+        ResetState();
 
         if (!explore)
         {
             exploring = false;
-            observing = false;
+            camTargetPos = Vector3.zero;
         }
         else
         {
             exploring = true;
-            observing = false;
+            camTargetPos = exploreOffset;
         }
+    }
+
+    public void SetNewObservePoint(Transform newObservePoint, Transform newFocalTarget)
+    {
+        if(newObservePoint != null)
+            observePoint = newObservePoint;
+        if(newFocalTarget != null)
+            focalTarget = newFocalTarget;
+
+        ResetState();
+    }
+
+    void ResetState()
+    {
+        lastPos = transform.position;
+        lastRot = transform.rotation;
+        lastCamPos = cam.transform.localPosition;
+        lastCamRot = cam.transform.localRotation;
+        startTime = Time.time;
+        centered = false;
+        hasMoved = false;
+        tracking = false;
+        offset = false;
     }
 }

@@ -16,7 +16,8 @@ public class IslandMenu : MonoBehaviour
 
     public Camera cam;
     public OrbitalFocusCam orbital;
-    public Transform observationFocus;
+    public Transform defaultObservePoint;
+    public Transform defaultObservationFocus;
 
     [Header("GUI Update")]
     public GameObject[] searchGUIElements;
@@ -39,6 +40,10 @@ public class IslandMenu : MonoBehaviour
     [Header("Discovery Generation")]
     public Transform[] spawnPositions;
     public Vector3 maxPositionAdjustment;
+    public Transform threeIslandObservationPoint;
+    public Transform fiveIslandObservationPoint;
+    public Transform threeIslandFocus;
+    public Transform fiveIslandFocus;
 
     private int islandIndex;
     private GameObject currentIsland, bufferedIsland;
@@ -111,7 +116,7 @@ public class IslandMenu : MonoBehaviour
 
     public void IslandQueue()
     {
-        orbital.ExploreMode(observationFocus, false);
+        orbital.ExploreMode(defaultObservationFocus, false);
         ToggleGUIElementsTo(searchGUIElements, true);
         ToggleGUIElementsTo(exploreGUIElements, false);
     }
@@ -204,14 +209,28 @@ public class IslandMenu : MonoBehaviour
     //Server Call
     void DiscoverRandomIslands(int missionType)
     {
-        IslandDiscovery discovery = new IslandDiscovery(new ulong[] { 100, 10000, 10 }, new float[] { 0.5f, 0.375f, 0.75f });
+        IslandDiscovery discovery = null;
+
+        if (missionType >= 0)
+        {
+            discovery = new IslandDiscovery(new ulong[] { 100, 10000, 10 }, new float[] { 0.5f, 0.375f, 0.75f });
+            currentIsland.SetActive(false);
+        }
 
         if (missionType == 0)
+        {
             discoveredIslands = discovery.GetIslands(3);
-        else if(missionType == 1)
+            orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
+        }
+        else if (missionType == 1)
+        {
             discoveredIslands = discovery.GetIslands(5);
-        else
-            discoveredIslands = discovery.GetIslands(1); //Just easy way of telling if its broken
+            orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
+        }
+        else if (missionType == -1)
+        {
+            orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
+        }
     }
 
     public void GenerateDiscoveryIslands(int missionType)
