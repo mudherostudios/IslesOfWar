@@ -22,6 +22,8 @@ public class IslandMenu : MonoBehaviour
     [Header("GUI Update")]
     public GameObject[] searchGUIElements;
     public GameObject[] exploreGUIElements;
+    public GameObject[] discoveryGUIElements;
+    public GameObject[] inspectGUIElements;
     public Text islandName;
 
     [Header ("Prefabs")]
@@ -44,6 +46,7 @@ public class IslandMenu : MonoBehaviour
     public Transform fiveIslandObservationPoint;
     public Transform threeIslandFocus;
     public Transform fiveIslandFocus;
+    public string discoveryText;
 
     private int islandIndex;
     private GameObject currentIsland, bufferedIsland;
@@ -51,14 +54,17 @@ public class IslandMenu : MonoBehaviour
     private int direction;
     private Island[] discoveredIslands;
     private GameObject[] discoveredIslandObjects;
+    StateMaster stateMaster;
     
 
     public void Start()
     {
+        stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
+        stateMaster.GetStates(islandCount);
+
+        islands = stateMaster.playerState.islands;
         islandIndex = 0;
         direction = 0;
-
-        islands = GetRandomIslands(islandCount);
 
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
@@ -105,8 +111,17 @@ public class IslandMenu : MonoBehaviour
                         else if (button.buttonType == "IslandTile")
                         {
                             orbital.ExploreMode(hit.transform, true);
-                            ToggleGUIElementsTo(searchGUIElements, false);
-                            ToggleGUIElementsTo(exploreGUIElements, true);
+
+                            if (orbital.observePoint == defaultObservePoint)
+                            {
+                                ToggleGUIElementsTo(searchGUIElements, false);
+                                ToggleGUIElementsTo(exploreGUIElements, true);
+                            }
+                            else
+                            {
+                                ToggleGUIElementsTo(discoveryGUIElements, false);
+                                ToggleGUIElementsTo(inspectGUIElements, true);
+                            }
                         }
                     }
                 }
@@ -114,11 +129,21 @@ public class IslandMenu : MonoBehaviour
         }
     }
 
-    public void IslandQueue()
+    public void IslandQueue(int type)
     {
+
         orbital.ExploreMode(defaultObservationFocus, false);
-        ToggleGUIElementsTo(searchGUIElements, true);
-        ToggleGUIElementsTo(exploreGUIElements, false);
+
+        if (type == 0)
+        {
+            ToggleGUIElementsTo(searchGUIElements, true);
+            ToggleGUIElementsTo(exploreGUIElements, false);
+        }
+        else if (type == 1)
+        {
+            ToggleGUIElementsTo(discoveryGUIElements, true);
+            ToggleGUIElementsTo(inspectGUIElements, false);
+        }
     }
 
     public void RefreshIsland(int increment)
@@ -206,54 +231,58 @@ public class IslandMenu : MonoBehaviour
         }
     }
 
-    //Server Call
     void DiscoverRandomIslands(int missionType)
     {
-        IslandDiscovery discovery = null;
-
         if (missionType >= 0)
         {
-            discovery = new IslandDiscovery(new ulong[] { 100, 10000, 10 }, new float[] { 0.5f, 0.375f, 0.75f });
             currentIsland.SetActive(false);
+            islandName.text = discoveryText;
         }
 
         if (missionType == 0)
         {
-            discoveredIslands = discovery.GetIslands(3);
+            discoveredIslands = stateMaster.DiscoverIslands(3);
             orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
         }
         else if (missionType == 1)
         {
-            discoveredIslands = discovery.GetIslands(5);
+            discoveredIslands = stateMaster.DiscoverIslands(5);
             orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
         }
         else if (missionType == -1)
         {
             orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
+            currentIsland.SetActive(true);
+            islandName.text = islands[islandIndex].name;
         }
     }
 
     public void GenerateDiscoveryIslands(int missionType)
     {
+        //Talks to Server
         DiscoverRandomIslands(missionType);
-        int count = 1;
 
-        if (missionType == 0)
-            count = 3;
-        else if (missionType == 1)
-            count = 5;
-
-        int discoveredIndex = 0;
-        discoveredIslandObjects = new GameObject[count];
-
-        for (int i = 0; i < count; i++, discoveredIndex++)
+        if (missionType >= 0)
         {
-            Vector3 pos = spawnPositions[i].position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f),0, Random.Range(-1.0f, 1.0f)));
-            Vector3 rot = new Vector3(0, Random.value*360, 0);
-            discoveredIslandObjects[discoveredIndex] = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x,rot.y,rot.z));
-            IslandStats stats = discoveredIslandObjects[discoveredIndex].transform.GetComponent<IslandStats>();
-            stats.animator.enabled = false;
-            PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
+            int count = 1;
+
+            if (missionType == 0)
+                count = 3;
+            else if (missionType == 1)
+                count = 5;
+
+            int discoveredIndex = 0;
+            discoveredIslandObjects = new GameObject[count];
+
+            for (int i = 0; i < count; i++, discoveredIndex++)
+            {
+                Vector3 pos = spawnPositions[i].position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f)));
+                Vector3 rot = new Vector3(0, Random.value * 360, 0);
+                discoveredIslandObjects[discoveredIndex] = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x, rot.y, rot.z));
+                IslandStats stats = discoveredIslandObjects[discoveredIndex].transform.GetComponent<IslandStats>();
+                stats.animator.enabled = false;
+                PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
+            }
         }
         
     }
@@ -325,25 +354,6 @@ public class IslandMenu : MonoBehaviour
         return converted;
     }
 
-    //Server Call
-    Island[] GetRandomIslands(int count)
-    {
-        IslandGenerator generator = new IslandGenerator();
-        Island[] tempIslands = new Island[count];
-
-        for(int i = 0; i < count; i++)
-        {
-            int type = Mathf.FloorToInt(Random.value * 3);
-            tempIslands[i] = generator.Generate(type, 0.5f);
-
-            if (type == 0 || type == 1)
-                tempIslands[i].name = "#" + tempIslands[i].name;
-            else if(type == 2)
-                tempIslands[i].name = "$" + tempIslands[i].name;
-        }
-
-        return tempIslands;
-    }
 
     void ToggleGUIElementsTo(GameObject[] guiElements, bool active)
     {

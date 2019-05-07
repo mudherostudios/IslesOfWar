@@ -5,6 +5,9 @@ using ClientSide;
 
 namespace ServerSide
 {
+    //All mock code as a place holders in this namespace. 
+    //Real server code will just be an API interface that converts to an object.
+
     public class IslandDiscovery
     {
         public ulong[] islandCounts;
@@ -13,6 +16,7 @@ namespace ServerSide
 
         public IslandDiscovery(ulong[] _islandCounts, float[] likelihoods)
         {
+            //Indices
             //0 - Player Owned
             //1 - Undiscovered
             //2 - Depleted

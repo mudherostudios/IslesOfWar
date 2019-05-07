@@ -24,17 +24,82 @@ namespace ClientSide
     public struct Cost
     {
         public ulong warbucks, oil, metal, concrete;
-        public ulong amount;
+        public long amount;
+        public ulong bigAmount;
         public string type;
 
-        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, ulong _amount, string _type)
+        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, long _amount, string _type)
         {
             warbucks = _warbucks;
             oil = _oil;
             metal = _metal;
             concrete = _concrete;
             amount = _amount;
+
+            if (amount > 0)
+                bigAmount = (ulong)_amount;
+            else
+                bigAmount = 0;
+
             type = _type;
+        }
+
+        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, ulong _bigAmount, string _type)
+        {
+            warbucks = _warbucks;
+            oil = _oil;
+            metal = _metal;
+            concrete = _concrete;
+            amount = 0;
+            bigAmount = _bigAmount;
+            type = _type;
+        }
+    }
+
+    public class PurchaseTable
+    {
+        public Cost riflemanCost;
+        public Cost machineGunnerCost;
+        public Cost bazookamanCost;
+        public Cost lightTankCost;
+        public Cost mediumTankCost;
+        public Cost heavyTankCost;
+        public Cost lightFighterCost;
+        public Cost mediumFighterCost;
+        public Cost bomberCost;
+        public Cost troopBunkerCost;
+        public Cost tankBunkerCost;
+        public Cost aircraftBunkerCost;
+        public Cost troopBlockerCost;
+        public Cost tankBlockerCost;
+        public Cost aircraftBlockerCost;
+
+        public PurchaseTable(Cost[] costs)
+        {
+            riflemanCost = costs[0];
+            machineGunnerCost = costs[1];
+            bazookamanCost = costs[2];
+            lightTankCost = costs[3];
+            mediumTankCost = costs[4];
+            heavyTankCost = costs[5];
+            lightFighterCost = costs[6];
+            mediumFighterCost = costs[7];
+            bomberCost = costs[8];
+            troopBunkerCost = costs[9];
+            tankBunkerCost = costs[10];
+            aircraftBunkerCost = costs[11];
+            troopBlockerCost = costs[12];
+            tankBlockerCost = costs[13];
+            aircraftBlockerCost = costs[14];
+        }
+
+        public Cost[] Costs
+        {
+            get
+            {
+                return new Cost[] {riflemanCost, machineGunnerCost, bazookamanCost, lightTankCost, mediumTankCost, heavyTankCost, lightFighterCost, mediumFighterCost, bomberCost,
+                    troopBunkerCost, tankBunkerCost, aircraftBunkerCost, troopBlockerCost, tankBunkerCost, aircraftBunkerCost};
+            }
         }
     }
 
@@ -69,17 +134,17 @@ namespace ClientSide
 
     public class PlayerState 
     {
-        public ulong riflemen, machineGunners, bazookas;
+        public ulong riflemen, machineGunners, bazookamen;
         public ulong lightTanks, mediumTanks, heavyTanks;
         public ulong lightFighters, mediumFighters, bombers;
         public ulong warbucks, oil, metal, concrete;
-        public uint[] islands;
+        public Island[] islands;
 
-        public PlayerState(ulong[] unitCounts, ulong[] resourceCounts, uint[] islandCounts)
+        public PlayerState(ulong[] unitCounts, ulong[] resourceCounts, Island[] _islands)
         {
             riflemen = unitCounts[0];
             machineGunners = unitCounts[1];
-            bazookas = unitCounts[2];
+            bazookamen = unitCounts[2];
             lightTanks = unitCounts[3];
             mediumTanks = unitCounts[4];
             heavyTanks = unitCounts[5];
@@ -92,8 +157,38 @@ namespace ClientSide
             metal = resourceCounts[2];
             concrete = resourceCounts[3];
 
-            //Don't remember wtf I was thinking for this one.
-            islands = islandCounts;
+            islands = _islands;
+        }
+
+        public void UpdateResources(Cost cost, int modifier)
+        {
+            modifier *= (int)cost.amount;
+            warbucks -= (ulong)((long)cost.warbucks * modifier);
+            oil -= (ulong)((long)cost.oil * modifier);
+            metal -= (ulong)((long)cost.metal * modifier); ;
+            concrete -= (ulong)((long)cost.concrete * modifier);
+        }
+
+        public void UpdateUnits(long count, string type)
+        {
+            if (type == "rifleman")
+                riflemen = (ulong)((long)(riflemen) + count);
+            else if(type == "machineGunner")
+                machineGunners = (ulong)((long)(machineGunners) + count);
+            else if (type == "bazookaman")
+                bazookamen = (ulong)((long)(bazookamen) + count);
+            else if (type == "lightTank")
+                lightTanks = (ulong)((long)(lightTanks) + count);
+            else if (type == "mediumTank")
+                mediumTanks = (ulong)((long)(mediumTanks) + count);
+            else if (type == "heavyTank")
+                heavyTanks = (ulong)((long)(heavyTanks) + count);
+            else if (type == "lightFighter")
+                lightFighters = (ulong)((long)(lightFighters) + count);
+            else if (type == "mediumFighter")
+                mediumFighters = (ulong)((long)(mediumFighters) + count);
+            else if (type == "bomber")
+                bombers = (ulong)((long)(bombers) + count);
         }
     }
 }

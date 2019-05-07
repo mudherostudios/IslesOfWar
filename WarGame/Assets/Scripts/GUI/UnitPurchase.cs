@@ -20,7 +20,7 @@ public class UnitPurchase: WorldGUI
 
     public Cost TryPurchase()
     {
-        unitCost.amount = fieldAmounts[0];
+        unitCost.bigAmount = fieldAmounts[0];
         Reset(false);
         return unitCost;
     }
