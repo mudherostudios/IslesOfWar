@@ -60,7 +60,8 @@ public class IslandMenu : MonoBehaviour
     public void Start()
     {
         stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
-        stateMaster.GetStates(islandCount);
+        stateMaster.InitilializeConnection();
+        stateMaster.GetState();
 
         islands = stateMaster.playerState.islands;
         islandIndex = 0;
@@ -241,13 +242,23 @@ public class IslandMenu : MonoBehaviour
 
         if (missionType == 0)
         {
-            discoveredIslands = stateMaster.DiscoverIslands(3);
-            orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
+            FakeIslandJson islandData = stateMaster.SendIslandDiscoveryRequest(3);
+
+            if (islandData.success)
+            {
+                discoveredIslands = islandData.islands;
+                orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
+            }
         }
         else if (missionType == 1)
         {
-            discoveredIslands = stateMaster.DiscoverIslands(5);
-            orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
+            FakeIslandJson islandData = stateMaster.SendIslandDiscoveryRequest(5);
+
+            if (islandData.success)
+            {
+                discoveredIslands = islandData.islands;
+                orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
+            }
         }
         else if (missionType == -1)
         {

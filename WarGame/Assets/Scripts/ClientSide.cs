@@ -4,6 +4,34 @@ using UnityEngine;
 
 namespace ClientSide
 {
+    public struct FakeStateJson
+    {
+        public PlayerState player;
+        public WorldState world;
+        public PurchaseTable table;
+        public bool success;
+
+        public FakeStateJson(PlayerState p, WorldState w, PurchaseTable t, bool s)
+        {
+            player = p;
+            world = w;
+            table = t;
+            success = s;
+        }
+    }
+
+    public struct FakeIslandJson
+    {
+        public Island[] islands;
+        public bool success;
+
+        public FakeIslandJson(Island[] i, bool s)
+        {
+            islands = i;
+            success = s;
+        }
+    }
+
     public struct Island
     {
         public string name, features, collectors;
@@ -53,6 +81,21 @@ namespace ClientSide
             amount = 0;
             bigAmount = _bigAmount;
             type = _type;
+        }
+
+        public void ResetAmount()
+        {
+            amount = 0;
+            bigAmount = 0;
+        }
+
+        public void SetAmount(long _amount)
+        {
+            amount = _amount;
+            if (_amount >= 0)
+                bigAmount = (ulong)_amount;
+            else
+                bigAmount = 0;
         }
     }
 
@@ -130,6 +173,38 @@ namespace ClientSide
             poolTimer = timer;
             timeRecieved = Time.time;
         }
+
+        public float GetContributionPercent(string pool, ulong amount)
+        {
+            float percent = 0;
+            double totalContributions = 0;
+            ulong contributingAmount = amount;
+
+            if (pool == "warbucks")
+            {
+                totalContributions = warbucksTotalContributions;
+                contributingAmount += warbucksContributed;
+            }
+            else if (pool == "oil")
+            {
+                totalContributions = oilTotalContributions;
+                contributingAmount += oilContributed;
+            }
+            else if (pool == "metal")
+            {
+                totalContributions = metalTotalContributions;
+                contributingAmount += metalContributed;
+            }
+            else if (pool == "concrete")
+            {
+                totalContributions = concreteTotalContributions;
+                contributingAmount += concreteContributed;
+            }
+
+            percent = (float)(totalContributions / contributingAmount);
+
+            return percent;
+        }
     }
 
     public class PlayerState 
@@ -158,37 +233,6 @@ namespace ClientSide
             concrete = resourceCounts[3];
 
             islands = _islands;
-        }
-
-        public void UpdateResources(Cost cost, int modifier)
-        {
-            modifier *= (int)cost.amount;
-            warbucks -= (ulong)((long)cost.warbucks * modifier);
-            oil -= (ulong)((long)cost.oil * modifier);
-            metal -= (ulong)((long)cost.metal * modifier); ;
-            concrete -= (ulong)((long)cost.concrete * modifier);
-        }
-
-        public void UpdateUnits(long count, string type)
-        {
-            if (type == "rifleman")
-                riflemen = (ulong)((long)(riflemen) + count);
-            else if(type == "machineGunner")
-                machineGunners = (ulong)((long)(machineGunners) + count);
-            else if (type == "bazookaman")
-                bazookamen = (ulong)((long)(bazookamen) + count);
-            else if (type == "lightTank")
-                lightTanks = (ulong)((long)(lightTanks) + count);
-            else if (type == "mediumTank")
-                mediumTanks = (ulong)((long)(mediumTanks) + count);
-            else if (type == "heavyTank")
-                heavyTanks = (ulong)((long)(heavyTanks) + count);
-            else if (type == "lightFighter")
-                lightFighters = (ulong)((long)(lightFighters) + count);
-            else if (type == "mediumFighter")
-                mediumFighters = (ulong)((long)(mediumFighters) + count);
-            else if (type == "bomber")
-                bombers = (ulong)((long)(bombers) + count);
         }
     }
 }

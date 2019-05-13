@@ -174,6 +174,5 @@ public class PoolContribute: WorldGUI
     {
         Reset();
         Initialize(_state);
-        UpdateAllStats();
     }
 }

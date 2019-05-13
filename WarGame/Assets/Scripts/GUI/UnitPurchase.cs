@@ -20,9 +20,10 @@ public class UnitPurchase: WorldGUI
 
     public Cost TryPurchase()
     {
-        unitCost.bigAmount = fieldAmounts[0];
+        Cost tryCost = unitCost;
+        tryCost.SetAmount((long)fieldAmounts[0]);
         Reset(false);
-        return unitCost;
+        return tryCost;
     }
 
     public void Reset(bool setCost)
@@ -30,7 +31,7 @@ public class UnitPurchase: WorldGUI
         Reset();
 
         if (setCost)
-            unitCost.amount = 0;
+            unitCost.ResetAmount();
     }
     
 
