@@ -21,17 +21,9 @@ public class UnitPurchase: WorldGUI
     public Cost TryPurchase()
     {
         Cost tryCost = unitCost;
-        tryCost.SetAmount((long)fieldAmounts[0]);
-        Reset(false);
-        return tryCost;
-    }
-
-    public void Reset(bool setCost)
-    {
+        unitCost.amount = fieldAmounts[0];
         Reset();
-
-        if (setCost)
-            unitCost.ResetAmount();
+        return tryCost;
     }
     
 

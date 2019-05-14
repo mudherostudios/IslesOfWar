@@ -52,50 +52,17 @@ namespace ClientSide
     public struct Cost
     {
         public ulong warbucks, oil, metal, concrete;
-        public long amount;
-        public ulong bigAmount;
+        public ulong amount;
         public string type;
 
-        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, long _amount, string _type)
+        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, ulong _amount, string _type)
         {
             warbucks = _warbucks;
             oil = _oil;
             metal = _metal;
             concrete = _concrete;
             amount = _amount;
-
-            if (amount > 0)
-                bigAmount = (ulong)_amount;
-            else
-                bigAmount = 0;
-
             type = _type;
-        }
-
-        public Cost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, ulong _bigAmount, string _type)
-        {
-            warbucks = _warbucks;
-            oil = _oil;
-            metal = _metal;
-            concrete = _concrete;
-            amount = 0;
-            bigAmount = _bigAmount;
-            type = _type;
-        }
-
-        public void ResetAmount()
-        {
-            amount = 0;
-            bigAmount = 0;
-        }
-
-        public void SetAmount(long _amount)
-        {
-            amount = _amount;
-            if (_amount >= 0)
-                bigAmount = (ulong)_amount;
-            else
-                bigAmount = 0;
         }
     }
 

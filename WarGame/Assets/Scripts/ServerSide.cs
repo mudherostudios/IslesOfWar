@@ -286,30 +286,35 @@ namespace ServerSide
 
         public FakeStateJson ContributeToPool(Cost resources)
         {
-            if (CanSpendResources(resources))
+            if (CanSpendResources(resources, true))
             {
-                SpendResources(resources);
+                SpendResources(resources, true);
 
-                if (resources.type == "warbucks")
+                if (resources.type == "warbucksPool")
                 {
-                    worldState.warbucksTotalContributions += resources.bigAmount;
-                    worldState.warbucksContributed += resources.bigAmount;
+                    worldState.warbucksTotalContributions += resources.amount;
+                    worldState.warbucksContributed += resources.amount;
                 }
-                else if (resources.type == "oil")
+                else if (resources.type == "oilPool")
                 {
-                    worldState.oilTotalContributions += resources.bigAmount;
-                    worldState.oilContributed += resources.bigAmount;
+                    worldState.oilTotalContributions += resources.amount;
+                    worldState.oilContributed += resources.amount;
                 }
-                else if (resources.type == "metal")
+                else if (resources.type == "metalPool")
                 {
-                    worldState.metalTotalContributions += resources.bigAmount;
-                    worldState.metalContributed += resources.bigAmount;
+                    worldState.metalTotalContributions += resources.amount;
+                    worldState.metalContributed += resources.amount;
                 }
-                else if (resources.type == "concrete")
+                else if (resources.type == "concretePool")
                 {
-                    worldState.concreteTotalContributions += resources.bigAmount;
-                    worldState.concreteContributed += resources.bigAmount;
+                    worldState.concreteTotalContributions += resources.amount;
+                    worldState.concreteContributed += resources.amount;
                 }
+
+                worldState.warbucksPool += resources.warbucks;
+                worldState.oilPool += resources.oil;
+                worldState.metalPool += resources.metal;
+                worldState.concretePool += resources.concrete;
 
                 return new FakeStateJson(playerState, worldState, purchaseTable, true);
             }
@@ -319,28 +324,28 @@ namespace ServerSide
 
         public FakeStateJson PurchaseUnits(Cost cost)
         {
-            if (CanSpendResources(cost))
+            if (CanSpendResources(cost, false))
             {
-                SpendResources(cost);
+                SpendResources(cost, false);
 
                 if (cost.type == "rifleman")
-                    playerState.riflemen += cost.bigAmount;
+                    playerState.riflemen += cost.amount;
                 else if (cost.type == "machineGunner")
-                    playerState.machineGunners += cost.bigAmount;
+                    playerState.machineGunners += cost.amount;
                 else if (cost.type == "bazookaman")
-                    playerState.bazookamen += cost.bigAmount;
+                    playerState.bazookamen += cost.amount;
                 else if (cost.type == "lightTank")
-                    playerState.lightTanks += cost.bigAmount;
+                    playerState.lightTanks += cost.amount;
                 else if (cost.type == "mediumTank")
-                    playerState.mediumTanks += cost.bigAmount;
+                    playerState.mediumTanks += cost.amount;
                 else if (cost.type == "heavyTank")
-                    playerState.heavyTanks += cost.bigAmount;
+                    playerState.heavyTanks += cost.amount;
                 else if (cost.type == "lightFighter")
-                    playerState.lightFighters += cost.bigAmount;
+                    playerState.lightFighters += cost.amount;
                 else if (cost.type == "mediumFighter")
-                    playerState.mediumFighters += cost.bigAmount;
+                    playerState.mediumFighters += cost.amount;
                 else if (cost.type == "bomber")
-                    playerState.bombers += cost.bigAmount;
+                    playerState.bombers += cost.amount;
 
                 return new FakeStateJson(playerState, worldState, purchaseTable, true);
             }
@@ -380,12 +385,20 @@ namespace ServerSide
             return tempIslands;
         }
 
-        bool CanSpendResources(Cost resources)
+        bool CanSpendResources(Cost resources, bool isResourcePool)
         {
-            ulong w = resources.warbucks * resources.bigAmount;
-            ulong o = resources.oil * resources.bigAmount;
-            ulong m = resources.metal * resources.bigAmount;
-            ulong c = resources.concrete * resources.bigAmount;
+            ulong w = resources.warbucks;
+            ulong o = resources.oil;
+            ulong m = resources.metal;
+            ulong c = resources.concrete;
+
+            if (!isResourcePool)
+            {
+                w *= resources.amount;
+                o *= resources.amount;
+                m *= resources.amount;
+                c *= resources.amount;
+            }
 
             if (w <= playerState.warbucks && o <= playerState.oil && m <= playerState.metal && c <= playerState.concrete)
             {
@@ -395,12 +408,20 @@ namespace ServerSide
             return false;
         }
 
-        void SpendResources(Cost resources)
+        void SpendResources(Cost resources, bool isResourcePool)
         {
-            ulong w = resources.warbucks * resources.bigAmount;
-            ulong o = resources.oil * resources.bigAmount;
-            ulong m = resources.metal * resources.bigAmount;
-            ulong c = resources.concrete * resources.bigAmount;
+            ulong w = resources.warbucks;
+            ulong o = resources.oil;
+            ulong m = resources.metal;
+            ulong c = resources.concrete;
+
+            if (!isResourcePool)
+            {
+                w *= resources.amount;
+                o *= resources.amount;
+                m *= resources.amount;
+                c *= resources.amount;
+            }
 
             playerState.warbucks -= w;
             playerState.oil -= o;

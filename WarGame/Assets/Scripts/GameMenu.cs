@@ -46,23 +46,8 @@ public class GameMenu : MonoBehaviour
         stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
         stateMaster.InitilializeConnection();
         stateMaster.GetState();
-
-        riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
-        machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
-        bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);
-
-        lightTankPurchase.Initialize(stateMaster.purchaseTable.lightTankCost);
-        mediumTankPurchase.Initialize(stateMaster.purchaseTable.mediumTankCost);
-        heavyTankPurchase.Initialize(stateMaster.purchaseTable.heavyTankCost);
-
-        lightFighterPurchase.Initialize(stateMaster.purchaseTable.lightFighterCost);
-        mediumFighterPurchase.Initialize(stateMaster.purchaseTable.mediumFighterCost);
-        bomberPurchase.Initialize(stateMaster.purchaseTable.bomberCost);
-
-        warbucksPool.Initialize(stateMaster.worldState);
-        oilPool.Initialize(stateMaster.worldState);
-        metalPool.Initialize(stateMaster.worldState);
-        concretePool.Initialize(stateMaster.worldState);
+        InitializeUnitGUIs();
+        InitializePoolGUIs();
 
         isTipping = false;
         SetGUIContents();
@@ -135,7 +120,7 @@ public class GameMenu : MonoBehaviour
                     else if(button.buttonType == "PoolSend")
                     {
                         SendToPool(selectedPoolContribute.TrySend());
-                        selectedPoolContribute.Reset(stateMaster.worldState);
+                        InitializePoolGUIs();
                     }
                     else if (button.buttonType == "MenuRevealer")
                     {
@@ -145,9 +130,9 @@ public class GameMenu : MonoBehaviour
                             selectedWorldUI.gameObject.SetActive(true);
 
                         if (selectedUnitPurchase != null)
-                            selectedUnitPurchase.Reset(true);
+                            selectedUnitPurchase.Reset();
                         if (selectedPoolContribute != null)
-                            selectedPoolContribute.Reset(stateMaster.worldState);
+                            selectedPoolContribute.Reset();
                     }
                 }
                 else
@@ -181,7 +166,7 @@ public class GameMenu : MonoBehaviour
 
     void SendToPool(Cost sendAmount)
     {
-        if (sendAmount.amount != 0 )
+        if (sendAmount.amount != 0)
         {
             stateMaster.SendResourcesToPool(sendAmount);
             SetGUIContents();
@@ -219,6 +204,37 @@ public class GameMenu : MonoBehaviour
             if (toolTip.activeSelf)
                 toolTip.SetActive(false);
         }
+    }
+
+    void InitializePoolGUIs()
+    {
+        warbucksPool.Initialize(stateMaster.worldState);
+        oilPool.Initialize(stateMaster.worldState);
+        metalPool.Initialize(stateMaster.worldState);
+        concretePool.Initialize(stateMaster.worldState);
+    }
+
+    void InitializeUnitGUIs()
+    {
+        riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
+        machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
+        bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);
+
+        lightTankPurchase.Initialize(stateMaster.purchaseTable.lightTankCost);
+        mediumTankPurchase.Initialize(stateMaster.purchaseTable.mediumTankCost);
+        heavyTankPurchase.Initialize(stateMaster.purchaseTable.heavyTankCost);
+
+        lightFighterPurchase.Initialize(stateMaster.purchaseTable.lightFighterCost);
+        mediumFighterPurchase.Initialize(stateMaster.purchaseTable.mediumFighterCost);
+        bomberPurchase.Initialize(stateMaster.purchaseTable.bomberCost);
+    }
+
+    void UpdateAllPoolGUIs()
+    {
+        warbucksPool.UpdateAllStats();
+        oilPool.UpdateAllStats();
+        metalPool.UpdateAllStats();
+        concretePool.UpdateAllStats();
     }
 
     void SetGUIContents()
