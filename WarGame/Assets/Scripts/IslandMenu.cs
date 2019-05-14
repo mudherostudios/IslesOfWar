@@ -54,6 +54,8 @@ public class IslandMenu : MonoBehaviour
     private int direction;
     private Island[] discoveredIslands;
     private GameObject[] discoveredIslandObjects;
+    private bool removingIslands;
+    private float islandRemovalTimer;
     StateMaster stateMaster;
     
 
@@ -66,6 +68,7 @@ public class IslandMenu : MonoBehaviour
         islands = stateMaster.playerState.islands;
         islandIndex = 0;
         direction = 0;
+        removingIslands = false;
 
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
@@ -74,6 +77,7 @@ public class IslandMenu : MonoBehaviour
 
     public void Update()
     {
+        //Check to see if we are centered yet.
         if (direction != 0)
         {
             float leftDist = Vector3.Distance(currentIsland.transform.position, deleteLeft);
@@ -128,17 +132,29 @@ public class IslandMenu : MonoBehaviour
                 }
             }
         }
+
+        //Check to see if we are discovering islands.
+        if (removingIslands)
+        {
+            float timer = Time.time - islandRemovalTimer;
+            if (timer > orbital.observeLerpSpeed)
+            {
+                RemoveIslands();
+            }
+        }
     }
 
     public void IslandQueue(int type)
     {
-
         orbital.ExploreMode(defaultObservationFocus, false);
 
         if (type == 0)
         {
             ToggleGUIElementsTo(searchGUIElements, true);
             ToggleGUIElementsTo(exploreGUIElements, false);
+            removingIslands = true;
+            islandRemovalTimer = Time.time;
+            SetDefaultObservation();
         }
         else if (type == 1)
         {
@@ -262,10 +278,9 @@ public class IslandMenu : MonoBehaviour
         }
         else if (missionType == -1)
         {
-            orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
-            currentIsland.SetActive(true);
-            islandName.text = islands[islandIndex].name;
+            SetDefaultObservation();
         }
+
     }
 
     public void GenerateDiscoveryIslands(int missionType)
@@ -295,7 +310,6 @@ public class IslandMenu : MonoBehaviour
                 PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
             }
         }
-        
     }
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
@@ -365,6 +379,26 @@ public class IslandMenu : MonoBehaviour
         return converted;
     }
 
+    void RemoveIslands()
+    {
+        if (discoveredIslandObjects != null)
+        {
+            for (int i = 0; i < discoveredIslandObjects.Length; i++)
+            {
+                Destroy(discoveredIslandObjects[i]);
+            }
+        }
+
+        discoveredIslandObjects = null;
+        removingIslands = false;
+    }
+
+    void SetDefaultObservation()
+    {
+        orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
+        currentIsland.SetActive(true);
+        islandName.text = islands[islandIndex].name;
+    }
 
     void ToggleGUIElementsTo(GameObject[] guiElements, bool active)
     {
