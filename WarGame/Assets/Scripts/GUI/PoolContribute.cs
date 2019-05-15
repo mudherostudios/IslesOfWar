@@ -73,8 +73,6 @@ public class PoolContribute: WorldGUI
         strModifiers[1] = string.Format("x {0:0.000}", modifiers[1]);
         strModifiers[2] = string.Format("x {0:0.000}", modifiers[2]);
 
-        
-
         switch(poolType)
         {
             case 0:
@@ -95,9 +93,9 @@ public class PoolContribute: WorldGUI
                 modifiers[1] = 0;
                 break;
             case 3:
-                pool = state.oilPool;
-                poolContributions = state.metalTotalContributions;
-                poolContributed = state.metalContributed;
+                pool = state.concretePool;
+                poolContributions = state.concreteTotalContributions;
+                poolContributed = state.concreteContributed;
                 modifiers[2] = 0;
                 break;
             default:
@@ -119,7 +117,7 @@ public class PoolContribute: WorldGUI
         ulong.TryParse(tradeAmounts[0].text, out oil);
         ulong.TryParse(tradeAmounts[1].text, out metal);
         ulong.TryParse(tradeAmounts[2].text, out concrete);
-        ulong contributions = (ulong)((oil * modifiers[0]) + (metal * modifiers[1]) +(concrete * modifiers[2]));
+        ulong contributions = (ulong)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
 
         Cost cost = new Cost(0, oil, metal, concrete, contributions, poolStrType);
         Reset();
@@ -168,12 +166,5 @@ public class PoolContribute: WorldGUI
         tradeAmounts[0].text = fieldAmounts[0].ToString(oilFormat);
         tradeAmounts[1].text = fieldAmounts[1].ToString(metalFormat);
         tradeAmounts[2].text = fieldAmounts[2].ToString(concreteFormat);
-    }
-
-    public void Reset(WorldState _state)
-    {
-        Reset();
-        Initialize(_state);
-        UpdateAllStats();
     }
 }

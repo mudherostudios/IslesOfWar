@@ -20,17 +20,10 @@ public class UnitPurchase: WorldGUI
 
     public Cost TryPurchase()
     {
-        unitCost.bigAmount = fieldAmounts[0];
-        Reset(false);
-        return unitCost;
-    }
-
-    public void Reset(bool setCost)
-    {
+        Cost tryCost = unitCost;
+        unitCost.amount = fieldAmounts[0];
         Reset();
-
-        if (setCost)
-            unitCost.amount = 0;
+        return tryCost;
     }
     
 

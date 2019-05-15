@@ -5,10 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using ClientSide;
 
-public class GameMaster : MonoBehaviour
+public class GameMenu : MonoBehaviour
 {
     //Order for arrays dealing with resources is always warbucks, oil, metal, concrete
-
     public StateMaster stateMaster;
 
     [Header("GUI Elements")]
@@ -45,25 +44,10 @@ public class GameMaster : MonoBehaviour
     void Start()
     {
         stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
-        stateMaster.InitilializePurchaseTable();
-        stateMaster.GetStates(10);
-
-        riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
-        machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
-        bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);
-
-        lightTankPurchase.Initialize(stateMaster.purchaseTable.lightTankCost);
-        mediumTankPurchase.Initialize(stateMaster.purchaseTable.mediumTankCost);
-        heavyTankPurchase.Initialize(stateMaster.purchaseTable.heavyTankCost);
-
-        lightFighterPurchase.Initialize(stateMaster.purchaseTable.lightFighterCost);
-        mediumFighterPurchase.Initialize(stateMaster.purchaseTable.mediumFighterCost);
-        bomberPurchase.Initialize(stateMaster.purchaseTable.bomberCost);
-
-        warbucksPool.Initialize(stateMaster.worldState);
-        oilPool.Initialize(stateMaster.worldState);
-        metalPool.Initialize(stateMaster.worldState);
-        concretePool.Initialize(stateMaster.worldState);
+        stateMaster.InitilializeConnection();
+        stateMaster.GetState();
+        InitializeUnitGUIs();
+        InitializePoolGUIs();
 
         isTipping = false;
         SetGUIContents();
@@ -108,7 +92,6 @@ public class GameMaster : MonoBehaviour
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             
-
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.transform.tag == "WorldButton")
@@ -137,7 +120,7 @@ public class GameMaster : MonoBehaviour
                     else if(button.buttonType == "PoolSend")
                     {
                         SendToPool(selectedPoolContribute.TrySend());
-                        selectedPoolContribute.Reset(stateMaster.worldState);
+                        InitializePoolGUIs();
                     }
                     else if (button.buttonType == "MenuRevealer")
                     {
@@ -147,9 +130,9 @@ public class GameMaster : MonoBehaviour
                             selectedWorldUI.gameObject.SetActive(true);
 
                         if (selectedUnitPurchase != null)
-                            selectedUnitPurchase.Reset(true);
+                            selectedUnitPurchase.Reset();
                         if (selectedPoolContribute != null)
-                            selectedPoolContribute.Reset(stateMaster.worldState);
+                            selectedPoolContribute.Reset();
                     }
                 }
                 else
@@ -176,20 +159,16 @@ public class GameMaster : MonoBehaviour
     {
         if (purchaseAmount.amount != 0)
         {
-            bool canBuy = stateMaster.SendResourceRequest(purchaseAmount);
-
-            if (canBuy)
-                stateMaster.SendUnitRequest(purchaseAmount.amount, purchaseAmount.type);
-
+            stateMaster.SendPurchaseRequest(purchaseAmount);
             SetGUIContents();
         }
     }
 
     void SendToPool(Cost sendAmount)
     {
-        if (sendAmount.amount != 0 )
+        if (sendAmount.amount != 0)
         {
-            stateMaster.SendResourceRequest(sendAmount);
+            stateMaster.SendResourcesToPool(sendAmount);
             SetGUIContents();
         }
     }
@@ -205,7 +184,7 @@ public class GameMaster : MonoBehaviour
             if (toolTip.activeSelf == false)
                 toolTip.SetActive(true);
 
-            if (pos.x < Screen.height / 2)
+            if (pos.x < Screen.width / 2)
                 isLeft = true;
 
             if (pos.y < Screen.height / 2)
@@ -225,6 +204,37 @@ public class GameMaster : MonoBehaviour
             if (toolTip.activeSelf)
                 toolTip.SetActive(false);
         }
+    }
+
+    void InitializePoolGUIs()
+    {
+        warbucksPool.Initialize(stateMaster.worldState);
+        oilPool.Initialize(stateMaster.worldState);
+        metalPool.Initialize(stateMaster.worldState);
+        concretePool.Initialize(stateMaster.worldState);
+    }
+
+    void InitializeUnitGUIs()
+    {
+        riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
+        machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
+        bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);
+
+        lightTankPurchase.Initialize(stateMaster.purchaseTable.lightTankCost);
+        mediumTankPurchase.Initialize(stateMaster.purchaseTable.mediumTankCost);
+        heavyTankPurchase.Initialize(stateMaster.purchaseTable.heavyTankCost);
+
+        lightFighterPurchase.Initialize(stateMaster.purchaseTable.lightFighterCost);
+        mediumFighterPurchase.Initialize(stateMaster.purchaseTable.mediumFighterCost);
+        bomberPurchase.Initialize(stateMaster.purchaseTable.bomberCost);
+    }
+
+    void UpdateAllPoolGUIs()
+    {
+        warbucksPool.UpdateAllStats();
+        oilPool.UpdateAllStats();
+        metalPool.UpdateAllStats();
+        concretePool.UpdateAllStats();
     }
 
     void SetGUIContents()
