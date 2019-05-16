@@ -32,15 +32,40 @@ namespace ClientSide
         }
     }
 
+    public struct PlayerInfo
+    {
+        public string username;
+        public ulong islandCount;
+
+        public PlayerInfo(string _username, ulong _islandCount)
+        {
+            username = _username;
+            islandCount = _islandCount;
+        }
+    }
+
     public struct Island
     {
         public string name, features, collectors;
+        public bool isDepleted;
+        public PlayerInfo owner;
 
-        public Island(string _name, string _features, string _collectors)
+        public Island(string _name, string _features, string _collectors, bool _isDepleted)
         {
             name = _name;
             features = _features;
             collectors = _collectors;
+            isDepleted = _isDepleted;
+            owner = new PlayerInfo();
+        }
+
+        public Island(string _name, string _features, string _collectors, bool _isDepleted, PlayerInfo userInfo)
+        {
+            name = _name;
+            features = _features;
+            collectors = _collectors;
+            isDepleted = _isDepleted;
+            owner = userInfo;
         }
 
         public int totalTiles
