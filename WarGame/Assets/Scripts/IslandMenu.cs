@@ -34,7 +34,6 @@ public class IslandMenu : MonoBehaviour
     [Header("Main Generation")]
     public Vector3 generateCenter;
     public Vector3 genereateRotation;
-    public int islandCount;
     public float islandChangeSpeed;
     public Vector3 deleteLeft;
     public Vector3 deleteRight;
@@ -48,7 +47,7 @@ public class IslandMenu : MonoBehaviour
     public Transform fiveIslandFocus;
     public string discoveryText;
 
-    private int islandIndex;
+    private int islandIndex, islandCount;
     private GameObject currentIsland, bufferedIsland;
     private IslandStats currentStats, bufferedStats;
     private int direction;
@@ -67,6 +66,7 @@ public class IslandMenu : MonoBehaviour
 
         islands = stateMaster.playerState.islands;
         islandIndex = 0;
+        islandCount = islands.Length;
         direction = 0;
         removingIslands = false;
 
@@ -92,7 +92,6 @@ public class IslandMenu : MonoBehaviour
                 bufferedStats = null;
                 direction = 0;
             }
-
         }
         else
         {
@@ -133,7 +132,6 @@ public class IslandMenu : MonoBehaviour
             }
         }
 
-        //Check to see if we are discovering islands.
         if (removingIslands)
         {
             float timer = Time.time - islandRemovalTimer;
@@ -198,7 +196,7 @@ public class IslandMenu : MonoBehaviour
                 islandIndex = islandCount - 1;
             else
                 islandIndex += increment;
-            
+            Debug.Log(islandIndex);
             PlaceTiles(islands[islandIndex], bufferedStats, bufferedIsland.transform, true);
         }
     }
