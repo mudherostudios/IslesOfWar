@@ -7,7 +7,6 @@ namespace ServerSide
 {
     //All mock code as a place holders in this namespace. 
     //Real server code will just be an API interface that converts to an object.
-
     public class IslandDiscovery
     {
         public ulong[] islandCounts;
@@ -238,7 +237,7 @@ namespace ServerSide
             }
 
             if (type == -1)
-                Debug.Log(last);
+                Debug.Log("Check Probability Range");
 
             return type;
         }
