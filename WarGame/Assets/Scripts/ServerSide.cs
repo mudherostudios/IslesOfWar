@@ -153,6 +153,8 @@ namespace ServerSide
             string collectors = "";
             int[] resourceTypes = new int[12];
             TileFeatureLookUp lut = new TileFeatureLookUp();
+            PlayerInfo ownerInfo = new PlayerInfo();
+            bool depleted = false;
 
             for (int t = 0; t < 12; t++)
             {
@@ -163,6 +165,11 @@ namespace ServerSide
             //Owned || Depleted else Undiscovered
             if (type == 0 || type == 2)
             {
+                ownerInfo.username = "owned";
+
+                if (type == 2)
+                    depleted = true;
+
                 float threshold = 0.0f;
 
                 for (int c = 0; c < 12; c++)
@@ -185,7 +192,7 @@ namespace ServerSide
                 collectors = "000000000000";
             }
 
-            Island island = new Island(features, features, collectors);
+            Island island = new Island(features, features, collectors, depleted, ownerInfo);
             return island;
         }
 
