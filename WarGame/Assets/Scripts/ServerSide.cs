@@ -328,6 +328,15 @@ namespace ServerSide
             return new FakeStateJson(playerState, worldState, purchaseTable, false);
         }
 
+        public FakeStateJson AddIsland(Island island)
+        {
+            List<Island> tempIslands = new List<Island>();
+            tempIslands.AddRange(playerState.islands);
+            tempIslands.Add(island);
+            playerState.islands = tempIslands.ToArray();
+            return new FakeStateJson(playerState, worldState, purchaseTable, true);
+        }
+
         public FakeStateJson PurchaseUnits(Cost cost)
         {
             if (CanSpendResources(cost, false))
