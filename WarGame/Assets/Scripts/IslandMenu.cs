@@ -52,6 +52,7 @@ public class IslandMenu : MonoBehaviour
     private IslandStats currentStats, bufferedStats;
     private int direction;
     private Island[] discoveredIslands;
+    private Island selectedDiscoveredIsland;
     private GameObject[] discoveredIslandObjects;
     private bool removingIslands;
     private float islandRemovalTimer;
@@ -126,6 +127,10 @@ public class IslandMenu : MonoBehaviour
                                 ToggleGUIElementsTo(discoveryGUIElements, false);
                                 ToggleGUIElementsTo(inspectGUIElements, true);
                             }
+                        }
+                        else if (button.buttonType == "DiscoveryBadge")
+                        {
+                            selectedDiscoveredIsland = button.logicParent.GetComponent<IslandStats>().islandInfo;
                         }
                     }
                 }
@@ -308,6 +313,11 @@ public class IslandMenu : MonoBehaviour
                 PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
             }
         }
+    }
+
+    public void SubmitSelectedIsland()
+    {
+        FakeStateJson islandSubmission = stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland);
     }
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)

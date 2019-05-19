@@ -54,5 +54,11 @@ public class StateMaster : MonoBehaviour
         FakeIslandJson islandData = server.DiscoverIslands(count);
         return islandData;
     }
+
+    public FakeStateJson SendDiscoveredIslandSelection(Island island)
+    {
+        FakeStateJson jsonData = server.AddIsland(island);
+        return jsonData;
+    }
     //End Server Calls
 }
