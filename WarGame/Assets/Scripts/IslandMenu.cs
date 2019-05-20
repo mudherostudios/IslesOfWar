@@ -24,6 +24,7 @@ public class IslandMenu : MonoBehaviour
     public GameObject[] exploreGUIElements;
     public GameObject[] discoveryGUIElements;
     public GameObject[] inspectGUIElements;
+    public GameObject submitIslandQuery;
     public Text islandName;
 
     [Header ("Prefabs")]
@@ -131,6 +132,7 @@ public class IslandMenu : MonoBehaviour
                         else if (button.buttonType == "DiscoveryBadge")
                         {
                             selectedDiscoveredIsland = button.logicParent.GetComponent<IslandStats>().islandInfo;
+                            submitIslandQuery.SetActive(true);
                         }
                     }
                 }
@@ -201,7 +203,6 @@ public class IslandMenu : MonoBehaviour
                 islandIndex = islandCount - 1;
             else
                 islandIndex += increment;
-            Debug.Log(islandIndex);
             PlaceTiles(islands[islandIndex], bufferedStats, bufferedIsland.transform, true);
         }
     }
@@ -310,6 +311,8 @@ public class IslandMenu : MonoBehaviour
                 discoveredIslandObjects[discoveredIndex] = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x, rot.y, rot.z));
                 IslandStats stats = discoveredIslandObjects[discoveredIndex].transform.GetComponent<IslandStats>();
                 stats.animator.enabled = false;
+                stats.islandInfo = discoveredIslands[discoveredIndex];
+                stats.TurnOnIslandBadge();
                 PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform, false);
             }
         }
@@ -317,7 +320,11 @@ public class IslandMenu : MonoBehaviour
 
     public void SubmitSelectedIsland()
     {
-        FakeStateJson islandSubmission = stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland);
+        if (stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland))
+        {
+            islands = stateMaster.playerState.islands;
+            islandCount = islands.Length;
+        }
     }
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)

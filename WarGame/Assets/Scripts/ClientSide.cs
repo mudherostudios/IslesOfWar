@@ -48,23 +48,26 @@ namespace ClientSide
     {
         public string name, features, collectors;
         public bool isDepleted;
+        public int type;
         public PlayerInfo owner;
 
-        public Island(string _name, string _features, string _collectors, bool _isDepleted)
+        public Island(string _name, string _features, string _collectors, bool _isDepleted, int _type)
         {
             name = _name;
             features = _features;
             collectors = _collectors;
             isDepleted = _isDepleted;
+            type = _type;
             owner = new PlayerInfo();
         }
 
-        public Island(string _name, string _features, string _collectors, bool _isDepleted, PlayerInfo userInfo)
+        public Island(string _name, string _features, string _collectors, bool _isDepleted, int _type, PlayerInfo userInfo)
         {
             name = _name;
             features = _features;
             collectors = _collectors;
             isDepleted = _isDepleted;
+            type = _type;
             owner = userInfo;
         }
 
