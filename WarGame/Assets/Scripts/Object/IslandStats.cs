@@ -6,13 +6,17 @@ public class IslandStats: MonoBehaviour
 {
     public Transform[] hexTiles;
     public Transform[] fogs;
+    public GameObject[] islandBadges;
     public Animator animator;
     public Island islandInfo;
-    public int layer = 0;
-    private float lerpValue;
 
     public int totalTiles
     {
         get { return hexTiles.Length; }
+    }
+
+    public void TurnOnIslandBadge()
+    {
+        islandBadges[islandInfo.type].SetActive(true);
     }
 }

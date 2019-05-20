@@ -16,8 +16,8 @@ namespace ServerSide
         public IslandDiscovery(ulong[] _islandCounts, float[] likelihoods)
         {
             //Indices
-            //0 - Player Owned
-            //1 - Undiscovered
+            //0 - Undiscovered
+            //1 - Player Owned
             //2 - Depleted
             islandCounts = _islandCounts;
             relativeLikelihoods = likelihoods;
@@ -36,7 +36,7 @@ namespace ServerSide
 
             double[] tempProbs = new double[_probabilities.Length];
             probabilities = new float[_probabilities.Length];
-            double totalProbs = 0.0d;
+            double totalProbs = 0.0;
 
             for (int p = 0; p < _probabilities.Length; p++)
             {
@@ -81,8 +81,8 @@ namespace ServerSide
                         You'd need to recalculate everytime for perfect probabilities, 
                         but thats a lot of needless computation. But we will have to account
                         for the possibility of running out of an island type in the real implementation*/
-                        p = probabilities.Length;
                         types[i] = p;
+                        p = probabilities.Length;
                     }
                     else
                     {
@@ -162,9 +162,9 @@ namespace ServerSide
             }
 
             //Owned || Depleted else Undiscovered
-            if (type == 0 || type == 2)
+            if (type == 1 || type == 2)
             {
-                ownerInfo.username = "owned";
+                ownerInfo.username = "Owned";
 
                 if (type == 2)
                     depleted = true;
@@ -182,7 +182,7 @@ namespace ServerSide
                         collectors += 0;
                 }
             }
-            else if (type == 1)
+            else if (type == 0)
             {
                 collectors = "000000000000";
             }
@@ -191,7 +191,7 @@ namespace ServerSide
                 collectors = "000000000000";
             }
 
-            Island island = new Island(features, features, collectors, depleted, ownerInfo);
+            Island island = new Island(features, features, collectors, depleted, type, ownerInfo);
             return island;
         }
 
@@ -375,7 +375,7 @@ namespace ServerSide
 
         public FakeIslandJson DiscoverIslands(int count)
         {
-            IslandDiscovery discovery = new IslandDiscovery(new ulong[] { 100, 10000, 10 }, new float[] { 0.5f, 0.375f, 0.75f });
+            IslandDiscovery discovery = new IslandDiscovery(new ulong[] { 10000, 10000, 10000 }, new float[] { 1, 1, 1 });
             Island[] discoveredIslands = discovery.GetIslands(count);
 
             return new FakeIslandJson(discoveredIslands, true);
@@ -388,13 +388,9 @@ namespace ServerSide
 
             for (int i = 0; i < count; i++)
             {
-                int type = Mathf.FloorToInt(Random.value * 3);
+                int type = tempIslands[i].type;
                 tempIslands[i] = generator.Generate(type, 0.5f);
-
-                if (type == 0 || type == 1)
-                    tempIslands[i].name = "#" + tempIslands[i].name;
-                else if (type == 2)
-                    tempIslands[i].name = "$" + tempIslands[i].name;
+                tempIslands[i].name = "P:" + tempIslands[i].name;
             }
 
             return tempIslands;
