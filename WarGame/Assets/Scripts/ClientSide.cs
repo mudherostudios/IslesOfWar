@@ -209,6 +209,7 @@ namespace ClientSide
         public ulong lightFighters, mediumFighters, bombers;
         public ulong warbucks, oil, metal, concrete;
         public Island[] islands;
+        public Island[] attackableIslands;
 
         public PlayerState(ulong[] unitCounts, ulong[] resourceCounts, Island[] _islands)
         {
@@ -228,6 +229,7 @@ namespace ClientSide
             concrete = resourceCounts[3];
 
             islands = _islands;
+            attackableIslands = new Island[1];
         }
     }
 }
