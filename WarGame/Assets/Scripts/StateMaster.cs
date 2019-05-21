@@ -57,7 +57,12 @@ public class StateMaster : MonoBehaviour
 
     public bool SendDiscoveredIslandSelection(Island island)
     {
-        FakeStateJson jsonData = server.AddIsland(island);
+        bool isAttackable = false;
+
+        if (island.owner.username != "")
+            isAttackable = true;
+
+        FakeStateJson jsonData = server.AddIsland(island, isAttackable);
         SetStates(jsonData);
         return jsonData.success;
     }
