@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Ocean
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _DETAIL_MULX2 _NORMALMAP _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _NORMALMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -29,7 +29,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
-        m_Texture: {fileID: 2800000, guid: 55b7a06b213d60441a6c3891bf3f9fc0, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailMask:
@@ -46,15 +46,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 50, y: 50}
+        m_Scale: {x: 150, y: 150}
         m_Offset: {x: 0, y: 0}
     - _Fresnel:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 55b7a06b213d60441a6c3891bf3f9fc0, type: 3}
-        m_Scale: {x: 50, y: 50}
+        m_Texture: {fileID: 2800000, guid: 50c4ce44ca3ac61469d6a5cd6ebba24e, type: 3}
+        m_Scale: {x: 150, y: 150}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -90,7 +90,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpAmt: 10
-    - _BumpScale: -0.6
+    - _BumpScale: 4.93
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DistortionPower: 10
@@ -98,17 +98,17 @@ Material:
     - _FresnelScale: 4
     - _GerstnerIntensity: 1
     - _GlossMapScale: 0.722
-    - _Glossiness: 1
+    - _Glossiness: 0.794
     - _GlossyReflections: 1
     - _MaxTreshold: 0
-    - _Metallic: 0.231
+    - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _ReflDistort: 0.44
     - _RefrDistort: 0.4
     - _Shininess: 87
-    - _SmoothnessTextureChannel: 1
+    - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _TargetValue: 0
@@ -127,7 +127,7 @@ Material:
     - _BaseColor: {r: 0.54, g: 0.95, b: 0.99, a: 1}
     - _BumpDirection: {r: 1, g: 1, b: -1, a: 1}
     - _BumpTiling: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-    - _Color: {r: 1, g: 1, b: 1, a: 0.20784314}
+    - _Color: {r: 0, g: 0.5878153, b: 1, a: 0.23529412}
     - _DistortParams: {r: 1, g: 1, b: 2, a: 1.15}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Foam: {r: 0.1, g: 0.375, b: 0, a: 0}
