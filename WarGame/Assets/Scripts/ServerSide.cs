@@ -165,7 +165,6 @@ namespace ServerSide
             if (type == 1 || type == 2)
             {
                 ownerInfo.username = "Owned";
-
                 if (type == 2)
                     depleted = true;
 
@@ -191,6 +190,7 @@ namespace ServerSide
                 collectors = "000000000000";
             }
 
+            
             Island island = new Island(features, features, collectors, depleted, type, ownerInfo);
             return island;
         }
@@ -330,19 +330,16 @@ namespace ServerSide
 
         public FakeStateJson AddIsland(Island island, bool isAttackable)
         {
-            Island[] islands = playerState.islands;
-
-            if (isAttackable)
-                islands = playerState.attackableIslands;
-
-            List<Island> tempIslands = new List<Island>();
-            tempIslands.AddRange(islands);
-            tempIslands.Add(island);
-
-            if (isAttackable)
-                playerState.attackableIslands = tempIslands.ToArray();
-            else
+            if (!isAttackable)
+            {
+                List<Island> tempIslands = new List<Island>();
+                tempIslands.AddRange(playerState.islands);
+                tempIslands.Add(island);
                 playerState.islands = tempIslands.ToArray();
+            }
+            else
+                playerState.attackableIslands[0] = island;
+
             return new FakeStateJson(playerState, worldState, purchaseTable, true);
         }
 

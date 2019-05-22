@@ -24,7 +24,7 @@ public class IslandMenu : MonoBehaviour
     public GameObject[] exploreGUIElements;
     public GameObject[] discoveryGUIElements;
     public GameObject[] inspectGUIElements;
-    public GameObject submitIslandQuery;
+    public GameObject submitIslandQuery, overwriteAttackableIsland;
     public Text islandName;
 
     [Header ("Prefabs")]
@@ -132,7 +132,19 @@ public class IslandMenu : MonoBehaviour
                         else if (button.buttonType == "DiscoveryBadge")
                         {
                             selectedDiscoveredIsland = button.logicParent.GetComponent<IslandStats>().islandInfo;
-                            submitIslandQuery.SetActive(true);
+
+                            if (selectedDiscoveredIsland.owner.username != null)
+                            {
+                                if (stateMaster.playerState.attackableIslands[0].owner.username != null)
+                                    overwriteAttackableIsland.SetActive(true);
+                                else
+                                    submitIslandQuery.SetActive(true);
+                            }
+                            else
+                            {
+                                submitIslandQuery.SetActive(true);
+                            }
+                            
                         }
                     }
                 }
@@ -197,20 +209,47 @@ public class IslandMenu : MonoBehaviour
                 currentStats.animator.SetTrigger("Left");
             }
 
-            if (islandIndex + increment >= islandCount)
+            int possibleIndexes = islandCount;
+            int attackableIndexes = stateMaster.playerState.attackableIslands.Length;
+
+            if (stateMaster.playerState.attackableIslands[attackableIndexes-1].owner.username != null)
+                possibleIndexes += attackableIndexes;
+
+            if (islandIndex + increment >= possibleIndexes)
                 islandIndex = 0;
             else if (islandIndex + increment < 0)
-                islandIndex = islandCount - 1;
+                islandIndex = possibleIndexes - 1;
             else
                 islandIndex += increment;
-            PlaceTiles(islands[islandIndex], bufferedStats, bufferedIsland.transform, true);
+
+            Island island = new Island();
+
+            if (islandIndex < islandCount)
+                island = islands[islandIndex];
+            else
+                island = stateMaster.playerState.attackableIslands[possibleIndexes - islandCount - 1];
+
+            PlaceTiles(island, bufferedStats, bufferedIsland.transform, true);
         }
     }
 
     public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent, bool isKnown)
     {
-        if(isKnown)
+        IslandStats parent = tileParent.GetComponent<IslandStats>();
+
+        if (isKnown)
+        {
             islandName.text = island.name;
+        }
+        else
+        {
+            parent.fogs[0].eulerAngles = new Vector3(0, Random.value * 360, 0);
+            parent.fogs[1].eulerAngles = new Vector3(0, Random.value * 360, 0);
+            parent.fogs[0].gameObject.SetActive(true);
+            parent.fogs[1].gameObject.SetActive(true);
+        }
+
+        tileParent.GetComponent<IslandStats>().islandInfo = island;
 
         for (int h = 0; h < island.totalTiles; h++)
         {
@@ -241,11 +280,6 @@ public class IslandMenu : MonoBehaviour
             }
             else
             {
-                IslandStats parent = tileParent.GetComponent<IslandStats>();
-                parent.fogs[0].eulerAngles = new Vector3(0, Random.value * 360, 0);
-                parent.fogs[1].eulerAngles = new Vector3(0, Random.value * 360, 0);
-                parent.fogs[0].gameObject.SetActive(true);
-                parent.fogs[1].gameObject.SetActive(true);
                 if(tempTile.GetComponent<TileStats>().water != null)
                     tempTile.GetComponent<TileStats>().water.SetActive(false);
             }
@@ -412,7 +446,15 @@ public class IslandMenu : MonoBehaviour
     {
         orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
         currentIsland.SetActive(true);
-        islandName.text = islands[islandIndex].name;
+
+        string name = "Error";
+
+        if (islandIndex >= islandCount)
+            name = stateMaster.playerState.attackableIslands[islandIndex - islandCount - 1].name;
+        else
+            name = islands[islandIndex].name;
+
+        islandName.text = name;
     }
 
     void ToggleGUIElementsTo(GameObject[] guiElements, bool active)

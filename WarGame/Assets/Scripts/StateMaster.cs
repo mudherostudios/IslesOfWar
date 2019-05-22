@@ -59,7 +59,7 @@ public class StateMaster : MonoBehaviour
     {
         bool isAttackable = false;
 
-        if (island.owner.username != "")
+        if (island.owner.username != null)
             isAttackable = true;
 
         FakeStateJson jsonData = server.AddIsland(island, isAttackable);
