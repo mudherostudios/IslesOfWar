@@ -32,6 +32,57 @@ namespace ClientSide
         }
     }
 
+    public struct FakeSquadJson
+    {
+        public Squad squad;
+        public bool success;
+
+        public FakeSquadJson(Squad _squad, bool s)
+        {
+            squad = _squad;
+            success = true;
+        }
+    }
+
+    public struct BattlePlan
+    {
+        public string[] squadPlans;
+        public bool isAttacker;
+
+        public BattlePlan(string[] plans, bool attacker)
+        {
+            squadPlans = plans;
+            isAttacker = attacker;
+        }
+    }
+
+    public struct Squad
+    {
+        public ulong riflemen, machineGunners, bazookamen;
+        public ulong lightTanks, mediumTanks, heavyTanks;
+        public ulong lightFighters, mediumFighters, bombers;
+        public ulong troopBunkers, tankBunkers, antiAircrafts;
+
+        public Squad(ulong[] squadCounts)
+        {
+            riflemen = squadCounts[0];
+            machineGunners = squadCounts[1];
+            bazookamen = squadCounts[2];
+
+            lightTanks = squadCounts[3];
+            mediumTanks = squadCounts[4];
+            heavyTanks = squadCounts[5];
+
+            lightFighters = squadCounts[6];
+            mediumFighters = squadCounts[7];
+            bombers = squadCounts[8];
+
+            troopBunkers = squadCounts[9];
+            tankBunkers = squadCounts[10];
+            antiAircrafts = squadCounts[11];
+        }
+    }
+
     public struct PlayerInfo
     {
         public string username;
