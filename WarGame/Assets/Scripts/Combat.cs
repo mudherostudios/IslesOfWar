@@ -92,30 +92,38 @@ namespace Combat
 
     class CombatTables
     {
-        //3x4 grid troop, tanks, aircraft, bunkers
-        public float[,] damageTable, healthTable, modifierTable, orderProbabilityTable;
+        public float[] damageTable, healthTable, orderProbabilityTable;
+        public float[,] modifierTable;
 
         public CombatTables()
         {
-            damageTable = new float[,]
+            damageTable = new float[]
             {
-                {2.0f, 3.0f, 4.0f},
-                {2.5f, 5.0f, 10.0f},
-                {8.0f, 12.0f, 14.0f},
-                {12.0f, 30.0f, 16.0f}
+                2.0f, 3.0f, 4.0f,
+                2.5f, 5.0f, 10.0f,
+                8.0f, 12.0f, 14.0f,
+                12.0f, 30.0f, 16.0f
             };
 
-            healthTable = new float[,]
+            healthTable = new float[]
             {
-                {100.0f, 100.0f, 100.0f},
-                {125.0f, 250.0f, 500.0f},
-                {200.0f, 300.0f, 200.0f},
-                {300.0f, 750.0f, 400.0f}
+                100.0f, 100.0f, 100.0f,
+                125.0f, 250.0f, 500.0f,
+                200.0f, 300.0f, 200.0f,
+                300.0f, 750.0f, 400.0f
+            };
+
+            orderProbabilityTable = new float[]
+            {
+                0.5f, 0.4f, 0.3f,
+                10.1f, 0.085f, 0.065f,
+                0.05f, 0.05f, 0.05f,
+                0.01f, 0.01f, 0.01f
             };
 
             modifierTable = new float[,]
             {
-                //troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, aBunk
+                //12x12 grid troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, aBunk
                 {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
                 {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
                 {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
@@ -129,14 +137,6 @@ namespace Combat
                 {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
                 {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f,}
             };
-
-            orderProbabilityTable = new float[,]
-            {
-                {0.5f, 0.4f, 0.3f},
-                {10.1f, 0.085f, 0.065f},
-                {0.05f, 0.05f, 0.05f},
-                {0.01f, 0.01f, 0.01f}
-            };
         }
     }
 
@@ -144,12 +144,82 @@ namespace Combat
     {
         public Squad blufor, opfor;
         public double bluforTotalHealth, opforTotalHealth;
-        public double blueforTotalDamage, opforTotalDamage;
+        public double bluforTotalDamage, opforTotalDamage;
+        public float[] bluforProbabilities, opforProbabilities;
+        public CombatTables tables = new CombatTables();
 
         public Engagement(Squad _blufor, Squad _opfor)
         {
             blufor = _blufor;
             opfor = _opfor;
+
+            bluforTotalHealth = CalculateTotalHealth(blufor);
+            opforTotalHealth = CalculateTotalHealth(opfor);
+
+            bluforTotalDamage = CalculateTotalDamage(blufor);
+            opforTotalDamage = CalculateTotalDamage(opfor);
+        }
+
+        double CalculateTotalHealth(Squad squad)
+        {
+            long[] units = squad.fullSquad;
+            double totalHealth = 0;
+
+            for (int u = 0; u < units.Length; u++)
+            {
+                totalHealth += units[u] * tables.healthTable[u];
+            }
+
+            return totalHealth;
+        }
+
+        double CalculateTotalDamage(Squad squad)
+        {
+            long[] units = squad.fullSquad;
+            double totalAttack = 0;
+
+            for (int u = 0; u < units.Length; u++)
+            {
+                for (int m = 0; m < units.Length; m++)
+                {
+                    totalAttack += (units[u] * tables.damageTable[u]) * (units[u] * tables.modifierTable[u, m]);
+                }
+            }
+
+            return totalAttack;
+        }
+
+        float[] CalculateUnitProbabilities(Squad squad)
+        {
+            long[] units = squad.fullSquad;
+            float[] relativeProbabilities = new float[units.Length];
+            float[] trueProbabilities = new float[units.Length];
+            float totalRelatives = 0;
+
+            for (int r = 0; r < relativeProbabilities.Length; r++)
+            {
+                relativeProbabilities[r] = (float)(units[r])*tables.orderProbabilityTable[r];
+                totalRelatives += relativeProbabilities[r];
+            }
+
+            for (int t = 0; t < trueProbabilities.Length; t++)
+            {
+                trueProbabilities[t] = relativeProbabilities[t] / totalRelatives;
+            }
+
+            return trueProbabilities;
+        }
+
+        long GetTotalUnitCount(long[] units)
+        {
+            long total = 0;
+
+            for (int u = 0; u < units.Length; u++)
+            {
+                total += units[u];
+            }
+
+            return total;
         }
     }
 }
