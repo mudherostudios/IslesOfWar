@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,23 @@ namespace Combat
         {
             squad = _squad;
             success = true;
+        }
+    }
+
+    public struct EngagementHistory
+    {
+        public long[,] bluforHistory;
+        public long[,] opforHistory;
+
+        public string winner;
+        public Squad remainingSquad;
+
+        public EngagementHistory(long[,] _bluforHistory, long[,] _opforHistory, string _winner, Squad winningSquad)
+        {
+            bluforHistory = _bluforHistory;
+            opforHistory = _opforHistory;
+            winner = _winner;
+            remainingSquad = winningSquad;
         }
     }
 
@@ -34,6 +52,9 @@ namespace Combat
         public long lightTanks, mediumTanks, heavyTanks;
         public long lightFighters, mediumFighters, bombers;
         public long troopBunkers, tankBunkers, antiAircrafts;
+        public double totalHealth, totalDamage;
+        public float[] unitProbabilities;
+        public int damagedUnit;
 
         public Squad(long[] squadCounts)
         {
@@ -52,6 +73,13 @@ namespace Combat
             troopBunkers = squadCounts[9];
             tankBunkers = squadCounts[10];
             antiAircrafts = squadCounts[11];
+
+            totalHealth = 0;
+            totalDamage = 0;
+
+            unitProbabilities = new float[squadCounts.Length];
+
+            damagedUnit = -1;
         }
 
         public long[] fullSquad
@@ -90,7 +118,7 @@ namespace Combat
         }
     }
 
-    class CombatTables
+    public class CombatTables
     {
         public float[] damageTable, healthTable, orderProbabilityTable;
         public float[,] modifierTable;
@@ -123,7 +151,7 @@ namespace Combat
 
             modifierTable = new float[,]
             {
-                //12x12 grid troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, aBunk
+                //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, aBunk
                 {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
                 {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
                 {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
@@ -140,12 +168,9 @@ namespace Combat
         }
     }
 
-    class Engagement
+    public class Engagement
     {
         public Squad blufor, opfor;
-        public double bluforTotalHealth, opforTotalHealth;
-        public double bluforTotalDamage, opforTotalDamage;
-        public float[] bluforProbabilities, opforProbabilities;
         public CombatTables tables = new CombatTables();
 
         public Engagement(Squad _blufor, Squad _opfor)
@@ -153,11 +178,99 @@ namespace Combat
             blufor = _blufor;
             opfor = _opfor;
 
-            bluforTotalHealth = CalculateTotalHealth(blufor);
-            opforTotalHealth = CalculateTotalHealth(opfor);
+            blufor.totalHealth = CalculateTotalHealth(blufor);
+            opfor.totalHealth = CalculateTotalHealth(opfor);
 
-            bluforTotalDamage = CalculateTotalDamage(blufor);
-            opforTotalDamage = CalculateTotalDamage(opfor);
+            blufor.totalDamage = CalculateTotalDamage(blufor);
+            opfor.totalDamage = CalculateTotalDamage(opfor);
+
+            blufor.unitProbabilities = CalculateUnitProbabilities(blufor);
+            opfor.unitProbabilities = CalculateUnitProbabilities(opfor);
+        }
+
+        public EngagementHistory ResolveEngagement()
+        {
+            List<long[]> bluforHistory = new List<long[]>();
+            List<long[]> opforHistory = new List<long[]>();
+            bool engagementIsOver = false;
+            string winner = "";
+            Squad winningSquad = new Squad();
+
+            while (!engagementIsOver)
+            {
+                long[] bluforRemaining = CalculateCasulaties(opfor, blufor);
+                long[] opforRemaining = CalculateCasulaties(blufor, opfor);
+
+                blufor.SetUnits(bluforRemaining);
+                opfor.SetUnits(opforRemaining);
+
+                blufor.totalHealth = CalculateTotalHealth(blufor);
+                opfor.totalHealth = CalculateTotalHealth(opfor);
+
+                blufor.totalDamage = CalculateTotalDamage(blufor);
+                opfor.totalDamage = CalculateTotalDamage(opfor);
+
+                blufor.unitProbabilities = CalculateUnitProbabilities(blufor);
+                opfor.unitProbabilities = CalculateUnitProbabilities(opfor);
+
+                bluforHistory.Add(bluforRemaining);
+                opforHistory.Add(opforRemaining);
+
+                if (blufor.totalHealth == 0 && opfor.totalHealth != 0)
+                {
+                    winner = "opfor";
+                    winningSquad = opfor;
+                    engagementIsOver = true;
+                }
+                else if (blufor.totalHealth != 0 && opfor.totalHealth == 0)
+                {
+                    winner = "blufor";
+                    winningSquad = blufor;
+                    engagementIsOver = true;
+                }
+                else if (blufor.totalHealth == 0 && opfor.totalHealth == 0)
+                {
+                    winner = "lolEveryone be ded";
+                    engagementIsOver = true;
+                }
+            }
+
+            return new EngagementHistory(Get2DHistory(bluforHistory), Get2DHistory(opforHistory), winner, winningSquad);
+        }
+
+        long[] CalculateCasulaties(Squad attacker, Squad defender)
+        {
+            long[]units = defender.fullSquad;
+            double cumulativeDamage = 0;
+
+            if (defender.totalHealth > attacker.totalDamage)
+            {
+                System.Random random = new System.Random();
+
+                while (cumulativeDamage < attacker.totalDamage)
+                {
+                    int deadUnit = defender.damagedUnit;
+
+                    while (deadUnit > -1 && units[deadUnit] == 0)
+                    {
+                        deadUnit = GetUnitByProbability(random, defender.unitProbabilities);
+                    }
+
+                    cumulativeDamage += tables.healthTable[deadUnit];
+
+                    if (attacker.totalDamage - cumulativeDamage > 0)
+                        units[deadUnit]--;
+                    else
+                        defender.damagedUnit = deadUnit;
+                }
+            }
+            else
+            {
+                defender.damagedUnit = -1;
+                return new long[units.Length];
+            }
+
+            return units;
         }
 
         double CalculateTotalHealth(Squad squad)
@@ -220,6 +333,39 @@ namespace Combat
             }
 
             return total;
+        }
+
+        int GetUnitByProbability(System.Random random, float[] probabilities)
+        {
+            double threshold = random.NextDouble();
+            double currentRange = 0.0;
+
+            for (int p = 0; p < probabilities.Length; p++)
+            {
+                if(probabilities[p] <= threshold)
+                {
+                    return p;
+                }
+
+                currentRange += probabilities[p];
+            }
+
+            return -1;
+        }
+
+        long[,] Get2DHistory(List<long[]> listHistory)
+        {
+            long[,] history = new long[listHistory.Count, listHistory[0].Length];
+
+            for (int h = 0; h < history.GetLength(0); h++)
+            {
+                for (int u = 0; u < history.GetLength(1); u++)
+                {
+                    history[h, u] = listHistory[h][u];
+                }
+            }
+
+            return history;
         }
     }
 }
