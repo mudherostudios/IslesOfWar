@@ -251,9 +251,11 @@ namespace Combat
                 {
                     int deadUnit = defender.damagedUnit;
 
-                    while (deadUnit > -1 && units[deadUnit] == 0)
+                    while (deadUnit > -1)
                     {
                         deadUnit = GetUnitByProbability(random, defender.unitProbabilities);
+                        if (units[deadUnit] == 0)
+                            deadUnit = -1;
                     }
 
                     cumulativeDamage += tables.healthTable[deadUnit];
