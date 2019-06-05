@@ -46,7 +46,7 @@ namespace Combat
         }
     }
 
-    public struct Squad
+    public class Squad
     {
         public long riflemen, machineGunners, bazookamen;
         public long lightTanks, mediumTanks, heavyTanks;
@@ -55,6 +55,11 @@ namespace Combat
         public double totalHealth, totalDamage;
         public float[] unitProbabilities;
         public int damagedUnit;
+        public double remainingHealth;
+
+        public Squad()
+        {
+        }
 
         public Squad(long[] squadCounts)
         {
@@ -77,9 +82,10 @@ namespace Combat
             totalHealth = 0;
             totalDamage = 0;
 
-            unitProbabilities = new float[squadCounts.Length];
+            unitProbabilities = new float[12];
 
             damagedUnit = -1;
+            remainingHealth = 0.0;
         }
 
         public long[] fullSquad
@@ -96,6 +102,124 @@ namespace Combat
 
                 return squad;
             }
+        }
+
+        public void CalculateCasualties(Squad attacker, CombatTables tables)
+        {
+            long[] units = fullSquad;
+            double cumulativeDamage = 0;
+            long unitCount = GetTotalUnitCount();
+
+            if (totalHealth > attacker.totalDamage)
+            {
+                System.Random random = new System.Random();
+
+                if (damagedUnit != -1)
+                {
+                    if (remainingHealth <= attacker.totalDamage)
+                    {
+                        cumulativeDamage += remainingHealth;
+                        remainingHealth = 0;
+                        units[damagedUnit]--;
+                        unitCount--;
+                        damagedUnit = -1;
+                    }
+                    else
+                    {
+                        remainingHealth -= attacker.totalDamage;
+                        cumulativeDamage = attacker.totalDamage;
+                    }
+
+                    CalculateUnitProbabilities(tables, units);
+                }
+
+                while (cumulativeDamage < attacker.totalDamage &&  unitCount > 0)
+                {
+                    int deadUnit = GetUnitByProbability(random);
+
+                    if (deadUnit == -1)
+                        Debug.Log("HALLO!");
+
+                    cumulativeDamage += tables.healthTable[deadUnit];
+
+                    if (cumulativeDamage < attacker.totalDamage)
+                    {
+                        units[deadUnit]--;
+                        unitCount--;
+                        CalculateUnitProbabilities(tables, units);
+                    }
+                    else
+                    {
+                        remainingHealth = cumulativeDamage - attacker.totalDamage;
+                        damagedUnit = deadUnit;
+                        cumulativeDamage = attacker.totalDamage;
+                    }
+                }
+            }
+            else
+            {
+                remainingHealth = 0;
+                damagedUnit = -1;
+                units = new long[12];
+            }
+
+            SetUnits(units);
+        }
+
+        int GetUnitByProbability(System.Random random)
+        {
+            double threshold = random.NextDouble();
+            double currentRange = 0.0;
+
+            for (int p = 0; p < unitProbabilities.Length; p++)
+            {
+                if (threshold <= currentRange + unitProbabilities[p])
+                {
+                    return p;
+                }
+
+                currentRange += unitProbabilities[p];
+            }
+
+            return -1;
+        }
+
+        public void CalculateUnitProbabilities(CombatTables tables)
+        {
+            CalculateUnitProbabilities(tables, fullSquad);
+        }
+
+        public void CalculateUnitProbabilities(CombatTables tables, long[] units)
+        {
+            float[] relativeProbabilities = new float[units.Length];
+            float[] trueProbabilities = new float[units.Length];
+            float totalRelatives = 0;
+
+            for (int r = 0; r < relativeProbabilities.Length; r++)
+            {
+                relativeProbabilities[r] = (float)(units[r]) * tables.orderProbabilityTable[r];
+                totalRelatives += relativeProbabilities[r];
+            }
+
+            for (int t = 0; t < trueProbabilities.Length; t++)
+            {
+                trueProbabilities[t] = relativeProbabilities[t] / totalRelatives;
+            }
+
+            unitProbabilities = trueProbabilities;
+        }
+
+        long GetTotalUnitCount()
+        {
+            long total = 0;
+            long[] units = fullSquad;
+
+            for (int u = 0; u < units.Length; u++)
+            {
+                total += units[u];
+            }
+
+            return total;
         }
 
         public void SetUnits(long[] squad)
@@ -163,7 +287,7 @@ namespace Combat
                 {1.0f, 1.0f, 1.0f,     1.5f, 1.5f, 1.5f,    0.1f, 0.1f, 0.1f,     2.0f, 2.0f, 2.0f},
                 {2.0f, 2.0f, 2.0f,     1.5f, 0.25f, 0.25f,  2.25f, 1.5f, 1.5f,    0.0f, 0.0f, 0.0f},
                 {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
-                {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f,}
+                {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
             };
         }
     }
@@ -178,14 +302,16 @@ namespace Combat
             blufor = _blufor;
             opfor = _opfor;
 
-            blufor.totalHealth = CalculateTotalHealth(blufor);
-            opfor.totalHealth = CalculateTotalHealth(opfor);
+            double[] healths = CalculateTotalHealth(blufor, opfor);
+            blufor.totalHealth = healths[0];
+            opfor.totalHealth = healths[1];
 
-            blufor.totalDamage = CalculateTotalDamage(blufor);
-            opfor.totalDamage = CalculateTotalDamage(opfor);
+            double[] damages = CalculateTotalDamage(blufor, opfor);
+            blufor.totalDamage = damages[0];
+            opfor.totalDamage = damages[1];
 
-            blufor.unitProbabilities = CalculateUnitProbabilities(blufor);
-            opfor.unitProbabilities = CalculateUnitProbabilities(opfor);
+            blufor.CalculateUnitProbabilities(tables);
+            opfor.CalculateUnitProbabilities(tables);
         }
 
         public EngagementHistory ResolveEngagement()
@@ -198,23 +324,19 @@ namespace Combat
 
             while (!engagementIsOver)
             {
-                long[] bluforRemaining = CalculateCasulaties(opfor, blufor);
-                long[] opforRemaining = CalculateCasulaties(blufor, opfor);
+                blufor.CalculateCasualties(opfor, tables);
+                opfor.CalculateCasualties(blufor, tables);
 
-                blufor.SetUnits(bluforRemaining);
-                opfor.SetUnits(opforRemaining);
+                double[] healths = CalculateTotalHealth(blufor, opfor);
+                blufor.totalHealth = healths[0];
+                opfor.totalHealth = healths[1];
 
-                blufor.totalHealth = CalculateTotalHealth(blufor);
-                opfor.totalHealth = CalculateTotalHealth(opfor);
+                double[] damages = CalculateTotalDamage(blufor, opfor);
+                blufor.totalDamage = damages[0];
+                opfor.totalDamage = damages[1];
 
-                blufor.totalDamage = CalculateTotalDamage(blufor);
-                opfor.totalDamage = CalculateTotalDamage(opfor);
-
-                blufor.unitProbabilities = CalculateUnitProbabilities(blufor);
-                opfor.unitProbabilities = CalculateUnitProbabilities(opfor);
-
-                bluforHistory.Add(bluforRemaining);
-                opforHistory.Add(opforRemaining);
+                bluforHistory.Add(blufor.fullSquad);
+                opforHistory.Add(opfor.fullSquad);
 
                 if (blufor.totalHealth == 0 && opfor.totalHealth != 0)
                 {
@@ -230,7 +352,7 @@ namespace Combat
                 }
                 else if (blufor.totalHealth == 0 && opfor.totalHealth == 0)
                 {
-                    winner = "lolEveryone be ded";
+                    winner = "none";
                     engagementIsOver = true;
                 }
             }
@@ -238,103 +360,45 @@ namespace Combat
             return new EngagementHistory(Get2DHistory(bluforHistory), Get2DHistory(opforHistory), winner, winningSquad);
         }
 
-        long[] CalculateCasulaties(Squad attacker, Squad defender)
+        double[] CalculateTotalHealth(Squad squadA, Squad squadB)
         {
-            long[]units = defender.fullSquad;
-            double cumulativeDamage = 0;
+            long[] unitsA = squadA.fullSquad;
+            long[] unitsB = squadB.fullSquad;
+            double totalHealthA = 0;
+            double totalHealthB = 0;
 
-            if (defender.totalHealth > attacker.totalDamage)
+            for (int u = 0; u < unitsA.Length; u++)
             {
-                System.Random random = new System.Random();
-
-                while (cumulativeDamage < attacker.totalDamage)
-                {
-                    int deadUnit = defender.damagedUnit;
-
-                    while (deadUnit > -1)
-                    {
-                        deadUnit = GetUnitByProbability(random, defender.unitProbabilities);
-                        if (units[deadUnit] == 0)
-                            deadUnit = -1;
-                    }
-
-                    cumulativeDamage += tables.healthTable[deadUnit];
-
-                    if (attacker.totalDamage - cumulativeDamage > 0)
-                        units[deadUnit]--;
-                    else
-                        defender.damagedUnit = deadUnit;
-                }
-            }
-            else
-            {
-                defender.damagedUnit = -1;
-                return new long[units.Length];
+                totalHealthA += unitsA[u] * tables.healthTable[u];
+                totalHealthB += unitsB[u] * tables.healthTable[u];
             }
 
-            return units;
+            return new double[] { totalHealthA, totalHealthB };
         }
 
-        double CalculateTotalHealth(Squad squad)
+        double[] CalculateTotalDamage(Squad squadA, Squad squadB)
         {
-            long[] units = squad.fullSquad;
-            double totalHealth = 0;
+            long[] unitsA = squadA.fullSquad;
+            long[] unitsB = squadB.fullSquad;
+            double totalAttackA = 0;
+            double totalAttackB = 0;
+            long unitCountA = 0;
+            long unitCountB = 0;
 
-            for (int u = 0; u < units.Length; u++)
+            for (int u = 0; u < unitsA.Length; u++)
             {
-                totalHealth += units[u] * tables.healthTable[u];
-            }
 
-            return totalHealth;
-        }
+                unitCountA += unitsA[u];
+                unitCountB += unitsB[u];
 
-        double CalculateTotalDamage(Squad squad)
-        {
-            long[] units = squad.fullSquad;
-            double totalAttack = 0;
-
-            for (int u = 0; u < units.Length; u++)
-            {
-                for (int m = 0; m < units.Length; m++)
+                for (int m = 0; m < unitsB.Length; m++)
                 {
-                    totalAttack += (units[u] * tables.damageTable[u]) * (units[u] * tables.modifierTable[u, m]);
+                    totalAttackA += (unitsA[u] * tables.damageTable[u]) * (unitsB[m] * tables.modifierTable[u, m]);
+                    totalAttackB += (unitsB[u] * tables.damageTable[u]) * (unitsA[m] * tables.modifierTable[u, m]);
                 }
             }
 
-            return totalAttack;
-        }
-
-        float[] CalculateUnitProbabilities(Squad squad)
-        {
-            long[] units = squad.fullSquad;
-            float[] relativeProbabilities = new float[units.Length];
-            float[] trueProbabilities = new float[units.Length];
-            float totalRelatives = 0;
-
-            for (int r = 0; r < relativeProbabilities.Length; r++)
-            {
-                relativeProbabilities[r] = (float)(units[r])*tables.orderProbabilityTable[r];
-                totalRelatives += relativeProbabilities[r];
-            }
-
-            for (int t = 0; t < trueProbabilities.Length; t++)
-            {
-                trueProbabilities[t] = relativeProbabilities[t] / totalRelatives;
-            }
-
-            return trueProbabilities;
-        }
-
-        long GetTotalUnitCount(long[] units)
-        {
-            long total = 0;
-
-            for (int u = 0; u < units.Length; u++)
-            {
-                total += units[u];
-            }
-
-            return total;
+            return new double[] { totalAttackA / unitCountB , totalAttackB / unitCountA };
         }
 
         int GetUnitByProbability(System.Random random, float[] probabilities)
@@ -344,7 +408,7 @@ namespace Combat
 
             for (int p = 0; p < probabilities.Length; p++)
             {
-                if(probabilities[p] <= threshold)
+                if(threshold <= currentRange + probabilities[p])
                 {
                     return p;
                 }
