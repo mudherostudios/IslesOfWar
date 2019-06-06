@@ -354,6 +354,7 @@ public class IslandMenu : MonoBehaviour
 
     public void SubmitSelectedIsland()
     {
+        islandIndex = 0;
         if (stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland))
         {
             islands = stateMaster.playerState.islands;
