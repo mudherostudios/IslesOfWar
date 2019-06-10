@@ -36,14 +36,42 @@ namespace Combat
 
     public struct BattlePlan
     {
-        public string[] squadPlans;
-        public bool isAttacker;
+        public int[][] squadPositions;
+        public long[][] squadCounts;
 
-        public BattlePlan(string[] plans, bool attacker)
+        public bool isAttacker;
+        public bool reactToNewlyAdjacent;
+
+        public BattlePlan(int[][] positions, long[][] squads, bool attacker, bool react)
         {
-            squadPlans = plans;
+            squadPositions = positions;
+            squadCounts = squads;
             isAttacker = attacker;
+            reactToNewlyAdjacent = react;
+
         }
+    }
+
+    public class BattlePlanner
+    {
+        public BattlePlan plan;
+        private List<int[]> squadMoves;
+
+        public BattlePlanner(Squad[] squads, bool isAttacker)
+        {
+            List<long[]> squadCounts = new List<long[]>();
+
+            for (int s = 0; s < squads.Length; s++)
+            {
+                squadCounts.Add(squads[s].fullSquad);
+                squadMoves.Add(new int[6]);
+            }
+
+            plan = new BattlePlan(new int[squads.Length][], squadCounts.ToArray(), isAttacker, true);
+        }
+
+
+
     }
 
     public class Squad
@@ -136,9 +164,6 @@ namespace Combat
                 while (cumulativeDamage < attacker.totalDamage &&  unitCount > 0)
                 {
                     int deadUnit = GetUnitByProbability(random);
-
-                    if (deadUnit == -1)
-                        Debug.Log("HALLO!");
 
                     cumulativeDamage += tables.healthTable[deadUnit];
 
