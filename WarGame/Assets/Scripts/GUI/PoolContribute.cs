@@ -156,11 +156,11 @@ public class PoolContribute: WorldGUI
         string metalFormat = "";
         string concreteFormat = "";
 
-        if (fieldAmounts[0] > 1000000000)
+        if (fieldAmounts[0] > 999999999)
             oilFormat = "G2";
-        if (fieldAmounts[1] > 1000000000)
+        if (fieldAmounts[1] > 999999999)
             metalFormat = "G2";
-        if (fieldAmounts[2] > 1000000000)
+        if (fieldAmounts[2] > 999999999)
             concreteFormat = "G2";
 
         tradeAmounts[0].text = fieldAmounts[0].ToString(oilFormat);

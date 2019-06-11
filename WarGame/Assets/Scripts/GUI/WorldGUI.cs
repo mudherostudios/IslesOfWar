@@ -35,4 +35,15 @@ public class WorldGUI : MonoBehaviour
             fieldAmounts[i] = 0;
         }
     }
+
+    public void Reset(int field)
+    {
+        fields[field] = "0";
+        fieldAmounts[field] = 0;
+    }
+
+    public static long MapUlongToLong(ulong ulongValue)
+    {
+        return unchecked((long)ulongValue + long.MinValue);
+    }
 }

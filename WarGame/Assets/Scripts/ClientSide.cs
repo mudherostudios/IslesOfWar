@@ -136,8 +136,24 @@ namespace ClientSide
         {
             get
             {
-                return new Cost[] {riflemanCost, machineGunnerCost, bazookamanCost, lightTankCost, mediumTankCost, heavyTankCost, lightFighterCost, mediumFighterCost, bomberCost,
-                    troopBunkerCost, tankBunkerCost, aircraftBunkerCost, troopBlockerCost, tankBunkerCost, aircraftBunkerCost};
+                return new Cost[] 
+                {
+                    riflemanCost,
+                    machineGunnerCost,
+                    bazookamanCost,
+                    lightTankCost,
+                    mediumTankCost,
+                    heavyTankCost,
+                    lightFighterCost,
+                    mediumFighterCost,
+                    bomberCost,
+                    troopBunkerCost,
+                    tankBunkerCost,
+                    aircraftBunkerCost,
+                    troopBlockerCost,
+                    tankBunkerCost,
+                    aircraftBunkerCost
+                };
             }
         }
     }
@@ -211,6 +227,7 @@ namespace ClientSide
         public ulong warbucks, oil, metal, concrete;
         public Island[] islands;
         public Island[] attackableIslands;
+        public Squad[] squads;
 
         public PlayerState(ulong[] unitCounts, ulong[] resourceCounts, Island[] _islands)
         {
@@ -231,6 +248,29 @@ namespace ClientSide
 
             islands = _islands;
             attackableIslands = new Island[1];
+
+            squads = new Squad[] {new Squad(), new Squad(), new Squad()};
+        }
+
+        public ulong[] allUnits
+        {
+            get
+            {
+                ulong[] units = new ulong[]
+                {
+                    riflemen,
+                    machineGunners,
+                    bazookamen,
+                    lightTanks,
+                    mediumTanks,
+                    heavyTanks,
+                    lightFighters,
+                    mediumFighters,
+                    bombers
+                };
+
+                return units;
+             }
         }
     }
 }
