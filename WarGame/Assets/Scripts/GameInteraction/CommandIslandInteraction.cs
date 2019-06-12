@@ -27,8 +27,11 @@ public class CommandIslandInteraction : Interaction
 
     private void Start()
     {
-        //InitializeUnitGUIs();
-        //InitializePoolGUIs();
+        stateMaster.InitilializeConnection();
+        stateMaster.GetState();
+
+        InitializeUnitGUIs();
+        InitializePoolGUIs();
 
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
     }
@@ -42,9 +45,8 @@ public class CommandIslandInteraction : Interaction
         {
             CheckMainIslandGUIs();
         }
-
             
-        //UpdateTimers();
+        UpdateTimers();
     }
 
     void CheckMainIslandGUIs()
@@ -78,6 +80,7 @@ public class CommandIslandInteraction : Interaction
 
     void InitializeUnitGUIs()
     {
+        Debug.Log("Initializing Unit GUIs");
         riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
         machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
         bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);

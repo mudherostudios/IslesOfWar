@@ -42,8 +42,8 @@ public class WorldGUI : MonoBehaviour
         fieldAmounts[field] = 0;
     }
 
-    public static long MapUlongToLong(ulong ulongValue)
+    public static long MapUlongToLong(ulong value)
     {
-        return unchecked((long)ulongValue + long.MinValue);
+        return unchecked((long)value + long.MinValue);
     }
 }

@@ -109,7 +109,7 @@ public class GameMenu : MonoBehaviour
 
 
                     if (button.buttonType == "InputField")
-                    {
+                    { 
                         isTyping = true;
                         fieldID = button.fieldID;
                     }

@@ -4,15 +4,10 @@ using UnityEngine;
 
 public class LockToRelativePoint : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Transform objectLock;
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        transform.position = objectLock.position;
     }
 }

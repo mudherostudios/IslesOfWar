@@ -36,15 +36,15 @@ public class Interaction : MonoBehaviour
                     clickedButtonType = selectedButton.buttonType;
                     Debug.Log(clickedButtonType);
 
-                    if (selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && selectedButton.logicParent != selectedWorldUI)
+                    if(selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && selectedButton.logicParent.GetComponent<WorldGUI>() != selectedWorldUI)
                         selectedWorldUIObject.gameObject.SetActive(false);
 
                     selectedWorldUIObject = selectedButton.logicParent;
                     selectedWorldUI = selectedWorldUIObject.GetComponent<WorldGUI>();
-
                     
                     if (clickedButtonType == buttonTypes[0])
                     {
+                        Debug.Log(selectedWorldUIObject.name);
                         isTyping = true;
                         fieldID = selectedButton.fieldID;
                     }
@@ -54,6 +54,7 @@ public class Interaction : MonoBehaviour
                             selectedWorldUI.gameObject.SetActive(false);
                         else
                             selectedWorldUI.gameObject.SetActive(true);
+                        
                     }
                 }
                 else
