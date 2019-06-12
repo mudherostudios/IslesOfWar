@@ -57,7 +57,7 @@ public class ScreenGUI : MonoBehaviour
         }
     }
 
-    void SetGUIContents()
+    public void SetGUIContents()
     {
         resourceContent[0].text = GetOrderOfMagnitudeString(stateMaster.playerState.warbucks);
         resourceContent[1].text = GetOrderOfMagnitudeString(stateMaster.playerState.oil);

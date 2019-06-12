@@ -8,29 +8,20 @@ public class Interaction : MonoBehaviour
 {
     public Camera cam;
     public StateMaster stateMaster;
+    public ScreenGUI screenGUI;
 
     [Header("Button Types")]
     public string[] buttonTypes = new string[] { "InputField", "MenuRevealer" };
 
     private string clickedButtonType = "None";
-    private bool isTyping = false;
-    private int fieldID = -1;
+    protected bool isTyping = false;
+    protected int fieldID = -1;
 
-    private Transform selectedWorldUIObject;
-    private WorldGUI selectedWorldUI;
+    protected Transform selectedWorldUIObject;
+    protected WorldGUI selectedWorldUI;
+    protected WorldButton selectedButton;
 
-    void Start()
-    {
-        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-    }
-
-    void Update()
-    {
-        Typing();
-        WorldButtonCheck();
-    }
-
-    void WorldButtonCheck()
+    protected void WorldButtonCheck()
     {
         if (cam != null && Input.GetButtonDown("Fire1"))
         {
@@ -41,20 +32,21 @@ public class Interaction : MonoBehaviour
             {
                 if (hit.transform.tag == "WorldButton")
                 {
-                    WorldButton button = hit.transform.GetComponent<WorldButton>();
+                    selectedButton = hit.transform.GetComponent<WorldButton>();
+                    clickedButtonType = selectedButton.buttonType;
+                    Debug.Log(clickedButtonType);
 
-                    if (selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && button.logicParent != selectedWorldUI)
+                    if (selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && selectedButton.logicParent != selectedWorldUI)
                         selectedWorldUIObject.gameObject.SetActive(false);
 
-                    selectedWorldUIObject = button.logicParent;
+                    selectedWorldUIObject = selectedButton.logicParent;
                     selectedWorldUI = selectedWorldUIObject.GetComponent<WorldGUI>();
 
-                    clickedButtonType = button.buttonType;
-
+                    
                     if (clickedButtonType == buttonTypes[0])
                     {
                         isTyping = true;
-                        fieldID = button.fieldID;
+                        fieldID = selectedButton.fieldID;
                     }
                     else if (clickedButtonType == buttonTypes[1])
                     {
@@ -68,9 +60,9 @@ public class Interaction : MonoBehaviour
                 {
                     clickedButtonType = "None";
 
-                    if (selectedWorldUI != null)
+                    if (selectedWorldUIObject != null)
                     {
-                        selectedWorldUI.gameObject.SetActive(false);
+                        selectedWorldUIObject.gameObject.SetActive(false);
                     }
 
                     isTyping = false;
@@ -83,7 +75,7 @@ public class Interaction : MonoBehaviour
         }
     }
 
-    void Typing()
+    protected void Typing()
     {
         if (isTyping && selectedWorldUI != null)
         {
@@ -117,4 +109,8 @@ public class Interaction : MonoBehaviour
         return clickedButtonType;
     }
 
+    public void SetGUIContents()
+    {
+        screenGUI.SetGUIContents();
+    }
 }
