@@ -6,14 +6,8 @@ using UnityEngine.EventSystems;
 
 public class GUIVariables : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public GameMenu master;
+    public ScreenGUI master;
     public string toolTipContent;
-   
-    void Start()
-    {
-        if(master == null)
-            master = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<GameMenu>();
-    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
