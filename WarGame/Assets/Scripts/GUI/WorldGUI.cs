@@ -9,12 +9,19 @@ public class WorldGUI : MonoBehaviour
 
     public void AddCharacter(string str, int ID)
     {
-        if (fields[ID].Length < 10 && "0123456789".Contains(str))
+        if (ID >= 0)
         {
-            fields[ID] += str;
-            ulong temp = 0;
-            ulong.TryParse(fields[ID], out temp);
-            fieldAmounts[ID] = temp;
+            if (fields[ID].Length < 10 && "0123456789".Contains(str))
+            {
+                fields[ID] += str;
+                ulong temp = 0;
+                ulong.TryParse(fields[ID], out temp);
+                fieldAmounts[ID] = temp;
+            }
+        }
+        else
+        {
+            Debug.Log("ID is " + ID);
         }
     }
 

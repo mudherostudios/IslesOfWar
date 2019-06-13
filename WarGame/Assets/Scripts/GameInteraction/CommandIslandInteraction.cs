@@ -38,14 +38,15 @@ public class CommandIslandInteraction : Interaction
 
     private void Update()
     {
-        Typing();
+        MenuUpdates();
         WorldButtonCheck();
 
         if (Input.GetButtonDown("Fire1"))
         {
             CheckMainIslandGUIs();
         }
-            
+
+        Typing();
         UpdateTimers();
     }
 
@@ -56,17 +57,36 @@ public class CommandIslandInteraction : Interaction
             
             selectedUnitPurchase = selectedWorldUIObject.GetComponent<UnitPurchase>();
             selectedPoolContribute = selectedWorldUIObject.GetComponent<PoolContribute>();
-            string tempButtonType = PeekButtonType();
-            
-            if (tempButtonType == "PurchaseButton")
+            string peekedType = PeekButtonType();
+
+            if (peekedType == buttonTypes[1])
+            {
+                if (selectedUnitPurchase != null)
+                    selectedUnitPurchase.Reset();
+                if (selectedPoolContribute != null)
+                    selectedPoolContribute.Reset();
+            }
+
+            if (peekedType == "PurchaseButton")
             {
                 Purchase(selectedUnitPurchase.TryPurchase());
             }
-            else if (tempButtonType == "PoolSend")
+            else if (peekedType == "PoolSend")
             {
                 SendToPool(selectedPoolContribute.TrySend());
                 InitializePoolGUIs();
             }
+        }
+    }
+
+    void MenuUpdates()
+    {
+        if (isTyping && selectedWorldUI != null)
+        {
+            if (selectedUnitPurchase != null)
+                selectedUnitPurchase.UpdateAllStats();
+            else if (selectedPoolContribute != null)
+                selectedPoolContribute.UpdateAllStats();
         }
     }
 
