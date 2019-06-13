@@ -9,7 +9,7 @@ public class WorldGUI : MonoBehaviour
 
     public void AddCharacter(string str, int ID)
     {
-        if (ID >= 0)
+        if (ID >= 0 && ID < fields.Length)
         {
             if (fields[ID].Length < 10 && "0123456789".Contains(str))
             {

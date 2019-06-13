@@ -5,6 +5,8 @@ using ClientSide;
 
 public class CommandIslandInteraction : Interaction
 {
+    public OrbitalFocusCam orbital;
+
     [Header("Purchase GUIs")]
     public UnitPurchase riflemanPurchase;
     public UnitPurchase machineGunnerPurchase;
@@ -54,7 +56,7 @@ public class CommandIslandInteraction : Interaction
     {
         if (selectedWorldUI != null)
         {
-            
+
             selectedUnitPurchase = selectedWorldUIObject.GetComponent<UnitPurchase>();
             selectedPoolContribute = selectedWorldUIObject.GetComponent<PoolContribute>();
             string peekedType = PeekButtonType();
@@ -75,6 +77,12 @@ public class CommandIslandInteraction : Interaction
             {
                 SendToPool(selectedPoolContribute.TrySend());
                 InitializePoolGUIs();
+            }
+            else if (peekedType == "Tile")
+            {
+                orbital.ExploreMode(selectedWorldUIObject, true);
+                selectedWorldUIObject = null;
+                selectedWorldUI = null;
             }
         }
     }
