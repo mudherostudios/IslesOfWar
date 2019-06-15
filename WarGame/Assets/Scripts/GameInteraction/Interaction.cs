@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
+using ClientSide;
 
 public class Interaction : MonoBehaviour
 {
     public Camera cam;
+    public OrbitalFocusCam orbital;
     public StateMaster stateMaster;
     public ScreenGUI screenGUI;
 
     [Header("Button Types")]
-    public string[] buttonTypes = new string[] { "InputField", "MenuRevealer" };
+    public string[] buttonTypes = new string[] { "InputField", "MenuRevealer", "Tile"};
 
     private string clickedButtonType = "None";
     protected bool isTyping = false;
@@ -54,7 +56,12 @@ public class Interaction : MonoBehaviour
                             selectedWorldUI.gameObject.SetActive(false);
                         else
                             selectedWorldUI.gameObject.SetActive(true);
-                        
+                    }
+                    else if (clickedButtonType == buttonTypes[2])
+                    {
+                        orbital.ExploreMode(selectedWorldUIObject, true);
+                        selectedWorldUIObject = null;
+                        selectedWorldUI = null;
                     }
                 }
                 else

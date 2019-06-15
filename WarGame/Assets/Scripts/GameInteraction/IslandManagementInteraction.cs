@@ -1,0 +1,220 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using ClientSide;
+
+public class IslandManagementInteraction: Interaction
+{
+    public Island[] islands;
+    public string[] tileVariations;
+    
+    public Transform defaultObservePoint;
+    public Transform defaultObservationFocus;
+
+    [Header("Prefabs")]
+    public GameObject[] tilePrefabs;
+    public GameObject tileHolderPrefab;
+    public Vector3 offset;
+
+    [Header("Main Generation")]
+    public Vector3 generateCenter;
+    public Vector3 genereateRotation;
+    public float islandChangeSpeed;
+    public Vector3 deleteLeft;
+    public Vector3 deleteRight;
+
+    private int islandIndex, islandCount;
+    private GameObject currentIsland, bufferedIsland;
+    private IslandStats currentStats, bufferedStats;
+    private int direction;
+
+    public void Start()
+    {
+        stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
+        stateMaster.InitilializeConnection();
+        stateMaster.GetState();
+
+        islands = stateMaster.playerState.islands;
+        islandIndex = 0;
+        islandCount = islands.Length;
+        direction = 0;
+
+        currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
+        currentStats = currentIsland.GetComponent<IslandStats>();
+        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform);
+    }
+
+    public void Update()
+    {
+        WorldButtonCheck();
+
+        if (direction != 0)
+        {
+            float leftDist = Vector3.Distance(currentIsland.transform.position, deleteLeft);
+            float rightDist = Vector3.Distance(currentIsland.transform.position, deleteRight);
+
+            if (leftDist <= 1 || rightDist <= 1)
+            {
+                Destroy(currentIsland);
+                currentIsland = bufferedIsland;
+                currentStats = bufferedStats;
+                bufferedIsland = null;
+                bufferedStats = null;
+                direction = 0;
+            }
+        }
+    }
+
+    public void RefreshIsland(int increment)
+    {
+        if (bufferedStats == null)
+        {
+            direction = increment;
+
+            if (direction > 0)
+                bufferedIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
+            else if (direction < 0)
+                bufferedIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
+
+            bufferedStats = bufferedIsland.GetComponent<IslandStats>();
+
+            if (direction > 0)
+            {
+                bufferedStats.animator.SetLayerWeight(0, 0);
+                bufferedStats.animator.SetLayerWeight(1, 1);
+                bufferedStats.animator.SetTrigger("Right");
+                currentStats.animator.SetTrigger("Right");
+            }
+            else if (direction < 0)
+            {
+
+                bufferedStats.animator.SetLayerWeight(0, 0);
+                bufferedStats.animator.SetLayerWeight(2, 1);
+                bufferedStats.animator.SetTrigger("Left");
+                currentStats.animator.SetTrigger("Left");
+            }
+
+            int possibleIndexes = islandCount;
+            int attackableIndexes = stateMaster.playerState.attackableIslands.Length;
+
+            if (stateMaster.playerState.attackableIslands[attackableIndexes - 1].owner.username != null)
+                possibleIndexes += attackableIndexes;
+
+            if (islandIndex + increment >= possibleIndexes)
+                islandIndex = 0;
+            else if (islandIndex + increment < 0)
+                islandIndex = possibleIndexes - 1;
+            else
+                islandIndex += increment;
+
+            Island island = new Island();
+
+            if (islandIndex < islandCount)
+                island = islands[islandIndex];
+            else
+                island = stateMaster.playerState.attackableIslands[possibleIndexes - islandCount - 1];
+
+            PlaceTiles(island, bufferedStats, bufferedIsland.transform);
+        }
+    }
+
+    public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
+    {
+        IslandStats parent = tileParent.GetComponent<IslandStats>();
+
+        tileParent.GetComponent<IslandStats>().islandInfo = island;
+
+        for (int h = 0; h < island.totalTiles; h++)
+        {
+            int r = Mathf.FloorToInt(Random.Range(0, 6));
+            string featString = island.features[h].ToString();
+            string collectorString = island.collectors[h].ToString();
+            GameObject tempTile = null;
+
+            if (tileVariations[0].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[0], islandStats.hexTiles[h].position + offset, tileParent.rotation);
+            }
+            else if (tileVariations[1].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[1], islandStats.hexTiles[h].position + offset, tileParent.rotation);
+            }
+            else if (tileVariations[2].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[2], islandStats.hexTiles[h].position + offset, tileParent.rotation);
+            }
+
+            tempTile.transform.Rotate(Vector3.up, 60 * r);
+            tempTile.transform.SetParent(tileParent);
+
+            TurnOnResourcesAndCollectors(tempTile.GetComponent<TileStats>().resourceParents, tempTile.GetComponent<TileStats>().collectorParents, featString, collectorString);
+        }
+    }
+
+    void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
+    {
+        int r = GetConvertedType(type);
+        int c = GetConvertedType(built);
+        GameObject resourceObject = null;
+
+        if (r == 1 || r == 4 || r == 5 || r == 7)
+        {
+            resourceObject = resources[0];
+
+            if (c == 1 || c == 4 || c == 5 || c == 7)
+                resourceObject = collectors[0];
+
+            ActivateRandomChild(resourceObject.transform);
+        }
+
+        if (r == 2 || r == 4 || r == 6 || r == 7)
+        {
+            resourceObject = resources[1];
+
+            if (c == 2 || c == 4 || c == 6 || c == 7)
+                resourceObject = collectors[1];
+
+            ActivateRandomChild(resourceObject.transform);
+        }
+
+        if (r == 3 || r == 5 || r == 6 || r == 7)
+        {
+            resourceObject = resources[2];
+
+            if (c == 3 || c == 5 || c == 6 || c == 7)
+                resourceObject = collectors[2];
+
+            ActivateRandomChild(resourceObject.transform);
+        }
+    }
+
+    void ActivateRandomChild(Transform collection)
+    {
+        int r = (int)Mathf.Floor(Random.value * collection.childCount);
+        collection.GetChild(r).gameObject.SetActive(true);
+    }
+
+    int GetConvertedType(string type)
+    {
+        int converted = -1;
+
+        if ("0aA".Contains(type))
+            converted = 0;
+        else if ("1bB".Contains(type))
+            converted = 1;
+        else if ("2cC".Contains(type))
+            converted = 2;
+        else if ("3dD".Contains(type))
+            converted = 3;
+        else if ("4eE".Contains(type))
+            converted = 4;
+        else if ("5fF".Contains(type))
+            converted = 5;
+        else if ("6gG".Contains(type))
+            converted = 6;
+        else if ("7hH".Contains(type))
+            converted = 7;
+
+        return converted;
+    }
+}
