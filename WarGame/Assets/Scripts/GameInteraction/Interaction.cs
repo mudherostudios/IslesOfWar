@@ -121,4 +121,13 @@ public class Interaction : MonoBehaviour
     {
         screenGUI.SetGUIContents();
     }
+
+    public void SetVariables(StateMaster _stateMaster, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
+    {
+        stateMaster = _stateMaster;
+        cam = _cam;
+        orbital = _orbital;
+        screenGUI = _screenGUI;
+        buttonTypes = _buttonTypes;
+    }
 }

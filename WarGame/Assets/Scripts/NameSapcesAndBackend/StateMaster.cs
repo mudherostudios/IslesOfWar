@@ -12,11 +12,11 @@ public class StateMaster : MonoBehaviour
     public FakeServer server;
 
     //Change this eventually, connect only after login.
-    public void Start()
+    public void Connect()
     {
         InitilializeConnection();
         GetState();
-        Debug.Log("Connected");
+        Debug.Log("Connected.");
     }
 
     //Client Side Calculations & Tracking without Server Requests

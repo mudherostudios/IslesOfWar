@@ -28,22 +28,6 @@ public class IslandManagementInteraction: Interaction
     private IslandStats currentStats, bufferedStats;
     private int direction;
 
-    public void Start()
-    {
-        stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
-        stateMaster.InitilializeConnection();
-        stateMaster.GetState();
-
-        islands = stateMaster.playerState.islands;
-        islandIndex = 0;
-        islandCount = islands.Length;
-        direction = 0;
-
-        currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
-        currentStats = currentIsland.GetComponent<IslandStats>();
-        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform);
-    }
-
     public void Update()
     {
         WorldButtonCheck();
@@ -65,7 +49,48 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
-    public void RefreshIsland(int increment)
+    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Vector3[] positional, float changeSpeed)
+    {
+        tileHolderPrefab = prefabs[prefabs.Length - 1];
+        tilePrefabs = new GameObject[prefabs.Length];
+
+        for (int p = 0; p < prefabs.Length - 1; p++)
+        {
+            tilePrefabs[p] = prefabs[p];
+        }
+        
+        tileVariations = _tileVariations;
+        offset = _offset;
+
+        generateCenter = positional[0];
+        genereateRotation = positional[1];
+        deleteLeft = positional[2];
+        deleteRight = positional[3];
+        islandChangeSpeed = changeSpeed;
+    }
+
+    public void TurnOnIsland()
+    {
+        islandIndex = 0;
+        currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
+        currentStats = currentIsland.GetComponent<IslandStats>();
+        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform);
+    }
+
+    public void TurnOffIsland()
+    {
+        Destroy(currentIsland);
+        currentIsland = null;
+        currentStats = null;
+    }
+
+    public void SetObservationPoints(Transform observe, Transform focus)
+    {
+        defaultObservePoint = observe;
+        defaultObservationFocus = focus;
+    }
+
+    public void IncrementIslandIndex(int increment)
     {
         if (bufferedStats == null)
         {
@@ -118,7 +143,7 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
-    public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
+    void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
     {
         IslandStats parent = tileParent.GetComponent<IslandStats>();
 
@@ -216,5 +241,13 @@ public class IslandManagementInteraction: Interaction
             converted = 7;
 
         return converted;
+    }
+
+    public void Initialize()
+    {
+        islands = stateMaster.playerState.islands;
+        islandIndex = 0;
+        islandCount = islands.Length;
+        direction = 0;
     }
 }

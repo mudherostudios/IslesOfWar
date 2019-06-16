@@ -23,18 +23,29 @@ public class IslandDiscoveryInteraction : Interaction
     private Island selectedDiscoveredIsland;
     private GameObject[] discoveredIslandObjects;
 
-    private void Start()
-    {
-        stateMaster = GameObject.FindGameObjectWithTag("StateMaster").GetComponent<StateMaster>();
-        stateMaster.InitilializeConnection();
-        stateMaster.GetState();
-
-        GenerateDiscoveryIslands(0);
-    }
-
     private void Update()
     {
         WorldButtonCheck();
+    }
+
+    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform[] spawns, Transform[] observationPoints, Vector3 _maxPositionAdjustment)
+    {
+        tileHolderPrefab = prefabs[prefabs.Length - 1];
+        tilePrefabs = new GameObject[prefabs.Length];
+
+        for (int p = 0; p < prefabs.Length - 1; p++)
+        {
+            tilePrefabs[p] = prefabs[p];
+        }
+
+        tileVariations = _tileVariations;
+        offset = _offset;
+
+        spawnPositions = spawns;
+        threeIslandObservationPoint = observationPoints[0];
+        fiveIslandObservationPoint = observationPoints[1];
+        threeIslandFocus = observationPoints[2];
+        fiveIslandFocus = observationPoints[3];
     }
 
     public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
@@ -129,6 +140,19 @@ public class IslandDiscoveryInteraction : Interaction
                 PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform);
             }
         }
+    }
+
+    public void RemoveIslands()
+    {
+        if (discoveredIslandObjects != null)
+        {
+            for (int i = 0; i < discoveredIslandObjects.Length; i++)
+            {
+                Destroy(discoveredIslandObjects[i]);
+            }
+        }
+
+        discoveredIslandObjects = null;
     }
 
     /*Under Navigator I think this shoudl go.

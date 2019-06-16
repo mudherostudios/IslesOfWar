@@ -24,7 +24,6 @@ public class OrbitalFocusCam : MonoBehaviour
         ppVolume = cam.GetComponent<PostProcessVolume>();
         ppVolume.profile.TryGetSettings(out dof);
         dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
-        exploring = false;
         hasMoved = false;
         tracking = false;
         centered = true;
@@ -135,17 +134,12 @@ public class OrbitalFocusCam : MonoBehaviour
     {
         focalTarget = explorationPoint;
         ResetState();
+        exploring = explore;
 
         if (!explore)
-        {
-            exploring = false;
             camTargetPos = Vector3.zero;
-        }
         else
-        {
-            exploring = true;
             camTargetPos = exploreOffset;
-        }
     }
 
     public void SetNewObservePoint(Transform newObservePoint, Transform newFocalTarget)
