@@ -126,8 +126,8 @@ namespace ServerSide
 
         public IslandGenerator()
         {
-            tileProbabilities[0] = 0.75f; //Flat Normal
-            tileProbabilities[1] = 0.15f; //Lake
+            tileProbabilities[0] = 0.65f; //Flat Normal
+            tileProbabilities[1] = 0.25f; //Lake
             tileProbabilities[2] = 0.10f; //Mountain
 
             //I should probably change this to oil metal limestone like all the other arrays.

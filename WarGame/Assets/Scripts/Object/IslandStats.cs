@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ClientSide;
+
 public class IslandStats: MonoBehaviour
 {
     public Transform[] hexTiles;

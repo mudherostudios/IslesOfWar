@@ -172,7 +172,17 @@ public class IslandManagementInteraction: Interaction
             tempTile.transform.Rotate(Vector3.up, 60 * r);
             tempTile.transform.SetParent(tileParent);
 
-            TurnOnResourcesAndCollectors(tempTile.GetComponent<TileStats>().resourceParents, tempTile.GetComponent<TileStats>().collectorParents, featString, collectorString);
+            TileStats tempStats = tempTile.GetComponent<TileStats>();
+            TurnOnResourcesAndCollectors(tempStats.resourceParents, tempStats.collectorParents, featString, collectorString);
+            TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
+            TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
+
+            float tempStructureProb = 0;
+
+            if (tempStats.structureProbabilities.Length != tempStats.structures.Length && tempStats.structureProbabilities != null)
+                tempStructureProb = tempStats.structureProbabilities[0];
+
+            ActivateRandomObject(tempStats.structures, tempStructureProb);
         }
     }
 
@@ -213,10 +223,40 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
+    void TurnOnDetails(GameObject[] details, float[] detailProbs)
+    {
+        if (details != null)
+        {
+            for (int d = 0; d < details.Length; d++)
+            {
+                float threshold = Random.value;
+
+                if (threshold <= detailProbs[d])
+                    details[d].SetActive(true);
+            }
+        }
+    }
+
     void ActivateRandomChild(Transform collection)
     {
         int r = (int)Mathf.Floor(Random.value * collection.childCount);
         collection.GetChild(r).gameObject.SetActive(true);
+    }
+
+    void ActivateRandomObject(GameObject[] objects, float noneProbability)
+    {
+        if (objects != null)
+        {
+            int paddedTotal = objects.Length;
+
+            if (noneProbability > 0)
+                paddedTotal = (int)((float)objects.Length / noneProbability);
+
+            int r = (int)Mathf.Floor(Random.value * paddedTotal);
+            Debug.Log(paddedTotal);
+            if(r < objects.Length && r >= 0)
+                objects[r].SetActive(true);
+        }
     }
 
     int GetConvertedType(string type)
