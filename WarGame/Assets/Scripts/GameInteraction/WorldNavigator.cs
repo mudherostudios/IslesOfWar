@@ -63,7 +63,9 @@ public class WorldNavigator : MonoBehaviour
     public Transform threeIslandFocus;
     public Transform fiveIslandFocus;
 
+    [Header("Command Mode Variables")]
     public Transform commandIsland;
+    public Transform commandCenter;
 
     [Header("Scene Cleaning")]
     public float commandCleanTimer;
@@ -74,14 +76,14 @@ public class WorldNavigator : MonoBehaviour
     {
         COMMAND,
         MANAGEMENT,
-        DISCOVERY3,
-        DISCOVERY5,
+        DISCOVERY,
         NONE
     }
 
-    private Mode mode = Mode.COMMAND;
+    private Mode mode = Mode.NONE;
     private Mode cleanMode = Mode.NONE;
     private float sceneCleanTimer = 0;
+    private bool traversing = false;
 
     private void Awake()
     {
@@ -97,6 +99,8 @@ public class WorldNavigator : MonoBehaviour
         commandScript.enabled = true;
         managementScript.enabled = false;
         discoveryScript.enabled = false;
+        orbital.ExploreMode(commandIsland, false);
+        orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
 
         //Command Variables
         UnitPurchase[] unitPurchaseGUIs = new UnitPurchase[] { riflemanPurchase, machineGunnerPurchase, bazookamanPurchase, lightTankPurchase, mediumTankPurchase,
@@ -115,18 +119,21 @@ public class WorldNavigator : MonoBehaviour
         Transform[] cameraObservationPoints = new Transform[] { threeIslandObservationPoint, fiveIslandObservationPoint, threeIslandFocus, fiveIslandFocus };
 
         commandScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
-        commandScript.SetCommandVariables(unitPurchaseGUIs, poolContributeGUIs, commandObservationPoint);
+        commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
+        commandScript.SetCommandVariables(unitPurchaseGUIs, poolContributeGUIs, commandCenter);
 
         managementScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
 
         discoveryScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
-        discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPositions, cameraObservationPoints, maxPositionAdjustment);
+        discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPositions, maxPositionAdjustment);
+        discoveryScript.SetObservationPoints(cameraObservationPoints);
 
         commandScript.Initialize();
-        commandScript.GotoCommandCenter();
         managementScript.Initialize();
+
+        SetCommandMode();
     }
 
     private void Update()
@@ -141,7 +148,7 @@ public class WorldNavigator : MonoBehaviour
             {
                 managementScript.TurnOffIsland();
             }
-            else if (cleanMode == Mode.DISCOVERY3 || cleanMode == Mode.DISCOVERY5)
+            else if (cleanMode == Mode.DISCOVERY)
             {
                 discoveryScript.RemoveIslands();
             }
@@ -155,10 +162,22 @@ public class WorldNavigator : MonoBehaviour
         {
             SetCommandMode();
         }
+        else if (Input.GetKeyDown(KeyCode.D) && mode != Mode.DISCOVERY)
+        {
+            SetDiscoveryMode(0);
+        }
+
+        if (mode == Mode.COMMAND && traversing && orbital.isAtTarget)
+        {
+            traversing = false;
+            commandScript.GotoCommandCenter();
+        }
     }
 
     public void SetCommandMode()
     {
+        traversing = true;
+
         if (mode != cleanMode)
             cleanMode = mode;
         else
@@ -166,19 +185,21 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.MANAGEMENT)
             managementScript.enabled = false;
-        else if (mode == Mode.DISCOVERY3 || mode == Mode.DISCOVERY5)
+        else if (mode == Mode.DISCOVERY)
             discoveryScript.enabled = false;
 
         mode = Mode.COMMAND;
         commandScript.enabled = true;
         commandIsland.gameObject.SetActive(true);
-        commandScript.GotoCommandCenter();
+        commandScript.GotoCommandIsland();
 
         sceneCleanTimer = commandCleanTimer;
     }
 
     public void SetManageMode()
     {
+        traversing = true;
+
         if (mode != cleanMode)
             cleanMode = mode;
         else
@@ -186,20 +207,22 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.COMMAND)
             commandScript.enabled = false;
-        else if (mode == Mode.DISCOVERY3 || mode == Mode.DISCOVERY5)
+        else if (mode == Mode.DISCOVERY)
             discoveryScript.enabled = false;
 
         mode = Mode.MANAGEMENT;
 
         managementScript.enabled = true;
         managementScript.TurnOnIsland();
+        managementScript.GotoObservationPoint();
 
-        orbital.SetNewObservePoint(managementObservationPoint, managementFocusPoint);
         sceneCleanTimer = managementCleanTimer;
     }
 
     public void SetDiscoveryMode(int missionType)
     {
+        traversing = true;
+
         if (mode != cleanMode)
             cleanMode = mode;
         else
@@ -210,19 +233,10 @@ public class WorldNavigator : MonoBehaviour
         else if (mode == Mode.MANAGEMENT)
             managementScript.enabled = false;
 
-        if (missionType == 0)
-        {
-            mode = Mode.DISCOVERY3;
-            orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
-        }
-        else if (missionType == 1)
-        {
-            mode = Mode.DISCOVERY5;
-            orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
-        }
+        mode = Mode.DISCOVERY;
 
         discoveryScript.enabled = true;
-        //Generate Islands;
+        discoveryScript.GenerateDiscoveryIslands(missionType);
 
         sceneCleanTimer = discoveryCleanTimer;
     }

@@ -23,6 +23,8 @@ public class CommandIslandInteraction : Interaction
     public PoolContribute concretePool;
 
     public Transform commandCenter;
+    public Transform observePoint;
+    public Transform focalPoint;
     
     private UnitPurchase selectedUnitPurchase;
     private PoolContribute selectedPoolContribute;
@@ -61,15 +63,26 @@ public class CommandIslandInteraction : Interaction
         commandCenter = _commandCenter;
     }
 
+    public void SetObservationPoints(Transform observe, Transform focus)
+    {
+        observePoint = observe;
+        focalPoint = focus;
+    }
+
     public void Initialize()
     {
         InitializeUnitGUIs();
         InitializePoolGUIs();
     }
 
+    public void GotoCommandIsland()
+    {
+        orbital.ExploreMode(commandCenter, false);
+        orbital.SetNewObservePoint(observePoint, focalPoint);
+    }
+
     public void GotoCommandCenter()
     {
-        Debug.Log("TO THE BUNKER!!");
         orbital.ExploreMode(commandCenter, true);
     }
 

@@ -49,6 +49,12 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
+    public void GotoObservationPoint()
+    {
+        orbital.ExploreMode(defaultObservePoint, false);
+        orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
+    }
+
     public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Vector3[] positional, float changeSpeed)
     {
         tileHolderPrefab = prefabs[prefabs.Length - 1];

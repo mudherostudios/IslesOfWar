@@ -28,7 +28,7 @@ public class IslandDiscoveryInteraction : Interaction
         WorldButtonCheck();
     }
 
-    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform[] spawns, Transform[] observationPoints, Vector3 _maxPositionAdjustment)
+    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform[] spawns, Vector3 _maxPositionAdjustment)
     {
         tileHolderPrefab = prefabs[prefabs.Length - 1];
         tilePrefabs = new GameObject[prefabs.Length];
@@ -42,6 +42,10 @@ public class IslandDiscoveryInteraction : Interaction
         offset = _offset;
 
         spawnPositions = spawns;
+    }
+
+    public void SetObservationPoints(Transform[] observationPoints)
+    {
         threeIslandObservationPoint = observationPoints[0];
         fiveIslandObservationPoint = observationPoints[1];
         threeIslandFocus = observationPoints[2];
@@ -84,6 +88,47 @@ public class IslandDiscoveryInteraction : Interaction
 
             if (tempTile.GetComponent<TileStats>().water != null)
                 tempTile.GetComponent<TileStats>().water.SetActive(false);
+
+            TileStats tempStats = tempTile.GetComponent<TileStats>();
+            TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
+            TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
+
+            float tempStructureProb = 0;
+
+            if (tempStats.structureProbabilities.Length != tempStats.structures.Length && tempStats.structureProbabilities != null)
+                tempStructureProb = tempStats.structureProbabilities[0];
+
+            ActivateRandomObject(tempStats.structures, tempStructureProb);
+        }
+    }
+
+    void TurnOnDetails(GameObject[] details, float[] detailProbs)
+    {
+        if (details != null)
+        {
+            for (int d = 0; d < details.Length; d++)
+            {
+                float threshold = Random.value;
+
+                if (threshold <= detailProbs[d])
+                    details[d].SetActive(true);
+            }
+        }
+    }
+
+    void ActivateRandomObject(GameObject[] objects, float noneProbability)
+    {
+        if (objects != null)
+        {
+            int paddedTotal = objects.Length;
+
+            if (noneProbability > 0)
+                paddedTotal = (int)((float)objects.Length / noneProbability);
+
+            int r = (int)Mathf.Floor(Random.value * paddedTotal);
+            Debug.Log(paddedTotal);
+            if (r < objects.Length && r >= 0)
+                objects[r].SetActive(true);
         }
     }
 
@@ -96,6 +141,7 @@ public class IslandDiscoveryInteraction : Interaction
             if (islandData.success)
             {
                 discoveredIslands = islandData.islands;
+                orbital.ExploreMode(threeIslandObservationPoint, false);
                 orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
             }
         }
@@ -106,6 +152,7 @@ public class IslandDiscoveryInteraction : Interaction
             if (islandData.success)
             {
                 discoveredIslands = islandData.islands;
+                orbital.ExploreMode(fiveIslandObservationPoint, false);
                 orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
             }
         }
@@ -138,6 +185,7 @@ public class IslandDiscoveryInteraction : Interaction
                 stats.islandInfo = discoveredIslands[discoveredIndex];
                 stats.TurnOnIslandBadge();
                 PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform);
+                
             }
         }
     }
@@ -155,15 +203,13 @@ public class IslandDiscoveryInteraction : Interaction
         discoveredIslandObjects = null;
     }
 
-    /*Under Navigator I think this shoudl go.
+    /*
     public void SubmitSelectedIsland()
     {
-        islandIndex = 0;
         if (stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland))
         {
             islands = stateMaster.playerState.islands;
             islandCount = islands.Length;
         }
-    }
-    */
+    }*/
 }

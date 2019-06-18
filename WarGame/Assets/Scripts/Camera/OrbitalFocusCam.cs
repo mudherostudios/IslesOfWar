@@ -164,4 +164,12 @@ public class OrbitalFocusCam : MonoBehaviour
         tracking = false;
         offset = false;
     }
+
+    public bool isAtTarget
+    {
+        get
+        {
+            return centered;
+        }
+    }
 }

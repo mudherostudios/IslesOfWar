@@ -23,6 +23,9 @@ public class Interaction : MonoBehaviour
     protected WorldGUI selectedWorldUI;
     protected WorldButton selectedButton;
 
+    protected Vector3 targetPosition;
+    protected bool isAtTarget;
+
     protected void WorldButtonCheck()
     {
         if (cam != null && Input.GetButtonDown("Fire1"))
