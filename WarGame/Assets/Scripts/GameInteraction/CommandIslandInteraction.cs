@@ -21,20 +21,13 @@ public class CommandIslandInteraction : Interaction
     public PoolContribute oilPool;
     public PoolContribute metalPool;
     public PoolContribute concretePool;
+
+    public Transform commandCenter;
+    public Transform observePoint;
+    public Transform focalPoint;
     
     private UnitPurchase selectedUnitPurchase;
     private PoolContribute selectedPoolContribute;
-
-    private void Start()
-    {
-        stateMaster.InitilializeConnection();
-        stateMaster.GetState();
-
-        InitializeUnitGUIs();
-        InitializePoolGUIs();
-
-        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-    }
 
     private void Update()
     {
@@ -48,6 +41,49 @@ public class CommandIslandInteraction : Interaction
 
         Typing();
         UpdateTimers();
+    }
+
+    public void SetCommandVariables(UnitPurchase[] unitGUIs, PoolContribute[] poolGUIs, Transform _commandCenter)
+    {
+        riflemanPurchase = unitGUIs[0];
+        machineGunnerPurchase = unitGUIs[1];
+        bazookamanPurchase = unitGUIs[2];
+        lightTankPurchase = unitGUIs[3];
+        mediumTankPurchase = unitGUIs[4];
+        heavyTankPurchase = unitGUIs[5];
+        lightFighterPurchase = unitGUIs[6];
+        mediumFighterPurchase = unitGUIs[7];
+        bomberPurchase = unitGUIs[8];
+
+        warbucksPool = poolGUIs[0];
+        oilPool = poolGUIs[1];
+        metalPool = poolGUIs[2];
+        concretePool = poolGUIs[3];
+
+        commandCenter = _commandCenter;
+    }
+
+    public void SetObservationPoints(Transform observe, Transform focus)
+    {
+        observePoint = observe;
+        focalPoint = focus;
+    }
+
+    public void Initialize()
+    {
+        InitializeUnitGUIs();
+        InitializePoolGUIs();
+    }
+
+    public void GotoCommandIsland()
+    {
+        orbital.ExploreMode(commandCenter, false);
+        orbital.SetNewObservePoint(observePoint, focalPoint);
+    }
+
+    public void GotoCommandCenter()
+    {
+        orbital.ExploreMode(commandCenter, true);
     }
 
     void CheckMainIslandGUIs()

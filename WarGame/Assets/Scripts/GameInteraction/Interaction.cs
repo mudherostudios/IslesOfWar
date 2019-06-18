@@ -23,6 +23,9 @@ public class Interaction : MonoBehaviour
     protected WorldGUI selectedWorldUI;
     protected WorldButton selectedButton;
 
+    protected Vector3 targetPosition;
+    protected bool isAtTarget;
+
     protected void WorldButtonCheck()
     {
         if (cam != null && Input.GetButtonDown("Fire1"))
@@ -120,5 +123,14 @@ public class Interaction : MonoBehaviour
     public void SetGUIContents()
     {
         screenGUI.SetGUIContents();
+    }
+
+    public void SetVariables(StateMaster _stateMaster, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
+    {
+        stateMaster = _stateMaster;
+        cam = _cam;
+        orbital = _orbital;
+        screenGUI = _screenGUI;
+        buttonTypes = _buttonTypes;
     }
 }
