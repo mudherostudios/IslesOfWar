@@ -126,7 +126,6 @@ public class IslandDiscoveryInteraction : Interaction
                 paddedTotal = (int)((float)objects.Length / noneProbability);
 
             int r = (int)Mathf.Floor(Random.value * paddedTotal);
-            Debug.Log(paddedTotal);
             if (r < objects.Length && r >= 0)
                 objects[r].SetActive(true);
         }

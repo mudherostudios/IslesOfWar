@@ -39,7 +39,6 @@ public class Interaction : MonoBehaviour
                 {
                     selectedButton = hit.transform.GetComponent<WorldButton>();
                     clickedButtonType = selectedButton.buttonType;
-                    Debug.Log(clickedButtonType);
 
                     if(selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && selectedButton.logicParent.GetComponent<WorldGUI>() != selectedWorldUI)
                         selectedWorldUIObject.gameObject.SetActive(false);
@@ -55,10 +54,10 @@ public class Interaction : MonoBehaviour
                     }
                     else if (clickedButtonType == buttonTypes[1])
                     {
-                        if (selectedWorldUI.gameObject.activeSelf)
-                            selectedWorldUI.gameObject.SetActive(false);
+                        if (selectedWorldUIObject.gameObject.activeSelf)
+                            selectedWorldUIObject.gameObject.SetActive(false);
                         else
-                            selectedWorldUI.gameObject.SetActive(true);
+                            selectedWorldUIObject.gameObject.SetActive(true);
                     }
                     else if (clickedButtonType == buttonTypes[2])
                     {

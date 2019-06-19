@@ -30,7 +30,14 @@ public class IslandManagementInteraction: Interaction
 
     public void Update()
     {
-        WorldButtonCheck();
+        if (Input.GetButtonDown("Fire1"))
+        {
+            if (selectedButton != null && !selectedButton.gameObject.activeSelf && PeekButtonType() == "CollectorReveal")
+                selectedButton.gameObject.SetActive(true);
+            
+            WorldButtonCheck();
+            CheckNodeSelection();
+        }
 
         if (direction != 0)
         {
@@ -45,6 +52,24 @@ public class IslandManagementInteraction: Interaction
                 bufferedIsland = null;
                 bufferedStats = null;
                 direction = 0;
+            }
+        }
+    }
+
+    void CheckNodeSelection()
+    {
+        string peekedType = PeekButtonType();
+
+        if (selectedWorldUI != null && peekedType == "CollectorReveal")
+        {
+            if (selectedWorldUIObject.gameObject.activeSelf)
+            {
+                selectedWorldUIObject.gameObject.SetActive(false);
+            }
+            else
+            {
+                selectedWorldUIObject.gameObject.SetActive(true);
+                selectedButton.gameObject.SetActive(false);
             }
         }
     }
@@ -148,7 +173,7 @@ public class IslandManagementInteraction: Interaction
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
         }
     }
-
+    
     void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
     {
         IslandStats parent = tileParent.GetComponent<IslandStats>();
@@ -259,7 +284,6 @@ public class IslandManagementInteraction: Interaction
                 paddedTotal = (int)((float)objects.Length / noneProbability);
 
             int r = (int)Mathf.Floor(Random.value * paddedTotal);
-            Debug.Log(paddedTotal);
             if(r < objects.Length && r >= 0)
                 objects[r].SetActive(true);
         }
