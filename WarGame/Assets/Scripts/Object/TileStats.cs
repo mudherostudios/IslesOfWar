@@ -18,4 +18,7 @@ public class TileStats : MonoBehaviour
     public float[] rockProbabilities;
     public float[] vegetationProbabilities;
     public float[] structureProbabilities;
+
+    [Header("Type Info")]
+    public GameObject positionParent;
 }

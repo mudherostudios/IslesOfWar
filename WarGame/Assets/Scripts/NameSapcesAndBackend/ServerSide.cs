@@ -96,29 +96,6 @@ namespace ServerSide
         }
     }
 
-    public class TileFeatureLookUp
-    {
-        public char[,] lookUpTable;
-
-        public TileFeatureLookUp()
-        {
-            lookUpTable = new char[,]
-            {
-                { '0', '1', '2', '3', '4', '5', '6', '7' },
-                { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' },
-                { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
-            };
-        }
-
-        public char GetFeatureCode(int tileType, int resourceType)
-        {
-            if (tileType == -1 || resourceType == -1)
-                return '!';
-
-            return lookUpTable[tileType, resourceType];
-        }
-    }
-
     public class IslandGenerator
     {
         public float[] tileProbabilities = new float[3];
@@ -151,14 +128,14 @@ namespace ServerSide
             string features = "";
             string collectors = "";
             int[] resourceTypes = new int[12];
-            TileFeatureLookUp lut = new TileFeatureLookUp();
+            EncodeUtility encode = new EncodeUtility();
             PlayerInfo ownerInfo = new PlayerInfo();
             bool depleted = false;
 
             for (int t = 0; t < 12; t++)
             {
                 resourceTypes[t] = GetResourceType();
-                features += lut.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
+                features += encode.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
             }
 
             //Owned || Depleted else Undiscovered
@@ -341,6 +318,73 @@ namespace ServerSide
                 playerState.attackableIslands[0] = island;
 
             return new FakeStateJson(playerState, worldState, purchaseTable, true);
+        }
+
+        //Cost type amount for this one should be I:T:R:C:P
+        //I is the island index, T is the tile index, R is the resource/tile type, C is the collector type, and P is the base type you want to purchase;
+        public FakeStateJson PurchaseIslandStructures(Cost cost)
+        {
+            EncodeUtility utility = new EncodeUtility();
+            string[] types = cost.type.Split(':');
+            bool successfulPurchase = false;
+
+            if (types != null && types.Length == 5)
+            {
+                int islandIndex = 0;
+                int tileIndex = 0;
+                int.TryParse(types[0], out islandIndex);
+                int.TryParse(types[1], out tileIndex);
+
+                int resourceType = utility.GetConvertedType(types[1]);
+                int collectorType = utility.GetConvertedType(types[2]);
+                int purchaseType = utility.GetConvertedType(types[3]);
+
+                int[] resources = utility.GetBaseTypes(resourceType);
+                int[] collectors = utility.GetBaseTypes(collectorType);
+
+                if (CanSpendResources(cost, false))
+                {
+                    for (int r = 0; r < resources.Length; r++)
+                    {
+                        if (collectors[r] != resources[r] && r == purchaseType - 1)
+                        {
+                            successfulPurchase = true;
+                            r = resources.Length;
+                        }
+                    }
+                }
+
+                if (successfulPurchase)
+                {
+                    collectors[purchaseType - 1] = purchaseType;
+                    UpdateCollectorString(islandIndex, tileIndex, collectors);
+                }
+            }
+
+            return new FakeStateJson(playerState, worldState, purchaseTable, successfulPurchase);
+        }
+
+        void UpdateCollectorString(int islandIndex, int tileIndex, int[] updatedCollectorTypes)
+        {
+            int baseType = 0;
+            int types = 0;
+
+            for (int c = 0; c < updatedCollectorTypes.Length; c++)
+            {
+                if (updatedCollectorTypes[c] != 0)
+                    types++;
+
+                baseType += updatedCollectorTypes[c];
+            }
+
+            if (types >= 2)
+                baseType += 1;
+
+            EncodeUtility utility = new EncodeUtility();
+            int tileType = utility.GetTileType(playerState.islands[islandIndex].features[tileIndex]);
+            char updatedTileType = utility.GetFeatureCode(tileType, baseType);
+
+            playerState.islands[islandIndex].SetTile(tileIndex, updatedTileType);
         }
 
         public FakeStateJson PurchaseUnits(Cost cost)

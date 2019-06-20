@@ -72,6 +72,13 @@ namespace ClientSide
             owner = userInfo;
         }
 
+        public void SetTile(int index, char updated)
+        {
+            char[] expandedFeatures = features.ToCharArray();
+            expandedFeatures[index] = updated;
+            features = expandedFeatures.ToString();
+        }
+
         public int totalTiles
         {
             get { return features.Length; }
@@ -92,6 +99,88 @@ namespace ClientSide
             concrete = _concrete;
             amount = _amount;
             type = _type;
+        }
+    }
+
+    public class EncodeUtility
+    {
+        //Keep zeroed indicies so you can use math as logic instead of a shit load of ifs.
+        private int[][] resourceDecodeTable = new int[][]
+        {
+            new int[] {0, 0, 0},
+            new int[] {1, 0, 0},
+            new int[] {0, 2, 0},
+            new int[] {0, 0, 3},
+            new int[] {1, 2, 0},
+            new int[] {1, 2, 3},
+            new int[] {0, 2, 3},
+            new int[] {1, 2, 3}
+        };
+
+        public char[,] tileEncodeTable = new char[,]
+        {
+            { '0', '1', '2', '3', '4', '5', '6', '7' },
+            { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' },
+            { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
+        };
+
+        public char GetFeatureCode(int tileType, int resourceType)
+        {
+            if (tileType == -1 || resourceType == -1)
+                return '!';
+
+            return tileEncodeTable[tileType, resourceType];
+        }
+
+        public int[] GetBaseTypes(int type)
+        {
+            return resourceDecodeTable[type];
+        }
+
+        public int GetConvertedType(char type)
+        {
+            return GetConvertedType(type.ToString());
+        }
+
+        public int GetConvertedType(string type)
+        {
+            int converted = -1;
+
+            if ("0aA".Contains(type))
+                converted = 0;
+            else if ("1bB".Contains(type))
+                converted = 1;
+            else if ("2cC".Contains(type))
+                converted = 2;
+            else if ("3dD".Contains(type))
+                converted = 3;
+            else if ("4eE".Contains(type))
+                converted = 4;
+            else if ("5fF".Contains(type))
+                converted = 5;
+            else if ("6gG".Contains(type))
+                converted = 6;
+            else if ("7hH".Contains(type))
+                converted = 7;
+
+            return converted;
+        }
+
+        public int GetTileType(char type)
+        {
+            return GetTileType(type.ToString());
+        }
+
+        public int GetTileType(string type)
+        {
+            if ("01234567".Contains(type))
+                return 0;
+            else if ("abcdefgh".Contains(type))
+                return 1;
+            else if ("ABCDEFGH".Contains(type))
+                return 2;
+
+            return -1;
         }
     }
 

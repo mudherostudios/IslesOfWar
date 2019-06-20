@@ -62,14 +62,24 @@ public class IslandManagementInteraction: Interaction
 
         if (selectedWorldUI != null && peekedType == "CollectorReveal")
         {
-            if (selectedWorldUIObject.gameObject.activeSelf)
+            if (selectedButton.gameObject.activeSelf)
             {
-                selectedWorldUIObject.gameObject.SetActive(false);
+                string data = "";
+                int tileIndex = selectedButton.logicParent.GetComponent<TileStats>().positionParent.GetComponent<WorldButton>().fieldID;
+                string resourceType = stateMaster.playerState.islands[islandIndex].features[tileIndex].ToString();
+                string collectorType = stateMaster.playerState.islands[islandIndex].collectors[tileIndex].ToString();
+                int purchaseType = selectedButton.transform.GetComponent<WorldButton>().fieldID;
+                data = islandIndex + ":" + tileIndex + ":" + resourceType + ":" + collectorType + ":" + purchaseType;
+
+                Debug.Log(data);
+                Cost cost = new Cost(0, 0, 0, 0, 1, data);
+                if(stateMaster.SendPurchaseStructureRequest(cost))
+                    selectedWorldUIObject.gameObject.SetActive(false);
             }
             else
             {
-                selectedWorldUIObject.gameObject.SetActive(true);
-                selectedButton.gameObject.SetActive(false);
+                //selectedWorldUIObject.gameObject.SetActive(true);
+                //selectedButton.gameObject.SetActive(false);
             }
         }
     }
@@ -204,6 +214,8 @@ public class IslandManagementInteraction: Interaction
             tempTile.transform.SetParent(tileParent);
 
             TileStats tempStats = tempTile.GetComponent<TileStats>();
+            tempStats.positionParent = islandStats.hexTiles[h].gameObject;
+
             TurnOnResourcesAndCollectors(tempStats.resourceParents, tempStats.collectorParents, featString, collectorString);
             TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
             TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
@@ -219,24 +231,23 @@ public class IslandManagementInteraction: Interaction
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
     {
-        int r = GetConvertedType(type);
-        int c = GetConvertedType(built);
+        EncodeUtility utility = new EncodeUtility();
+        int r = utility.GetConvertedType(type);
+        int c = utility.GetConvertedType(built);
         GameObject resourceObject = null;
 
         if (r == 1 || r == 4 || r == 5 || r == 7)
         {
             resourceObject = resources[0];
-
             if (c == 1 || c == 4 || c == 5 || c == 7)
                 resourceObject = collectors[0];
-
+           
             ActivateRandomChild(resourceObject.transform);
         }
 
         if (r == 2 || r == 4 || r == 6 || r == 7)
         {
             resourceObject = resources[1];
-
             if (c == 2 || c == 4 || c == 6 || c == 7)
                 resourceObject = collectors[1];
 
@@ -246,7 +257,6 @@ public class IslandManagementInteraction: Interaction
         if (r == 3 || r == 5 || r == 6 || r == 7)
         {
             resourceObject = resources[2];
-
             if (c == 3 || c == 5 || c == 6 || c == 7)
                 resourceObject = collectors[2];
 
@@ -287,30 +297,6 @@ public class IslandManagementInteraction: Interaction
             if(r < objects.Length && r >= 0)
                 objects[r].SetActive(true);
         }
-    }
-
-    int GetConvertedType(string type)
-    {
-        int converted = -1;
-
-        if ("0aA".Contains(type))
-            converted = 0;
-        else if ("1bB".Contains(type))
-            converted = 1;
-        else if ("2cC".Contains(type))
-            converted = 2;
-        else if ("3dD".Contains(type))
-            converted = 3;
-        else if ("4eE".Contains(type))
-            converted = 4;
-        else if ("5fF".Contains(type))
-            converted = 5;
-        else if ("6gG".Contains(type))
-            converted = 6;
-        else if ("7hH".Contains(type))
-            converted = 7;
-
-        return converted;
     }
 
     public void Initialize()
