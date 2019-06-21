@@ -28,7 +28,7 @@ public class CommandIslandInteraction : Interaction
     
     private UnitPurchase selectedUnitPurchase;
     private PoolContribute selectedPoolContribute;
-
+    private string[] commandButtonTypes = new string[] { "UnitPurchase", "PoolSend"};
     private void Update()
     {
         MenuUpdates();
@@ -90,11 +90,11 @@ public class CommandIslandInteraction : Interaction
     {
         if (selectedWorldUI != null)
         {
-            selectedUnitPurchase = selectedWorldUIObject.GetComponent<UnitPurchase>();
-            selectedPoolContribute = selectedWorldUIObject.GetComponent<PoolContribute>();
+            selectedUnitPurchase = selectedWorldUI.gameObject.GetComponent<UnitPurchase>();
+            selectedPoolContribute = selectedWorldUI.gameObject.GetComponent<PoolContribute>();
             string peekedType = PeekButtonType();
 
-            if (peekedType == buttonTypes[1])
+            if (peekedType == buttonTypes[2])
             {
                 if (selectedUnitPurchase != null)
                     selectedUnitPurchase.Reset();
@@ -102,12 +102,12 @@ public class CommandIslandInteraction : Interaction
                     selectedPoolContribute.Reset();
             }
 
-            //Put check to see if buttons are children of the selected tile.
-            if (peekedType == "PurchaseButton")
+            
+            if (peekedType == commandButtonTypes[0])
             {
                 Purchase(selectedUnitPurchase.TryPurchase());
             }
-            else if (peekedType == "PoolSend")
+            else if (peekedType == commandButtonTypes[1])
             {
                 SendToPool(selectedPoolContribute.TrySend());
                 InitializePoolGUIs();
@@ -136,7 +136,6 @@ public class CommandIslandInteraction : Interaction
 
     void InitializeUnitGUIs()
     {
-        Debug.Log("Initializing Unit GUIs");
         riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
         machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
         bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);

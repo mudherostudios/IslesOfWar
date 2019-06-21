@@ -335,9 +335,9 @@ namespace ServerSide
                 int.TryParse(types[0], out islandIndex);
                 int.TryParse(types[1], out tileIndex);
 
-                int resourceType = utility.GetConvertedType(types[1]);
-                int collectorType = utility.GetConvertedType(types[2]);
-                int purchaseType = utility.GetConvertedType(types[3]);
+                int resourceType = utility.GetConvertedType(types[2]);
+                int collectorType = utility.GetConvertedType(types[3]);
+                int purchaseType = utility.GetConvertedType(types[4]);
 
                 int[] resources = utility.GetBaseTypes(resourceType);
                 int[] collectors = utility.GetBaseTypes(collectorType);
@@ -346,6 +346,7 @@ namespace ServerSide
                 {
                     for (int r = 0; r < resources.Length; r++)
                     {
+                        //Minus 1 because types start at 1 not zero. Zero is no type.
                         if (collectors[r] != resources[r] && r == purchaseType - 1)
                         {
                             successfulPurchase = true;
@@ -366,7 +367,7 @@ namespace ServerSide
 
         void UpdateCollectorString(int islandIndex, int tileIndex, int[] updatedCollectorTypes)
         {
-            int baseType = 0;
+            int collectorType = 0;
             int types = 0;
 
             for (int c = 0; c < updatedCollectorTypes.Length; c++)
@@ -374,17 +375,15 @@ namespace ServerSide
                 if (updatedCollectorTypes[c] != 0)
                     types++;
 
-                baseType += updatedCollectorTypes[c];
+                collectorType += updatedCollectorTypes[c];
             }
 
             if (types >= 2)
-                baseType += 1;
+                collectorType += 1;
 
             EncodeUtility utility = new EncodeUtility();
-            int tileType = utility.GetTileType(playerState.islands[islandIndex].features[tileIndex]);
-            char updatedTileType = utility.GetFeatureCode(tileType, baseType);
 
-            playerState.islands[islandIndex].SetTile(tileIndex, updatedTileType);
+            playerState.islands[islandIndex].SetCollectors(tileIndex, collectorType.ToString()[0]);
         }
 
         public FakeStateJson PurchaseUnits(Cost cost)

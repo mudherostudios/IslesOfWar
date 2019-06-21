@@ -13,7 +13,7 @@ public class Interaction : MonoBehaviour
     public ScreenGUI screenGUI;
 
     [Header("Button Types")]
-    public string[] buttonTypes = new string[] { "InputField", "MenuRevealer", "Tile"};
+    public string[] buttonTypes = new string[] { "NavigationButton", "ObjectRevealer", "InputField", "IndexedNavigation"};
 
     private string clickedButtonType = "None";
     protected bool isTyping = false;
@@ -40,48 +40,59 @@ public class Interaction : MonoBehaviour
                     selectedButton = hit.transform.GetComponent<WorldButton>();
                     clickedButtonType = selectedButton.buttonType;
 
-                    if(selectedWorldUIObject != null && selectedWorldUIObject.gameObject.activeSelf && selectedButton.logicParent.GetComponent<WorldGUI>() != selectedWorldUI)
-                        selectedWorldUIObject.gameObject.SetActive(false);
-
-                    selectedWorldUIObject = selectedButton.logicParent;
-                    selectedWorldUI = selectedWorldUIObject.GetComponent<WorldGUI>();
-                    
-                    if (clickedButtonType == buttonTypes[0])
+                    if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[3])
                     {
-                        Debug.Log(selectedWorldUIObject.name);
-                        isTyping = true;
-                        fieldID = selectedButton.fieldID;
+                        NavigateToDestination();
                     }
                     else if (clickedButtonType == buttonTypes[1])
                     {
-                        if (selectedWorldUIObject.gameObject.activeSelf)
-                            selectedWorldUIObject.gameObject.SetActive(false);
-                        else
-                            selectedWorldUIObject.gameObject.SetActive(true);
+                        RevealObject();
                     }
                     else if (clickedButtonType == buttonTypes[2])
                     {
-                        orbital.ExploreMode(selectedWorldUIObject, true);
-                        selectedWorldUIObject = null;
-                        selectedWorldUI = null;
+                        SelectInputField();
                     }
                 }
-                else
-                {
-                    clickedButtonType = "None";
-
-                    if (selectedWorldUIObject != null)
-                    {
-                        selectedWorldUIObject.gameObject.SetActive(false);
-                    }
-
-                    isTyping = false;
-                }
             }
-            else
-            {
-                clickedButtonType = "None";
-            }
+        }
+    }
+
+    private void NavigateToDestination()
+    {
+        Transform destination = selectedButton.GetComponent<NavigationButton>().navigationDestination;
+
+        if (destination != null)
+        {
+            orbital.ExploreMode(destination, true);
+            selectedWorldUIObject = null;
+            selectedWorldUI = null;
+        }
+    }
+
+    private void RevealObject()
+    {
+        GameObject hiddenObject = selectedButton.GetComponent<ObjectRevealer>().hiddenObject;
+
+        if (hiddenObject != null)
+        {
+            if (hiddenObject.activeSelf)
+                hiddenObject.SetActive(false);
+            else if (!hiddenObject.activeSelf)
+                hiddenObject.SetActive(true);
+        }
+    }
+
+    //Fix "selectedWorldUI" logic in CommandIslandInteraction
+    //Currently uses whether or not it is null to reset guis
+    private void SelectInputField()
+    {
+        InputField inputField = selectedButton.GetComponent<InputField>();
+
+        if (inputField != null)
+        {
+            selectedWorldUI = inputField.guiParent;
+            isTyping = true;
+            fieldID = inputField.fieldID;
         }
     }
 

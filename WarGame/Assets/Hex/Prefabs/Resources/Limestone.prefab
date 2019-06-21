@@ -11,15 +11,15 @@ GameObject:
   - component: {fileID: 5089858242360456900}
   - component: {fileID: 5287454678991513978}
   - component: {fileID: 7155914245232700332}
-  - component: {fileID: 3849993940973080134}
   - component: {fileID: 5179994959840276127}
+  - component: {fileID: 7227418283539831646}
   m_Layer: 0
   m_Name: Limestone
   m_TagString: WorldButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5089858242360456900
 Transform:
   m_ObjectHideFlags: 0
@@ -79,21 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &3849993940973080134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6063582138642026236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
-  buttonType: CollectorReveal
-  fieldID: 3
 --- !u!65 &5179994959840276127
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -107,3 +92,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0660008, y: 1.3315332, z: 0.51464546}
   m_Center: {x: -0.05438962, y: -0.08540614, z: 0.027822135}
+--- !u!114 &7227418283539831646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6063582138642026236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bccb094858eb05044a17a580e74584e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonType: TilePurchasePrompter
+  hiddenObject: {fileID: 0}
+  indexParent: {fileID: 0}
+  tileTypeParent: {fileID: 0}
+  purchaseType: 3

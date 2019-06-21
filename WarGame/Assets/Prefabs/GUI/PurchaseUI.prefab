@@ -55,6 +55,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
+  lockY: 1
 --- !u!114 &8719488902766424418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,7 +165,7 @@ GameObject:
   - component: {fileID: 223403347445038040}
   - component: {fileID: 223403347445038047}
   - component: {fileID: 6372813154619503046}
-  - component: {fileID: 3626350777872559950}
+  - component: {fileID: 3842348670544268098}
   m_Layer: 0
   m_Name: Amount
   m_TagString: WorldButton
@@ -373,7 +374,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 6.748565, y: 1.6157813, z: 0.27}
   m_Center: {x: -0.017633915, y: 1.7037466, z: -0.000000004212065}
---- !u!114 &3626350777872559950
+--- !u!114 &3842348670544268098
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -382,11 +383,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 223403347445038045}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fa994167331e8746aeef9547e0dfbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 223403346876549528}
   buttonType: InputField
+  guiParent: {fileID: 8719488902766424418}
   fieldID: 0
 --- !u!1 &223403347897967051
 GameObject:
@@ -622,9 +623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 223403346876549528}
   buttonType: PurchaseButton
-  fieldID: 0
 --- !u!1 &223403348303189218
 GameObject:
   m_ObjectHideFlags: 0

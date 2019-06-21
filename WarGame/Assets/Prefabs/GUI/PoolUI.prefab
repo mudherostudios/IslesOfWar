@@ -537,9 +537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 1546954449785841797}
   buttonType: PoolSend
-  fieldID: -1
 --- !u!1 &1482178803541843802
 GameObject:
   m_ObjectHideFlags: 0
@@ -1938,7 +1936,7 @@ GameObject:
   - component: {fileID: 5276058044102936786}
   - component: {fileID: 4228178778053965391}
   - component: {fileID: 3705930777109771866}
-  - component: {fileID: 8392450120409136742}
+  - component: {fileID: 8344707830021874577}
   m_Layer: 0
   m_Name: Input
   m_TagString: WorldButton
@@ -2249,7 +2247,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 7, y: 2, z: 0.4}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8392450120409136742
+--- !u!114 &8344707830021874577
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2258,11 +2256,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4559054386248697808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fa994167331e8746aeef9547e0dfbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  guiParent: {fileID: 8330714224995309953}
   fieldID: 1
 --- !u!1 &4778023611689547127
 GameObject:
@@ -2557,7 +2555,7 @@ GameObject:
   - component: {fileID: 6569527833499959981}
   - component: {fileID: 2179207837898771719}
   - component: {fileID: 5001571064324428227}
-  - component: {fileID: 4579955575722058815}
+  - component: {fileID: 7237142223630284533}
   m_Layer: 0
   m_Name: Input
   m_TagString: WorldButton
@@ -2740,7 +2738,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 3380260751561570850}
   m_subTextObjects:
@@ -2868,7 +2866,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 7, y: 2, z: 0.4}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4579955575722058815
+--- !u!114 &7237142223630284533
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2877,11 +2875,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5705544309490238756}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fa994167331e8746aeef9547e0dfbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  guiParent: {fileID: 8330714224995309953}
   fieldID: 2
 --- !u!1 &5860104331285702588
 GameObject:
@@ -3057,7 +3055,7 @@ GameObject:
   - component: {fileID: 2442267051205301743}
   - component: {fileID: 3288477195185204668}
   - component: {fileID: 6108923990338380510}
-  - component: {fileID: 4101413401290818734}
+  - component: {fileID: 3913370991613617511}
   m_Layer: 0
   m_Name: Input
   m_TagString: WorldButton
@@ -3240,7 +3238,7 @@ MonoBehaviour:
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
   m_isInputParsingRequired: 0
-  m_inputSource: 3
+  m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 7857384063439759241}
   m_subTextObjects:
@@ -3368,7 +3366,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 7, y: 2, z: 0.4}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4101413401290818734
+--- !u!114 &3913370991613617511
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3377,11 +3375,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7408498998908918872}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fa994167331e8746aeef9547e0dfbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 1546954449785841797}
   buttonType: InputField
+  guiParent: {fileID: 8330714224995309953}
   fieldID: 0
 --- !u!1 &7489641895512658005
 GameObject:

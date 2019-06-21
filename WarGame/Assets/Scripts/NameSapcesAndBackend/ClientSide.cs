@@ -72,11 +72,16 @@ namespace ClientSide
             owner = userInfo;
         }
 
-        public void SetTile(int index, char updated)
+        public void SetCollectors(int index, char updated)
         {
-            char[] expandedFeatures = features.ToCharArray();
-            expandedFeatures[index] = updated;
-            features = expandedFeatures.ToString();
+            char[] expandedCollectors = collectors.ToCharArray();
+            expandedCollectors[index] = updated;
+            collectors = "";
+
+            for(int c = 0; c < expandedCollectors.Length; c++)
+            {
+                collectors += expandedCollectors[c].ToString();
+            }
         }
 
         public int totalTiles
@@ -112,7 +117,7 @@ namespace ClientSide
             new int[] {0, 2, 0},
             new int[] {0, 0, 3},
             new int[] {1, 2, 0},
-            new int[] {1, 2, 3},
+            new int[] {1, 0, 3},
             new int[] {0, 2, 3},
             new int[] {1, 2, 3}
         };

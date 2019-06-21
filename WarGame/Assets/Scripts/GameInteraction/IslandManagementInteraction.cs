@@ -10,6 +10,7 @@ public class IslandManagementInteraction: Interaction
     
     public Transform defaultObservePoint;
     public Transform defaultObservationFocus;
+    public string[] managementButtonTypes = new string[] { "TilePurchasePrompter" };
 
     [Header("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -60,21 +61,24 @@ public class IslandManagementInteraction: Interaction
     {
         string peekedType = PeekButtonType();
 
-        if (selectedWorldUI != null && peekedType == "CollectorReveal")
+        if (peekedType == managementButtonTypes[0])
         {
             if (selectedButton.gameObject.activeSelf)
             {
+                TilePurchasePrompter prompter = selectedButton.gameObject.GetComponent<TilePurchasePrompter>();
                 string data = "";
-                int tileIndex = selectedButton.logicParent.GetComponent<TileStats>().positionParent.GetComponent<WorldButton>().fieldID;
+                int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
                 string resourceType = stateMaster.playerState.islands[islandIndex].features[tileIndex].ToString();
                 string collectorType = stateMaster.playerState.islands[islandIndex].collectors[tileIndex].ToString();
-                int purchaseType = selectedButton.transform.GetComponent<WorldButton>().fieldID;
+                int purchaseType = prompter.purchaseType;
                 data = islandIndex + ":" + tileIndex + ":" + resourceType + ":" + collectorType + ":" + purchaseType;
 
-                Debug.Log(data);
                 Cost cost = new Cost(0, 0, 0, 0, 1, data);
-                if(stateMaster.SendPurchaseStructureRequest(cost))
-                    selectedWorldUIObject.gameObject.SetActive(false);
+                if (stateMaster.SendPurchaseStructureRequest(cost))
+                {
+                    prompter.hiddenObject.SetActive(true);
+                    prompter.gameObject.SetActive(false);
+                }
             }
             else
             {
@@ -214,7 +218,7 @@ public class IslandManagementInteraction: Interaction
             tempTile.transform.SetParent(tileParent);
 
             TileStats tempStats = tempTile.GetComponent<TileStats>();
-            tempStats.positionParent = islandStats.hexTiles[h].gameObject;
+            tempStats.SetIndexParent(islandStats.hexTiles[h].gameObject);
 
             TurnOnResourcesAndCollectors(tempStats.resourceParents, tempStats.collectorParents, featString, collectorString);
             TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);

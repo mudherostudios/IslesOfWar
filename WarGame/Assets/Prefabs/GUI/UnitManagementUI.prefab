@@ -221,7 +221,6 @@ GameObject:
   - component: {fileID: 3812273681988762408}
   - component: {fileID: 4965541320384143292}
   - component: {fileID: 8109235554621535514}
-  - component: {fileID: 6323703655890494921}
   m_Layer: 0
   m_Name: OKTroops
   m_TagString: WorldButton
@@ -431,21 +430,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1385739739944908177}
   m_CullTransparentMesh: 0
---- !u!114 &6323703655890494921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385739739944908177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
-  buttonType: UnitAdd
-  fieldID: 2
 --- !u!1 &1521444681854441789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1211,9 +1195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
   buttonType: SquadSubmit
-  fieldID: 0
 --- !u!1 &2029057801326877933
 GameObject:
   m_ObjectHideFlags: 0
@@ -2225,9 +2207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
   buttonType: Cancel
-  fieldID: 0
 --- !u!1 &2997761335672768732
 GameObject:
   m_ObjectHideFlags: 0
@@ -2242,7 +2222,6 @@ GameObject:
   - component: {fileID: 3878157593779719640}
   - component: {fileID: 2651404215044375959}
   - component: {fileID: 7240836173194813273}
-  - component: {fileID: 7240066059672424595}
   m_Layer: 0
   m_Name: OkTanks
   m_TagString: WorldButton
@@ -2450,21 +2429,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2997761335672768732}
   m_CullTransparentMesh: 0
---- !u!114 &7240066059672424595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2997761335672768732}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
-  buttonType: UnitAdd
-  fieldID: 1
 --- !u!1 &3632090369575696234
 GameObject:
   m_ObjectHideFlags: 0
@@ -4157,12 +4121,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4249525939419680677}
-  - component: {fileID: 8607751814439771683}
   - component: {fileID: 1044216458456674733}
   - component: {fileID: 4255712481933318732}
   - component: {fileID: 3393219482937427780}
   - component: {fileID: 304816433857380511}
   - component: {fileID: 7772441101601192344}
+  - component: {fileID: 8607751814439771683}
   m_Layer: 0
   m_Name: InputFieldTroops
   m_TagString: WorldButton
@@ -4189,19 +4153,6 @@ RectTransform:
   m_AnchoredPosition: {x: -36.12155, y: -25.529518}
   m_SizeDelta: {x: 20, y: 0.2}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!65 &8607751814439771683
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6597641216167502148}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 0.20611246, z: 0.044069003}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1044216458456674733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4472,6 +4423,19 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   m_maskType: 0
+--- !u!65 &8607751814439771683
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6597641216167502148}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.20611246, z: 0.044069003}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7042912343744384386
 GameObject:
   m_ObjectHideFlags: 0
@@ -4810,7 +4774,6 @@ GameObject:
   - component: {fileID: 7447531038611011229}
   - component: {fileID: 6974638836652786950}
   - component: {fileID: 6393929742030960488}
-  - component: {fileID: 2337312945472443594}
   m_Layer: 0
   m_Name: OkAir
   m_TagString: WorldButton
@@ -5018,21 +4981,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7212091601139502465}
   m_CullTransparentMesh: 0
---- !u!114 &2337312945472443594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7212091601139502465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81180f0bf3683db47a33fe2707c80b9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logicParent: {fileID: 0}
-  buttonType: UnitAdd
-  fieldID: 0
 --- !u!1 &7413892444307572552
 GameObject:
   m_ObjectHideFlags: 0
