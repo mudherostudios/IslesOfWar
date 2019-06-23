@@ -26,9 +26,9 @@ public class TileStats : MonoBehaviour
     {
         indexParent = _indexParent;
 
-        TilePurchasePrompter[] oilWells = GetChildren(resourceParents[0].transform);
-        TilePurchasePrompter[] metalMines = GetChildren(resourceParents[1].transform);
-        TilePurchasePrompter[] limeNodes = GetChildren(resourceParents[2].transform);
+        CollectorPurchasePrompter[] oilWells = GetChildren(resourceParents[0].transform);
+        CollectorPurchasePrompter[] metalMines = GetChildren(resourceParents[1].transform);
+        CollectorPurchasePrompter[] limeNodes = GetChildren(resourceParents[2].transform);
 
         for (int n = 0; n < oilWells.Length; n++)
         {
@@ -38,13 +38,13 @@ public class TileStats : MonoBehaviour
         }
     }
 
-    TilePurchasePrompter[] GetChildren(Transform parent)
+    CollectorPurchasePrompter[] GetChildren(Transform parent)
     {
-        TilePurchasePrompter[] children = new TilePurchasePrompter[parent.childCount];
+        CollectorPurchasePrompter[] children = new CollectorPurchasePrompter[parent.childCount];
 
         for (int c = 0; c < children.Length; c++)
         {
-            children[c] = parent.GetChild(c).gameObject.GetComponent<TilePurchasePrompter>();
+            children[c] = parent.GetChild(c).gameObject.GetComponent<CollectorPurchasePrompter>();
         }
 
         return children;

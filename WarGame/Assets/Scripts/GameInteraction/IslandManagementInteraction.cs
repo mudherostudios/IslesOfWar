@@ -10,7 +10,7 @@ public class IslandManagementInteraction: Interaction
     
     public Transform defaultObservePoint;
     public Transform defaultObservationFocus;
-    public string[] managementButtonTypes = new string[] { "TilePurchasePrompter" };
+    public string[] managementButtonTypes = new string[] { "CollectorPurchasePrompter", "DefensePurchasePrompter" };
 
     [Header("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -33,13 +33,16 @@ public class IslandManagementInteraction: Interaction
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            if (selectedButton != null && !selectedButton.gameObject.activeSelf && PeekButtonType() == "CollectorReveal")
-                selectedButton.gameObject.SetActive(true);
-            
             WorldButtonCheck();
-            CheckNodeSelection();
+            string peekedType = PeekButtonType();
+
+            if (peekedType == managementButtonTypes[0])
+                CheckResourceSelection();
+            else if (peekedType == managementButtonTypes[1])
+                CheckDefenseSelection();
         }
 
+        //Island Movement
         if (direction != 0)
         {
             float leftDist = Vector3.Distance(currentIsland.transform.position, deleteLeft);
@@ -57,34 +60,36 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
-    void CheckNodeSelection()
+    void CheckResourceSelection()
     {
-        string peekedType = PeekButtonType();
-
-        if (peekedType == managementButtonTypes[0])
+        if (selectedButton.gameObject.activeSelf)
         {
-            if (selectedButton.gameObject.activeSelf)
-            {
-                TilePurchasePrompter prompter = selectedButton.gameObject.GetComponent<TilePurchasePrompter>();
-                string data = "";
-                int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
-                string resourceType = stateMaster.playerState.islands[islandIndex].features[tileIndex].ToString();
-                string collectorType = stateMaster.playerState.islands[islandIndex].collectors[tileIndex].ToString();
-                int purchaseType = prompter.purchaseType;
-                data = islandIndex + ":" + tileIndex + ":" + resourceType + ":" + collectorType + ":" + purchaseType;
+            CollectorPurchasePrompter prompter = selectedButton.gameObject.GetComponent<CollectorPurchasePrompter>();
+            int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
+            string resourceType = stateMaster.playerState.islands[islandIndex].features[tileIndex].ToString();
+            string collectorType = stateMaster.playerState.islands[islandIndex].collectors[tileIndex].ToString();
+            int purchaseType = prompter.purchaseType;
 
-                Cost cost = new Cost(0, 0, 0, 0, 1, data);
-                if (stateMaster.SendPurchaseStructureRequest(cost))
-                {
-                    prompter.hiddenObject.SetActive(true);
-                    prompter.gameObject.SetActive(false);
-                }
-            }
-            else
+            StructureCost cost = new StructureCost(0, 0, 0, 0, new int[] { islandIndex, tileIndex }, purchaseType);
+            if (stateMaster.SendPurchaseCollectorRequest(cost))
             {
-                //selectedWorldUIObject.gameObject.SetActive(true);
-                //selectedButton.gameObject.SetActive(false);
+                prompter.hiddenObject.SetActive(true);
+                prompter.gameObject.SetActive(false);
             }
+        }
+    }
+
+    void CheckDefenseSelection()
+    {
+        PurchasePrompter prompter = selectedButton.gameObject.GetComponent<PurchasePrompter>();
+        int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
+        int purchaseType = prompter.purchaseType;
+
+        StructureCost cost = new StructureCost(0, 0, 0, 0, new int[] { islandIndex, tileIndex }, purchaseType);
+        if (stateMaster.SendPurchaseDefenseRequest(cost))
+        {
+            prompter.hiddenObject.SetActive(true);
+            prompter.gameObject.SetActive(false);
         }
     }
 
@@ -236,8 +241,8 @@ public class IslandManagementInteraction: Interaction
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
     {
         EncodeUtility utility = new EncodeUtility();
-        int r = utility.GetConvertedType(type);
-        int c = utility.GetConvertedType(built);
+        int r = utility.GetXType(type);
+        int c = utility.GetXType(built);
         GameObject resourceObject = null;
 
         if (r == 1 || r == 4 || r == 5 || r == 7)

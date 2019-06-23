@@ -57,9 +57,16 @@ public class StateMaster : MonoBehaviour
         return jsonData.success;
     }
 
-    public bool SendPurchaseStructureRequest(Cost cost)
+    public bool SendPurchaseCollectorRequest(StructureCost cost)
     {
-        FakeStateJson jsonData = server.PurchaseIslandStructures(cost);
+        FakeStateJson jsonData = server.PurchaseIslandCollector(cost);
+        SetStates(jsonData);
+        return jsonData.success;
+    }
+
+    public bool SendPurchaseDefenseRequest(StructureCost cost)
+    {
+        FakeStateJson jsonData = server.PurchaseIslandDefense(cost);
         SetStates(jsonData);
         return jsonData.success;
     }

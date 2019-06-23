@@ -87,7 +87,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7262069313668405481}
   - component: {fileID: 2071904225084085726}
-  - component: {fileID: 9068844277114354399}
+  - component: {fileID: 4762210722312718503}
   m_Layer: 0
   m_Name: MetalOre
   m_TagString: WorldButton
@@ -125,7 +125,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3.5763178, y: 1.3616396, z: 3.5660677}
   m_Center: {x: 0.11461902, y: 0.49369556, z: -0.05473375}
---- !u!114 &9068844277114354399
+--- !u!114 &4762210722312718503
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -134,14 +134,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6355842346623975009}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bccb094858eb05044a17a580e74584e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d1d218487bf7c140a37ad0938184cae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: TilePurchasePrompter
+  buttonType: CollectorPurchasePrompter
   hiddenObject: {fileID: 0}
   indexParent: {fileID: 0}
-  tileTypeParent: {fileID: 0}
   purchaseType: 2
+  tileTypeParent: {fileID: 0}
 --- !u!1 &6489863046027329402
 GameObject:
   m_ObjectHideFlags: 0

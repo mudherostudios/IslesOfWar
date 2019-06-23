@@ -168,7 +168,7 @@ namespace ServerSide
             }
 
             
-            Island island = new Island(features, features, collectors, depleted, type, ownerInfo);
+            Island island = new Island(features, features, collectors, "))))))))))))", depleted, type, ownerInfo);
             return island;
         }
 
@@ -320,52 +320,72 @@ namespace ServerSide
             return new FakeStateJson(playerState, worldState, purchaseTable, true);
         }
 
-        //Cost type amount for this one should be I:T:R:C:P
-        //I is the island index, T is the tile index, R is the resource/tile type, C is the collector type, and P is the base type you want to purchase;
-        public FakeStateJson PurchaseIslandStructures(Cost cost)
+        public FakeStateJson PurchaseIslandCollector(StructureCost cost)
         {
             EncodeUtility utility = new EncodeUtility();
-            string[] types = cost.type.Split(':');
             bool successfulPurchase = false;
 
-            if (types != null && types.Length == 5)
+            string tileResources = playerState.islands[cost.islandIndex].features[cost.tileIndex].ToString();
+            string tileCollectors = playerState.islands[cost.islandIndex].collectors[cost.tileIndex].ToString();
+
+            int resourceType = utility.GetXType(tileResources);
+            int collectorType = utility.GetXType(tileCollectors);
+
+            int[] resources = utility.GetBaseTypes(resourceType);
+            int[] collectors = utility.GetBaseTypes(collectorType);
+
+            successfulPurchase = CanSpendResources(cost);
+
+            for (int r = 0; r < resources.Length; r++)
             {
-                int islandIndex = 0;
-                int tileIndex = 0;
-                int.TryParse(types[0], out islandIndex);
-                int.TryParse(types[1], out tileIndex);
-
-                int resourceType = utility.GetConvertedType(types[2]);
-                int collectorType = utility.GetConvertedType(types[3]);
-                int purchaseType = utility.GetConvertedType(types[4]);
-
-                int[] resources = utility.GetBaseTypes(resourceType);
-                int[] collectors = utility.GetBaseTypes(collectorType);
-
-                if (CanSpendResources(cost, false))
+                //Minus 1 because types start at 1 not zero. Zero is no type.
+                if (collectors[r] != resources[r] && r == cost.purchaseType - 1)
                 {
-                    for (int r = 0; r < resources.Length; r++)
-                    {
-                        //Minus 1 because types start at 1 not zero. Zero is no type.
-                        if (collectors[r] != resources[r] && r == purchaseType - 1)
-                        {
-                            successfulPurchase = true;
-                            r = resources.Length;
-                        }
-                    }
+                    successfulPurchase = true;
+                    r = resources.Length;
                 }
+            }
 
-                if (successfulPurchase)
-                {
-                    collectors[purchaseType - 1] = purchaseType;
-                    UpdateCollectorString(islandIndex, tileIndex, collectors);
-                }
+            if (successfulPurchase)
+            {
+                collectors[cost.purchaseType - 1] = cost.purchaseType;
+                UpdateCollectors(cost.islandIndex, cost.tileIndex, collectors);
             }
 
             return new FakeStateJson(playerState, worldState, purchaseTable, successfulPurchase);
         }
 
-        void UpdateCollectorString(int islandIndex, int tileIndex, int[] updatedCollectorTypes)
+        public FakeStateJson PurchaseIslandDefense(StructureCost cost)
+        {
+            bool successfulPurchase = false;
+            EncodeUtility utility = new EncodeUtility();
+            string islandDefenses = playerState.islands[cost.islandIndex].defenses;
+
+            int blockerType = utility.GetYType(islandDefenses[cost.tileIndex]);
+            int bunkerCombo = utility.GetXType(islandDefenses[cost.tileIndex]);
+            int[] tileDefenses = utility.GetDefenseTypes(blockerType, bunkerCombo);
+
+            if (cost.purchaseType > 0 && cost.purchaseType <= tileDefenses.Length)
+            {
+                successfulPurchase = CanSpendResources(cost);
+
+                if (blockerType != 0 && cost.purchaseType <= 3)
+                    successfulPurchase = false;
+
+                if (tileDefenses[cost.purchaseType - 1] != 0)
+                    successfulPurchase = false;
+            }
+
+            if (successfulPurchase)
+            {
+                tileDefenses[cost.purchaseType - 1] = cost.purchaseType;
+                UpdateDefenses(cost.islandIndex, cost.tileIndex, tileDefenses);
+            }
+
+            return new FakeStateJson(playerState, worldState, purchaseTable, successfulPurchase);
+        }
+
+        void UpdateCollectors(int islandIndex, int tileIndex, int[] updatedCollectorTypes)
         {
             int collectorType = 0;
             int types = 0;
@@ -381,9 +401,34 @@ namespace ServerSide
             if (types >= 2)
                 collectorType += 1;
 
-            EncodeUtility utility = new EncodeUtility();
-
             playerState.islands[islandIndex].SetCollectors(tileIndex, collectorType.ToString()[0]);
+        }
+
+        void UpdateDefenses(int islandIndex, int tileIndex, int[] updatedTile)
+        {
+            int blockerType = 0;
+            int bunkerType = 0;
+
+            for(int u = 0; u < 3; u++)
+            {
+                if (updatedTile[u] != 0)
+                    blockerType = u+1;
+            }
+
+            int[] bunkerSet = new int[3];
+
+            for (int s = 0; s < bunkerSet.Length; s++)
+            {
+                if(updatedTile[s+3] > 0)
+                    bunkerSet[s] = updatedTile[s+3]-3;
+            }
+
+            EncodeUtility utility = new EncodeUtility();
+            bunkerType = utility.GetDecodeIndex(bunkerSet);
+            char defenseType = utility.GetDefenseCode(blockerType, bunkerType);
+            playerState.islands[islandIndex].SetDefenses(tileIndex, defenseType);
+
+            Debug.Log(playerState.islands[islandIndex].defenses);
         }
 
         public FakeStateJson PurchaseUnits(Cost cost)
@@ -443,6 +488,13 @@ namespace ServerSide
             }
 
             return tempIslands;
+        }
+
+        bool CanSpendResources(StructureCost resources)
+        {
+            Cost cost = new Cost(resources.warbucks, resources.oil, resources.metal, resources.concrete, 1, "ResourceCollector");
+
+            return CanSpendResources(cost, false);
         }
 
         bool CanSpendResources(Cost resources, bool isResourcePool)

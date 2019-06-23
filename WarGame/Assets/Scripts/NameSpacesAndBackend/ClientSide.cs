@@ -47,26 +47,28 @@ namespace ClientSide
 
     public struct Island
     {
-        public string name, features, collectors;
+        public string name, features, collectors, defenses;
         public bool isDepleted;
         public int type;
         public PlayerInfo owner;
 
-        public Island(string _name, string _features, string _collectors, bool _isDepleted, int _type)
+        public Island(string _name, string _features, string _collectors, string _defenses, bool _isDepleted, int _type)
         {
             name = _name;
             features = _features;
             collectors = _collectors;
+            defenses = _defenses;
             isDepleted = _isDepleted;
             type = _type;
             owner = new PlayerInfo();
         }
 
-        public Island(string _name, string _features, string _collectors, bool _isDepleted, int _type, PlayerInfo userInfo)
+        public Island(string _name, string _features, string _collectors, string _defenses, bool _isDepleted, int _type, PlayerInfo userInfo)
         {
             name = _name;
             features = _features;
             collectors = _collectors;
+            defenses = _defenses;
             isDepleted = _isDepleted;
             type = _type;
             owner = userInfo;
@@ -81,6 +83,18 @@ namespace ClientSide
             for(int c = 0; c < expandedCollectors.Length; c++)
             {
                 collectors += expandedCollectors[c].ToString();
+            }
+        }
+
+        public void SetDefenses(int index, char updated)
+        {
+            char[] expandedDefenses = defenses.ToCharArray();
+            expandedDefenses[index] = updated;
+            defenses = "";
+
+            for (int d = 0; d < expandedDefenses.Length; d++)
+            {
+                defenses += expandedDefenses[d].ToString();
             }
         }
 
@@ -107,10 +121,26 @@ namespace ClientSide
         }
     }
 
+    public struct StructureCost
+    {
+        public ulong warbucks, oil, metal, concrete;
+        public int islandIndex, tileIndex, purchaseType;
+
+        public StructureCost(ulong _warbucks, ulong _oil, ulong _metal, ulong _concrete, int[] islandTileIndex, int _purchaseType)
+        {
+            warbucks = _warbucks;
+            oil = _oil;
+            metal = _metal;
+            concrete = _concrete;
+            islandIndex = islandTileIndex[0];
+            tileIndex = islandTileIndex[1];
+            purchaseType = _purchaseType;
+        }
+    }
+
     public class EncodeUtility
     {
-        //Keep zeroed indicies so you can use math as logic instead of a shit load of ifs.
-        private int[][] resourceDecodeTable = new int[][]
+        private int[][] decodeTable = new int[][]
         {
             new int[] {0, 0, 0},
             new int[] {1, 0, 0},
@@ -121,69 +151,129 @@ namespace ClientSide
             new int[] {0, 2, 3},
             new int[] {1, 2, 3}
         };
-
-        public char[,] tileEncodeTable = new char[,]
+        
+        public char[,] encodeTable = new char[,]
         {
+            { ')', '!', '@', '#', '$', '%', '^', '&' },
             { '0', '1', '2', '3', '4', '5', '6', '7' },
             { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' },
             { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
         };
 
+
         public char GetFeatureCode(int tileType, int resourceType)
         {
             if (tileType == -1 || resourceType == -1)
-                return '!';
+                return 'Z';
 
-            return tileEncodeTable[tileType, resourceType];
+            return encodeTable[tileType+1, resourceType];
+        }
+
+        public char GetDefenseCode(int blockerType, int bunkerCombo)
+        {
+            if (blockerType == -1 || bunkerCombo == -1)
+                return 'Z';
+
+            return encodeTable[blockerType, bunkerCombo];
+        }
+
+        public int[] GetDefenseTypes(int blocker, int bunkers)
+        {
+            int[] blockerPart = new int[3];
+
+            if(blocker != 0)
+                blockerPart[blocker - 1] = blocker;
+
+            int[] bunkerPart = GetBaseTypes(bunkers);
+
+            int[] defenses = new int[6];
+            
+            for (int d = 0; d < defenses.Length; d++)
+            {
+                if (d < blockerPart.Length)
+                    defenses[d] = blockerPart[d];
+                else
+                {
+                    if(bunkerPart[d - 3] != 0)
+                        defenses[d] = bunkerPart[d - 3] + 3;
+                }
+            }
+
+            return defenses;
         }
 
         public int[] GetBaseTypes(int type)
         {
-            return resourceDecodeTable[type];
+            return decodeTable[type];
         }
 
-        public int GetConvertedType(char type)
+        public int GetXType(char type)
         {
-            return GetConvertedType(type.ToString());
+            return GetXType(type.ToString());
         }
 
-        public int GetConvertedType(string type)
+        public int GetXType(string type)
         {
             int converted = -1;
 
-            if ("0aA".Contains(type))
+            if (")0aA".Contains(type))
                 converted = 0;
-            else if ("1bB".Contains(type))
+            else if ("!1bB".Contains(type))
                 converted = 1;
-            else if ("2cC".Contains(type))
+            else if ("@2cC".Contains(type))
                 converted = 2;
-            else if ("3dD".Contains(type))
+            else if ("#3dD".Contains(type))
                 converted = 3;
-            else if ("4eE".Contains(type))
+            else if ("$4eE".Contains(type))
                 converted = 4;
-            else if ("5fF".Contains(type))
+            else if ("%5fF".Contains(type))
                 converted = 5;
-            else if ("6gG".Contains(type))
+            else if ("^6gG".Contains(type))
                 converted = 6;
-            else if ("7hH".Contains(type))
+            else if ("&7hH".Contains(type))
                 converted = 7;
 
             return converted;
         }
 
-        public int GetTileType(char type)
+        public int GetYType(char type)
         {
-            return GetTileType(type.ToString());
+            return GetYType(type.ToString());
         }
 
-        public int GetTileType(string type)
+        public int GetYType(string type)
         {
-            if ("01234567".Contains(type))
+
+            if (")!@#$%^&*(".Contains(type))
                 return 0;
-            else if ("abcdefgh".Contains(type))
+            if ("01234567".Contains(type))
                 return 1;
-            else if ("ABCDEFGH".Contains(type))
+            else if ("abcdefgh".Contains(type))
                 return 2;
+            else if ("ABCDEFGH".Contains(type))
+                return 3;
+
+            return -1;
+        }
+
+        public int GetDecodeIndex(int[] set)
+        {
+            for (int i = 0; i < decodeTable.Length; i++)
+            {
+                bool foundIndex = true;
+
+                for (int s = 0; s < set.Length; s++)
+                {
+                    if (decodeTable[i][s] != set[s])
+                    {
+                        s = set.Length;
+                        foundIndex = false;
+                    }
+                }
+
+                if (foundIndex)
+                    return i;
+            }
 
             return -1;
         }
