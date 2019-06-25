@@ -25,7 +25,7 @@ public class IslandDiscoveryInteraction : Interaction
 
     private void Update()
     {
-        WorldButtonCheck();
+        WorldButtonCheck(Input.GetButtonDown("Fire1"));
     }
 
     public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform[] spawns, Vector3 _maxPositionAdjustment)

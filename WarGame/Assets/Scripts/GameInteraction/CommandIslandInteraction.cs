@@ -29,12 +29,14 @@ public class CommandIslandInteraction : Interaction
     private UnitPurchase selectedUnitPurchase;
     private PoolContribute selectedPoolContribute;
     private string[] commandButtonTypes = new string[] { "UnitPurchase", "PoolSend"};
+
     private void Update()
     {
         MenuUpdates();
-        WorldButtonCheck();
+        bool clicked = Input.GetButtonDown("Fire1");
+        WorldButtonCheck(clicked);
 
-        if (Input.GetButtonDown("Fire1"))
+        if (clicked)
         {
             CheckMainIslandGUIs();
         }

@@ -26,9 +26,9 @@ public class Interaction : MonoBehaviour
     protected Vector3 targetPosition;
     protected bool isAtTarget;
 
-    protected void WorldButtonCheck()
+    protected void WorldButtonCheck(bool didClick)
     {
-        if (cam != null && Input.GetButtonDown("Fire1"))
+        if (didClick)
         {
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);

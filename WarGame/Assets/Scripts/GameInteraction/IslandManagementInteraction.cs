@@ -31,9 +31,11 @@ public class IslandManagementInteraction: Interaction
 
     public void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        bool clicked = Input.GetButtonDown("Fire1");
+        WorldButtonCheck(clicked);
+
+        if (clicked)
         {
-            WorldButtonCheck();
             string peekedType = PeekButtonType();
 
             if (peekedType == managementButtonTypes[0])
