@@ -55,6 +55,10 @@ public class Interaction : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            clickedButtonType = "None";
+        }
     }
 
     private void NavigateToDestination()

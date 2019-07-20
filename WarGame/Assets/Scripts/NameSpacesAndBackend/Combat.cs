@@ -96,7 +96,7 @@ namespace Combat
         {
             List<int> allAdjacentIndices = new List<int>();
 
-            for (int p = 0; p < adjacencyMatrix.Length; p++)
+            for (int p = 0; p < adjacencyMatrix.GetLength(0); p++)
             {
                 if (adjacencyMatrix[position, p] == 1)
                     allAdjacentIndices.Add(p);
@@ -110,50 +110,52 @@ namespace Combat
 
     public class AttackPlanner
     {
-        List<long[]> squadCounts = new List<long[]>();
-        List<int[]> squadMoves = new List<int[]>();
-        private int[] lastMoveCounts;
+        private long[][] squadCounts = new long[3][];
+        int[][] squadMoves = new int[3][];
+        private int[] lastMoveIndex;
         private AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix();
 
         public AttackPlanner(Squad[] squads)
         {
-            lastMoveCounts = new int[squads.Length];
+            lastMoveIndex = new int[squads.Length];
 
             for (int s = 0; s < squads.Length; s++)
             {
-                AddSquad(squads[s].fullSquad);
+                AddSquad(s, squads[s].fullSquad);
             }
         }
 
-        public void AddSquad(long[] squadCount)
+        public void AddSquad(int squad, long[] squadCount)
         {
-            squadCounts.Add(squadCount);
-            squadMoves.Add(new int[6]);
+            squadCounts[squad] = squadCount;
+            squadMoves[squad] = new int[6] {-1, -1, -1, -1, -1, -1 };
         }
 
-        public void AddMove(int squad, int position)
+        public bool AddMove(int squad, int position)
         {
             bool canMove = false;
-            int lastMove = lastMoveCounts[squad];
+            int lastIndex = lastMoveIndex[squad];
 
-            if (lastMove == 0)
+            if (lastIndex == 0)
                 canMove = true;
-            else if (adjacencyMatrix.IsAdjacent(squadMoves[squad][lastMove], position) && lastMove < 6)
+            else if (adjacencyMatrix.IsAdjacent(squadMoves[squad][lastIndex-1], position) && lastIndex < 6)
                 canMove = true;
 
             if (canMove)
             {
-                squadMoves[squad][lastMove] = position;
-                lastMoveCounts[squad]++;
+                squadMoves[squad][lastIndex] = position;
+                lastMoveIndex[squad]++;
             }
+
+            return canMove;
         }
 
         public void RemoveLastMove(int squad)
         {
-            if (lastMoveCounts[squad] > 0)
+            if (lastMoveIndex[squad] > 0)
             {
-                squadMoves[squad][lastMoveCounts[squad]] = 0;
-                lastMoveCounts[squad]--;
+                squadMoves[squad][lastMoveIndex[squad]] = -1;
+                lastMoveIndex[squad]--;
             }
         }
 
@@ -161,39 +163,37 @@ namespace Combat
         {
             get
             {
-                return new BattlePlan(squadMoves.ToArray(), squadCounts.ToArray(), true, null);
+                return new BattlePlan(squadMoves, squadCounts, true, null);
             }
         }
     }
 
     public class DefensePlanner
     {
-        private List<long[]> squadCounts = new List<long[]>();
+        private long[][] squadCounts = new long[4][];
         private List<List<int>> defensePositions = new List<List<int>>();
-        private List<bool> reactToNewlyAdjacents = new List<bool>();
+        private bool[] reactToNewlyAdjacents = new bool[4];
         private AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix();
 
         public DefensePlanner(Squad[] squads)
         {
             for (int s = 0; s < squads.Length; s++)
             {
-                AddSquad(squads[s].fullSquad);
+                AddSquad(s, squads[s].fullSquad);
             }
         }
 
-        public void AddSquad(long[] squadCount)
+        public void AddSquad(int squad, long[] squadCount)
         {
-            squadCounts.Add(squadCount);
+            squadCounts[squad]= squadCount;
             defensePositions.Add(new List<int>());
-            reactToNewlyAdjacents.Add(true);
+            reactToNewlyAdjacents[squad] = true;
         }
 
         public void SetSquadPosition(int squad, int position)
         {
-            defensePositions[squad][0] = position;
-            List<int> temp = new List<int>();
-            temp.AddRange(adjacencyMatrix.GetAllAdjacentIndices(position, false));
-            defensePositions.Add(temp);
+            defensePositions[squad].Add(position);
+            defensePositions[squad].AddRange(adjacencyMatrix.GetAllAdjacentIndices(position, true));
         }
 
         public void ToggleSquadReactCommand(int squad)
@@ -203,10 +203,21 @@ namespace Combat
 
         public void ToggleDefenseZone(int squad, int position)
         {
-            if (defensePositions[squad].Contains(position))
-                defensePositions[squad].Remove(position);
-            else
-                defensePositions[squad].Add(position);
+            if (defensePositions.Count != 0 && defensePositions[squad][0] != position)
+            {
+                if (adjacencyMatrix.IsAdjacent(defensePositions[squad][0], position))
+                {
+                    if (defensePositions[squad].Contains(position))
+                        defensePositions[squad].Remove(position);
+                    else
+                        defensePositions[squad].Add(position);
+                }
+            }
+        }
+
+        public bool GetStateOfPosition(int squad, int position)
+        {
+            return defensePositions[squad].Contains(position);
         }
 
         public BattlePlan defensePlan
@@ -220,7 +231,7 @@ namespace Combat
                     tempDefenses.Add(defensePositions[t].ToArray());
                 }
 
-                return new BattlePlan(tempDefenses.ToArray(), squadCounts.ToArray(), false, reactToNewlyAdjacents.ToArray());
+                return new BattlePlan(tempDefenses.ToArray(), squadCounts, false, reactToNewlyAdjacents);
             }
         }
     }

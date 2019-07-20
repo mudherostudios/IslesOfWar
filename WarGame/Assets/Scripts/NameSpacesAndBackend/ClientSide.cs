@@ -45,12 +45,17 @@ namespace ClientSide
         }
     }
 
-    public struct Island
+    public class Island
     {
         public string name, features, collectors, defenses;
         public bool isDepleted;
         public int type;
         public PlayerInfo owner;
+        public BattlePlan defensePlan;
+
+        public Island()
+        {
+        }
 
         public Island(string _name, string _features, string _collectors, string _defenses, bool _isDepleted, int _type)
         {
