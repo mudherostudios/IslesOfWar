@@ -7,7 +7,7 @@ public class CommunicationInterface : MonoBehaviour
 {
     [Header("Game Info")]
     public int network;
-    public string gamespace;
+    public string gameSpace;
     public string storageType;
 
     [Header("Connection Info")]
@@ -55,7 +55,7 @@ public class CommunicationInterface : MonoBehaviour
             if (stateRetriever == null)
             {
                 stateRetriever = gameObject.AddComponent<GameStateRetriever>();
-                stateRetriever.SetInfoVariables(daemonInfo, gsrInfo, pathInfo, network, gamespace, storageType);
+                stateRetriever.SetInfoVariables(daemonInfo, gsrInfo, pathInfo, network, storageType, gameSpace);
                 stateRetriever.communicator = this;
             }
         }
@@ -80,11 +80,6 @@ public class CommunicationInterface : MonoBehaviour
             if (stateRetriever != null)
             {
                 stateRetriever.Disconnect();
-
-                if (!stateRetriever.isConnected)
-                    stateRetriever = null;
-                else
-                    Debug.Log("Retriever Still Connected.");
             }
             else
             {
@@ -109,10 +104,19 @@ public class CommunicationInterface : MonoBehaviour
     {
         totalBlocks = xayaCommands.networkBlockCount;
         blockProgress = xayaCommands.GetBlockHeight(blockhash);
-        Debug.Log(gamedata);
-        unparsedGameStates.Add(gamedata);
+
+        if (gamedata != "")
+        {
+            Debug.Log(gamedata);
+            unparsedGameStates.Add(gamedata);
+        }
     }
 
+    public void CleanConnections()
+    {
+        stateRetriever = null;
+        xayaCommands = null;
+    }
 
     void SetConnectionInfo()
     {

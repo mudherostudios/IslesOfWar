@@ -21,7 +21,7 @@ namespace MudHero
             string gameNamespace = "";
             string storageType = "";
 
-            public void SetInfoVariables(ConnectionInfo _daemonConnectionInfo, ConnectionInfo _gsrConnectionInfo, StateProcessorPathInfo _pathInfo, int net, string game, string storage)
+            public void SetInfoVariables(ConnectionInfo _daemonConnectionInfo, ConnectionInfo _gsrConnectionInfo, StateProcessorPathInfo _pathInfo, int net, string storage, string game)
             {
                 daemonInfo = _daemonConnectionInfo;
                 gsrInfo = _gsrConnectionInfo;
@@ -50,7 +50,7 @@ namespace MudHero
             IEnumerator GSRAsync()
             {
                 string result = "";
-                wrapper = new XayaWrapper(pathInfo.library, ref result, XayaProcessing.setGenesisInfo, XayaProcessing.parseStateInfo, XayaProcessing.rewindData);
+                wrapper = new XayaWrapper(pathInfo.library, ref result, XayaProcessing.SetGenesisInfo, XayaProcessing.ParseStateInfo, XayaProcessing.RewindData);
                 result += "\n" + wrapper.SetConnectInfo(daemonInfo.ip, daemonInfo.port, gsrInfo.ip, gsrInfo.port, daemonInfo.username, daemonInfo.userpassword);
 
                 yield return Ninja.JumpToUnity;
@@ -89,7 +89,7 @@ namespace MudHero
                             if (actualState.gamestate != null)
                             {
                                 yield return Ninja.JumpToUnity;
-                                communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate.ToString());
+                                communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate);
                                 yield return Ninja.JumpBack;
                             }
 

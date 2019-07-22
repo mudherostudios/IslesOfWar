@@ -10,7 +10,7 @@ namespace IslesOfWar
         {
             public static int chain = 0;
 
-            public static string setGenesisInfo(out int height, out string hashHex)
+            public static string SetGenesisInfo(out int height, out string hashHex)
             {
                 //Set block genesis information here.
                 //Change all of this, it was for Vuteka
@@ -34,16 +34,34 @@ namespace IslesOfWar
                 return "";
             }
 
-            public static string parseStateInfo(string currentState, string blockData, string undoData, out string updatedData)
+            public static string ParseStateInfo(string currentState, string blockData, string undoData, out string updatedData)
             {
                 //Parse all of the information and ensure data is legitimate.
                 //Then return the undo data and out the correct parsed info.
                 //If the parsed info is invalid out and return empty but structured valid variables.
-                updatedData = "";
-                return "";
+                //Make sure to add to the current state or else it will skip over if you are just replacing.
+                //It is somehow deciding x amount of blocks before sending to Communicator.
+                //So if your updatedData that has valid stuff is in the middle of the x amount then it will get written over with "[]" in the next y of x.
+                if (blockData.Length > 1)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(blockData);
+                    string result = JsonConvert.SerializeObject(data["moves"]);
+
+                    if (result.Length > 10)
+                        updatedData = currentState + JsonConvert.SerializeObject(data["moves"]);
+                    else
+                        updatedData = currentState;
+
+                    return "";
+                }
+                else
+                {
+                    updatedData = "";
+                    return "";
+                }
             }
 
-            public static string rewindData(string updatedData, string blockData, string undoData)
+            public static string RewindData(string updatedData, string blockData, string undoData)
             {
                 //Do rewinding of reorged data, if they occur, in here.
                 return "";

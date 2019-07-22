@@ -307,6 +307,7 @@ GameObject:
   - component: {fileID: 976587962}
   - component: {fileID: 976587961}
   - component: {fileID: 976587964}
+  - component: {fileID: 976587965}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -391,7 +392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   network: 0
-  gamespace: vuteka
+  gameSpace: vuteka
   storageType: memory
   xayaDaemonIP: 127.0.0.1
   xayaDaemonPort: 8396
@@ -404,6 +405,27 @@ MonoBehaviour:
   libraryPath: /../XayaStateProcessor/
   logsPath: /../XayaStateProcessor/glogs/
   databasePath: /../XayaStateProcessor/database/
+  totalBlocks: 0
+  blockProgress: 0
+--- !u!114 &976587965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976587960}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021c31cec1a53ea4580bb94f9c52146c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockData: "{   \"block\": { \t\"hash\": \"dda7eccde4857742e5000bd66cf72154ce26c22876582654bc8b8d78dadbce8c\",
+    \t\"height\": 558369, \t\"parent\": \"18f72c91c7b9223e9c7d0525216277e4016d748a2c81be4ba9d4a2b30eaed92d\",
+    \t\"rngseed\": \"b36747498ce183b9da32b3ab6e0d72f2a17aa06859c08cf1d1e91907cb09dddc\",
+    \t\"timestamp\": 1549056526   },   \"moves\": [ \t{ \t  \"move\": { \t\t\"m\":
+    \"Hello world!\" \t  }, \t  \"name\": \"ALICE\", \t  \"out\": { \t\t\"CMBPmRos5QADg2T8kvkQhMaMV5WzpzfedR\":
+    3443.7832612 \t  }, \t  \"txid\": \"edd0d7a7662a1b5f8ded16e333f114eb5bea343a432e6c72dfdbdcfef6bf4d44\"
+    \t}   ],   \"reqtoken\": \"1fba0f4f9e76a65b1f09f3ea40a59af8\" }"
 --- !u!1 &1092914544
 GameObject:
   m_ObjectHideFlags: 0
