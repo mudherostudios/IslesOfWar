@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar.Communication;
-using IslesOfWar.Callbacks;
-
+using IslesOfWar.GameStateProcessing;
+using MudHero.XayaProcessing;
+using Newtonsoft.Json;
 public class XayaConnectionTest : MonoBehaviour
 {
+    public string blockData; //should have valid block data but not valid move data
+    public string validBlockData; //should have valid block data and move data
+
     // Update is called once per frame
     void Update()
     {
@@ -38,12 +42,16 @@ public class XayaConnectionTest : MonoBehaviour
         command.sqd[0] = new uint[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
         command.sqd[1] = new uint[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
-        DefendCommand defend = new DefendCommand();
+        BattleCommand defend = new BattleCommand();
         defend.id = "0";
         defend.pln = command.pln;
         defend.sqd = command.sqd;
         defend.flw = new int[] { 0, 1 };
 
+        Actions actions = ActionParser.JsonToActions(blockData);
+        Actions validActions = ActionParser.JsonToActions(validBlockData);
+        PlayerActions playerActions = ActionParser.ParseMove(JsonConvert.SerializeObject(actions.moves[0].move));
+        
         string data = CommandUtility.UpdateNation("ZW");
         Debug.Log(data);
 
@@ -67,5 +75,51 @@ public class XayaConnectionTest : MonoBehaviour
 
         data = CommandUtility.DefendIsland(defend);
         Debug.Log(data);
+        
+        Debug.Log(actions.moves.Count);
+        Debug.Log(actions.rngseed);
+
+        for (int i = 0; i < actions.moves[0].inputs.Count; i++)
+        {
+            Debug.Log(actions.moves[0].inputs[i].txid);
+            Debug.Log(actions.moves[0].inputs[i].vout);
+        }
+
+        Debug.Log(JsonConvert.SerializeObject(actions.moves[0].move));
+        Debug.Log(actions.moves[0].name);
+        Debug.Log(actions.moves[0].txid);
+        Debug.Log(actions.admin);
+
+        if (playerActions.nat != null)
+        {
+            Debug.Log("      Debugging Move Parsing      ");
+            string islandIDs = "";
+            foreach (string id in playerActions.dep)
+            {
+                islandIDs += "ID: " + id + "\n";
+            }
+
+            Debug.Log
+            (
+                "Nation: " + playerActions.nat + "\n" +
+                "-Build Order-" + "\n" +
+                "ID: " + playerActions.bld.id + "\n" +
+                "Collectors: " + playerActions.bld.col + "\n" +
+                "Defenses: " + playerActions.bld.def + "\n" + "------\n" +
+                "Unit Purchase: " + playerActions.buy[0] + "\n" +
+                "Search Islands: " + playerActions.srch + "\n" +
+                "-Resource Submissions-" + "\n" +
+                "Resource Type: " + playerActions.pot.rsrc + "\n" +
+                "Amounts: " + playerActions.pot.amnt[1] + "\n" + "------\n" +
+                "-Depleted Islands-" + "\n" +
+                islandIDs + "--------\n" +
+                "Attack Plan Island: " + playerActions.attk.id + "\n" +
+                "Defend Order Island: " + playerActions.dfnd.id
+            );
+        }
+        else
+        {
+            Debug.Log("Failed to Parse Player Actions");
+        }
     }
 }

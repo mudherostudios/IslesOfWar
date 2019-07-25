@@ -3,7 +3,7 @@ using System.Collections;
 using BitcoinLib.Responses;
 using CielaSpike;
 using UnityEngine;
-using IslesOfWar.Callbacks;
+using MudHero.XayaProcessing;
 
 namespace MudHero
 {
@@ -50,7 +50,7 @@ namespace MudHero
             IEnumerator GSRAsync()
             {
                 string result = "";
-                wrapper = new XayaWrapper(pathInfo.library, ref result, XayaProcessing.SetGenesisInfo, XayaProcessing.ParseStateInfo, XayaProcessing.RewindData);
+                wrapper = new XayaWrapper(pathInfo.library, ref result, Callback.SetGenesisInfo, Callback.ParseStateInfo, Callback.RewindData);
                 result += "\n" + wrapper.SetConnectInfo(daemonInfo.ip, daemonInfo.port, gsrInfo.ip, gsrInfo.port, daemonInfo.username, daemonInfo.userpassword);
 
                 yield return Ninja.JumpToUnity;
