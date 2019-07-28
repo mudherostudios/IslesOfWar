@@ -103,7 +103,7 @@ namespace MudHero
                     }
                     else
                     {
-                        yield return new WaitForSeconds(0.5f);
+                        yield return new WaitForSeconds(0.25f);
                     }
                 }
             }

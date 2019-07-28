@@ -68,7 +68,8 @@ namespace MudHero
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(blockData);
                     string moves = JsonConvert.SerializeObject(data["moves"]);
                     string admin = JsonConvert.SerializeObject(data["admin"]);
-                    string rng = JsonConvert.SerializeObject(data["block"]["rngseed"]);
+                    string rng = "\"rngseed\":" + JsonConvert.SerializeObject(data["block"]["rngseed"]) + ",";
+                    string height = "\"" + JsonConvert.SerializeObject(data["block"]["height"]) + "\":";
 
                     if (moves.Length < 4)
                         moves = "";
@@ -80,17 +81,12 @@ namespace MudHero
                     else
                         admin = "\"admin\":" + admin + ",";
 
-                    if (moves == "" && admin == "")
-                        rng = "";
-                    else
-                        rng = "\"rngseed\":" + rng + ",";
-
-                    if (moves.Length > 4 || admin.Length > 4)
+                    if (moves.Length > 0 || admin.Length > 0)
                     {
                         if (currentState != "")
-                            updatedData = string.Format("{0},{1}{3}{4}{5}{2}", currentState, "{", "}", rng, admin, moves);
+                            updatedData = string.Format("{0},{6}{1}{3}{4}{5}{2}", currentState, "{", "}", rng, admin, moves, height);
                         else 
-                            updatedData = string.Format("{0}{2}{3}{4}{1}", "{", "}", rng, admin, moves);
+                            updatedData = string.Format("{5}{0}{2}{3}{4}{1}", "{", "}", rng, admin, moves, height);
                     }
                     else
                         updatedData = currentState;
@@ -106,7 +102,6 @@ namespace MudHero
 
             public static string RewindData(string updatedData, string blockData, string undoData)
             {
-                //Do rewinding of reorged data, if they occur, in here.
                 return "";
             }
 

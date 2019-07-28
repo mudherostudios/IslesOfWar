@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MudHero.XayaCommunication;
+using IslesOfWar.Communication;
+using IslesOfWar.GameStateProcessing;
 
 public class CommunicationInterface : MonoBehaviour
 {
@@ -34,11 +36,14 @@ public class CommunicationInterface : MonoBehaviour
 
     public int totalBlocks = 0;
     public int blockProgress = 0;
-    private List<string> unparsedGameStates;
+    string lastGamedata = "";
+    Dictionary<string, List<PlayerActions>> actionDictionary;
+    Dictionary<string, List<PlayerActions>> differenceDictionary;
 
     private void Start()
     {
-        unparsedGameStates = new List<string>();
+        actionDictionary = new Dictionary<string, List<PlayerActions>>();
+        differenceDictionary = new Dictionary<string, List<PlayerActions>>();
         SetConnectionInfo();
     }
 
@@ -105,10 +110,13 @@ public class CommunicationInterface : MonoBehaviour
         totalBlocks = xayaCommands.networkBlockCount;
         blockProgress = xayaCommands.GetBlockHeight(blockhash);
 
-        if (gamedata != "")
+        if (gamedata != "" && gamedata != lastGamedata)
         {
-            Debug.Log(gamedata);
-            unparsedGameStates.Add(gamedata);
+            lastGamedata = gamedata;
+            differenceDictionary.Clear();
+
+            ActionParser.UpdateDictionary(gamedata, ref actionDictionary, ref differenceDictionary);
+            Debug.Log(string.Format("Recieved new state at {0}.",blockProgress));
         }
     }
 

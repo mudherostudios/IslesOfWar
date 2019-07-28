@@ -1,23 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+//TestNameUpdates & TestActionParsing
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
+
+//TestActionParsing
 using MudHero.XayaProcessing;
 using Newtonsoft.Json;
+
+//TestSQLiteDB
+using Mono.Data.Sqlite;
+using System.Data;
+using System.IO;
+
 public class XayaConnectionTest : MonoBehaviour
 {
     public string blockData; //should have valid block data but not valid move data
     public string validBlockData; //should have valid block data and move data
+    public string databasePath = "/database/";
+    public string dbName = "";
+    public bool DEBUG = true;
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
-            Test();
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            TestNameUpdates();
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+            TestActionParsing();
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+            TestSQLiteDB();
     }
 
-    void Test()
+    void TestNameUpdates()
     {
         IslandBuildOrder buildOrder = new IslandBuildOrder();
         buildOrder.id = "0";
@@ -48,34 +65,24 @@ public class XayaConnectionTest : MonoBehaviour
         defend.sqd = command.sqd;
         defend.flw = new int[] { 0, 1 };
 
+        string nation = CommandUtility.UpdateNation("ZW");
+        string build = CommandUtility.CompleteIslandBuildCommands(buildOrder);
+        string purchase = CommandUtility.CompleteUnitPurchaseOrder(purchaseOrder);
+        string search = CommandUtility.SearchForIslands();
+        string pot = CommandUtility.SubmitToResourcePot(order);
+        string crypto = CommandUtility.SubmitToCryptoPot(depletedIslands);
+        string atk = CommandUtility.AttackIsland(command);
+        string def = CommandUtility.DefendIsland(defend);
+
+        Debug.Log(string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n", nation, build, purchase, search, pot, crypto, atk, def));
+    }
+
+    void TestActionParsing()
+    {
         Actions actions = ActionParser.JsonToActions(blockData);
         Actions validActions = ActionParser.JsonToActions(validBlockData);
-        PlayerActions playerActions = ActionParser.ParseMove(JsonConvert.SerializeObject(actions.moves[0].move));
-        
-        string data = CommandUtility.UpdateNation("ZW");
-        Debug.Log(data);
+        PlayerActions playerActions = ActionParser.ParseMove(JsonConvert.SerializeObject(validActions.moves[0].move));
 
-        data = CommandUtility.CompleteIslandBuildCommands(buildOrder);
-        Debug.Log(data);
-
-        data = CommandUtility.CompleteUnitPurchaseOrder(purchaseOrder);
-        Debug.Log(data);
-
-        data = CommandUtility.SearchForIslands();
-        Debug.Log(data);
-
-        data = CommandUtility.SubmitToResourcePot(order);
-        Debug.Log(data);
-
-        data = CommandUtility.SubmitToCryptoPot(depletedIslands);
-        Debug.Log(data);
-
-        data = CommandUtility.AttackIsland(command);
-        Debug.Log(data);
-
-        data = CommandUtility.DefendIsland(defend);
-        Debug.Log(data);
-        
         Debug.Log(actions.moves.Count);
         Debug.Log(actions.rngseed);
 
@@ -92,7 +99,6 @@ public class XayaConnectionTest : MonoBehaviour
 
         if (playerActions.nat != null)
         {
-            Debug.Log("      Debugging Move Parsing      ");
             string islandIDs = "";
             foreach (string id in playerActions.dep)
             {
@@ -101,25 +107,85 @@ public class XayaConnectionTest : MonoBehaviour
 
             Debug.Log
             (
-                "Nation: " + playerActions.nat + "\n" +
+                "Nation: " + playerActions.nat + "\n\n" +
                 "-Build Order-" + "\n" +
                 "ID: " + playerActions.bld.id + "\n" +
                 "Collectors: " + playerActions.bld.col + "\n" +
-                "Defenses: " + playerActions.bld.def + "\n" + "------\n" +
+                "Defenses: " + playerActions.bld.def + "\n" + "------\n\n" +
                 "Unit Purchase: " + playerActions.buy[0] + "\n" +
-                "Search Islands: " + playerActions.srch + "\n" +
+                "Search Islands: " + playerActions.srch + "\n\n" +
                 "-Resource Submissions-" + "\n" +
                 "Resource Type: " + playerActions.pot.rsrc + "\n" +
-                "Amounts: " + playerActions.pot.amnt[1] + "\n" + "------\n" +
+                "Amounts: " + playerActions.pot.amnt[1] + "\n" + "------\n\n" +
                 "-Depleted Islands-" + "\n" +
-                islandIDs + "--------\n" +
+                islandIDs + "--------\n\n" +
                 "Attack Plan Island: " + playerActions.attk.id + "\n" +
-                "Defend Order Island: " + playerActions.dfnd.id
+                "Defend Order Island: " + playerActions.dfnd.id + "\n\n"
             );
         }
         else
         {
             Debug.Log("Failed to Parse Player Actions");
         }
+    }
+
+    void TestSQLiteDB()
+    {
+        IDbCommand dbCommand;
+        IDbCommand otherCommand;
+        IDbCommand readCommand;
+        IDataReader reader;
+        
+        string folderPath = string.Format("{0}{1}", Application.persistentDataPath, databasePath);
+        string connection = string.Format("URI=file:{0}{1}",folderPath,dbName);
+
+        if (!Directory.Exists(folderPath))
+        {
+            if(DEBUG)
+                Debug.Log(string.Format("Creating Folder at {0}.", folderPath));
+            Directory.CreateDirectory(folderPath);
+        }
+        else if(Directory.Exists(folderPath) && DEBUG)
+        {
+            
+            Debug.Log("Folder Already Exists. Not Recreating.");
+        }
+
+        if(DEBUG)
+            Debug.Log(string.Format("Attempting database connection with {0}.", connection));
+
+        IDbConnection dbConnection = new SqliteConnection(connection);
+        dbConnection.Open();
+
+        if (DEBUG)
+            Debug.Log("Creating Table.");
+
+        dbCommand = dbConnection.CreateCommand();
+        string sqlCreateTable = "CREATE TABLE IF NOT EXISTS my_table (id INTEGER PRIMARY KEY, val INTEGER )";
+        dbCommand.CommandText = sqlCreateTable;
+        reader = dbCommand.ExecuteReader();
+
+        if (DEBUG)
+            Debug.Log("Updating Table.");
+
+        otherCommand = dbConnection.CreateCommand();
+        otherCommand.CommandText = "INSERT OR REPLACE INTO my_table (id, val) VALUES (0, 5)";
+        otherCommand.ExecuteNonQuery();
+
+        if (DEBUG)
+            Debug.Log("Reading Database");
+
+        readCommand = dbConnection.CreateCommand();
+        string dbQuery = "SELECT * FROM my_table";
+        readCommand.CommandText = dbQuery;
+        reader = readCommand.ExecuteReader();
+
+        while (reader.Read())
+        {
+            Debug.Log(string.Format("id: {0}\nval: {1}\n", reader[0].ToString(), reader[1].ToString()));
+        }
+
+        reader.Close();
+        dbConnection.Close();
     }
 }

@@ -20,6 +20,27 @@ namespace IslesOfWar
             {
                 return JsonConvert.DeserializeObject<PlayerActions>(move);
             }
+
+            public static void UpdateDictionary(string serializedDict, ref Dictionary<string, List<PlayerActions>> oldDict, ref Dictionary<string, List<PlayerActions>> differenceDict )
+            {
+                Dictionary<string, Actions> deserialized = JsonConvert.DeserializeObject <Dictionary<string, Actions>>("{"+serializedDict+"}");
+                
+                foreach (KeyValuePair<string,Actions> pair in deserialized)
+                {
+                    if (!oldDict.ContainsKey(pair.Key))
+                    {
+                        List<PlayerActions> playerActions = new List<PlayerActions>();
+
+                        foreach (Move move in pair.Value.moves)
+                        {
+                            playerActions.Add(ParseMove(JsonConvert.SerializeObject(move.move)));
+                        }
+
+                        differenceDict.Add(pair.Key, playerActions);
+                        oldDict.Add(pair.Key, playerActions);
+                    }
+                }
+            }
         }
     }
 }
