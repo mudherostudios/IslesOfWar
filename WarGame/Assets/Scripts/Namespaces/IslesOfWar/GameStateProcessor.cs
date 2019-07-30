@@ -9,13 +9,8 @@ namespace IslesOfWar
 {
     namespace GameStateProcessing
     {
-        public static class ActionParser
+        public static class PlayerActionParser
         {
-            public static Actions JsonToActions(string data)
-            {
-                return JsonConvert.DeserializeObject<Actions>(data);
-            }
-
             public static PlayerActions ParseMove(string move)
             {
                 return JsonConvert.DeserializeObject<PlayerActions>(move);
@@ -24,7 +19,7 @@ namespace IslesOfWar
             public static void UpdateDictionary(string serializedDict, ref Dictionary<string, List<PlayerActions>> oldDict, ref Dictionary<string, List<PlayerActions>> differenceDict )
             {
                 Dictionary<string, Actions> deserialized = JsonConvert.DeserializeObject <Dictionary<string, Actions>>("{"+serializedDict+"}");
-                
+
                 foreach (KeyValuePair<string,Actions> pair in deserialized)
                 {
                     if (!oldDict.ContainsKey(pair.Key))
@@ -41,6 +36,7 @@ namespace IslesOfWar
                     }
                 }
             }
+            
         }
     }
 }

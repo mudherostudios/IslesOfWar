@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MudHero.SQLite3;
 using MudHero.XayaCommunication;
+using MudHero.XayaProcessing;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
+using Newtonsoft.Json;
 
 public class CommunicationInterface : MonoBehaviour
 {
@@ -26,7 +29,7 @@ public class CommunicationInterface : MonoBehaviour
     public string libraryPath;
     public string logsPath;
     public string databasePath;
-
+    public string databaseName;
 
     private ConnectionInfo daemonInfo;
     private ConnectionInfo gsrInfo;
@@ -37,13 +40,17 @@ public class CommunicationInterface : MonoBehaviour
     public int totalBlocks = 0;
     public int blockProgress = 0;
     string lastGamedata = "";
-    Dictionary<string, List<PlayerActions>> actionDictionary;
-    Dictionary<string, List<PlayerActions>> differenceDictionary;
+    Dictionary<string, List<PlayerActions>> playerActionDictionary;
+    Dictionary<string, List<PlayerActions>> playerDifferenceDictionary;
+    Dictionary<string, Actions> actionDictionary;
+    Dictionary<string, Actions> differenceDictionary;
 
     private void Start()
     {
-        actionDictionary = new Dictionary<string, List<PlayerActions>>();
-        differenceDictionary = new Dictionary<string, List<PlayerActions>>();
+        actionDictionary = new Dictionary<string, Actions>();
+        differenceDictionary = new Dictionary<string, Actions>();
+        playerActionDictionary = new Dictionary<string, List<PlayerActions>>();
+        playerDifferenceDictionary = new Dictionary<string, List<PlayerActions>>();
         SetConnectionInfo();
     }
 
@@ -91,7 +98,6 @@ public class CommunicationInterface : MonoBehaviour
                 Debug.Log("There is no State Retriever to Disconnect.");
             }
         }
-        
     }
 
     public bool isConnectedToXayaDaemon
@@ -110,12 +116,15 @@ public class CommunicationInterface : MonoBehaviour
         totalBlocks = xayaCommands.networkBlockCount;
         blockProgress = xayaCommands.GetBlockHeight(blockhash);
 
+        differenceDictionary.Clear();
+        playerDifferenceDictionary.Clear();
+
         if (gamedata != "" && gamedata != lastGamedata)
         {
             lastGamedata = gamedata;
-            differenceDictionary.Clear();
 
-            ActionParser.UpdateDictionary(gamedata, ref actionDictionary, ref differenceDictionary);
+            XayaActionParser.UpdateRawDictionary(gamedata, ref actionDictionary, ref differenceDictionary);
+            PlayerActionParser.UpdateDictionary(gamedata, ref playerActionDictionary, ref playerDifferenceDictionary);
             Debug.Log(string.Format("Recieved new state at {0}.",blockProgress));
         }
     }
@@ -132,5 +141,4 @@ public class CommunicationInterface : MonoBehaviour
         gsrInfo = new ConnectionInfo(gsrIP, gsrPort, "", username, userpassword, walletPassword);
         pathInfo = new StateProcessorPathInfo(Application.dataPath, libraryPath, databasePath, logsPath);
     }
-
 }

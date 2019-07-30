@@ -86,9 +86,9 @@ public class Tests : MonoBehaviour
 
     void TestActionParsing()
     {
-        Actions actions = ActionParser.JsonToActions(blockData);
-        Actions validActions = ActionParser.JsonToActions(validBlockData);
-        PlayerActions playerActions = ActionParser.ParseMove(JsonConvert.SerializeObject(validActions.moves[0].move));
+        Actions actions = XayaActionParser.JsonToActions(blockData);
+        Actions validActions = XayaActionParser.JsonToActions(validBlockData);
+        PlayerActions playerActions = PlayerActionParser.ParseMove(JsonConvert.SerializeObject(validActions.moves[0].move));
 
         Debug.Log(actions.moves.Count);
         Debug.Log(actions.rngseed);

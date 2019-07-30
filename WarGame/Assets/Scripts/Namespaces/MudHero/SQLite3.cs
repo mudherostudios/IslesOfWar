@@ -28,7 +28,7 @@ namespace MudHero
                     if (searchKey.Length > 0)
                     {
                         if (searchValue.GetType() == typeof(string))
-                            whereStatement = string.Format("WHERE {0} = \"{1}\"", searchKey, searchValue);
+                            whereStatement = string.Format("WHERE {0} = \'{1}\'", searchKey, searchValue);
                         else if (searchValue.GetType() == typeof(int) || searchValue.GetType() == typeof(long))
                             whereStatement = string.Format("WHERE {0} = {1}", searchKey, searchValue);
                     }
@@ -66,8 +66,8 @@ namespace MudHero
                         var type = values[v].GetType();
 
                         if (type == typeof(string))
-                            field += string.Format("\"{0}\",", values[v]);
-                        else if (type == typeof(long) || type == typeof(double))
+                            field += string.Format("\'{0}\',", values[v]);
+                        else if (type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double))
                             field += values[v] + ",";
                     }
                     else
@@ -91,8 +91,8 @@ namespace MudHero
                         var type = values[v].GetType();
 
                         if (type == typeof(string))
-                            field += string.Format("{0}=\"{1}\",", ids[v], values[v]);
-                        else if (type == typeof(long) || type == typeof(double))
+                            field += string.Format("{0}=\'{1}\',", ids[v], values[v]);
+                        else if (type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double))
                             field += string.Format("{0}={1},", ids[v], values[v]);
                     }
                     else
@@ -152,7 +152,7 @@ namespace MudHero
                     }
                     catch(Exception e)
                     {
-                        Debug.Log(string.Format("Failed to Create Table. \n{0}", e.Message));
+                        Debug.Log(string.Format("Failed to Create Table. \n{0}\n{1}", e.Message, createCommand.CommandText));
                     }
                 }
             }
@@ -170,7 +170,7 @@ namespace MudHero
                     }
                     catch(Exception e)
                     {
-                        Debug.Log(string.Format("Failed to Insert Row.\n{0}", e.Message));
+                        Debug.Log(string.Format("Failed to Insert Row.\n{0}\n{1}", e.Message, insertCommand.CommandText));
                     }
                 }
             }
@@ -189,7 +189,7 @@ namespace MudHero
                     }
                     catch(Exception e)
                     {
-                        Debug.Log(string.Format("Failed to Update Row.\n{0}",e.Message));
+                        Debug.Log(string.Format("Failed to Update Row.\n{0}\n{1}",e.Message,updateCommand.CommandText));
                     }
                 }
             }
@@ -233,7 +233,7 @@ namespace MudHero
                     catch (Exception e)
                     {
                         dbReader.Close();
-                        Debug.Log(string.Format("Failed to Get Objects.\n{0}", e.Message));
+                        Debug.Log(string.Format("Failed to Get Objects.\n{0}\n{1}", e.Message, readerCommand.CommandText));
                         return null;
                     }
                 }
