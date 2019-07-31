@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 //Orchestrates activity between the main island interaction, manageable island interaction, and discovery island interaction.
 public class WorldNavigator : MonoBehaviour
@@ -33,7 +33,7 @@ public class WorldNavigator : MonoBehaviour
     public float islandChangeSpeed;
 
     [Header("Discovery Generation")]
-    public Transform[] spawnPositions;
+    public Transform spawnPosition;
     public Vector3 maxPositionAdjustment;
 
     [Header("Command Island GUIs")]
@@ -127,7 +127,7 @@ public class WorldNavigator : MonoBehaviour
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
 
         discoveryScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
-        discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPositions, maxPositionAdjustment);
+        discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPosition, maxPositionAdjustment);
         discoveryScript.SetObservationPoints(cameraObservationPoints);
 
         commandScript.Initialize();
@@ -236,7 +236,7 @@ public class WorldNavigator : MonoBehaviour
         mode = Mode.DISCOVERY;
 
         discoveryScript.enabled = true;
-        discoveryScript.GenerateDiscoveryIslands(missionType);
+        discoveryScript.GenerateDiscoveryIslands();
 
         sceneCleanTimer = discoveryCleanTimer;
     }

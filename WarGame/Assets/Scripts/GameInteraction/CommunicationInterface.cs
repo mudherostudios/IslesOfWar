@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MudHero.SQLite3;
 using MudHero.XayaCommunication;
-using MudHero.XayaProcessing;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 using Newtonsoft.Json;

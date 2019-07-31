@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 public class IslandStats: MonoBehaviour
 {
@@ -16,8 +16,15 @@ public class IslandStats: MonoBehaviour
         get { return hexTiles.Length; }
     }
 
-    public void TurnOnIslandBadge()
+    public void TurnOnIslandBadge(string player)
     {
-        islandBadges[islandInfo.type].SetActive(true);
+        int type = 0;
+
+        if (islandInfo.isDepleted)
+            type = 2;
+        else if (islandInfo.owner != player && islandInfo.owner != "")
+            type = 1;
+
+        islandBadges[type].SetActive(true);
     }
 }

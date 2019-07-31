@@ -59,13 +59,13 @@ public class ScreenGUI : MonoBehaviour
 
     public void SetGUIContents()
     {
-        resourceContent[0].text = GetOrderOfMagnitudeString(stateMaster.playerState.warbucks);
-        resourceContent[1].text = GetOrderOfMagnitudeString(stateMaster.playerState.oil);
-        resourceContent[2].text = GetOrderOfMagnitudeString(stateMaster.playerState.metal);
-        resourceContent[3].text = GetOrderOfMagnitudeString(stateMaster.playerState.concrete);
+        resourceContent[0].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[0]);
+        resourceContent[1].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[1]);
+        resourceContent[2].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[2]);
+        resourceContent[3].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[3]);
     }
 
-    string GetOrderOfMagnitudeString(ulong amount)
+    string GetOrderOfMagnitudeString(long amount)
     {
         string orderOfMag = "";
 

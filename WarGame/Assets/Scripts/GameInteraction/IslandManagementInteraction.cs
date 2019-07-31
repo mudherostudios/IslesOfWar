@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 public class IslandManagementInteraction: Interaction
 {
-    public Island[] islands;
+    public string[] islands;
     public string[] tileVariations;
     
     public Transform defaultObservePoint;
@@ -25,6 +25,7 @@ public class IslandManagementInteraction: Interaction
     public Vector3 deleteRight;
 
     private int islandIndex, islandCount;
+    private string islandID;
     private GameObject currentIsland, bufferedIsland;
     private IslandStats currentStats, bufferedStats;
     private int direction;
@@ -68,12 +69,12 @@ public class IslandManagementInteraction: Interaction
         {
             CollectorPurchasePrompter prompter = selectedButton.gameObject.GetComponent<CollectorPurchasePrompter>();
             int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
-            string resourceType = stateMaster.playerState.islands[islandIndex].features[tileIndex].ToString();
-            string collectorType = stateMaster.playerState.islands[islandIndex].collectors[tileIndex].ToString();
+            string resourceType = stateMaster.state.islands[islandID].features[tileIndex].ToString();
+            string collectorType = stateMaster.state.islands[islandID].collectors[tileIndex].ToString();
             int purchaseType = prompter.purchaseType;
 
-            StructureCost cost = new StructureCost(0, 0, 0, 0, new int[] { islandIndex, tileIndex }, purchaseType);
-            if (stateMaster.SendPurchaseCollectorRequest(cost))
+            StructureCost cost = new StructureCost(0, 0, 0, 0, islandID, tileIndex, purchaseType);
+            if (stateMaster.SendPurchaseCollectorRequest(stateMaster.player, cost))
             {
                 prompter.hiddenObject.SetActive(true);
                 prompter.gameObject.SetActive(false);
@@ -87,8 +88,8 @@ public class IslandManagementInteraction: Interaction
         int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
         int purchaseType = prompter.purchaseType;
 
-        StructureCost cost = new StructureCost(0, 0, 0, 0, new int[] { islandIndex, tileIndex }, purchaseType);
-        if (stateMaster.SendPurchaseDefenseRequest(cost))
+        StructureCost cost = new StructureCost(0, 0, 0, 0, islandID, tileIndex, purchaseType);
+        if (stateMaster.SendPurchaseDefenseRequest(stateMaster.player, cost))
         {
             prompter.hiddenObject.SetActive(true);
             prompter.gameObject.SetActive(false);
@@ -123,10 +124,12 @@ public class IslandManagementInteraction: Interaction
 
     public void TurnOnIsland()
     {
+        islands = stateMaster.state.players[stateMaster.player].islands.ToArray();
         islandIndex = 0;
+        islandID = islands[islandIndex];
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
-        PlaceTiles(islands[islandIndex], currentStats, currentIsland.transform);
+        PlaceTiles(stateMaster.state.islands[islandID], currentStats, currentIsland.transform);
     }
 
     public void TurnOffIsland()
@@ -172,10 +175,9 @@ public class IslandManagementInteraction: Interaction
             }
 
             int possibleIndexes = islandCount;
-            int attackableIndexes = stateMaster.playerState.attackableIslands.Length;
 
-            if (stateMaster.playerState.attackableIslands[attackableIndexes - 1].owner.username != null)
-                possibleIndexes += attackableIndexes;
+            if (stateMaster.state.players[stateMaster.player].attackableIsland != "")
+                possibleIndexes += 1;
 
             if (islandIndex + increment >= possibleIndexes)
                 islandIndex = 0;
@@ -187,9 +189,9 @@ public class IslandManagementInteraction: Interaction
             Island island = new Island();
 
             if (islandIndex < islandCount)
-                island = islands[islandIndex];
+                island = stateMaster.state.islands[islandID];
             else
-                island = stateMaster.playerState.attackableIslands[possibleIndexes - islandCount - 1];
+                island = stateMaster.state.islands[stateMaster.state.players[stateMaster.player].attackableIsland];
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
         }
@@ -201,7 +203,7 @@ public class IslandManagementInteraction: Interaction
 
         tileParent.GetComponent<IslandStats>().islandInfo = island;
 
-        for (int h = 0; h < island.totalTiles; h++)
+        for (int h = 0; h < island.features.Length; h++)
         {
             int r = Mathf.FloorToInt(Random.Range(0, 6));
             string featString = island.features[h].ToString();
@@ -312,7 +314,7 @@ public class IslandManagementInteraction: Interaction
 
     public void Initialize()
     {
-        islands = stateMaster.playerState.islands;
+        islands = stateMaster.state.players[stateMaster.player].islands.ToArray();
         islandIndex = 0;
         islandCount = islands.Length;
         direction = 0;

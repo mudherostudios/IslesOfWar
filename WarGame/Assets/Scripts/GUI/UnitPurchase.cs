@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 using TMPro;
 
 public class UnitPurchase: WorldGUI
@@ -14,7 +14,7 @@ public class UnitPurchase: WorldGUI
     {
         unitCost = cost;
         fields = new string[] { "" };
-        fieldAmounts = new ulong[] { 0 };
+        fieldAmounts = new long[] { 0 };
         UpdateAllStats();
     }
 
@@ -23,7 +23,7 @@ public class UnitPurchase: WorldGUI
         Cost tryCost = unitCost;
         unitCost.amount = fieldAmounts[0];
         Reset();
-        return tryCost;
+        return tryCost; 
     }
     
 
@@ -33,10 +33,11 @@ public class UnitPurchase: WorldGUI
         string formatO = "";
         string formatM = "";
         string formatC = "";
-        ulong warbucks = fieldAmounts[0] * unitCost.warbucks;
-        ulong oil = fieldAmounts[0] * unitCost.oil;
-        ulong metal = fieldAmounts[0] * unitCost.metal;
-        ulong concrete = fieldAmounts[0] * unitCost.concrete;
+        ulong amount = StateUtility.MapLongToUlong(fieldAmounts[0]);
+        ulong warbucks = amount * unitCost.warbucks;
+        ulong oil = amount * unitCost.oil;
+        ulong metal = amount * unitCost.metal;
+        ulong concrete = amount * unitCost.concrete;
 
         if (warbucks > 10000)
             formatW = "G2";

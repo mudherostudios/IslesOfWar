@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
-using Combat;
+using IslesOfWar.ClientSide;
+using IslesOfWar.Combat;
 
 public class BattlePlanInteraction : Interaction
 {

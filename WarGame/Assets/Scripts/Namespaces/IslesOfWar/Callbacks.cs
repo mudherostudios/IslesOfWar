@@ -2,61 +2,10 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MudHero
+namespace IslesOfWar
 {
-    namespace XayaProcessing
+    namespace GameStateProcessing
     {
-        //**************************************************
-        //This Section Used To Deserialize Json into Objects
-        //**************************************************
-        public class Actions
-        {
-            public string blockhash { get; set; }
-            public string rngseed { get; set; }
-            public dynamic admin { get; set; }
-            public List<Move> moves { get; set; }
-        }
-
-        public class Transaction
-        {
-            public string txid { get; set; }
-            public int vout { get; set; }
-        }
-
-        public class Move
-        {
-            public List<Transaction> inputs { get; set; }
-            public dynamic move { get; set; }
-            public string name { get; set; }
-            public string txid { get; set; }
-        }
-        //*********************************************
-        //End of Deserialization Classes
-        //*********************************************
-
-        public static class XayaActionParser
-        {
-
-            public static Actions JsonToActions(string data)
-            {
-                return JsonConvert.DeserializeObject<Actions>(data);
-            }
-
-            public static void UpdateRawDictionary(string serializedDict, ref Dictionary<string, Actions> oldDict, ref Dictionary<string, Actions> differenceDict)
-            {
-                Dictionary<string, Actions> deserialized = JsonConvert.DeserializeObject<Dictionary<string, Actions>>("{" + serializedDict + "}");
-
-                foreach (KeyValuePair<string, Actions> pair in deserialized)
-                {
-                    if (!oldDict.ContainsKey(pair.Key))
-                    {
-                        differenceDict.Add(pair.Key, pair.Value);
-                        oldDict.Add(pair.Key, pair.Value);
-                    }
-                }
-            }
-        }
-
         public static class Callback
         {
             public static int chain = 0;

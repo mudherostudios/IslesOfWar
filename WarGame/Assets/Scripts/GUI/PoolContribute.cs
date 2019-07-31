@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 using TMPro;
 
 public class PoolContribute: WorldGUI
@@ -13,25 +13,27 @@ public class PoolContribute: WorldGUI
     public TextMeshPro poolTimer;
     public TextMeshPro poolOwnership;
 
+    private string player;
     private double[] modifiers;
     private string[] strModifiers;
     private ulong pool, poolContributions, poolContributed;
     private int hours, minutes;
     private float seconds, lastTime;
     private string poolStrType;
-    private WorldState state;
+    private Dictionary<string, ResourceContribution> resources;
 
-    public void Initialize(WorldState _state)
+    public void Initialize(string _player, Dictionary<string, ResourceContribution> _resources, float xayaTime)
     {
-        state = _state;
-        lastTime = state.timeRecieved;
+        player = _player;
+        resources = _resources;
+        lastTime = xayaTime;
         fields = new string[] { "", "", "" };
-        fieldAmounts = new ulong[] { 0, 0, 0 };
+        fieldAmounts = new long[] { 0, 0, 0 };
         
 
         modifiers = new double[3];
         strModifiers = new string[3];
-        ulong[] tempPools = new ulong[] {state.oilPool, state.metalPool, state.concretePool};
+        ulong[] tempPools = new ulong[] {StateUtility.GetPoolSize(resources,"oil"), StateUtility.GetPoolSize(resources,"metal"), StateUtility.GetPoolSize(resources,"concrete") };
 
         if (poolType == 0)
         {
@@ -73,37 +75,14 @@ public class PoolContribute: WorldGUI
         strModifiers[1] = string.Format("x {0:0.000}", modifiers[1]);
         strModifiers[2] = string.Format("x {0:0.000}", modifiers[2]);
 
-        switch(poolType)
+
+        if ("warbucks,oil,metal,concrete".Contains(poolStrType))
         {
-            case 0:
-                pool = state.warbucksPool;
-                poolContributions = state.warbucksTotalContributions;
-                poolContributed = state.warbucksContributed;
-                break;
-            case 1:
-                pool = state.oilPool;
-                poolContributions = state.oilTotalContributions;
-                poolContributed = state.oilContributed;
-                modifiers[0] = 0;
-                break;
-            case 2:
-                pool = state.metalPool;
-                poolContributions = state.metalTotalContributions;
-                poolContributed = state.metalContributed;
-                modifiers[1] = 0;
-                break;
-            case 3:
-                pool = state.concretePool;
-                poolContributions = state.concreteTotalContributions;
-                poolContributed = state.concreteContributed;
-                modifiers[2] = 0;
-                break;
-            default:
-                pool = 0;
-                poolContributions = 1;
-                poolContributed = 0;
-                break;
-        }
+            pool = StateUtility.GetPoolSize(resources, poolStrType);
+            poolContributions = (ulong)StateUtility.GetPlayerContributedResources(resources[player], modifiers, poolStrType);
+            poolContributed = (ulong)StateUtility.GetTotalContributedResources(resources, modifiers, poolStrType);
+        }     
+           
 
         UpdateAllStats();
         UpdateTimer();
@@ -111,13 +90,13 @@ public class PoolContribute: WorldGUI
 
     public Cost TrySend()
     {
-        ulong oil = 0;
-        ulong metal = 0;
-        ulong concrete = 0;
-        ulong.TryParse(tradeAmounts[0].text, out oil);
-        ulong.TryParse(tradeAmounts[1].text, out metal);
-        ulong.TryParse(tradeAmounts[2].text, out concrete);
-        ulong contributions = (ulong)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
+        uint oil = 0;
+        uint metal = 0;
+        uint concrete = 0;
+        uint.TryParse(tradeAmounts[0].text, out oil);
+        uint.TryParse(tradeAmounts[1].text, out metal);
+        uint.TryParse(tradeAmounts[2].text, out concrete);
+        uint contributions = (uint)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
 
         Cost cost = new Cost(0, oil, metal, concrete, contributions, poolStrType);
         Reset();
@@ -126,14 +105,15 @@ public class PoolContribute: WorldGUI
 
     public void UpdateTimer()
     {
-        state.poolTimer -= Time.time - lastTime;
+        Debug.Log("Remember this does nothing and needs to pull from the xayablock time.");
+        float poolTimer = Time.time - lastTime;
         lastTime = Time.time;
 
-        seconds = state.poolTimer % 60;
-        minutes = (int)((state.poolTimer - seconds)/60) % 60;
-        hours = (int)(state.poolTimer - seconds - (minutes * 60))/(3600);
+        seconds = poolTimer % 60;
+        minutes = (int)((poolTimer - seconds)/60) % 60;
+        hours = (int)(poolTimer - seconds - (minutes * 60))/(3600);
 
-        poolTimer.text = string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
+        string text = string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
     }
 
     public void UpdateAllStats()

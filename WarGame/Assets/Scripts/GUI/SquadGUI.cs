@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Combat;
-using ClientSide;
+using IslesOfWar.Combat;
+using IslesOfWar.ClientSide;
 using TMPro;
 
 public class SquadGUI : WorldGUI
@@ -12,7 +12,7 @@ public class SquadGUI : WorldGUI
     public TextMeshPro[] unitInputs;
 
     public long[][] squads;
-    public ulong[] allUnits;
+    public long[] allUnits;
 
     private int selectedSquad = 0;
     private PlayerState playerState;
@@ -22,7 +22,7 @@ public class SquadGUI : WorldGUI
         playerState = state;
         squads = new long[squads.Length][];
 
-        for (int s = 0; s < playerState.squads.Length; s++)
+        for (int s = 0; s < playerState.squads.Count; s++)
         {
             squads[s] = playerState.squads[s].fullSquad;
         }
@@ -35,12 +35,12 @@ public class SquadGUI : WorldGUI
         for (int f = 0; f < 3; f++)
         {
             int index = type * 3 + f;
-            ulong count = fieldAmounts[index];
+            long count = fieldAmounts[index];
 
             if (count <= allUnits[index])
             {
                 allUnits[index] -= count;
-                squads[selectedSquad][index] += MapUlongToLong(count);
+                squads[selectedSquad][index] += count;
             }
 
             Reset(index);
@@ -52,12 +52,12 @@ public class SquadGUI : WorldGUI
         for (int f = 0; f < 3; f++)
         {
             int index = type * 3 + f;
-            ulong count = fieldAmounts[index];
+            long count = fieldAmounts[index];
 
-            if (MapUlongToLong(count) <= squads[selectedSquad][f])
+            if (count <= squads[selectedSquad][f])
             {
                 allUnits[index] += count;
-                squads[selectedSquad][index] -= MapUlongToLong(count);
+                squads[selectedSquad][index] -= count;
             }
         }
     }

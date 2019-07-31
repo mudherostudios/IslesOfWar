@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldGUI : MonoBehaviour
 {
-    protected ulong[] fieldAmounts;
+    protected long[] fieldAmounts;
     protected string[] fields;
 
     public void AddCharacter(string str, int ID)
@@ -14,8 +14,8 @@ public class WorldGUI : MonoBehaviour
             if (fields[ID].Length < 10 && "0123456789".Contains(str))
             {
                 fields[ID] += str;
-                ulong temp = 0;
-                ulong.TryParse(fields[ID], out temp);
+                long temp = 0;
+                long.TryParse(fields[ID], out temp);
                 fieldAmounts[ID] = temp;
             }
         }
@@ -47,10 +47,5 @@ public class WorldGUI : MonoBehaviour
     {
         fields[field] = "0";
         fieldAmounts[field] = 0;
-    }
-
-    public static long MapUlongToLong(ulong value)
-    {
-        return unchecked((long)value + long.MinValue);
     }
 }

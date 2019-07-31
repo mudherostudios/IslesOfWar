@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 public class CommandIslandInteraction : Interaction
 {
@@ -130,25 +130,25 @@ public class CommandIslandInteraction : Interaction
 
     void InitializePoolGUIs()
     {
-        warbucksPool.Initialize(stateMaster.worldState);
-        oilPool.Initialize(stateMaster.worldState);
-        metalPool.Initialize(stateMaster.worldState);
-        concretePool.Initialize(stateMaster.worldState);
+        warbucksPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
+        oilPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
+        metalPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
+        concretePool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
     }
 
     void InitializeUnitGUIs()
     {
-        riflemanPurchase.Initialize(stateMaster.purchaseTable.riflemanCost);
-        machineGunnerPurchase.Initialize(stateMaster.purchaseTable.machineGunnerCost);
-        bazookamanPurchase.Initialize(stateMaster.purchaseTable.bazookamanCost);
+        riflemanPurchase.Initialize(stateMaster.state.purchaseTable.riflemanCost);
+        machineGunnerPurchase.Initialize(stateMaster.state.purchaseTable.machineGunnerCost);
+        bazookamanPurchase.Initialize(stateMaster.state.purchaseTable.bazookamanCost);
 
-        lightTankPurchase.Initialize(stateMaster.purchaseTable.lightTankCost);
-        mediumTankPurchase.Initialize(stateMaster.purchaseTable.mediumTankCost);
-        heavyTankPurchase.Initialize(stateMaster.purchaseTable.heavyTankCost);
+        lightTankPurchase.Initialize(stateMaster.state.purchaseTable.lightTankCost);
+        mediumTankPurchase.Initialize(stateMaster.state.purchaseTable.mediumTankCost);
+        heavyTankPurchase.Initialize(stateMaster.state.purchaseTable.heavyTankCost);
 
-        lightFighterPurchase.Initialize(stateMaster.purchaseTable.lightFighterCost);
-        mediumFighterPurchase.Initialize(stateMaster.purchaseTable.mediumFighterCost);
-        bomberPurchase.Initialize(stateMaster.purchaseTable.bomberCost);
+        lightFighterPurchase.Initialize(stateMaster.state.purchaseTable.lightFighterCost);
+        mediumFighterPurchase.Initialize(stateMaster.state.purchaseTable.mediumFighterCost);
+        bomberPurchase.Initialize(stateMaster.state.purchaseTable.bomberCost);
     }
 
     void UpdateAllPoolGUIs()
@@ -169,7 +169,7 @@ public class CommandIslandInteraction : Interaction
     {
         if (purchaseAmount.amount != 0)
         {
-            stateMaster.SendPurchaseRequest(purchaseAmount);
+            stateMaster.SendPurchaseRequest(stateMaster.player, purchaseAmount);
             SetGUIContents();
         }
     }
@@ -178,7 +178,7 @@ public class CommandIslandInteraction : Interaction
     {
         if (sendAmount.amount != 0)
         {
-            stateMaster.SendResourcesToPool(sendAmount);
+            stateMaster.SendResourcesToPool(stateMaster.player, sendAmount);
             SetGUIContents();
         }
     }

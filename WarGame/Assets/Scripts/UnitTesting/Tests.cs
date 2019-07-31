@@ -7,16 +7,12 @@ using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 
 //TestActionParsing
-using MudHero.XayaProcessing;
 using Newtonsoft.Json;
 
 //TestSQLiteDB
-using Mono.Data.Sqlite;
 using System.Data;
 using System.IO;
 
-//TestSQLCommandStrings & TestDBManager
-using MudHero.SQLite3;
 
 public class Tests : MonoBehaviour
 {
@@ -33,12 +29,6 @@ public class Tests : MonoBehaviour
             TestNameUpdates();
         if (Input.GetKeyDown(KeyCode.Alpha2))
             TestActionParsing();
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            TestSQLiteDB();
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-            TestSQLCommandStrings();
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-            TestDBManager();
     }
 
     void TestNameUpdates()
@@ -134,97 +124,5 @@ public class Tests : MonoBehaviour
         {
             Debug.Log("Failed to Parse Player Actions");
         }
-    }
-
-    void TestSQLiteDB()
-    {
-        IDbCommand dbCommand;
-        IDbCommand otherCommand;
-        IDbCommand readCommand;
-        IDataReader reader;
-        
-        string folderPath = string.Format("{0}{1}", Application.persistentDataPath, databasePath);
-        string connection = string.Format("URI=file:{0}{1}",folderPath,dbName);
-
-        if (!Directory.Exists(folderPath))
-        {
-            if(DEBUG)
-                Debug.Log(string.Format("Creating Folder at {0}.", folderPath));
-            Directory.CreateDirectory(folderPath);
-        }
-        else if(Directory.Exists(folderPath) && DEBUG)
-        {
-            
-            Debug.Log("Folder Already Exists. Not Recreating.");
-        }
-
-        if(DEBUG)
-            Debug.Log(string.Format("Attempting database connection with {0}.", connection));
-
-        IDbConnection dbConnection = new SqliteConnection(connection);
-        dbConnection.Open();
-
-        if (DEBUG)
-            Debug.Log("Creating Table.");
-
-        dbCommand = dbConnection.CreateCommand();
-        string sqlCreateTable = "CREATE TABLE IF NOT EXISTS my_table (id INTEGER PRIMARY KEY, val INTEGER )";
-        dbCommand.CommandText = sqlCreateTable;
-        dbCommand.ExecuteReader();
-
-        if (DEBUG)
-            Debug.Log("Updating Table.");
-
-        otherCommand = dbConnection.CreateCommand();
-        otherCommand.CommandText = "INSERT OR REPLACE INTO my_table (id, val) VALUES (0, 5)";
-        otherCommand.ExecuteNonQuery();
-
-        if (DEBUG)
-            Debug.Log("Reading Database");
-
-        readCommand = dbConnection.CreateCommand();
-        string dbQuery = "SELECT * FROM my_table";
-        readCommand.CommandText = dbQuery;
-        reader = readCommand.ExecuteReader();
-
-        while (reader.Read())
-        {
-            Debug.Log(string.Format("id: {0}\nval: {1}\n", reader[0].ToString(), reader[1].ToString()));
-        }
-
-        reader.Close();
-        dbConnection.Close();
-    }
-
-    void TestSQLCommandStrings()
-    {
-        string table = "islands";
-        string tableDefinitions = "id TEXT PRIMARY KEY, version INTEGER, lastblock INTEGER, owner TEXT, features TEXT, collectors TEXT, defenses TEXT";
-        string[] tableIDs = new string[] { "id", "version", "lastblock", "owner", "features", "collectors", "defenses"};
-        object[] tableValues = new object[] { "asdf", (long)1, (long)100, "asdf", null, "0123abcdABCD", "123456701234"};
-
-        Debug.Log(string.Format("CREATE TABLE IF NOT EXISTS {0}({1})", table, tableDefinitions));
-        Debug.Log(DBCommandUtility.GetInsertCommand(table, tableIDs, tableValues));
-        Debug.Log(DBCommandUtility.GetUpdateCommand(table, "id", "asdf", new string[] {"defenses", "owner", "lastblock"}, new object[] {"1337",null, (long)200}));
-        Debug.Log(DBCommandUtility.GetConditionalSelectCommand(table, new string[] { "id", "defenses" }, new object[] { "asdf", "123456" }, tableIDs));
-        Debug.Log(DBCommandUtility.GetSelectCommand(table, tableIDs));
-    }
-
-    void TestDBManager()
-    {
-        string table = "islands";
-        string tableDefinitions = "id TEXT PRIMARY KEY, version INTEGER, lastblock INTEGER, owner TEXT, features TEXT, collectors TEXT, defenses TEXT";
-        string[] tableIDs = new string[] { "id", "version", "lastblock", "owner", "features", "collectors", "defenses" };
-        object[] tableValues = new object[] { "asdf", (long)1, (long)100, "asdf", null, "0123abcdABCD", "123456701234" };
-
-        DBManager database = new DBManager(Application.persistentDataPath, dbName);
-        database.Open();
-        database.CreateTable(table, tableDefinitions);
-        database.Insert(table, tableIDs, tableValues);
-        database.Update(table, "id", "asdf", new string[] { "features" }, new object[] { "I am the features." });
-        object[][] objects = database.GetFromTable(table, new string[] { "id" }, new string[] { "asdf" }, tableIDs);
-        objects = database.GetFromTable(table, tableIDs);
-        objects = database.GetFromTable(table);
-        database.Close();
     }
 }

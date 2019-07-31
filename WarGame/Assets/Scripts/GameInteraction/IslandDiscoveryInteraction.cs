@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 public class IslandDiscoveryInteraction : Interaction
 {
@@ -12,23 +12,21 @@ public class IslandDiscoveryInteraction : Interaction
 
     [Header("Discovery Generation")]
     public string[] tileVariations;
-    public Transform[] spawnPositions;
+    public Transform spawnPosition;
     public Vector3 maxPositionAdjustment;
-    public Transform threeIslandObservationPoint;
-    public Transform fiveIslandObservationPoint;
-    public Transform threeIslandFocus;
-    public Transform fiveIslandFocus;
+    public Transform newIslandObservePoint;
+    public Transform newIslandFocus;
 
-    private Island[] discoveredIslands;
+    private Island discoveredIsland;
     private Island selectedDiscoveredIsland;
-    private GameObject[] discoveredIslandObjects;
+    private GameObject discoveredIslandObject;
 
     private void Update()
     {
         WorldButtonCheck(Input.GetButtonDown("Fire1"));
     }
 
-    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform[] spawns, Vector3 _maxPositionAdjustment)
+    public void SetGenerationVariables(GameObject[] prefabs, string[] _tileVariations, Vector3 _offset, Transform spawn, Vector3 _maxPositionAdjustment)
     {
         tileHolderPrefab = prefabs[prefabs.Length - 1];
         tilePrefabs = new GameObject[prefabs.Length];
@@ -41,15 +39,13 @@ public class IslandDiscoveryInteraction : Interaction
         tileVariations = _tileVariations;
         offset = _offset;
 
-        spawnPositions = spawns;
+        spawnPosition = spawn;
     }
 
     public void SetObservationPoints(Transform[] observationPoints)
     {
-        threeIslandObservationPoint = observationPoints[0];
-        fiveIslandObservationPoint = observationPoints[1];
-        threeIslandFocus = observationPoints[2];
-        fiveIslandFocus = observationPoints[3];
+        newIslandObservePoint = observationPoints[0];
+        newIslandFocus = observationPoints[1];
     }
 
     public void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
@@ -63,7 +59,7 @@ public class IslandDiscoveryInteraction : Interaction
         
         tileParent.GetComponent<IslandStats>().islandInfo = island;
 
-        for (int h = 0; h < island.totalTiles; h++)
+        for (int h = 0; h < island.features.Length; h++)
         {
             int r = Mathf.FloorToInt(Random.Range(0, 6));
             string featString = island.features[h].ToString();
@@ -131,75 +127,46 @@ public class IslandDiscoveryInteraction : Interaction
         }
     }
 
-    void DiscoverRandomIslands(int missionType)
+    void DiscoverRandomIslands()
     {
-        if (missionType == 0)
-        {
-            FakeIslandJson islandData = stateMaster.SendIslandDiscoveryRequest(3);
+        IslandMessage islandData = stateMaster.SendIslandDiscoveryRequest();
 
-            if (islandData.success)
-            {
-                discoveredIslands = islandData.islands;
-                orbital.ExploreMode(threeIslandObservationPoint, false);
-                orbital.SetNewObservePoint(threeIslandObservationPoint, threeIslandFocus);
-            }
-        }
-        else if (missionType == 1)
+        if (islandData.success)
         {
-            FakeIslandJson islandData = stateMaster.SendIslandDiscoveryRequest(5);
-
-            if (islandData.success)
-            {
-                discoveredIslands = islandData.islands;
-                orbital.ExploreMode(fiveIslandObservationPoint, false);
-                orbital.SetNewObservePoint(fiveIslandObservationPoint, fiveIslandFocus);
-            }
+            discoveredIsland = islandData.island;
+            orbital.ExploreMode(newIslandObservePoint, false);
+            orbital.SetNewObservePoint(newIslandObservePoint, newIslandFocus);
         }
     }
 
-    public void GenerateDiscoveryIslands(int missionType)
+    public void GenerateDiscoveryIslands()
     {
         //Talks to Server
-        DiscoverRandomIslands(missionType);
+        Debug.Log("Remember to make this use a reliable random with seed.");
+        DiscoverRandomIslands();
+        discoveredIslandObject = new GameObject();
 
-        if (missionType >= 0)
-        {
-            int count = 1;
 
-            if (missionType == 0)
-                count = 3;
-            else if (missionType == 1)
-                count = 5;
+        Vector3 pos = spawnPosition.position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f)));
+        Vector3 rot = new Vector3(0, Random.value * 360, 0);
+        discoveredIslandObject = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x, rot.y, rot.z));
+        IslandStats stats = discoveredIslandObject.transform.GetComponent<IslandStats>();
+        stats.animator.enabled = false;
+        stats.islandInfo = discoveredIsland;
+        stats.TurnOnIslandBadge(stateMaster.player);
+        PlaceTiles(discoveredIsland, stats, discoveredIslandObject.transform);
 
-            int discoveredIndex = 0;
-            discoveredIslandObjects = new GameObject[count];
-
-            for (int i = 0; i < count; i++, discoveredIndex++)
-            {
-                Vector3 pos = spawnPositions[i].position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f)));
-                Vector3 rot = new Vector3(0, Random.value * 360, 0);
-                discoveredIslandObjects[discoveredIndex] = Instantiate(tileHolderPrefab, pos, Quaternion.Euler(rot.x, rot.y, rot.z));
-                IslandStats stats = discoveredIslandObjects[discoveredIndex].transform.GetComponent<IslandStats>();
-                stats.animator.enabled = false;
-                stats.islandInfo = discoveredIslands[discoveredIndex];
-                stats.TurnOnIslandBadge();
-                PlaceTiles(discoveredIslands[discoveredIndex], stats, discoveredIslandObjects[discoveredIndex].transform);
-                
-            }
-        }
+        
     }
 
     public void RemoveIslands()
     {
-        if (discoveredIslandObjects != null)
+        if (discoveredIslandObject != null)
         {
-            for (int i = 0; i < discoveredIslandObjects.Length; i++)
-            {
-                Destroy(discoveredIslandObjects[i]);
-            }
+            Destroy(discoveredIslandObject);
         }
 
-        discoveredIslandObjects = null;
+        discoveredIslandObject = null;
     }
 
     /*

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
-using ClientSide;
+using IslesOfWar.ClientSide;
 
 public class Interaction : MonoBehaviour
 {
