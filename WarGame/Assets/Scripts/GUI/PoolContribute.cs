@@ -33,7 +33,7 @@ public class PoolContribute: WorldGUI
 
         modifiers = new double[3];
         strModifiers = new string[3];
-        ulong[] tempPools = new ulong[] {StateUtility.GetPoolSize(resources,"oil"), StateUtility.GetPoolSize(resources,"metal"), StateUtility.GetPoolSize(resources,"concrete") };
+        ulong[] tempPools = new ulong[] {PoolUtility.GetPoolSize(resources,"oil"), PoolUtility.GetPoolSize(resources,"metal"), PoolUtility.GetPoolSize(resources,"concrete") };
 
         if (poolType == 0)
         {
@@ -78,9 +78,9 @@ public class PoolContribute: WorldGUI
 
         if ("warbucks,oil,metal,concrete".Contains(poolStrType))
         {
-            pool = StateUtility.GetPoolSize(resources, poolStrType);
-            poolContributions = (ulong)StateUtility.GetPlayerContributedResources(resources[player], modifiers, poolStrType);
-            poolContributed = (ulong)StateUtility.GetTotalContributedResources(resources, modifiers, poolStrType);
+            pool = PoolUtility.GetPoolSize(resources, poolStrType);
+            poolContributions = (ulong)PoolUtility.GetPlayerContributedResources(resources[player], modifiers, poolStrType);
+            poolContributed = (ulong)PoolUtility.GetTotalContributedResources(resources, modifiers, poolStrType);
         }     
            
 

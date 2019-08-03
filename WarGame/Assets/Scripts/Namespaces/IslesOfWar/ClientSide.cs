@@ -7,7 +7,7 @@ namespace IslesOfWar
 {
     namespace ClientSide
     {
-        public static class StateUtility
+        public static class PoolUtility
         {
             public static ulong MapLongToUlong(long longValue)
             {
@@ -91,13 +91,21 @@ namespace IslesOfWar
             }
         }
 
-        public struct State
+        public class State
         {
             public Dictionary<string, PlayerState> players;
             public Dictionary<string, Island> islands;
             public Dictionary<string, ResourceContribution> resourceContributions;
             public Dictionary<string, string> depletedContributions;
             public PurchaseTable purchaseTable;
+
+            public State()
+            {
+                players = new Dictionary<string, PlayerState>();
+                islands = new Dictionary<string, Island>();
+                resourceContributions = new Dictionary<string, ResourceContribution>();
+                depletedContributions = new Dictionary<string, string>();
+            }
 
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, string> depContributions, PurchaseTable _table)
             {
@@ -185,8 +193,27 @@ namespace IslesOfWar
                     return true;
                 }
             }
+
+            public long[] GetTotalSquadMembers()
+            {
+                long[] total = new long[9];
+
+                if (squadCounts.Count > 0)
+                {
+                    for (int s = 0; s < squadCounts.Count; s++)
+                    {
+                        for (int u = 0; u < squadCounts[s].Count; u++)
+                        {
+                            total[u] += squadCounts[s][u];
+                        }
+                    }
+                }
+
+                return total;
+            }
         }
 
+        //Phase out
         public struct Cost
         {
             public uint warbucks, oil, metal, concrete;
@@ -222,21 +249,21 @@ namespace IslesOfWar
             }
         }
 
-        public class EncodeUtility
+        public static class EncodeUtility
         {
-            private int[][] decodeTable = new int[][]
+            private static int[][] decodeTable = new int[][]
             {
-            new int[] {0, 0, 0},
-            new int[] {1, 0, 0},
-            new int[] {0, 2, 0},
-            new int[] {0, 0, 3},
-            new int[] {1, 2, 0},
-            new int[] {1, 0, 3},
-            new int[] {0, 2, 3},
-            new int[] {1, 2, 3}
+                new int[] {0, 0, 0},
+                new int[] {1, 0, 0},
+                new int[] {0, 2, 0},
+                new int[] {0, 0, 3},
+                new int[] {1, 2, 0},
+                new int[] {1, 0, 3},
+                new int[] {0, 2, 3},
+                new int[] {1, 2, 3}
             };
 
-            public char[,] encodeTable = new char[,]
+            public static char[,] encodeTable = new char[,]
             {
             { ')', '!', '@', '#', '$', '%', '^', '&' },
             { '0', '1', '2', '3', '4', '5', '6', '7' },
@@ -245,7 +272,7 @@ namespace IslesOfWar
             };
 
 
-            public char GetFeatureCode(int tileType, int resourceType)
+            public static char GetFeatureCode(int tileType, int resourceType)
             {
                 if (tileType == -1 || resourceType == -1)
                     return 'Z';
@@ -253,7 +280,7 @@ namespace IslesOfWar
                 return encodeTable[tileType + 1, resourceType];
             }
 
-            public char GetDefenseCode(int blockerType, int bunkerCombo)
+            public static char GetDefenseCode(int blockerType, int bunkerCombo)
             {
                 if (blockerType == -1 || bunkerCombo == -1)
                     return 'Z';
@@ -261,7 +288,7 @@ namespace IslesOfWar
                 return encodeTable[blockerType, bunkerCombo];
             }
 
-            public int[] GetDefenseTypes(int blocker, int bunkers)
+            public static int[][] GetDefenseTypes(int blocker, int bunkers)
             {
                 int[] blockerPart = new int[3];
 
@@ -270,33 +297,22 @@ namespace IslesOfWar
 
                 int[] bunkerPart = GetBaseTypes(bunkers);
 
-                int[] defenses = new int[6];
-
-                for (int d = 0; d < defenses.Length; d++)
-                {
-                    if (d < blockerPart.Length)
-                        defenses[d] = blockerPart[d];
-                    else
-                    {
-                        if (bunkerPart[d - 3] != 0)
-                            defenses[d] = bunkerPart[d - 3] + 3;
-                    }
-                }
+                int[][] defenses = new int[][] { blockerPart, bunkerPart };
 
                 return defenses;
             }
 
-            public int[] GetBaseTypes(int type)
+            public static int[] GetBaseTypes(int type)
             {
                 return decodeTable[type];
             }
 
-            public int GetXType(char type)
+            public static int GetXType(char type)
             {
                 return GetXType(type.ToString());
             }
 
-            public int GetXType(string type)
+            public static int GetXType(string type)
             {
                 int converted = -1;
 
@@ -320,12 +336,12 @@ namespace IslesOfWar
                 return converted;
             }
 
-            public int GetYType(char type)
+            public static int GetYType(char type)
             {
                 return GetYType(type.ToString());
             }
 
-            public int GetYType(string type)
+            public static int GetYType(string type)
             {
 
                 if (")!@#$%^&*(".Contains(type))
@@ -340,7 +356,7 @@ namespace IslesOfWar
                 return -1;
             }
 
-            public int GetDecodeIndex(int[] set)
+            public static int GetDecodeIndex(int[] set)
             {
                 for (int i = 0; i < decodeTable.Length; i++)
                 {
@@ -361,6 +377,60 @@ namespace IslesOfWar
 
                 return -1;
             }
+        }
+
+        public static class IslandBuildUtility
+        {
+            public static bool CanBuildCollectorOnFeature(char feature, char existing, char ordered)
+            {
+                int featureType = EncodeUtility.GetXType(feature);
+                int existingType = EncodeUtility.GetXType(existing);
+                int orderedType = EncodeUtility.GetXType(ordered);
+
+                if (featureType > 0 && orderedType > 0 && existingType != orderedType)
+                {
+                    int[] possible = EncodeUtility.GetBaseTypes(featureType);
+                    int[] exists = EncodeUtility.GetBaseTypes(existingType);
+                    int[] orders = EncodeUtility.GetBaseTypes(orderedType);
+
+                    bool canBuild = true;
+
+                    for (int b = 0; b < possible.Length && canBuild; b++)
+                    {
+                        canBuild = possible[b] == orders[b] || orders[b] == 0;
+                        canBuild = exists[b] != orders[b];
+                    }
+
+                    return canBuild;
+                }
+
+                return false;
+            }
+
+            public static bool CanBuildDefense(char existing, char ordered)
+            {
+                int existingBlockerType = EncodeUtility.GetYType(existing);
+                int existingBunkerType = EncodeUtility.GetXType(existing);
+                int orderedBlockerType = EncodeUtility.GetYType(ordered);
+                int orderedBunkerType = EncodeUtility.GetXType(ordered);
+
+                bool canBuild = existingBlockerType == 0 && orderedBlockerType > -1;
+                int bunkers = 0;
+
+                int[] existingBunkers = EncodeUtility.GetBaseTypes(existingBunkerType);
+                int[] orderedBunkers = EncodeUtility.GetBaseTypes(orderedBunkerType);
+
+                for (int d = 0; d < existingBunkers.Length && canBuild; d++)
+                {
+                    if (existingBunkers[d] > 0)
+                        bunkers++;
+
+                    canBuild = bunkers < 2 && orderedBunkers[d] != existingBunkers[d];
+                }
+
+                return canBuild;
+            }
+
         }
 
         public class PurchaseTable
@@ -468,12 +538,10 @@ namespace IslesOfWar
             public List<long> resources;
             public List<string> islands;
             public string attackableIsland;
-            public List<Squad> squads;
 
             public long[] allUnits { get { return units.ToArray(); } }
             public long[] allResources { get { return resources.ToArray(); } }
             public string[] allIslands { get { return islands.ToArray(); } }
-            public Squad[] allSquads { get { return squads.ToArray(); } }
 
             public PlayerState(string nation,long[] unitCounts, long[] resourceCounts, string[] islandIDs, string _attackableIsland)
             {
@@ -482,7 +550,6 @@ namespace IslesOfWar
                 units = new List<long>();
                 resources = new List<long>();
                 islands = new List<string>();
-                squads = new List<Squad>();
                 
                 units.AddRange(unitCounts);
                 resources.AddRange(resourceCounts);

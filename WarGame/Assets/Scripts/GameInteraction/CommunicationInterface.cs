@@ -37,7 +37,6 @@ public class CommunicationInterface : MonoBehaviour
 
     public int totalBlocks = 0;
     public int blockProgress = 0;
-    string lastGamedata = "";
     Dictionary<string, List<PlayerActions>> playerActionDictionary;
     Dictionary<string, List<PlayerActions>> playerDifferenceDictionary;
     Dictionary<string, Actions> actionDictionary;
@@ -106,24 +105,6 @@ public class CommunicationInterface : MonoBehaviour
                 return xayaCommands.connected;
             else
                 return false;
-        }
-    }
-
-    public void UpdateBlockProgress(string blockhash, string gamedata)
-    {
-        totalBlocks = xayaCommands.networkBlockCount;
-        blockProgress = xayaCommands.GetBlockHeight(blockhash);
-
-        differenceDictionary.Clear();
-        playerDifferenceDictionary.Clear();
-
-        if (gamedata != "" && gamedata != lastGamedata)
-        {
-            lastGamedata = gamedata;
-
-            XayaActionParser.UpdateRawDictionary(gamedata, ref actionDictionary, ref differenceDictionary);
-            PlayerActionParser.UpdateDictionary(gamedata, ref playerActionDictionary, ref playerDifferenceDictionary);
-            Debug.Log(string.Format("Recieved new state at {0}.",blockProgress));
         }
     }
 

@@ -53,10 +53,10 @@ namespace IslesOfWar
             }
         }
 
-        public class AdjacencyMatrix
+        public static class AdjacencyMatrix
         {
             //https://en.wikipedia.org/wiki/Adjacency_matrix
-            private int[,] adjacencyMatrix = new int[,]
+            private static int[,] adjacencyMatrix = new int[,]
             {
             {2, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
             {1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
@@ -72,7 +72,7 @@ namespace IslesOfWar
             {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 2},
             };
 
-            public bool IsAdjacent(int currentPosition, int destination)
+            public static bool IsAdjacent(int currentPosition, int destination)
             {
                 bool adjacent = false;
 
@@ -85,7 +85,7 @@ namespace IslesOfWar
                 return adjacent;
             }
 
-            public int mapSize
+            public static int mapSize
             {
                 get
                 {
@@ -93,7 +93,7 @@ namespace IslesOfWar
                 }
             }
 
-            public int[] GetAllAdjacentIndices(int position, bool excludeSelf)
+            public static int[] GetAllAdjacentIndices(int position, bool excludeSelf)
             {
                 List<int> allAdjacentIndices = new List<int>();
 
@@ -114,7 +114,6 @@ namespace IslesOfWar
             private long[][] squadCounts = new long[3][];
             int[][] squadMoves = new int[3][];
             private int[] lastMoveIndex;
-            private AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix();
 
             public AttackPlanner(Squad[] squads)
             {
@@ -139,7 +138,7 @@ namespace IslesOfWar
 
                 if (lastIndex == 0)
                     canMove = true;
-                else if (adjacencyMatrix.IsAdjacent(squadMoves[squad][lastIndex - 1], position) && lastIndex < 6)
+                else if (AdjacencyMatrix.IsAdjacent(squadMoves[squad][lastIndex - 1], position) && lastIndex < 6)
                     canMove = true;
 
                 if (canMove)
@@ -174,7 +173,6 @@ namespace IslesOfWar
             private long[][] squadCounts = new long[4][];
             private List<List<int>> defensePositions = new List<List<int>>();
             private bool[] reactToNewlyAdjacents = new bool[4];
-            private AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix();
 
             public DefensePlanner(Squad[] squads)
             {
@@ -194,7 +192,7 @@ namespace IslesOfWar
             public void SetSquadPosition(int squad, int position)
             {
                 defensePositions[squad].Add(position);
-                defensePositions[squad].AddRange(adjacencyMatrix.GetAllAdjacentIndices(position, true));
+                defensePositions[squad].AddRange(AdjacencyMatrix.GetAllAdjacentIndices(position, true));
             }
 
             public void ToggleSquadReactCommand(int squad)
@@ -206,7 +204,7 @@ namespace IslesOfWar
             {
                 if (defensePositions.Count != 0 && defensePositions[squad][0] != position)
                 {
-                    if (adjacencyMatrix.IsAdjacent(defensePositions[squad][0], position))
+                    if (AdjacencyMatrix.IsAdjacent(defensePositions[squad][0], position))
                     {
                         if (defensePositions[squad].Contains(position))
                             defensePositions[squad].Remove(position);

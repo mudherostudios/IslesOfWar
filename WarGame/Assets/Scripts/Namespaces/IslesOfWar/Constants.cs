@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace IslesOfWar
 {
-    public class Constants
+    public static class Constants
     {
+        public static int[] version = new int[] { 0, 0, 0}; //Client Version, Compatibility Version, Effeciency Version
+
         public static Dictionary<string, string> countryCodes = new Dictionary<string, string>()
         {
             {"AF","Afghanistan"},{"AX","Ãland Islands"},{"AL","Albania"},{"DZ","Algeria"},{"AS","American Samoa"},
@@ -55,6 +57,42 @@ namespace IslesOfWar
             {"UM","United States Minor Outlying Islands"},{"UY","Uruguay"},{"UZ","Uzbekistan"},{"VU","Vanuatu"},
             {"VE","Venezuela,Bolivarian Republic of"},{"VN","Viet Nam"},{"VG","Virgin Islands,British"},{"VI","Virgin Islands,U.S."},
             {"WF","Wallis and Futuna"},{"EH","Western Sahara"},{"YE","Yemen"},{"ZM","Zambia"},{"ZW","Zimbabwe"}
+        };
+
+
+        //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
+        public static uint[,] unitCosts = new uint[,]
+        {
+            {10,    0,      10},
+            {50,    0,      20},
+            {100,   10,     20},
+            {100,   25,     100},
+            {200,   50,     200},
+            {500,   100,    500},
+            {250,   100,    50},
+            {500,   250,    75},
+            {1000,  500,    200}
+        };
+
+        public static int[,] blockerCosts = new int[,]
+        {
+            {10000, 100, 1000, 100 },
+            {10000, 1000, 500, 500 },
+            {10000, 500, 1000, 1000}
+        };
+
+        public static int[,] bunkerCosts = new int[,]
+        {
+            {10000, 100, 1000, 100 },
+            {10000, 1000, 500, 500 },
+            {10000, 500, 1000, 1000}
+        };
+
+        public static int[,] collectorCosts = new int[,]
+        {
+            {10000, 500, 1000, 1000 },
+            {10000, 1000, 500, 1000 },
+            {10000, 1000, 1000, 500 }
         };
     }
 }

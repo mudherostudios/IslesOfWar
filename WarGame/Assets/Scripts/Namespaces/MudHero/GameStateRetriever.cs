@@ -50,7 +50,7 @@ namespace MudHero
             IEnumerator GSRAsync()
             {
                 string result = "";
-                wrapper = new XayaWrapper(pathInfo.library, ref result, Callback.SetGenesisInfo, Callback.ParseStateInfo, Callback.RewindData);
+                wrapper = new XayaWrapper(pathInfo.library, ref result, Callback.SetGenesisInfo, Callback.PlayState, Callback.RewindState);
                 result += "\n" + wrapper.SetConnectInfo(daemonInfo.ip, daemonInfo.port, gsrInfo.ip, gsrInfo.port, daemonInfo.username, daemonInfo.userpassword);
 
                 yield return Ninja.JumpToUnity;
@@ -89,7 +89,7 @@ namespace MudHero
                             if (actualState.gamestate != null)
                             {
                                 yield return Ninja.JumpToUnity;
-                                communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate);
+                                //communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate); 
                                 yield return Ninja.JumpBack;
                             }
 

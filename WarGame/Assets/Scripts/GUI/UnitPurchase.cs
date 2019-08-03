@@ -33,7 +33,7 @@ public class UnitPurchase: WorldGUI
         string formatO = "";
         string formatM = "";
         string formatC = "";
-        ulong amount = StateUtility.MapLongToUlong(fieldAmounts[0]);
+        ulong amount = PoolUtility.MapLongToUlong(fieldAmounts[0]);
         ulong warbucks = amount * unitCost.warbucks;
         ulong oil = amount * unitCost.oil;
         ulong metal = amount * unitCost.metal;

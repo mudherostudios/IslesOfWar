@@ -244,9 +244,8 @@ public class IslandManagementInteraction: Interaction
 
     void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
     {
-        EncodeUtility utility = new EncodeUtility();
-        int r = utility.GetXType(type);
-        int c = utility.GetXType(built);
+        int r = EncodeUtility.GetXType(type);
+        int c = EncodeUtility.GetXType(built);
         GameObject resourceObject = null;
 
         if (r == 1 || r == 4 || r == 5 || r == 7)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace IslesOfWar
 {
@@ -15,18 +16,7 @@ namespace IslesOfWar
             public string def; //defenses
         }
 
-        public class UnitPurchaseOrder
-        {
-            public uint[] unitCounts; //Units to purchase
-        }
-
-        public class ResourceOrder
-        {
-            public int rsrc; //resource pool we submit too
-            public uint[] amnt; //amount we are submitting of each resource
-        }
-
-        public class ResourceOrderD //Deserialize needs Lists
+        public class ResourceOrder //Deserialize needs Lists
         {
             public int rsrc;
             public List<uint> amnt;
@@ -34,17 +24,9 @@ namespace IslesOfWar
 
         public class BattleCommand
         {
-            public string id;    //island identification
-            public int[][] pln;  //movement instructions
-            public uint[][] sqd; //counts of users per quad
-            public int[] flw;    //attack newly adjacent? 1 true 0 false
-        }
-
-        public class BattleCommandD
-        {
             public string id;
             public List<List<int>> pln;
-            public List<List<uint>> sqd;
+            public List<List<int>> sqd;
             public List<int> flw;
         }
 
@@ -52,61 +34,53 @@ namespace IslesOfWar
         {
             public string nat;
             public IslandBuildOrder bld; //Build
-            public List<uint> buy;       //Unit Purchase
-            public int srch;             //Island Search
-            public ResourceOrderD pot;   //Resource Pot Submission
+            public List<int> buy;       //Unit Purchase
+            public string srch;             //Island Search
+            public ResourceOrder pot;   //Resource Pot Submission
             public List<string> dep;     //Depleted Island Submissions
-            public BattleCommandD attk;  //Attack Plan
-            public BattleCommandD dfnd;  //Defend Orders
+            public BattleCommand attk;  //Attack Plan
+            public BattleCommand dfnd;  //Defend Orders
         }
 
         public static class CommandUtility
         {
-            public static string UpdateNation(string countryCode)
-            {
-                return string.Format("\"nat\":\"{0}\"", countryCode);
-            }
-
-            public static string CompleteIslandBuildCommands(IslandBuildOrder buildOrder)
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore};
-                return string.Format("\"bld\":{0}", JsonConvert.SerializeObject(buildOrder, Formatting.None, settings));
-            }
-
-            public static string CompleteUnitPurchaseOrder(UnitPurchaseOrder purchaseOrder)
-            {
-                return string.Format("\"buy\":{0}",JsonConvert.SerializeObject(purchaseOrder.unitCounts));
-            }
-
-            public static string CompleteUnitPurchaseOrder(uint[] purchaseOrder)
-            {
-                return string.Format("\"buy\":{0}", JsonConvert.SerializeObject(purchaseOrder));
-            }
-
-            public static string SearchForIslands()
-            {
-                return "\"srch\":1";
-            }
-
-            public static string SubmitToResourcePot(ResourceOrder potOrder)
-            {
-                return string.Format("\"pot\":{0}", JsonConvert.SerializeObject(potOrder));
-            }
-
-            public static string SubmitToCryptoPot(string[] ids)
-            {
-                return string.Format("\"dep\":{0}",JsonConvert.SerializeObject(ids));
-            }
-
-            public static string AttackIsland(BattleCommand command)
+            public static string GetSerializedCommand(PlayerActions actions)
             {
                 JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-                return string.Format("\"attk\":{0}", JsonConvert.SerializeObject(command, Formatting.None, settings));
+                return JsonConvert.SerializeObject(actions, Formatting.None, settings);
+            }
+        }
+
+        public static class Validity
+        {
+            public static bool JSON(string stringToValidate)
+            {
+                try
+                {
+                    object obj = JToken.Parse(stringToValidate);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
 
-            public static string DefendIsland(BattleCommand command)
+            public static bool Nation(string nationCode)
             {
-                return string.Format("\"dfnd\":{0}", JsonConvert.SerializeObject(command));
+                if (nationCode.Length == 2)
+                    if (Constants.countryCodes.ContainsKey(nationCode))
+                        return true;
+
+                return false;
+            }
+
+            public static bool IslandSearch(string searchType)
+            {
+                if (searchType == "norm")
+                    return true;
+                else
+                    return false;
             }
         }
     }

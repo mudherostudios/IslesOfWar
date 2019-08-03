@@ -4,6 +4,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using IslesOfWar.Communication;
 using IslesOfWar.ClientSide;
+using IslesOfWar.Combat;
 
 namespace IslesOfWar
 {
@@ -11,86 +12,38 @@ namespace IslesOfWar
     {
         public class IslandDiscovery
         {
-            public ulong[] islandCounts;
-            public float[] probabilities, relativeLikelihoods;
+            public float[] probabilities;
+            public float[] relativeLikelihoods  = new float[]{ 0.4f, 0.6f};//0 - Undiscovered; 1 - Player Owned;
             public ulong totalIslands;
 
-            public IslandDiscovery(ulong[] _islandCounts, float[] likelihoods)
+            public IslandDiscovery(int possible, int total)
             {
-                //Indices
-                //0 - Undiscovered
-                //1 - Player Owned
-                //2 - Depleted
-                islandCounts = _islandCounts;
-                relativeLikelihoods = likelihoods;
-                CalculateProbabilities(likelihoods);
+                CalculateProbabilities(relativeLikelihoods, possible, total);
             }
 
-            void CalculateProbabilities(float[] _probabilities)
+            void CalculateProbabilities(float[] likelihoods, int possibleIslands, int totalIslands)
             {
-                for (int c = 0; c < islandCounts.Length; c++)
-                {
-                    if (islandCounts[c] < 0)
-                        islandCounts[c] = 0;
-
-                    totalIslands += islandCounts[c];
-                }
-
-                double[] tempProbs = new double[_probabilities.Length];
-                probabilities = new float[_probabilities.Length];
+                double undiscoveredProb = 0.0;
+                double existingProb = 0.0;
                 double totalProbs = 0.0;
+                probabilities = new float[likelihoods.Length];
 
-                for (int p = 0; p < _probabilities.Length; p++)
-                {
-                    tempProbs[p] = _probabilities[p] * islandCounts[p];
-                    totalProbs += tempProbs[p];
-                }
+                undiscoveredProb = likelihoods[0] * possibleIslands;
+                existingProb = likelihoods[1] * totalIslands;
+                totalProbs = existingProb + undiscoveredProb;
 
-                for (int p = 0; p < tempProbs.Length; p++)
-                {
-                    probabilities[p] = (float)(tempProbs[p] / totalProbs);
-                }
+                probabilities[0] = (float)(undiscoveredProb / totalProbs);
+                probabilities[1] = (float)(existingProb / totalProbs);
             }
 
-            public Island GetIslands()
+            public Island GetIsland()
             {
                 IslandGenerator gen = new IslandGenerator();
                 Island island = new Island();
 
-                island = gen.Generate(0.5f);
+                island = gen.Generate();
 
                 return island;
-            }
-
-            int[] GetIslandTypes(int amount)
-            {
-                int[] types = new int[amount];
-
-                for (int i = 0; i < amount; i++)
-                {
-                    float chosen = Random.value;
-                    float current = 0;
-
-                    for (int p = 0; p < probabilities.Length; p++)
-                    {
-                        if (chosen <= current + probabilities[p])
-                        {
-                            /*Does not handle cases with counts that have reached zero already.
-                            You'd need to recalculate everytime for perfect probabilities, 
-                            but thats a lot of needless computation. But we will have to account
-                            for the possibility of running out of an island type in the real implementation*/
-                            types[i] = p;
-                            p = probabilities.Length;
-                        }
-                        else
-                        {
-                            current += probabilities[p];
-                        }
-                    }
-                }
-
-                CalculateProbabilities(relativeLikelihoods);
-                return types;
             }
         }
 
@@ -121,17 +74,16 @@ namespace IslesOfWar
                 resourceProbabilities[2] = probabilities[5];
             }
 
-            public Island Generate(float developmentChance)
+            public Island Generate()
             {
                 string features = "";
                 string collectors = "000000000000";
                 int[] resourceTypes = new int[12];
-                EncodeUtility encode = new EncodeUtility();
 
                 for (int t = 0; t < 12; t++)
                 {
                     resourceTypes[t] = GetResourceType();
-                    features += encode.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
+                    features += EncodeUtility.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
                 }
 
                 Island island = new Island("", features, collectors, "))))))))))))");
@@ -180,7 +132,7 @@ namespace IslesOfWar
                 }
 
                 if (type == -1)
-                    Debug.Log("Check Probability Range");
+                    Debug.Log("Check Probability Range for GetTileType().");
 
                 return type;
             }
@@ -199,55 +151,7 @@ namespace IslesOfWar
             {
                 state = new State(allPlayers, islands, resContributions, depContributions, table);
             }
-
-            public StateTracker(string fakeNation, string fakePlayer)
-            {
-                Dictionary<string, Island> islands = GeneratePlayerIslands(100);
-                PlayerState fakePlayerState;
-                Dictionary<string, PlayerState> players = new Dictionary<string, PlayerState>();
-                Dictionary<string, ResourceContribution> resourceContributions = new Dictionary<string, ResourceContribution>();
-                Dictionary<string, string> depletedContributions = new Dictionary<string, string>();
-
-                List<string> islandsToAssign = new List<string>();
-
-                foreach (KeyValuePair<string, Island> pair in islands)
-                {
-                    float r = Random.value;
-
-                    if (r > 0.1)
-                        islandsToAssign.Add(pair.Key);
-                }
-
-                fakePlayerState = new PlayerState(fakeNation, new long[9], new long[] { 1000, 1000, 1000, 1000 }, islandsToAssign.ToArray(), "");
-                players.Add("cairo", fakePlayerState);
-
-                Cost[] costs = new Cost[]
-                {
-                new Cost(50, 0, 10, 0, 1, "rifleman"),
-                new Cost(100, 0, 300, 0, 1, "machineGunner"),
-                new Cost(300, 0, 150, 0, 1, "bazookaman"),
-
-                new Cost(200, 200, 300, 0, 1, "lightTank"),
-                new Cost(200, 300, 600, 0, 1, "mediumTank"),
-                new Cost(400, 400, 900, 0, 1, "heavyTank"),
-
-                new Cost(1000, 400, 150, 0, 1, "lightFigther"),
-                new Cost(2000, 600, 250, 0, 1, "mediumFighter"),
-                new Cost(4000, 1000, 500, 0, 1, "bomber"),
-
-                new Cost(1000, 1000, 1000, 10000, 1, "troopBunker"),
-                new Cost(2000, 1000, 2000, 20000, 1, "tankBunker"),
-                new Cost(4000, 1000, 4000, 40000, 1, "aircraftBunker"),
-
-                new Cost(1000, 150, 1000, 500, 1, "troopBlocker"),
-                new Cost(2000, 300, 2000, 1000, 1, "tankBlocker"),
-                new Cost(4000, 300, 4000, 2000, 1, "aircraftBlocker")
-                };
-
-                PurchaseTable purchaseTable = new PurchaseTable(costs);
-
-                state = new State(players, islands, resourceContributions, depletedContributions, purchaseTable);
-            }
+           
 
             public State ContributeToPool(string playerName, Cost resources)
             {
@@ -285,7 +189,6 @@ namespace IslesOfWar
 
             public State PurchaseIslandCollector(string playerName, StructureCost cost)
             {
-                EncodeUtility utility = new EncodeUtility();
                 bool successfulPurchase = false;
 
                 if (state.islands[cost.islandID].owner == playerName)
@@ -293,11 +196,11 @@ namespace IslesOfWar
                     string tileResources = state.islands[playerName].features[cost.tileIndex].ToString();
                     string tileCollectors = state.islands[cost.islandID].collectors[cost.tileIndex].ToString();
 
-                    int resourceType = utility.GetXType(tileResources);
-                    int collectorType = utility.GetXType(tileCollectors);
+                    int resourceType = EncodeUtility.GetXType(tileResources);
+                    int collectorType = EncodeUtility.GetXType(tileCollectors);
 
-                    int[] resources = utility.GetBaseTypes(resourceType);
-                    int[] collectors = utility.GetBaseTypes(collectorType);
+                    int[] resources = EncodeUtility.GetBaseTypes(resourceType);
+                    int[] collectors = EncodeUtility.GetBaseTypes(collectorType);
 
                     successfulPurchase = CanSpendResources(playerName, cost);
 
@@ -323,16 +226,15 @@ namespace IslesOfWar
 
             public State PurchaseIslandDefense(string playerName, StructureCost cost)
             {
-                EncodeUtility utility = new EncodeUtility();
                 bool successfulPurchase = false;
 
                 if (state.islands[cost.islandID].owner == playerName)
                 {
                     string islandDefenses = state.islands[cost.islandID].defenses;
 
-                    int blockerType = utility.GetYType(islandDefenses[cost.tileIndex]);
-                    int bunkerCombo = utility.GetXType(islandDefenses[cost.tileIndex]);
-                    int[] tileDefenses = utility.GetDefenseTypes(blockerType, bunkerCombo);
+                    int blockerType = EncodeUtility.GetYType(islandDefenses[cost.tileIndex]);
+                    int bunkerCombo = EncodeUtility.GetXType(islandDefenses[cost.tileIndex]);
+                    int[][] tileDefenses = EncodeUtility.GetDefenseTypes(blockerType, bunkerCombo);
 
                     if (cost.purchaseType > 0 && cost.purchaseType <= tileDefenses.Length)
                     {
@@ -341,14 +243,14 @@ namespace IslesOfWar
                         if (blockerType != 0 && cost.purchaseType <= 3)
                             successfulPurchase = false;
 
-                        if (tileDefenses[cost.purchaseType - 1] != 0)
-                            successfulPurchase = false;
+                        //if (tileDefenses[cost.purchaseType - 1] != 0)
+                            //successfulPurchase = false;
                     }
 
                     if (successfulPurchase)
                     {
-                        tileDefenses[cost.purchaseType - 1] = cost.purchaseType;
-                        UpdateDefenses(cost.islandID, cost.tileIndex, tileDefenses);
+                        //tileDefenses[cost.purchaseType - 1] = cost.purchaseType;
+                        //UpdateDefenses(cost.islandID, cost.tileIndex, tileDefenses);
                     }
                 }
 
@@ -392,15 +294,15 @@ namespace IslesOfWar
                     if (updatedTile[s + 3] > 0)
                         bunkerSet[s] = updatedTile[s + 3] - 3;
                 }
-
-                EncodeUtility utility = new EncodeUtility();
-                bunkerType = utility.GetDecodeIndex(bunkerSet);
-                char defenseType = utility.GetDefenseCode(blockerType, bunkerType);
+                
+                bunkerType = EncodeUtility.GetDecodeIndex(bunkerSet);
+                char defenseType = EncodeUtility.GetDefenseCode(blockerType, bunkerType);
                 state.islands[islandID].SetDefenses(tileIndex, defenseType);
 
                 Debug.Log(state.islands[islandID].defenses);
             }
 
+            //Phase Out After Changed in Client
             public State PurchaseUnits(string playerName, Cost cost)
             {
                 if (CanSpendResources(playerName, cost, false))
@@ -435,28 +337,15 @@ namespace IslesOfWar
                 return state;
             }
 
-            public IslandMessage DiscoverIslands()
+            public IslandMessage DiscoverIslands(int totalIslands)
             {
-                IslandDiscovery discovery = new IslandDiscovery(new ulong[] { 10000, 10000, 10000 }, new float[] { 1, 1, 1 });
-                Island discoveredIsland = discovery.GetIslands();
+                IslandDiscovery discovery = new IslandDiscovery(totalIslands);
+                Island discoveredIsland = discovery.GetIsland();
 
                 return new IslandMessage(discoveredIsland, true);
             }
 
-            Dictionary<string, Island> GeneratePlayerIslands(int count)
-            {
-                IslandGenerator generator = new IslandGenerator();
-                Dictionary<string, Island> tempIslands = new Dictionary<string, Island>();
-
-                for (int i = 0; i < count; i++)
-                {
-                    Island temp = generator.Generate(0.5f);
-                    tempIslands.Add(temp.features, temp);
-                }
-
-                return tempIslands;
-            }
-
+            //Phase out in client
             bool CanSpendResources(string player, StructureCost resources)
             {
                 Cost cost = new Cost(resources.warbucks, resources.oil, resources.metal, resources.concrete, 1, "ResourceCollector");
@@ -464,6 +353,7 @@ namespace IslesOfWar
                 return CanSpendResources(player, cost, false);
             }
 
+            //Phase out in client
             bool CanSpendResources(string player, Cost resources, bool isResourcePool)
             {
                 long w = resources.warbucks;
@@ -487,6 +377,7 @@ namespace IslesOfWar
                 return false;
             }
 
+            //Phase out in client
             void SpendResources(string player, Cost resources, bool isResourcePool)
             {
                 long w = resources.warbucks;
@@ -531,57 +422,279 @@ namespace IslesOfWar
             public string txid { get; set; }
         }
 
-        public static class XayaActionParser
+        public class StateProcessor
         {
+            public State state;
+            public uint rate;
 
-            public static Actions JsonToActions(string data)
+            public StateProcessor()
             {
-                return JsonConvert.DeserializeObject<Actions>(data);
             }
 
-            public static void UpdateRawDictionary(string serializedDict, ref Dictionary<string, Actions> oldDict, ref Dictionary<string, Actions> differenceDict)
+            public StateProcessor(State _state)
             {
-                Dictionary<string, Actions> deserialized = JsonConvert.DeserializeObject<Dictionary<string, Actions>>("{" + serializedDict + "}");
+                state = _state;
+            }
 
-                foreach (KeyValuePair<string, Actions> pair in deserialized)
+            public void UpdateIslandAndPlayerResources()
+            {
+                foreach (KeyValuePair<string, Island> pair in state.islands)
                 {
-                    if (!oldDict.ContainsKey(pair.Key))
+                    string collectors = pair.Value.collectors;
+                    string owner = pair.Value.owner;
+                    if (collectors != "000000000000")
                     {
-                        differenceDict.Add(pair.Key, pair.Value);
-                        oldDict.Add(pair.Key, pair.Value);
-                    }
-                }
-            }
-        }
-
-        public static class PlayerActionParser
-        {
-            public static PlayerActions ParseMove(string move)
-            {
-                return JsonConvert.DeserializeObject<PlayerActions>(move);
-            }
-
-            public static void UpdateDictionary(string serializedDict, ref Dictionary<string, List<PlayerActions>> oldDict, ref Dictionary<string, List<PlayerActions>> differenceDict)
-            {
-                Dictionary<string, Actions> deserialized = JsonConvert.DeserializeObject<Dictionary<string, Actions>>("{" + serializedDict + "}");
-
-                foreach (KeyValuePair<string, Actions> pair in deserialized)
-                {
-                    if (!oldDict.ContainsKey(pair.Key))
-                    {
-                        List<PlayerActions> playerActions = new List<PlayerActions>();
-
-                        foreach (Move move in pair.Value.moves)
+                        for (int t = 0; t < collectors.Length; t++)
                         {
-                            playerActions.Add(ParseMove(JsonConvert.SerializeObject(move.move)));
+                            if (collectors[t] != 0)
+                            {
+                                int[] types = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(collectors[t]));
+                                UpdatePlayerResources(pair.Key, owner, t, types);
+                            }
                         }
-
-                        differenceDict.Add(pair.Key, playerActions);
-                        oldDict.Add(pair.Key, playerActions);
                     }
                 }
             }
 
+            void UpdatePlayerResources(string island, string player, int tile, int[] types)
+            {
+                if (types[0] > 0 && state.islands[island].resources[tile][0] > 0)
+                {
+                    state.islands[island].resources[tile][0] -= rate;
+                    state.players[player].resources[0] += rate;
+                }
+
+                if (types[1] > 0 && state.islands[island].resources[tile][1] > 0)
+                {
+                    state.islands[island].resources[tile][1] -= rate;
+                    state.players[player].resources[1] += rate;
+                }
+
+                if (types[2] > 0 && state.islands[island].resources[tile][2] > 0)
+                {
+                    state.islands[island].resources[tile][2] -= rate;
+                    state.players[player].resources[2] += rate;
+                }
+            }
+
+            public void AddPlayerOrUpdateNation(string player, string nation)
+            {
+                if (Validity.Nation(nation))
+                {
+                    if (state.players.ContainsKey(player))
+                        state.players[player].nationCode = nation;
+                }
+            }
+
+            public void DiscoverOrScoutIsland(string player, string searchCommand, string txid)
+            {
+                IslandDiscovery discovery = new IslandDiscovery(state.islands.Count);
+
+                Island discovered = discovery.GetIsland();
+
+                if (discovered.owner == "")
+                {
+                    discovered.owner = player;
+                    state.islands.Add(txid, discovered);
+                }
+                else
+                    state.players[player].attackableIsland = txid;
+            }
+
+            public void PurchaseUnits(string player, List<int> order)
+            {
+                long[] resources = state.players[player].allResources;
+                state.players[player].resources.Clear();
+                state.players[player].resources.AddRange(TryPurchaseUnits(order, resources));
+            }
+
+            public void DevelopIsland(string player, IslandBuildOrder order)
+            {
+                if (order.id != null)
+                {
+                    if (state.players[player].islands.Contains(order.id))
+                    {
+                        Island island = state.islands[order.id];
+                        bool collectorsOrdered = order.col != null;
+                        bool defensesOrdered = order.def != null;
+
+                        if (collectorsOrdered)
+                            collectorsOrdered = order.col != "000000000000" && order.col.Length == 12;
+
+                        if (defensesOrdered)
+                            defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
+
+                        for (int t = 0; t < island.features.Length; t++)
+                        {
+                            int featureX = EncodeUtility.GetXType(island.features[t]);
+
+                            if(collectorsOrdered)
+                                collectorsOrdered = IslandBuildUtility.CanBuildCollectorOnFeature(island.features[t], island.collectors[t], order.col[t]);
+                            if (defensesOrdered)
+                                defensesOrdered = IslandBuildUtility.CanBuildDefense(island.defenses[t], order.def[t]);
+
+                            if (collectorsOrdered || defensesOrdered)
+                            {
+                                long[] resources = state.players[player].allResources;
+
+                                if (collectorsOrdered)
+                                {
+                                    int[] collectorOrder = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(order.col[t]));
+                                    resources = TryPurchaseBuildings(collectorOrder, resources,Constants.collectorCosts);
+                                }
+
+                                if (defensesOrdered)
+                                {
+                                    int blockerType = EncodeUtility.GetYType(order.def[t]);
+                                    int bunkerType = EncodeUtility.GetXType(order.def[t]);
+
+                                    int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
+                                    resources = TryPurchaseBuildings(defenseOrder[0], resources, Constants.blockerCosts);
+                                    resources = TryPurchaseBuildings(defenseOrder[1], resources, Constants.bunkerCosts);
+                                }
+
+                                state.players[player].resources.Clear();
+                                state.players[player].resources.AddRange(resources);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            public void UpdateDefensePlan(string player, BattleCommand defensePlan)
+            {
+                bool canUpdate = defensePlan.id != null && defensePlan.pln != null && defensePlan.sqd != null && defensePlan.flw != null;
+
+                if (canUpdate)
+                {
+                    canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count 
+                    && defensePlan.pln.Count == defensePlan.flw.Count;
+
+                    if (canUpdate)
+                    {
+                        long[] totalUnits = state.players[player].allUnits;
+                        totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
+
+                        canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && PlansAreAdjacent(defensePlan.pln);
+
+                        if (canUpdate)
+                        {
+                            state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
+                            state.islands[defensePlan.id].squadPlans = defensePlan.pln;
+                        }
+                    }
+                }
+            }
+
+            bool PlansAreAdjacent(List<List<int>> plan)
+            {
+                bool adjacent = true;
+
+                for (int s = 0; s < plan.Count && adjacent; s++)
+                {
+                    for (int p = 1; p < plan[s].Count && adjacent; p++)
+                    {
+                        adjacent = AdjacencyMatrix.IsAdjacent(plan[s][0], plan[s][p]);
+                    }
+                }
+
+                return adjacent;
+            }
+
+            bool HasEnoughUnits(long[] units, List<List<int>> squadCounts)
+            {
+                bool hasEnough = units.Length == 9;
+
+                for (int s = 0; s < squadCounts.Count && hasEnough; s++)
+                {
+                    if (squadCounts[s].Count != 9)
+                    {
+                        hasEnough = false;
+                        continue;
+                    }
+
+                    units[0] -= squadCounts[s][0];
+                    units[1] -= squadCounts[s][1];
+                    units[2] -= squadCounts[s][2];
+                    units[3] -= squadCounts[s][3];
+                    units[4] -= squadCounts[s][4];
+                    units[5] -= squadCounts[s][5];
+                    units[6] -= squadCounts[s][6];
+                    units[7] -= squadCounts[s][7];
+                    units[8] -= squadCounts[s][8];
+
+                    hasEnough = units[0] >= 0 && units[1] >= 0 && units[2] >= 0 && units[3] >= 0 && units[4] >= 0 && units[5] >= 0 && units[6] >= 0 && units[7] >= 0 && units[8] >= 0;
+                }
+
+                return hasEnough;
+            }
+
+            long[] TryPurchaseUnits(List<int> order, long[] currentResources)
+            {
+                if (order.Count == 9)
+                {
+                    long[] updated = currentResources;
+                    bool canPurchase = true;
+
+                    for (int u = 0; u < 9 && canPurchase; u++)
+                    {
+                        if (order[u] > 0)
+                        {
+                            updated[0] -= Constants.unitCosts[u, 0] * order[u];
+                            updated[1] -= Constants.unitCosts[u, 1] * order[u];
+                            updated[2] -= Constants.unitCosts[u, 2] * order[u];
+                            updated[3] -= Constants.unitCosts[u, 3] * order[u];
+
+                            canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
+                        }
+                    }
+
+                    if (!canPurchase)
+                        return currentResources;
+
+                    return updated;
+                }
+                else
+                {
+                    return currentResources;
+                }
+
+            }
+
+            long[] TryPurchaseBuildings(int[] order, long[] currentResources, int[,] costs)
+            {
+                bool canPurchase = true;
+                long[] updated = currentResources;
+
+                for (int o = 0; o < order.Length && canPurchase; o++)
+                {
+                    if (order[o] != 0)
+                    {
+                        updated[0] -= costs[order[o] - 1, 0];
+                        updated[1] -= costs[order[o] - 1, 1];
+                        updated[2] -= costs[order[o] - 1, 2];
+                        updated[3] -= costs[order[o] - 1, 3];
+                    }
+
+                    canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
+                }
+
+                if (!canPurchase)
+                    return currentResources;
+
+                return updated;
+            }
+
+            long[] Add(long[] a, long[] b)
+            {
+                for (int u = 0; u < a.Length; u++)
+                {
+                    a[u] += b[u];
+                }
+
+                return a;
+            }
         }
     }
 }

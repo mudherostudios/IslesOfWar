@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using IslesOfWar.Communication;
+using IslesOfWar.ClientSide;
 
 namespace IslesOfWar
 {
@@ -53,47 +55,64 @@ namespace IslesOfWar
             }
 
             //Passes the moves data to the processor and tracks undo data.
-            public static string ParseStateInfo(string currentState, string blockData, string undoData, out string updatedData)
+            public static string PlayState(string currentState, string blockData, string undoData, out string updatedData)
             {
                 if (blockData.Length > 1)
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(blockData);
                     string moves = JsonConvert.SerializeObject(data["moves"]);
                     string admin = JsonConvert.SerializeObject(data["admin"]);
-                    string rng = "\"rngseed\":" + JsonConvert.SerializeObject(data["block"]["rngseed"]) + ",";
-                    string height = "\"" + JsonConvert.SerializeObject(data["block"]["height"]) + "\":";
-                    string hash = "\"blockhash\":" + JsonConvert.SerializeObject(data["block"]["hash"]) + ",";
+                    string rng = JsonConvert.SerializeObject(data["block"]["rngseed"]);
+                    StateProcessor processor;
 
-                    if (moves.Length < 4)
-                        moves = "";
+                    //Admin commands would be processed here first.
+
+                    if (currentState.Length > 2)
+                        processor = new StateProcessor(JsonConvert.DeserializeObject<State>(currentState));
                     else
-                        moves = "\"moves\":" + moves;
+                        processor = new StateProcessor(new State());
 
-                    if (admin.Length < 4)
-                        admin = "";
-                    else
-                        admin = "\"admin\":" + admin + ",";
+                    processor.UpdateIslandAndPlayerResources();
 
-                    if (moves.Length > 0 || admin.Length > 0)
+                    foreach (dynamic element in moves)
                     {
-                        if (currentState != "")
-                            updatedData = string.Format("{0},{7}{1}{3}{4}{5}{6}{2}", currentState, "{", "}", hash, rng, admin, moves, height);
-                        else 
-                            updatedData = string.Format("{6}{0}{2}{3}{4}{5}{1}", "{", "}", hash, rng, admin, moves, height);
-                    }
-                    else
-                        updatedData = currentState;
+                        string player = element["name"];
+                        PlayerActions actions = new PlayerActions();
 
-                    return "";
+                        if (Validity.JSON(element["move"]))
+                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"]);
+                        else
+                            continue;
+
+                        if (actions.nat != null)
+                            processor.AddPlayerOrUpdateNation(player, actions.nat); 
+
+                        if (processor.state.players.ContainsKey(player)) // Make Sure Player Exists
+                        {
+                            if (actions.srch != null)
+                                processor.DiscoverOrScoutIsland(player, actions.srch, element["txid"]);
+
+                            if (actions.buy != null)
+                                processor.PurchaseUnits(player, actions.buy);
+
+                            if (actions.bld != null)
+                                processor.DevelopIsland(player, actions.bld);
+
+                            if (actions.dfnd != null)
+                                processor.UpdateDefensePlan(player, actions.dfnd);
+                        }
+                    }
+
+                    //Attack Islands
+                    //Update Defender/Attack Squads
+                    //Update Island Ownership
                 }
-                else
-                {
-                    updatedData = "";
-                    return "";
-                }
+
+                updatedData = currentState;
+                return "";
             }
 
-            public static string RewindData(string updatedData, string blockData, string undoData)
+            public static string RewindState(string updatedData, string blockData, string undoData)
             {
                 return "";
             }
