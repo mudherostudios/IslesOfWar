@@ -248,6 +248,43 @@ namespace IslesOfWar
 
             public Squad()
             {
+               
+            }
+
+            public Squad(int[] squadCounts)
+            {
+                riflemen = squadCounts[0];
+                machineGunners = squadCounts[1];
+                bazookamen = squadCounts[2];
+
+                lightTanks = squadCounts[3];
+                mediumTanks = squadCounts[4];
+                heavyTanks = squadCounts[5];
+
+                lightFighters = squadCounts[6];
+                mediumFighters = squadCounts[7];
+                bombers = squadCounts[8];
+
+                if (squadCounts.Length > 9)
+                {
+                    troopBunkers = squadCounts[9];
+                    tankBunkers = squadCounts[10];
+                    antiAircrafts = squadCounts[11];
+                }
+                else
+                {
+                    troopBunkers = 0;
+                    tankBunkers = 0;
+                    antiAircrafts = 0;
+                }
+
+                totalHealth = 0;
+                totalDamage = 0;
+
+                unitProbabilities = new float[12];
+
+                damagedUnit = -1;
+                remainingHealth = 0.0;
             }
 
             public Squad(long[] squadCounts)
@@ -264,9 +301,18 @@ namespace IslesOfWar
                 mediumFighters = squadCounts[7];
                 bombers = squadCounts[8];
 
-                troopBunkers = squadCounts[9];
-                tankBunkers = squadCounts[10];
-                antiAircrafts = squadCounts[11];
+                if (squadCounts.Length > 9)
+                {
+                    troopBunkers = squadCounts[9];
+                    tankBunkers = squadCounts[10];
+                    antiAircrafts = squadCounts[11];
+                }
+                else
+                {
+                    troopBunkers = 0;
+                    tankBunkers = 0;
+                    antiAircrafts = 0;
+                }
 
                 totalHealth = 0;
                 totalDamage = 0;
@@ -293,7 +339,37 @@ namespace IslesOfWar
                 }
             }
 
-            public void CalculateCasualties(Squad attacker, CombatTables tables)
+            public long[] onlyUnits
+            {
+                get
+                {
+                    long[] squad = new long[]
+                    {
+                    riflemen, machineGunners, bazookamen,
+                    lightTanks, mediumTanks, heavyTanks,
+                    lightFighters, mediumFighters, bombers
+                    };
+
+                    return squad;
+                }
+            }
+
+            public int[] bunkers
+            {
+                get { return new int[] {(int)troopBunkers * 1, (int)tankBunkers * 2, (int)antiAircrafts * 3 }; }
+            }
+
+            public void AddBunkers(int[] bunkers)
+            {
+                if (bunkers[0] > 0)
+                    troopBunkers = 1;
+                if (bunkers[1] > 0)
+                    tankBunkers = 1;
+                if (bunkers[2] > 0)
+                    antiAircrafts = 1;
+            }
+
+            public void CalculateCasualties(Squad attacker)
             {
                 long[] units = fullSquad;
                 double cumulativeDamage = 0;
@@ -319,20 +395,20 @@ namespace IslesOfWar
                             cumulativeDamage = attacker.totalDamage;
                         }
 
-                        CalculateUnitProbabilities(tables, units);
+                        CalculateUnitProbabilities(units);
                     }
 
                     while (cumulativeDamage < attacker.totalDamage && unitCount > 0)
                     {
                         int deadUnit = GetUnitByProbability(random);
 
-                        cumulativeDamage += tables.healthTable[deadUnit];
+                        cumulativeDamage += Constants.unitHealths[deadUnit];
 
                         if (cumulativeDamage < attacker.totalDamage)
                         {
                             units[deadUnit]--;
                             unitCount--;
-                            CalculateUnitProbabilities(tables, units);
+                            CalculateUnitProbabilities(units);
                         }
                         else
                         {
@@ -370,12 +446,12 @@ namespace IslesOfWar
                 return -1;
             }
 
-            public void CalculateUnitProbabilities(CombatTables tables)
+            public void CalculateUnitProbabilities()
             {
-                CalculateUnitProbabilities(tables, fullSquad);
+                CalculateUnitProbabilities(fullSquad);
             }
 
-            public void CalculateUnitProbabilities(CombatTables tables, long[] units)
+            public void CalculateUnitProbabilities(long[] units)
             {
                 float[] relativeProbabilities = new float[units.Length];
                 float[] trueProbabilities = new float[units.Length];
@@ -383,7 +459,7 @@ namespace IslesOfWar
 
                 for (int r = 0; r < relativeProbabilities.Length; r++)
                 {
-                    relativeProbabilities[r] = (float)(units[r]) * tables.orderProbabilityTable[r];
+                    relativeProbabilities[r] = (float)(units[r]) * Constants.unitOrderProbabilities[r];
                     totalRelatives += relativeProbabilities[r];
                 }
 
@@ -428,60 +504,9 @@ namespace IslesOfWar
             }
         }
 
-        public class CombatTables
-        {
-            public float[] damageTable, healthTable, orderProbabilityTable;
-            public float[,] modifierTable;
-
-            public CombatTables()
-            {
-                damageTable = new float[]
-                {
-                2.0f, 3.0f, 4.0f,
-                2.5f, 5.0f, 10.0f,
-                8.0f, 12.0f, 14.0f,
-                12.0f, 30.0f, 16.0f
-                };
-
-                healthTable = new float[]
-                {
-                100.0f, 100.0f, 100.0f,
-                125.0f, 250.0f, 500.0f,
-                200.0f, 300.0f, 200.0f,
-                300.0f, 750.0f, 400.0f
-                };
-
-                orderProbabilityTable = new float[]
-                {
-                0.5f, 0.4f, 0.3f,
-                10.1f, 0.085f, 0.065f,
-                0.05f, 0.05f, 0.05f,
-                0.01f, 0.01f, 0.01f
-                };
-
-                modifierTable = new float[,]
-                {
-                //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, airBunk
-                {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
-                {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
-                {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
-                {1.0f, 1.0f, 1.0f,     1.0f, 0.5f, 0.25f,   0.3f, 0.15f, 0.1f,    1.5f, 0.5f, 1.5f},
-                {0.75f, 0.75f, 0.75f,  0.6f, 0.3f, 0.1f,    1.5f, 1.0f, 0.5f,     1.5f, 0.5f, 1.5f},
-                {0.5f, 0.5f, 0.5f,     2.0f, 1.5f, 1.0f,    0.75f, 0.5f, 0.2f,    1.5f, 0.5f, 1.5f},
-                {2.0f, 2.0f, 2.0f,     2.0f, 1.5f, 1.0f,    1.0f, 1.5f, 0.75f,    0.5f, 0.5f, 0.5f},
-                {1.5f, 1.5f, 1.5f,     2.0f, 1.5f, 1.0f,    0.5f, 1.0f, 1.5f,     1.0f, 1.0f, 1.0f},
-                {1.0f, 1.0f, 1.0f,     1.5f, 1.5f, 1.5f,    0.1f, 0.1f, 0.1f,     2.0f, 2.0f, 2.0f},
-                {2.0f, 2.0f, 2.0f,     1.5f, 0.25f, 0.25f,  2.25f, 1.5f, 1.5f,    0.0f, 0.0f, 0.0f},
-                {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
-                {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
-                };
-            }
-        }
-
         public class Engagement
         {
             public Squad blufor, opfor;
-            public CombatTables tables = new CombatTables();
 
             public Engagement(Squad _blufor, Squad _opfor)
             {
@@ -496,8 +521,8 @@ namespace IslesOfWar
                 blufor.totalDamage = damages[0];
                 opfor.totalDamage = damages[1];
 
-                blufor.CalculateUnitProbabilities(tables);
-                opfor.CalculateUnitProbabilities(tables);
+                blufor.CalculateUnitProbabilities();
+                opfor.CalculateUnitProbabilities();
             }
 
             public EngagementHistory ResolveEngagement()
@@ -510,8 +535,8 @@ namespace IslesOfWar
 
                 while (!engagementIsOver)
                 {
-                    blufor.CalculateCasualties(opfor, tables);
-                    opfor.CalculateCasualties(blufor, tables);
+                    blufor.CalculateCasualties(opfor);
+                    opfor.CalculateCasualties(blufor);
 
                     double[] healths = CalculateTotalHealth(blufor, opfor);
                     blufor.totalHealth = healths[0];
@@ -555,8 +580,8 @@ namespace IslesOfWar
 
                 for (int u = 0; u < unitsA.Length; u++)
                 {
-                    totalHealthA += unitsA[u] * tables.healthTable[u];
-                    totalHealthB += unitsB[u] * tables.healthTable[u];
+                    totalHealthA += unitsA[u] * Constants.unitHealths[u];
+                    totalHealthB += unitsB[u] * Constants.unitHealths[u];
                 }
 
                 return new double[] { totalHealthA, totalHealthB };
@@ -579,8 +604,8 @@ namespace IslesOfWar
 
                     for (int m = 0; m < unitsB.Length; m++)
                     {
-                        totalAttackA += (unitsA[u] * tables.damageTable[u]) * (unitsB[m] * tables.modifierTable[u, m]);
-                        totalAttackB += (unitsB[u] * tables.damageTable[u]) * (unitsA[m] * tables.modifierTable[u, m]);
+                        totalAttackA += (unitsA[u] * Constants.unitDamages[u]) * (unitsB[m] * Constants.unitCombatModifiers[u, m]);
+                        totalAttackB += (unitsB[u] * Constants.unitDamages[u]) * (unitsA[m] * Constants.unitCombatModifiers[u, m]);
                     }
                 }
 

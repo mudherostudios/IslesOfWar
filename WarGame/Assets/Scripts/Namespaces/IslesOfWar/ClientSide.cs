@@ -14,9 +14,9 @@ namespace IslesOfWar
                 return unchecked((ulong)(longValue - long.MinValue));
             }
             
-            public static ulong GetPoolSize(Dictionary<string, ResourceContribution> contributions, string type)
+            public static double GetPoolSize(Dictionary<string, ResourceContribution> contributions, string type)
             {
-                ulong poolSize = 0;
+                double poolSize = 0;
 
                 if (type == "oil")
                 {
@@ -216,11 +216,11 @@ namespace IslesOfWar
         //Phase out
         public struct Cost
         {
-            public uint warbucks, oil, metal, concrete;
+            public int warbucks, oil, metal, concrete;
             public long amount;
             public string type;
 
-            public Cost(uint _warbucks, uint _oil, uint _metal, uint _concrete, uint _amount, string _type)
+            public Cost(int _warbucks, int _oil, int _metal, int _concrete, int _amount, string _type)
             {
                 warbucks = _warbucks;
                 oil = _oil;
@@ -234,10 +234,10 @@ namespace IslesOfWar
         public struct StructureCost
         {
             public string islandID;
-            public uint warbucks, oil, metal, concrete;
+            public int warbucks, oil, metal, concrete;
             public int tileIndex, purchaseType;
 
-            public StructureCost(uint _warbucks, uint _oil, uint _metal, uint _concrete, string _islandID, int _tileIndex, int _purchaseType)
+            public StructureCost(int _warbucks, int _oil, int _metal, int _concrete, string _islandID, int _tileIndex, int _purchaseType)
             {
                 warbucks = _warbucks;
                 oil = _oil;
@@ -498,30 +498,30 @@ namespace IslesOfWar
 
         public class ResourceContribution
         {
-            public List<uint> warbucks;
-            public List<uint> oil;
-            public List<uint> metal;
-            public List<uint> concrete;
+            public List<double> warbucks;
+            public List<double> oil;
+            public List<double> metal;
+            public List<double> concrete;
 
             public ResourceContribution()
             {
-                warbucks = new List<uint>();
-                oil = new List<uint>();
-                metal = new List<uint>();
-                concrete = new List<uint>();
+                warbucks = new List<double>();
+                oil = new List<double>();
+                metal = new List<double>();
+                concrete = new List<double>();
 
-                warbucks.AddRange(new uint[] { 0, 0, 0 });
-                oil.AddRange(new uint[] { 0, 0 });
-                metal.AddRange(new uint[] { 0, 0 });
-                concrete.AddRange(new uint[] { 0, 0 });
+                warbucks.AddRange(new double[] { 0, 0, 0 });
+                oil.AddRange(new double[] { 0, 0 });
+                metal.AddRange(new double[] { 0, 0 });
+                concrete.AddRange(new double[] { 0, 0 });
             }
 
-            public ResourceContribution(uint[] _warbucks, uint[] _oil, uint[] _metal, uint[] _concrete)
+            public ResourceContribution(double[] _warbucks, double[] _oil, double[] _metal, double[] _concrete)
             {
-                warbucks = new List<uint>();
-                oil      = new List<uint>();
-                metal    = new List<uint>();
-                concrete = new List<uint>();
+                warbucks = new List<double>();
+                oil      = new List<double>();
+                metal    = new List<double>();
+                concrete = new List<double>();
 
                 warbucks.AddRange(_warbucks);
                 oil.AddRange(_oil);

@@ -72,8 +72,10 @@ namespace IslesOfWar
                     else
                         processor = new StateProcessor(new State());
 
+                    //Resource Loop
                     processor.UpdateIslandAndPlayerResources();
 
+                    //Main Loop
                     foreach (dynamic element in moves)
                     {
                         string player = element["name"];
@@ -85,7 +87,7 @@ namespace IslesOfWar
                             continue;
 
                         if (actions.nat != null)
-                            processor.AddPlayerOrUpdateNation(player, actions.nat); 
+                            processor.AddPlayerOrUpdateNation(player, actions.nat);
 
                         if (processor.state.players.ContainsKey(player)) // Make Sure Player Exists
                         {
@@ -103,9 +105,22 @@ namespace IslesOfWar
                         }
                     }
 
-                    //Attack Islands
-                    //Update Defender/Attack Squads
-                    //Update Island Ownership
+                    //Attack Loop
+                    foreach (dynamic element in moves)
+                    {
+                        string player = element["name"];
+                        PlayerActions actions = new PlayerActions();
+
+                        if (Validity.JSON(element["move"]))
+                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"]);
+                        else
+                            continue;
+
+                        if (processor.CanAttackIsland(player, actions))
+                        {
+                            processor.AttackIsland(player, actions.attk);
+                        }
+                    }
                 }
 
                 updatedData = currentState;

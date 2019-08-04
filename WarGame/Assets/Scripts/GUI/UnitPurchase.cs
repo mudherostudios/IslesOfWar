@@ -14,7 +14,7 @@ public class UnitPurchase: WorldGUI
     {
         unitCost = cost;
         fields = new string[] { "" };
-        fieldAmounts = new long[] { 0 };
+        fieldAmounts = new int[] { 0 };
         UpdateAllStats();
     }
 
@@ -33,11 +33,11 @@ public class UnitPurchase: WorldGUI
         string formatO = "";
         string formatM = "";
         string formatC = "";
-        ulong amount = PoolUtility.MapLongToUlong(fieldAmounts[0]);
-        ulong warbucks = amount * unitCost.warbucks;
-        ulong oil = amount * unitCost.oil;
-        ulong metal = amount * unitCost.metal;
-        ulong concrete = amount * unitCost.concrete;
+        double amount = fieldAmounts[0];
+        double warbucks = amount * unitCost.warbucks;
+        double oil = amount * unitCost.oil;
+        double metal = amount * unitCost.metal;
+        double concrete = amount * unitCost.concrete;
 
         if (warbucks > 10000)
             formatW = "G2";

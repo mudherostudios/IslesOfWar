@@ -16,7 +16,7 @@ public class PoolContribute: WorldGUI
     private string player;
     private double[] modifiers;
     private string[] strModifiers;
-    private ulong pool, poolContributions, poolContributed;
+    private double pool, poolContributions, poolContributed;
     private int hours, minutes;
     private float seconds, lastTime;
     private string poolStrType;
@@ -28,18 +28,18 @@ public class PoolContribute: WorldGUI
         resources = _resources;
         lastTime = xayaTime;
         fields = new string[] { "", "", "" };
-        fieldAmounts = new long[] { 0, 0, 0 };
+        fieldAmounts = new int[] { 0, 0, 0 };
         
 
         modifiers = new double[3];
         strModifiers = new string[3];
-        ulong[] tempPools = new ulong[] {PoolUtility.GetPoolSize(resources,"oil"), PoolUtility.GetPoolSize(resources,"metal"), PoolUtility.GetPoolSize(resources,"concrete") };
+        double[] tempPools = new double[] {PoolUtility.GetPoolSize(resources,"oil"), PoolUtility.GetPoolSize(resources,"metal"), PoolUtility.GetPoolSize(resources,"concrete") };
 
         if (poolType == 0)
         {
-            modifiers[0] = ((double)((tempPools[1] / 2) + (tempPools[2] / 2)) / tempPools[0]);
-            modifiers[1] = ((double)((tempPools[0] / 2) + (tempPools[2] / 2)) / tempPools[1]);
-            modifiers[2] = ((double)((tempPools[0] / 2) + (tempPools[1] / 2)) / tempPools[2]);
+            modifiers[0] = (((tempPools[1] / 2) + (tempPools[2] / 2)) / tempPools[0]);
+            modifiers[1] = (((tempPools[0] / 2) + (tempPools[2] / 2)) / tempPools[1]);
+            modifiers[2] = (((tempPools[0] / 2) + (tempPools[1] / 2)) / tempPools[2]);
             poolStrType = "warbucksPool";
         }
         else
@@ -90,13 +90,13 @@ public class PoolContribute: WorldGUI
 
     public Cost TrySend()
     {
-        uint oil = 0;
-        uint metal = 0;
-        uint concrete = 0;
-        uint.TryParse(tradeAmounts[0].text, out oil);
-        uint.TryParse(tradeAmounts[1].text, out metal);
-        uint.TryParse(tradeAmounts[2].text, out concrete);
-        uint contributions = (uint)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
+        int oil = 0;
+        int metal = 0;
+        int concrete = 0;
+        int.TryParse(tradeAmounts[0].text, out oil);
+        int.TryParse(tradeAmounts[1].text, out metal);
+        int.TryParse(tradeAmounts[2].text, out concrete);
+        int contributions = (int)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
 
         Cost cost = new Cost(0, oil, metal, concrete, contributions, poolStrType);
         Reset();
@@ -123,9 +123,9 @@ public class PoolContribute: WorldGUI
             poolFormat = "G2";
         poolAmount.text = pool.ToString(poolFormat);
 
-        ulong possiblePoints = (ulong)((modifiers[0] * fieldAmounts[0]) + (modifiers[1] * fieldAmounts[1]) + (modifiers[2] * fieldAmounts[2]));
-        ulong totalPoints = possiblePoints + poolContributions;
-        double ownership = ((double)(possiblePoints+poolContributed) / (totalPoints)) * 100;  
+        double possiblePoints = ((modifiers[0] * fieldAmounts[0]) + (modifiers[1] * fieldAmounts[1]) + (modifiers[2] * fieldAmounts[2]));
+        double totalPoints = possiblePoints + poolContributions;
+        double ownership = ((possiblePoints+poolContributed) / (totalPoints)) * 100;  
         poolOwnership.text = string.Format("%{0:00.000}", ownership);
 
         resourceModifiers[0].text = strModifiers[0];

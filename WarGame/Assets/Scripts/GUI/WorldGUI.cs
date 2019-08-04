@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldGUI : MonoBehaviour
 {
-    protected long[] fieldAmounts;
+    protected int[] fieldAmounts;
     protected string[] fields;
 
     public void AddCharacter(string str, int ID)
@@ -14,8 +14,8 @@ public class WorldGUI : MonoBehaviour
             if (fields[ID].Length < 10 && "0123456789".Contains(str))
             {
                 fields[ID] += str;
-                long temp = 0;
-                long.TryParse(fields[ID], out temp);
+                int temp = 0;
+                int.TryParse(fields[ID], out temp);
                 fieldAmounts[ID] = temp;
             }
         }

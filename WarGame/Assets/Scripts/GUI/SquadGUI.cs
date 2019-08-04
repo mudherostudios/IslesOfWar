@@ -11,7 +11,7 @@ public class SquadGUI : WorldGUI
     public TextMeshPro[] squadCounts;
     public TextMeshPro[] unitInputs;
 
-    public long[][] squads;
+    public int[][] squads;
     public long[] allUnits;
 
     private int selectedSquad = 0;
@@ -20,7 +20,7 @@ public class SquadGUI : WorldGUI
     public void Initialize(PlayerState state)
     {
         playerState = state;
-        squads = new long[squads.Length][];
+        squads = new int[squads.Length][];
 
         for (int s = 0; s < playerState.squads.Count; s++)
         {
@@ -35,7 +35,7 @@ public class SquadGUI : WorldGUI
         for (int f = 0; f < 3; f++)
         {
             int index = type * 3 + f;
-            long count = fieldAmounts[index];
+            int count = fieldAmounts[index];
 
             if (count <= allUnits[index])
             {
@@ -52,7 +52,7 @@ public class SquadGUI : WorldGUI
         for (int f = 0; f < 3; f++)
         {
             int index = type * 3 + f;
-            long count = fieldAmounts[index];
+            int count = fieldAmounts[index];
 
             if (count <= squads[selectedSquad][f])
             {

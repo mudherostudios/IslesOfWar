@@ -163,13 +163,13 @@ namespace IslesOfWar
                     SpendResources(playerName, resources, true);
 
                     if (resources.type == "warbucksPool")
-                        state.resourceContributions[playerName].warbucks = new List<uint>() { resources.oil, resources.metal, resources.concrete };
+                        state.resourceContributions[playerName].warbucks = new List<double>() { resources.oil, resources.metal, resources.concrete };
                     else if (resources.type == "oilPool")
-                        state.resourceContributions[playerName].oil = new List<uint> { resources.metal, resources.concrete };
+                        state.resourceContributions[playerName].oil = new List<double> { resources.metal, resources.concrete };
                     else if (resources.type == "metalPool")
-                        state.resourceContributions[playerName].metal = new List<uint> { resources.oil, resources.concrete };
+                        state.resourceContributions[playerName].metal = new List<double> { resources.oil, resources.concrete };
                     else if (resources.type == "concretePool")
-                        state.resourceContributions[playerName].concrete = new List<uint> { resources.oil, resources.metal };
+                        state.resourceContributions[playerName].concrete = new List<double> { resources.oil, resources.metal };
 
                     return state;
                 }
@@ -425,7 +425,7 @@ namespace IslesOfWar
         public class StateProcessor
         {
             public State state;
-            public uint rate;
+            public int rate;
 
             public StateProcessor()
             {
@@ -460,19 +460,19 @@ namespace IslesOfWar
             {
                 if (types[0] > 0 && state.islands[island].resources[tile][0] > 0)
                 {
-                    state.islands[island].resources[tile][0] -= rate;
+                    state.islands[island].resources[tile][0] -= (uint)rate;
                     state.players[player].resources[0] += rate;
                 }
 
                 if (types[1] > 0 && state.islands[island].resources[tile][1] > 0)
                 {
-                    state.islands[island].resources[tile][1] -= rate;
+                    state.islands[island].resources[tile][1] -= (uint)rate;
                     state.players[player].resources[1] += rate;
                 }
 
                 if (types[2] > 0 && state.islands[island].resources[tile][2] > 0)
                 {
-                    state.islands[island].resources[tile][2] -= rate;
+                    state.islands[island].resources[tile][2] -= (uint)rate;
                     state.players[player].resources[2] += rate;
                 }
             }
@@ -569,17 +569,29 @@ namespace IslesOfWar
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count 
-                    && defensePlan.pln.Count == defensePlan.flw.Count;
+                    && defensePlan.pln.Count == defensePlan.flw.Count && defensePlan.sqd.Count <= 4;
 
                     if (canUpdate)
                     {
                         long[] totalUnits = state.players[player].allUnits;
                         totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
-
-                        canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && PlansAreAdjacent(defensePlan.pln);
+                        
+                        canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
 
                         if (canUpdate)
                         {
+                            string island = state.islands[defensePlan.id].features;
+                            string defenses = state.islands[defensePlan.id].defenses;
+                            for (int i = 0; i < defensePlan.pln.Count && canUpdate; i++)
+                            {
+                                int pos = defensePlan.pln[i][0];
+                                canUpdate = TryPlaceUnitsOnFeature(island[pos], defenses[pos], defensePlan.sqd[i].ToArray());
+                            }
+                        }
+
+                        if (canUpdate)
+                        {
+                            //Make sure to remove units here from the player total units
                             state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
                             state.islands[defensePlan.id].squadPlans = defensePlan.pln;
                         }
@@ -587,16 +599,362 @@ namespace IslesOfWar
                 }
             }
 
-            bool PlansAreAdjacent(List<List<int>> plan)
+            public void AttackIsland(string player, BattleCommand attackPlan)
+            {
+                bool capturedIsland = state.islands[attackPlan.id].squadCounts.Count == 0;
+
+                //Remove attacking units from the attackers available units
+                for (int s = 0; s < attackPlan.sqd.Count; s++)
+                {
+                    for (int u = 0; u < state.players[player].units.Count; u++)
+                    {
+                        state.players[player].units[u] -= attackPlan.sqd[s][u];
+                    }
+                }
+                
+                if (!capturedIsland)
+                {
+                    string island = state.islands[attackPlan.id].features;
+                    string defenses = state.islands[attackPlan.id].defenses;
+                    
+                    List<List<int>> defenderCounts = state.islands[attackPlan.id].squadCounts;
+                    List<List<int>> attackerCounts = attackPlan.sqd;
+                    
+                    bool[] defendersCanContinue = new bool[defenderCounts.Count];
+                    bool[] attackerCanContinue = new bool[attackerCounts.Count];
+
+                    //Squads temp combat logic, will replace the combat loop with better optimized math.
+                    Squad[] defenderSquads = new Squad[defenderCounts.Count];
+                    Squad[] attackerSquads = new Squad[attackerCounts.Count];
+
+                    int[] defenderPositions = new int[defenderCounts.Count];
+                    int[] attackerPositions = new int[attackerCounts.Count];
+                    Engagement engagement;
+
+                    //Set defender arrays
+                    for (int s = 0; s < defenderCounts.Count; s++)
+                    {
+                        defenderSquads[s] = new Squad(defenderCounts[s].ToArray());
+                        defenderPositions[s] = state.islands[attackPlan.id].squadPlans[s][0];
+                        defendersCanContinue[s] = true;
+                    }
+
+                    //Set attacker arrays
+                    for (int s = 0; s < attackerCounts.Count; s++)
+                    {
+                        attackerSquads[s] = new Squad(attackerCounts[s].ToArray());
+                        attackerPositions[s] = attackPlan.pln[s][0];
+                        attackerCanContinue[s] = true;
+                    }
+
+                    int attackersLeft = attackerSquads.Length;
+                    int defendersLeft = defenderSquads.Length;
+
+                    for (int p = 0; p < 6 && attackersLeft > 0 && defendersLeft > 0; p++)
+                    {
+                        //All Attackers Move First
+                        for (int a = 0; a < attackerSquads.Length; a++)
+                        {
+                            if (p < attackPlan.pln[a].Count && attackerCanContinue[a])
+                            {
+                                int battleTile = attackPlan.pln[a][p];
+                                attackerPositions[a] = battleTile;
+                                int defender = Conflict(defenderPositions, battleTile);
+                                int[] bunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(defenses[battleTile]));
+                                int blockerType = EncodeUtility.GetYType(defenses[battleTile]);
+
+                                if (defender > -1)
+                                {
+                                    long[] aUnits = attackerSquads[a].onlyUnits;
+                                    long[] dUnits = defenderSquads[defender].onlyUnits;
+
+                                    long[] aReserve = new long[9];
+                                    long[] dReserve = new long[9];
+
+                                    //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
+                                    attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, out aReserve));
+                                    defenderSquads[defender] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], dUnits, out dReserve));
+                                    defenderSquads[defender].AddBunkers(bunkers);
+
+                                    //Fight
+                                    engagement = new Engagement(defenderSquads[defender], attackerSquads[a]);
+                                    EngagementHistory history = engagement.ResolveEngagement();
+
+                                    //Set the squads with any reserves they might have had
+                                    if (history.winner == "blufor")
+                                    {
+                                        defenderSquads[defender] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
+                                        int bunkerCombo = EncodeUtility.GetDecodeIndex(history.remainingSquad.bunkers);
+                                        state.islands[island].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(blockerType, bunkerCombo));
+                                        attackerSquads[a] = new Squad(aReserve);
+                                        attackerCanContinue[a] = false;
+                                        attackersLeft--;
+                                    }
+                                    else if (history.winner == "opfor")
+                                    {
+                                        attackerSquads[a] = new Squad(Add(history.remainingSquad.onlyUnits, aReserve));
+                                        defenderSquads[defender] = new Squad(dReserve);
+                                        defendersCanContinue[defender] = false;
+                                        state.islands[island].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
+                                        defendersLeft--;
+                                    }
+                                    else
+                                    {
+                                        state.islands[island].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
+                                        attackerSquads[a] = new Squad(aReserve);
+                                        attackerCanContinue[a] = false;
+                                        attackersLeft--;
+                                        defenderSquads[defender] = new Squad(dReserve);
+                                        defendersCanContinue[defender] = false;
+                                        defendersLeft--;
+                                    }
+                                }
+                                else
+                                {
+                                    state.islands[island].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
+                                }
+                            }
+                        }
+
+                        //All Defenders, If Any Survived, Move Next
+                        for (int d = 0; d < defenderSquads.Length; d++)
+                        {
+                            if (defendersCanContinue[d])
+                            {
+                                //Find first attacker in react zone.
+                                int attackerIndex = attackerCounts.Count;
+                                int reactPos = GetReactPosition(state.islands[island].squadPlans[d], attackerPositions, out attackerIndex);
+
+                                if (reactPos != -1 && AdjacencyMatrix.IsAdjacent(defenderPositions[d], reactPos) && attackerIndex != attackerCounts.Count)
+                                {
+                                    defenderPositions[d] = reactPos;
+                                    int[] bunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(defenses[reactPos]));
+                                    int blockerType = EncodeUtility.GetYType(defenses[reactPos]);
+
+                                    long[] aUnits = attackerSquads[attackerIndex].onlyUnits;
+                                    long[] dUnits = defenderSquads[d].onlyUnits;
+
+                                    long[] aReserve = new long[9];
+                                    long[] dReserve = new long[9];
+
+                                    //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
+                                    attackerSquads[attackerIndex] = new Squad(TryPlaceUnitsOnFeature(island[reactPos], defenses[reactPos], aUnits, out aReserve));
+                                    defenderSquads[d] = new Squad(TryPlaceUnitsOnFeature(island[reactPos], defenses[reactPos], dUnits, out dReserve));
+
+                                    //Fight
+                                    engagement = new Engagement(defenderSquads[d], attackerSquads[attackerIndex]);
+                                    EngagementHistory history = engagement.ResolveEngagement();
+
+                                    //Set the squads with any reserves they might have had
+                                    if (history.winner == "blufor")
+                                    {
+                                        defenderSquads[d] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
+                                        int bunkerCombo = EncodeUtility.GetDecodeIndex(history.remainingSquad.bunkers);
+                                        attackerSquads[attackerIndex] = new Squad(aReserve);
+                                        attackerCanContinue[attackerIndex] = false;
+                                        attackersLeft--;
+                                    }
+                                    else if (history.winner == "opfor")
+                                    {
+                                        attackerSquads[attackerIndex] = new Squad(Add(history.remainingSquad.onlyUnits, aReserve));
+                                        defenderSquads[d] = new Squad(dReserve);
+                                        defendersCanContinue[d] = false;
+                                        defendersLeft--;
+                                    }
+                                    else
+                                    {
+                                        attackerSquads[attackerIndex] = new Squad(aReserve);
+                                        attackerCanContinue[attackerIndex] = false;
+                                        attackersLeft--;
+                                        defenderSquads[d] = new Squad(dReserve);
+                                        defendersCanContinue[d] = false;
+                                        defendersLeft--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //Update Players and Island Ownership
+                    //Defenders retain island if even only one squad is left or if both teams lost all squads.
+                    if (defendersLeft == 0 && attackersLeft > 0)
+                    {
+                        string previousOwner = state.islands[island].owner;
+                        state.islands[island].owner = player;
+                        state.islands[island].squadPlans = null;
+                        state.islands[island].squadCounts = null;
+
+                        state.players[previousOwner].islands.Remove(island);
+                        state.players[player].islands.Add(island);
+                    }
+                    else
+                    {
+                        //Update defending squads.
+                        for (int d = 0; d < defenderSquads.Length; d++)
+                        {
+                            long[] s = defenderSquads[d].onlyUnits;
+                            state.islands[island].squadCounts[d] = new List<int>() {
+                                (int)s[0], (int)s[1], (int)s[2],
+                                (int)s[3], (int)s[4], (int)s[5],
+                                (int)s[6], (int)s[7], (int)s[8]};
+                        }
+                    }
+
+                    //Add survivors back to the players units. 
+                    //They might lose because they didn't find all squads so add them even if they lost.
+                    for (int a = 0; a < attackerSquads.Length; a++)
+                    {
+                        long[] units = attackerSquads[a].onlyUnits;
+
+                        for (int u = 0; u < state.players[player].units.Count; u++)
+                        {
+                            state.players[player].units[u] += units[u];
+                        }
+                    }
+
+                }
+            }
+
+            int GetReactPosition(List<int> defenseZone, int[] attackerPositions, out int attackerIndex)
+            {
+                for(int a = 0; a < attackerPositions.Length; a++ )
+                {
+                    if (defenseZone.Contains(attackerPositions[a]))
+                    {
+                        attackerIndex = a;
+                        return attackerPositions[a];
+                    }
+                }
+
+                attackerIndex = attackerPositions.Length;
+                return -1;
+            }
+
+            long[] TryPlaceUnitsOnFeature(char feature, char defenses, long[] units, out long[] remainder)
+            {
+                int featureType = EncodeUtility.GetYType(feature);
+                int defenseType = EncodeUtility.GetYType(defenses);
+                long[] placeable = new long[9];
+                remainder = new long[9];
+
+                if (defenseType != 1)
+                {
+                    placeable[0] = units[0];
+                    placeable[1] = units[1];
+                    placeable[2] = units[2];
+                }
+                else
+                {
+                    remainder[0] = units[0];
+                    remainder[1] = units[1];
+                    remainder[2] = units[2];
+                }
+
+                if (defenseType != 2 && featureType != 1)
+                {
+                    placeable[3] = units[3];
+                    placeable[4] = units[4];
+                    placeable[5] = units[5];
+                }
+                else
+                {
+                    remainder[3] = units[3];
+                    remainder[4] = units[4];
+                    remainder[5] = units[5];
+                }
+
+                if (defenseType != 3 && featureType != 2)
+                {
+                    placeable[6] = units[6];
+                    placeable[7] = units[7];
+                    placeable[8] = units[8];
+                }
+                else
+                {
+                    remainder[6] = units[6];
+                    remainder[7] = units[7];
+                    remainder[8] = units[8];
+                }
+
+                return placeable;
+            }
+
+            bool TryPlaceUnitsOnFeature(char feature, char defenses, int[] units)
+            {
+                int featureType = EncodeUtility.GetYType(feature);
+                int defenseType = EncodeUtility.GetYType(defenses);
+                return defenseType != 1 && defenseType != 2 && featureType != 1 && defenseType != 3 && featureType != 2;
+            }
+
+            int Conflict(int[] positions, int moveTarget)
+            {
+                int conflict = -1;
+
+                for (int p = 0; p < positions.Length && conflict == -1; p++)
+                {
+                    if (moveTarget == positions[p])
+                        conflict = p;
+                }
+
+                return conflict;
+            }
+
+            public bool CanAttackIsland(string player, PlayerActions actions)
+            {
+                bool canAttack = state.players.ContainsKey(player) && actions != null;
+
+                if (canAttack)
+                    canAttack = state.players[player].attackableIsland != null && actions.attk.id != null;
+
+                if (canAttack)
+                    canAttack = actions.attk.id != "" && state.players[player].attackableIsland == actions.attk.id && !state.players[player].islands.Contains(actions.attk.id);
+
+                if (canAttack)
+                    canAttack = actions.attk.pln != null && actions.attk.sqd != null;
+
+                if (canAttack)
+                    canAttack = actions.attk.pln.Count > 0 && actions.attk.pln.Count == actions.attk.sqd.Count && actions.attk.sqd.Count <= 3; 
+
+                if (canAttack)
+                {
+                    long[] units = state.players[player].allUnits;
+                    canAttack = HasEnoughUnits(units, actions.attk.sqd) && AttackPlansAreAdjacent(actions.attk.pln);
+                }
+
+                return canAttack;
+            }
+
+            bool AttackPlansAreAdjacent(List<List<int>> plan)
             {
                 bool adjacent = true;
 
                 for (int s = 0; s < plan.Count && adjacent; s++)
                 {
+                    adjacent = plan[s][0] != 5 && plan[s][0] != 6 && plan[s].Count <= 6;
+
+                    for (int p = 1; p < plan[s].Count && adjacent; p++)
+                    {
+                        adjacent = AdjacencyMatrix.IsAdjacent(plan[s][p - 1], plan[s][p]);
+                    }
+
+                }
+
+                return adjacent;
+            }
+
+            bool DefensePlansAreAdjacent(List<List<int>> plan)
+            {
+                bool adjacent = true;
+
+                for (int s = 0; s < plan.Count && adjacent; s++)
+                {
+                    adjacent = plan[s].Count <= 7;
+                    
                     for (int p = 1; p < plan[s].Count && adjacent; p++)
                     {
                         adjacent = AdjacencyMatrix.IsAdjacent(plan[s][0], plan[s][p]);
                     }
+                    
                 }
 
                 return adjacent;
@@ -686,9 +1044,10 @@ namespace IslesOfWar
                 return updated;
             }
 
+            //Biggest one first
             long[] Add(long[] a, long[] b)
             {
-                for (int u = 0; u < a.Length; u++)
+                for (int u = 0; u < a.Length && u < b.Length; u++)
                 {
                     a[u] += b[u];
                 }

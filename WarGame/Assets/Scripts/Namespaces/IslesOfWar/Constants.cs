@@ -6,7 +6,7 @@ namespace IslesOfWar
 {
     public static class Constants
     {
-        public static int[] version = new int[] { 0, 0, 0}; //Client Version, Compatibility Version, Effeciency Version
+        public static int[] version = new int[] {0, 0, 0}; //Client Version, Compatibility Version, Effeciency Version
 
         public static Dictionary<string, string> countryCodes = new Dictionary<string, string>()
         {
@@ -93,6 +93,48 @@ namespace IslesOfWar
             {10000, 500, 1000, 1000 },
             {10000, 1000, 500, 1000 },
             {10000, 1000, 1000, 500 }
+        };
+
+        public static float[] unitDamages = new float[]
+        {
+            2.0f, 3.0f, 4.0f,
+            2.5f, 5.0f, 10.0f,
+            8.0f, 12.0f, 14.0f,
+            12.0f, 30.0f, 16.0f
+        };
+
+        public static float[] unitHealths = new float[]
+        {
+            100.0f, 100.0f, 100.0f,
+            125.0f, 250.0f, 500.0f,
+            200.0f, 300.0f, 200.0f,
+            300.0f, 750.0f, 400.0f
+        };
+
+        public static float[] unitOrderProbabilities = new float[]
+        {
+            0.5f, 0.4f, 0.3f,
+            0.1f, 0.085f, 0.065f,
+            0.05f, 0.05f, 0.05f,
+            0.01f, 0.01f, 0.01f
+        };
+
+
+        //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, airBunk
+        public static float[,] unitCombatModifiers = new float[,]
+        {
+            {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
+            {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
+            {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f,     1.0f, 0.5f, 0.25f,   0.3f, 0.15f, 0.1f,    1.5f, 0.5f, 1.5f},
+            {0.75f, 0.75f, 0.75f,  0.6f, 0.3f, 0.1f,    1.5f, 1.0f, 0.5f,     1.5f, 0.5f, 1.5f},
+            {0.5f, 0.5f, 0.5f,     2.0f, 1.5f, 1.0f,    0.75f, 0.5f, 0.2f,    1.5f, 0.5f, 1.5f},
+            {2.0f, 2.0f, 2.0f,     2.0f, 1.5f, 1.0f,    1.0f, 1.5f, 0.75f,    0.5f, 0.5f, 0.5f},
+            {1.5f, 1.5f, 1.5f,     2.0f, 1.5f, 1.0f,    0.5f, 1.0f, 1.5f,     1.0f, 1.0f, 1.0f},
+            {1.0f, 1.0f, 1.0f,     1.5f, 1.5f, 1.5f,    0.1f, 0.1f, 0.1f,     2.0f, 2.0f, 2.0f},
+            {2.0f, 2.0f, 2.0f,     1.5f, 0.25f, 0.25f,  2.25f, 1.5f, 1.5f,    0.0f, 0.0f, 0.0f},
+            {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
         };
     }
 }
