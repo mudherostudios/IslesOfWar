@@ -6,7 +6,7 @@ namespace IslesOfWar
 {
     public static class Constants
     {
-        public static int[] version = new int[] {0, 0, 0}; //Client Version, Compatibility Version, Effeciency Version
+        public static int[] version = new int[] {0, 0, 0}; //Compatibility GSP Version, Effeciency Version, Client Version
 
         public static Dictionary<string, string> countryCodes = new Dictionary<string, string>()
         {
@@ -59,19 +59,20 @@ namespace IslesOfWar
             {"WF","Wallis and Futuna"},{"EH","Western Sahara"},{"YE","Yemen"},{"ZM","Zambia"},{"ZW","Zimbabwe"}
         };
 
-
+        public static int[] islandSearchCost = new int[] { 1000, 2500, 0, 0 };
+        
         //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
-        public static uint[,] unitCosts = new uint[,]
+        public static int[,] unitCosts = new int[,]
         {
-            {10,    0,      10},
-            {50,    0,      20},
-            {100,   10,     20},
-            {100,   25,     100},
-            {200,   50,     200},
-            {500,   100,    500},
-            {250,   100,    50},
-            {500,   250,    75},
-            {1000,  500,    200}
+            {10,    0,      10,     0},
+            {50,    0,      20,     0},
+            {100,   10,     20,     0},
+            {100,   25,     100,    0},
+            {200,   50,     200,    0},
+            {500,   100,    500,    0},
+            {250,   100,    50,     0},
+            {500,   250,    75,     0},
+            {1000,  500,    200,    0}
         };
 
         public static int[,] blockerCosts = new int[,]
@@ -118,8 +119,7 @@ namespace IslesOfWar
             0.05f, 0.05f, 0.05f,
             0.01f, 0.01f, 0.01f
         };
-
-
+        
         //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, airBunk
         public static float[,] unitCombatModifiers = new float[,]
         {

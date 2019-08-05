@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IslesOfWar;
 using IslesOfWar.ClientSide;
+
 
 public class CommandIslandInteraction : Interaction
 {
@@ -138,17 +140,17 @@ public class CommandIslandInteraction : Interaction
 
     void InitializeUnitGUIs()
     {
-        riflemanPurchase.Initialize(stateMaster.state.purchaseTable.riflemanCost);
-        machineGunnerPurchase.Initialize(stateMaster.state.purchaseTable.machineGunnerCost);
-        bazookamanPurchase.Initialize(stateMaster.state.purchaseTable.bazookamanCost);
+        riflemanPurchase.Initialize(new Cost(Constants.unitCosts, 0, 1, "rifleman"));
+        machineGunnerPurchase.Initialize(new Cost(Constants.unitCosts, 1, 1, "machineGunner"));
+        bazookamanPurchase.Initialize(new Cost(Constants.unitCosts, 2, 1, "bazookaman"));
 
-        lightTankPurchase.Initialize(stateMaster.state.purchaseTable.lightTankCost);
-        mediumTankPurchase.Initialize(stateMaster.state.purchaseTable.mediumTankCost);
-        heavyTankPurchase.Initialize(stateMaster.state.purchaseTable.heavyTankCost);
+        lightTankPurchase.Initialize(new Cost(Constants.unitCosts, 3, 1, "lightTank"));
+        mediumTankPurchase.Initialize(new Cost(Constants.unitCosts, 4, 1, "mediumTank"));
+        heavyTankPurchase.Initialize(new Cost(Constants.unitCosts, 5, 1, "heavyTank"));
 
-        lightFighterPurchase.Initialize(stateMaster.state.purchaseTable.lightFighterCost);
-        mediumFighterPurchase.Initialize(stateMaster.state.purchaseTable.mediumFighterCost);
-        bomberPurchase.Initialize(stateMaster.state.purchaseTable.bomberCost);
+        lightFighterPurchase.Initialize(new Cost(Constants.unitCosts, 6, 1, "lightFighter"));
+        mediumFighterPurchase.Initialize(new Cost(Constants.unitCosts, 7, 1, "mediumFighter"));
+        bomberPurchase.Initialize(new Cost(Constants.unitCosts, 8, 1, "bomber"));
     }
 
     void UpdateAllPoolGUIs()

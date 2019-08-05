@@ -125,6 +125,7 @@ GameObject:
   - component: {fileID: 976587961}
   - component: {fileID: 976587964}
   - component: {fileID: 976587965}
+  - component: {fileID: 976587966}
   m_Layer: 0
   m_Name: MainLogic
   m_TagString: MainCamera
@@ -232,7 +233,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976587960}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021c31cec1a53ea4580bb94f9c52146c, type: 3}
   m_Name: 
@@ -244,3 +245,15 @@ MonoBehaviour:
   databasePath: /database/
   dbName: IslesOfWar.db
   DEBUG: 1
+--- !u!114 &976587966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976587960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec718754e0bf1fa4bb36d2a3eda9314a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

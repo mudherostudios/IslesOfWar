@@ -39,13 +39,9 @@ public class CommunicationInterface : MonoBehaviour
     public int blockProgress = 0;
     Dictionary<string, List<PlayerActions>> playerActionDictionary;
     Dictionary<string, List<PlayerActions>> playerDifferenceDictionary;
-    Dictionary<string, Actions> actionDictionary;
-    Dictionary<string, Actions> differenceDictionary;
 
     private void Start()
     {
-        actionDictionary = new Dictionary<string, Actions>();
-        differenceDictionary = new Dictionary<string, Actions>();
         playerActionDictionary = new Dictionary<string, List<PlayerActions>>();
         playerDifferenceDictionary = new Dictionary<string, List<PlayerActions>>();
         SetConnectionInfo();

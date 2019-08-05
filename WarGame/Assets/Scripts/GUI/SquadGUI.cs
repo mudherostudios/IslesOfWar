@@ -17,14 +17,14 @@ public class SquadGUI : WorldGUI
     private int selectedSquad = 0;
     private PlayerState playerState;
 
-    public void Initialize(PlayerState state)
+    public void Initialize(PlayerState state, int[][] _squads)
     {
         playerState = state;
         squads = new int[squads.Length][];
 
-        for (int s = 0; s < playerState.squads.Count; s++)
+        for (int s = 0; s < _squads.Length; s++)
         {
-            squads[s] = playerState.squads[s].fullSquad;
+            squads[s] = _squads[s];
         }
 
         allUnits = playerState.allUnits;
@@ -71,13 +71,13 @@ public class SquadGUI : WorldGUI
         }
     }
 
-    public void Cancel()
+    public void Cancel(int[][] _squads)
     {
         Reset();
 
         for (int s = 0; s < squads.Length; s++)
         {
-            squads[s] = playerState.squads[s].fullSquad;
+            squads[s] = _squads[s];
         }
     }
 

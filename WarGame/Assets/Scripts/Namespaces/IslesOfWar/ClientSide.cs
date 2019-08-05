@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using IslesOfWar.Combat;
 
 namespace IslesOfWar
 {
@@ -97,7 +97,6 @@ namespace IslesOfWar
             public Dictionary<string, Island> islands;
             public Dictionary<string, ResourceContribution> resourceContributions;
             public Dictionary<string, string> depletedContributions;
-            public PurchaseTable purchaseTable;
 
             public State()
             {
@@ -107,7 +106,7 @@ namespace IslesOfWar
                 depletedContributions = new Dictionary<string, string>();
             }
 
-            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, string> depContributions, PurchaseTable _table)
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, string> depContributions)
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
@@ -118,7 +117,16 @@ namespace IslesOfWar
                 islands = allIslands;
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
-                purchaseTable = _table;
+            }
+
+            public Island[] allIslands
+            {
+                get { return islands.Values.ToArray(); }
+            }
+
+            public string[] allIslandIDs
+            {
+                get { return islands.Keys.ToArray(); }
             }
         }
 
@@ -137,7 +145,7 @@ namespace IslesOfWar
         public class Island
         {
             public string owner, features, collectors, defenses;
-            public List<List<uint>> resources; //Should be max of 12 tiles with 3 max resources per tile
+            public List<List<double>> resources; //Should be max of 12 tiles with 3 max resources per tile
             public List<List<int>> squadPlans; //Should be max 4 squads with max 7 zoneIDs of 0-11
             public List<List<int>> squadCounts; //Should be max 4 squads with max 9 slots for counts of unit types
 
@@ -229,6 +237,17 @@ namespace IslesOfWar
                 amount = _amount;
                 type = _type;
             }
+
+            public Cost(int[,] costs, int row, int _amount, string _type)
+            {
+                warbucks = costs[0, row];
+                oil = costs[1, row];
+                metal = costs[2, row];
+                concrete = costs[3, row];
+                amount = _amount;
+                type = _type;
+            }
+
         }
 
         public struct StructureCost
@@ -542,6 +561,15 @@ namespace IslesOfWar
             public long[] allUnits { get { return units.ToArray(); } }
             public long[] allResources { get { return resources.ToArray(); } }
             public string[] allIslands { get { return islands.ToArray(); } }
+
+            public PlayerState(string nation)
+            {
+                nationCode = nation;
+                units = new List<long>();
+                resources = new List<long>();
+                islands = new List<string>();
+                attackableIsland = "";
+            }
 
             public PlayerState(string nation,long[] unitCounts, long[] resourceCounts, string[] islandIDs, string _attackableIsland)
             {
