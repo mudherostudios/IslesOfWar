@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar.Combat;
@@ -106,8 +107,12 @@ namespace IslesOfWar
             public void PurchaseUnits(string player, List<int> order)
             {
                 long[] resources = state.players[player].allResources;
+                long[] units = state.players[player].allUnits;
+                long[][] result = TryPurchaseUnits(order, resources, units);
                 state.players[player].resources.Clear();
-                state.players[player].resources.AddRange(TryPurchaseUnits(order, resources));
+                state.players[player].resources.AddRange(result[0]);
+                state.players[player].units.Clear();
+                state.players[player].units.AddRange(result[1]);
             }
 
             public void DevelopIsland(string player, IslandBuildOrder order)
@@ -126,42 +131,89 @@ namespace IslesOfWar
                         if (defensesOrdered)
                             defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
 
-                        for (int t = 0; t < island.features.Length; t++)
+                        long[] resources = new long[4];
+                        Array.Copy(state.players[player].allResources, resources, 4);
+
+                        if(collectorsOrdered)
+                            resources = DevelopCollectors(order.col, island, resources, out collectorsOrdered);
+                        if (defensesOrdered)
+                            resources = DevelopCollectors(order.def, island, resources, out defensesOrdered);
+
+                        if (collectorsOrdered)
+                            state.islands[order.id].SetCollectors(order.col);
+                        if (defensesOrdered)
+                            state.islands[order.id].SetDefenses(order.def);
+
+                        if (collectorsOrdered || defensesOrdered)
                         {
-                            int featureX = EncodeUtility.GetXType(island.features[t]);
-
-                            if (collectorsOrdered)
-                                collectorsOrdered = IslandBuildUtility.CanBuildCollectorOnFeature(island.features[t], island.collectors[t], order.col[t]);
-                            if (defensesOrdered)
-                                defensesOrdered = IslandBuildUtility.CanBuildDefense(island.defenses[t], order.def[t]);
-
-                            if (collectorsOrdered || defensesOrdered)
-                            {
-                                long[] resources = state.players[player].allResources;
-
-                                if (collectorsOrdered)
-                                {
-                                    int[] collectorOrder = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(order.col[t]));
-                                    resources = TryPurchaseBuildings(collectorOrder, resources, Constants.collectorCosts);
-                                }
-
-                                if (defensesOrdered)
-                                {
-                                    int blockerType = EncodeUtility.GetYType(order.def[t]);
-                                    int bunkerType = EncodeUtility.GetXType(order.def[t]);
-
-                                    int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
-                                    resources = TryPurchaseBuildings(defenseOrder[0], resources, Constants.blockerCosts);
-                                    resources = TryPurchaseBuildings(defenseOrder[1], resources, Constants.bunkerCosts);
-                                }
-
-                                state.players[player].resources.Clear();
-                                state.players[player].resources.AddRange(resources);
-                            }
-
+                            state.players[player].resources.Clear();
+                            state.players[player].resources.AddRange(resources);
                         }
                     }
                 }
+            }
+
+            long[] DevelopCollectors(string order, Island island, long[] currentResources, out bool canDevelop)
+            {
+                bool develop = true;
+                long[] updated = new long[currentResources.Length];
+                Array.Copy(currentResources, updated, updated.Length);
+
+                for (int t = 0; t < island.features.Length && develop; t++)
+                {
+                    if (order[t] != '0')
+                    {
+                        if (develop)
+                            develop = IslandBuildUtility.CanBuildCollectorOnFeature(island.features[t], island.collectors[t], order[t]);
+
+                        if (develop)
+                        {
+                            int[] collectorOrder = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(order[t]));
+                            updated = TryPurchaseBuildings(collectorOrder, updated, Constants.collectorCosts, out develop);
+                        }
+                    }
+                }
+
+                canDevelop = develop;
+
+                if (develop)
+                    return updated;
+                else
+                    return currentResources;
+            }
+
+            long[] DevelopDefenses(string order, Island island, long[] currentResources, out bool canDevelop)
+            {
+                bool develop = true;
+                long[] updated = new long[currentResources.Length];
+
+                for (int t = 0; t < island.features.Length && develop; t++)
+                {
+                    if (order[t] != ')')
+                    {
+                        if (develop)
+                            develop = IslandBuildUtility.CanBuildDefense(island.defenses[t], order[t]);
+
+                        if (develop)
+                        {
+                            int blockerType = EncodeUtility.GetYType(order[t]);
+                            int bunkerType = EncodeUtility.GetXType(order[t]);
+
+                            int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
+                            bool canOrderDefenses = false;
+                            updated = TryPurchaseBuildings(defenseOrder[0], currentResources, Constants.blockerCosts, out canOrderDefenses);
+                            develop = develop && canOrderDefenses;
+                            updated = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out develop);
+                        }
+                    }
+                }
+
+                canDevelop = develop;
+
+                if (develop)
+                    return updated;
+                else
+                    return currentResources;
             }
 
             public void UpdateDefensePlan(string player, BattleCommand defensePlan)
@@ -590,11 +642,14 @@ namespace IslesOfWar
                 return hasEnough;
             }
 
-            long[] TryPurchaseUnits(List<int> order, long[] currentResources)
+            long[][] TryPurchaseUnits(List<int> order, long[] currentResources, long[] currentUnits)
             {
                 if (order.Count == 9)
                 {
-                    long[] updated = currentResources;
+                    long[] updated = new long[currentResources.Length];
+                    long[] reinforced = new long[currentUnits.Length];
+                    Array.Copy(currentResources, updated, currentResources.Length);
+                    Array.Copy(currentUnits, reinforced, currentUnits.Length);
                     bool canPurchase = true;
 
                     for (int u = 0; u < 9 && canPurchase; u++)
@@ -607,25 +662,28 @@ namespace IslesOfWar
                             updated[3] -= Constants.unitCosts[u, 3] * order[u];
 
                             canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
+
+                            reinforced[u] = currentUnits[u] + order[u];
                         }
                     }
 
                     if (!canPurchase)
-                        return currentResources;
+                        return new long[][] { currentResources, currentUnits };
 
-                    return updated;
+                    return new long[][] { updated, reinforced};
                 }
                 else
                 {
-                    return currentResources;
+                    return new long[][] { currentResources, currentUnits };
                 }
 
             }
 
-            long[] TryPurchaseBuildings(int[] order, long[] currentResources, int[,] costs)
+            long[] TryPurchaseBuildings(int[] order, long[] currentResources, int[,] costs, out bool purchaseable)
             {
                 bool canPurchase = true;
-                long[] updated = currentResources;
+                long[] updated = new long[currentResources.Length];
+                Array.Copy(currentResources,updated, currentResources.Length);
 
                 for (int o = 0; o < order.Length && canPurchase; o++)
                 {
@@ -639,6 +697,8 @@ namespace IslesOfWar
 
                     canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
                 }
+
+                purchaseable = canPurchase;
 
                 if (!canPurchase)
                     return currentResources;

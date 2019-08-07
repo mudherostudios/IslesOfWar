@@ -14,6 +14,15 @@ namespace IslesOfWar
             public string id;  //island identification
             public string col; //collectors
             public string def; //defenses
+
+            public IslandBuildOrder() { }
+
+            public IslandBuildOrder(string islandID, string collectors, string defenses)
+            {
+                id = islandID;
+                col = collectors;
+                def = defenses;
+            }
         }
 
         public class ResourceOrder //Deserialize needs Lists
@@ -33,11 +42,11 @@ namespace IslesOfWar
         public class PlayerActions
         {
             public string nat;
-            public IslandBuildOrder bld; //Build
+            public IslandBuildOrder bld;//Build
             public List<int> buy;       //Unit Purchase
-            public string srch;             //Island Search
+            public string srch;         //Island Search
             public ResourceOrder pot;   //Resource Pot Submission
-            public List<string> dep;     //Depleted Island Submissions
+            public List<string> dep;    //Depleted Island Submissions
             public BattleCommand attk;  //Attack Plan
             public BattleCommand dfnd;  //Defend Orders
         }

@@ -161,6 +161,26 @@ namespace IslesOfWar
                 defenses = _defenses;
             }
 
+            //Does not check to see if it a legitimate build. Should be checked before it gets here.
+            public void SetCollectors(string collectorOrder)
+            {
+                char[] expandedExisting = collectors.ToCharArray();
+                char[] expandedOrder = collectorOrder.ToCharArray();
+                collectors = "";
+
+                for (int c = 0; c < expandedExisting.Length; c++)
+                {
+                    int[] existingCollectorTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(expandedExisting[c]));
+                    int[] orderedCollectorTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(expandedOrder[c]));
+                    collectors += EncodeUtility.encodeTable[1,EncodeUtility.GetDecodeIndex(Join(existingCollectorTypes, orderedCollectorTypes))];
+                }
+            }
+
+            public void SetDefenses(string defenseOrder)
+            {
+
+            }
+
             public void SetCollectors(int index, char updated)
             {
                 char[] expandedCollectors = collectors.ToCharArray();
@@ -185,21 +205,18 @@ namespace IslesOfWar
                 }
             }
 
-            public bool isDepleted
+            public bool isDepleted()
             {
-                get
+                for (int t = 0; t < 12; t++)
                 {
-                    for (int t = 0; t < 12; t++)
+                    for (int r = 0; r < 3; r++)
                     {
-                        for (int r = 0; r < 3; r++)
-                        {
-                            if (resources[t][r] > 0)
-                                return false;
-                        }
+                        if (resources[t][r] > 0)
+                            return false;
                     }
-
-                    return true;
                 }
+
+                return true;
             }
 
             public long[] GetTotalSquadMembers()
@@ -218,6 +235,22 @@ namespace IslesOfWar
                 }
 
                 return total;
+            }
+
+            //Does not check to see if equal.
+            int[] Join(int[] a, int[] b)
+            {
+                int[] joined = new int[a.Length];
+
+                for (int i = 0; i < a.Length; i++)
+                {
+                    if (a[i] != 0)
+                        joined[i] = a[i];
+                    else
+                        joined[i] = b[i];
+                }
+
+                return joined;
             }
         }
 
@@ -417,7 +450,7 @@ namespace IslesOfWar
                     for (int b = 0; b < possible.Length && canBuild; b++)
                     {
                         canBuild = possible[b] == orders[b] || orders[b] == 0;
-                        canBuild = exists[b] != orders[b];
+                        canBuild = exists[b] != orders[b] || exists[b] == 0;
                     }
 
                     return canBuild;

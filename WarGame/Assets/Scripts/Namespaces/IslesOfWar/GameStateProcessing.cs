@@ -74,6 +74,7 @@ namespace IslesOfWar
             {
                 string features = "";
                 string collectors = "000000000000";
+                string defenses = "))))))))))))";
                 int[] resourceTypes = new int[12];
 
                 for (int t = 0; t < 12; t++)
@@ -82,7 +83,7 @@ namespace IslesOfWar
                     features += EncodeUtility.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
                 }
 
-                Island island = new Island(owner, features, collectors, "))))))))))))");
+                Island island = new Island(owner, features, collectors, defenses);
                 return island;
             }
 
