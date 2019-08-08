@@ -137,7 +137,7 @@ namespace IslesOfWar
                         if(collectorsOrdered)
                             resources = DevelopCollectors(order.col, island, resources, out collectorsOrdered);
                         if (defensesOrdered)
-                            resources = DevelopCollectors(order.def, island, resources, out defensesOrdered);
+                            resources = DevelopDefenses(order.def, island, resources, out defensesOrdered);
 
                         if (collectorsOrdered)
                             state.islands[order.id].SetCollectors(order.col);

@@ -178,7 +178,25 @@ namespace IslesOfWar
 
             public void SetDefenses(string defenseOrder)
             {
+                char[] expandedExisting = defenses.ToCharArray();
+                char[] expandedOrder = defenseOrder.ToCharArray();
+                defenses = "";
 
+                for (int d = 0; d < expandedExisting.Length; d++)
+                {
+                    int[] existingDefenseTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(expandedExisting[d]));
+                    int[] orderedDefenseTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(expandedOrder[d]));
+                    int existingBlockerType = EncodeUtility.GetYType(expandedExisting[d]);
+                    int orderedBlockerType = EncodeUtility.GetYType(expandedOrder[d]);
+                    int finalBlockerType = 0;
+
+                    if (existingBlockerType != 0)
+                        finalBlockerType = existingBlockerType;
+                    else
+                        finalBlockerType = orderedBlockerType;
+
+                    defenses += EncodeUtility.encodeTable[finalBlockerType, EncodeUtility.GetDecodeIndex(Join(existingDefenseTypes, orderedDefenseTypes))];
+                }
             }
 
             public void SetCollectors(int index, char updated)
@@ -473,10 +491,10 @@ namespace IslesOfWar
 
                 for (int d = 0; d < existingBunkers.Length && canBuild; d++)
                 {
-                    if (existingBunkers[d] > 0)
+                    if (existingBunkers[d] > 0 || orderedBunkers[d] > 0)
                         bunkers++;
 
-                    canBuild = bunkers < 2 && orderedBunkers[d] != existingBunkers[d];
+                    canBuild = bunkers <= 2 && orderedBunkers[d] != existingBunkers[d] || orderedBunkers[d] == 0;
                 }
 
                 return canBuild;
