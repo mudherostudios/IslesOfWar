@@ -161,7 +161,7 @@ namespace IslesOfWar
 
                 for (int t = 0; t < island.features.Length && develop; t++)
                 {
-                    if (order[t] != '0')
+                    if (!"0Aa".Contains(order[t].ToString()))
                     {
                         if (develop)
                             develop = IslandBuildUtility.CanBuildCollectorOnFeature(island.features[t], island.collectors[t], order[t]);

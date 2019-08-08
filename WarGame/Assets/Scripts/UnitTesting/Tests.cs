@@ -9,8 +9,6 @@ using IslesOfWar.GameStateProcessing;
 //TestActionParsing
 using Newtonsoft.Json;
 
-
-
 public class Tests : MonoBehaviour
 {
     public string blockData; //should have valid block data but not valid move data

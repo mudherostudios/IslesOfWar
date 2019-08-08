@@ -449,8 +449,7 @@ namespace IslesOfWar
 
                     for (int b = 0; b < possible.Length && canBuild; b++)
                     {
-                        canBuild = possible[b] == orders[b] || orders[b] == 0;
-                        canBuild = exists[b] != orders[b] || exists[b] == 0;
+                        canBuild = possible[b] == orders[b] && exists[b] != orders[b] || orders[b] == 0;
                     }
 
                     return canBuild;
