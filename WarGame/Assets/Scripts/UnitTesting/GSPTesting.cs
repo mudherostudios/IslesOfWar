@@ -21,7 +21,9 @@ public class GSPTesting : MonoBehaviour
     string searchIslandResults = "";
     string purchaseUnitResults = "";
     string purchaseCollectorsResults = "";
-    string purchaseDefensesResults = "";
+    string purchaseBunkerResults = "";
+    string purchaseBlockerResults = "";
+    string purchaseBlockerAndBunkerResults = "";
     string[] label;
     string[] results;
     int[,] colCost = Constants.collectorCosts;
@@ -43,7 +45,9 @@ public class GSPTesting : MonoBehaviour
         SearchIslandsTest();
         PurchaseUnitTest();
         PurchaseCollectorsTest();
-        PurchaseDefensesTests();
+        PurchaseBunkersTests();
+        BlockerPurchaseTest();
+        BunkerAndBlockerPurchaseTest();
         Debug.Log(GetTestResultStrings());
     }
 
@@ -107,7 +111,6 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         searchIslandResults = "";
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         UnityEngine.Random.InitState(1337);
 
         //Got lucky with seed 1337, allowed me to try all of the combinations first shot with minimum calls, so don't change that.
@@ -201,7 +204,6 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         purchaseUnitResults = "";
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         long[][] playerResources = new long[][] { new long[4], new long[4], new long[4] };
         Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
         Array.Copy(processor.state.players["pimpMacD"].allResources, playerResources[1], 4);
@@ -279,7 +281,6 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         purchaseCollectorsResults = "";
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
 
         long[][] playerResources = new long[][] { new long[4], new long[4], new long[4] };
         Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
@@ -348,7 +349,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of metal collector on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "200000000000", null));
@@ -359,7 +359,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of limestone collector on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 0, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "300000000000", null));
@@ -371,7 +370,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of oil and metal collectors on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 1, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "400000000000", null));
@@ -383,7 +381,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of oil and limestone collectors on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "500000000000", null));
@@ -395,7 +392,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of metal and limestone collectors on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "600000000000", null));
@@ -407,7 +403,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of all collectors on first tile with null defense
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 1, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", null));
@@ -419,7 +414,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development of single collectors on multiple different tiles of different types.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] {2,1,0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000012", null));
@@ -431,7 +425,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail in development with collectors on multiple tiles where at least one is incorrect. (Sneaky Bastard Almost Got Through)
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 2, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000022", null));
@@ -442,7 +435,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development on lower case letter. 
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("d", "000000000060", null));
@@ -455,7 +447,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail in development with collectors on multiple tiles where at least one is invalid but invalid case is multi collector request.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 2, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000042", null));
@@ -466,7 +457,6 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in development via overwriting with additional collector of different type.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 0 }));
         processor.state.islands["a"].collectors = "100000000000";
@@ -480,7 +470,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail in development because collector already exists.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         processor.state.islands["a"].collectors = "100000000000";
@@ -493,7 +482,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail in development with a multi collector request where one collector of a requested type exists already.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         processor.state.islands["a"].collectors = "100000000000";
@@ -505,7 +493,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail because malformed data
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "0000000|0000", null));
         bool passedTwentyThird = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
@@ -514,7 +501,6 @@ public class GSPTesting : MonoBehaviour
 
         //Fail because malformed data but some are correct
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "1000000|0000", null));
@@ -524,11 +510,10 @@ public class GSPTesting : MonoBehaviour
         purchaseCollectorsResults += GetPassOrFail(passedTwentyFourth);
     }
 
-    void PurchaseDefensesTests()
+    void PurchaseBunkersTests()
     {
         ResetTestData();
-        purchaseDefensesResults = "";
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
+        purchaseBunkerResults = "";
 
         long[][] playerResources = new long[][] { new long[4], new long[4], new long[4] };
         Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
@@ -541,122 +526,449 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))"));
         bool passedFirst = IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedFirst);
+        purchaseBunkerResults += GetPassOrFail(passedFirst);
 
         //Fail because defenses are not long enough. #2
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "!))"));
         bool passedSecond = IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedSecond);
+        purchaseBunkerResults += GetPassOrFail(passedSecond);
 
         //Succeed in development of troop bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1,new int[] { 1, 0, 0 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 0, 0 }));
         alteredIslands["a"].defenses = "!)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!)))))))))))"));
         bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedThird);
+        purchaseBunkerResults += GetPassOrFail(passedThird);
 
         //Succeed in development of tank bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 0, 1, 0 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 1, 0 }));
         alteredIslands["a"].defenses = "@)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "@)))))))))))"));
         bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedThird);
+        purchaseBunkerResults += GetPassOrFail(passedThird);
 
         //Succeed in development of air bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 0, 0, 1 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 0, 1 }));
         alteredIslands["a"].defenses = "#)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "#)))))))))))"));
         bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedFifth);
+        purchaseBunkerResults += GetPassOrFail(passedFifth);
 
         //Succeed in development of troop and tank bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 1, 1, 0 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 0 }));
         alteredIslands["a"].defenses = "$)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "$)))))))))))"));
         bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedSixth);
+        purchaseBunkerResults += GetPassOrFail(passedSixth);
 
         //Succeed in development of troop and air bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 1, 0, 1 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers( new int[] { 1, 0, 1 }));
         alteredIslands["a"].defenses = "%)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "%)))))))))))"));
         bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedSeventh);
+        purchaseBunkerResults += GetPassOrFail(passedSeventh);
 
         //Succeed in development of tank and air bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 0, 1, 1 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 1, 1 }));
         alteredIslands["a"].defenses = "^)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "^)))))))))))"));
         bool passedEigth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedEigth);
+        purchaseBunkerResults += GetPassOrFail(passedEigth);
 
         //Fail in development of troop, tank and air bunker.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 1, 1, 1 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers( new int[] { 1, 1, 1 }));
         alteredIslands["a"].defenses = "))))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "&)))))))))))"));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfDefenses(-1, new int[] { 1, 1, 1 }))
+        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedNinth);
+        purchaseBunkerResults += GetPassOrFail(passedNinth);
 
         //Succeed in development of multiple single defenses on multiple tiles.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 1, 1, 1 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 1 }));
         alteredIslands["a"].defenses = "!))))@))))#)";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@))))#)"));
         bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedTenth);
+        purchaseBunkerResults += GetPassOrFail(passedTenth);
 
         //Succeed in development of multiple single and multi defenses on multiple tiles.
         ResetTestData();
-        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
         processor.state.players["cairo"].resources.Clear();
-        processor.state.players["cairo"].resources.AddRange(GetCostOfDefenses(-1, new int[] { 3, 2, 2 }));
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 3, 1, 1 }));
         alteredIslands["a"].defenses = "!))))$))))%)";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))$))))%)"));
         bool passedEleventh = IsEqual(processor.state.players["cairo"].allResources, new long[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
-        purchaseDefensesResults += GetPassOrFail(passedEleventh);
+        purchaseBunkerResults += GetPassOrFail(passedEleventh);
 
+        //Fail in development of multiple single defenses on multiple tiles because one exists already on a tile.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 2, 0, 1 }));
+        alteredIslands["a"].defenses = ")))))!))))))";
+        processor.state.islands["a"].defenses = ")))))!))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))!))))#)"));
+        bool passedTwelfth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 2, 0, 1 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBunkerResults += GetPassOrFail(passedTwelfth);
+
+        //Fail in development of multiple single and multi defenses on multiple tiles because one exists already on a tile.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 3, 1, 1 }));
+        alteredIslands["a"].defenses = ")))))!))))))";
+        processor.state.islands["a"].defenses = ")))))!))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))$))))%)"));
+        bool passedThirteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 3, 1, 1 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBunkerResults += GetPassOrFail(passedThirteenth);
+    }
+
+    void BlockerPurchaseTest()
+    {
+        ResetTestData();
+        purchaseBlockerResults = "";
+        Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+        Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+
+        //Fail in development of blocker because incorrect length. #1
+        alteredIslands["a"].defenses = "))))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))"));
+        bool passedFirst = IslandsAreEqual(savedIslands, processor.state.islands)
+        && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands) && PlayersAreEqualExcept("", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedFirst);
+
+        //Fail in development of blocker because incorrect length. #2
+        ResetTestData();
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "0))"));
+        bool passedSecond = IslandsAreEqual(savedIslands, processor.state.islands)
+        && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands) && PlayersAreEqualExcept("", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedSecond);
+
+        //Succeed in development of troop blocker
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 0, 0 }));
+        alteredIslands["a"].defenses = "0)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0)))))))))))"));
+        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedThird);
+
+        //Succeed in development of tank blocker
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 1, 0 }));
+        alteredIslands["a"].defenses = "a)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "a)))))))))))"));
+        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedFourth);
+
+        //Succeed in development of air blocker
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers( new int[] { 0, 0, 1 }));
+        alteredIslands["a"].defenses = "A)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))))))))))"));
+        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedFifth);
+
+        //Succeed in development of multiple blockers on multiple tiles
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 1, 2 }));
+        alteredIslands["a"].defenses = "A)))0)))a))A";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))0)))a))A"));
+        bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedSixth);
+
+        //Fail in development of multiple blockers because not enough resources
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 0, 1 }));
+        alteredIslands["a"].defenses = "))))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A))))))))0aA"));
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 0, 1 }))
+        && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedSeventh);
+
+        //Fail in development of tank blocker because troop blocker already exists.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 1, 0 }));
+        processor.state.islands["a"].defenses = "0)))))))))))";
+        alteredIslands["a"].defenses = "0)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "a)))))))))))"));
+        bool passedEighth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 1, 0 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedEighth);
+
+        //Fail in development of air blocker because troop blocker already exists.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 0, 1 }));
+        processor.state.islands["a"].defenses = "0)))))))))))";
+        alteredIslands["a"].defenses = "0)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))))))))))"));
+        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 0, 1 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedNinth);
+
+        //Fail in development of troop blocker because air blocker already exists.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 0, 0 }));
+        processor.state.islands["a"].defenses = "A)))))))))))";
+        alteredIslands["a"].defenses = "A)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0)))))))))))"));
+        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 0, 0}))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerResults += GetPassOrFail(passedTenth);
+    }
+
+    void BunkerAndBlockerPurchaseTest()
+    {
+        ResetTestData();
+        purchaseBlockerAndBunkerResults = "";
+
+        Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+        Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+        
+        //Succeed building troop blocker and troop bunker
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })));
+        alteredIslands["a"].defenses = "1)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "1)))))))))))"));
+        bool passedFirst = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedFirst);
+
+        //Succeed building troop blocker and tank bunker
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 1, 0 })));
+        alteredIslands["a"].defenses = "2)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "2)))))))))))"));
+        bool passedSecond = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedSecond);
+
+        //Succeed building troop blocker and air bunker
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 0, 1 })));
+        alteredIslands["a"].defenses = "3)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "3)))))))))))"));
+        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedThird);
+
+        //Succeed building troop blocker and troop tank bunker combo
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 1, 0 })));
+        alteredIslands["a"].defenses = "4)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "4)))))))))))"));
+        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedFourth);
+
+        //Succeed building troop blocker and troop air bunker combo
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 1 })));
+        alteredIslands["a"].defenses = "5)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "5)))))))))))"));
+        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedFifth);
+
+        //Succeed building troop blocker and tank air bunker combo
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
+        alteredIslands["a"].defenses = "6)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "6)))))))))))"));
+        bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedSixth);
+
+        //Succeed building tank blocker and tank air bunker combo
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 0, 1, 0 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
+        alteredIslands["a"].defenses = "g)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "g)))))))))))"));
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedSeventh);
+
+        //Succeed building air blocker and tank air bunker combo
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 0, 0, 1 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
+        alteredIslands["a"].defenses = "G)))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "G)))))))))))"));
+        bool passedEigth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedEigth);
+
+        //Succeed building multiple bunkers and blockers on multiple tiles
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 3, 3, 3 }), GetCostOfBunkers(new int[] { 4, 4, 4 })));
+        alteredIslands["a"].defenses = ")01bcDE5gG))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, ")01bcDE5gG))"));
+        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedNinth);
+
+        //Fail building multiple bunkers and blockers on multiple tiles because not enough resources
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 0, 0 }));
+        alteredIslands["a"].defenses = "))))))))))))";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))@))))))"));
+        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 0, 0 }))
+        && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedTenth);
+
+        //Fail building multiple bunkers and blockers on multiple tiles because bad data
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 2, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })));
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))@))7)))"));
+        bool passedEleventh = IsEqual(processor.state.players["cairo"].allResources, Add(GetCostOfBlockers(new int[] { 2, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })))
+        && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedEleventh);
+
+        //Succeed building new bunkers on tiles with blocker on it.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange( GetCostOfBunkers(new int[] { 1, 1, 1 }));
+        processor.state.islands["a"].defenses = "0))))A)))))a";
+        alteredIslands["a"].defenses = "1))))C)))))d";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
+        bool passedTwelfth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedTwelfth);
+
+        //Succeed building new blocker on tiles with bunkers on it.
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 1, 1 }));
+        processor.state.islands["a"].defenses = "!))))@)))))#";
+        alteredIslands["a"].defenses = "1))))C)))))d";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
+        bool passedThriteenth = IsEqual(processor.state.players["cairo"].allResources, new long[4])
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedThriteenth);
+
+        //Fail building new bunkers on tiles with blocker on it because not enough resources
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 0 }));
+        processor.state.islands["a"].defenses = "0))))A)))))a";
+        alteredIslands["a"].defenses = "0))))A)))))a";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
+        bool passedFourteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 0 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedFourteenth);
+
+        //Fail building new bunkers on tiles with blocker on it because bunker already there
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 1 }));
+        processor.state.islands["a"].defenses = "1))))A)))))a";
+        alteredIslands["a"].defenses = "1))))A)))))a";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
+        bool passedFifteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 1 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedFifteenth);
+
+        //Fail building new blocker on tiles with bunkers on it because not enough resources
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 1, 0 }));
+        processor.state.islands["a"].defenses = "!))))@)))))#";
+        alteredIslands["a"].defenses = "!))))@)))))#";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
+        bool passedSixteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 1, 0 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedSixteenth);
+
+        //Fail building new blocker on tiles with bunkers on it because blocker exists
+        ResetTestData();
+        processor.state.players["cairo"].resources.Clear();
+        processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 1, 1}));
+        processor.state.islands["a"].defenses = "0))))@)))))#";
+        alteredIslands["a"].defenses = "0))))@)))))#";
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
+        bool passedSeventeenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 1, 1 }))
+        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        purchaseBlockerAndBunkerResults += GetPassOrFail(passedSeventeenth);
     }
 
     void ResetTestData()
@@ -691,19 +1003,37 @@ public class GSPTesting : MonoBehaviour
             {IIDs[13], IslandGenerator.Generate("nox")},
             {IIDs[14], IslandGenerator.Generate("nox")}
         };
+
+        processor.state = new State(players, islands, new Dictionary<string, ResourceContribution>(), new Dictionary<string, string>());
     }
 
-    long[] GetCostOfDefenses(int blocker, int[] bunkerCounts)
+    long[] Add(int[] a, int[] b)
+    {
+        long[] c = new long[a.Length];
+
+        for (int i = 0; i < c.Length; i++)
+        {
+            c[i] = a[i] + b[i];
+        }
+
+        return c;
+    }
+
+    long[] Add(long[] a, long[] b)
+    {
+        long[] c = new long[a.Length];
+
+        for (int i = 0; i < c.Length; i++)
+        {
+            c[i] = a[i] + b[i];
+        }
+
+        return c;
+    }
+
+    long[] GetCostOfBunkers(int[] bunkerCounts)
     {
         long[] cost = new long[4];
-
-        if (blocker >= 0 && blocker < 3)
-        {
-            cost[0] = Constants.blockerCosts[blocker, 0];
-            cost[1] = Constants.blockerCosts[blocker, 1];
-            cost[2] = Constants.blockerCosts[blocker, 2];
-            cost[3] = Constants.blockerCosts[blocker, 3];
-        }
 
         for (int b = 0; b < bunkerCounts.Length; b++)
         {
@@ -711,6 +1041,21 @@ public class GSPTesting : MonoBehaviour
             cost[1] += bunkerCounts[b] * Constants.bunkerCosts[b, 1];
             cost[2] += bunkerCounts[b] * Constants.bunkerCosts[b, 2];
             cost[3] += bunkerCounts[b] * Constants.bunkerCosts[b, 3];
+        }
+
+        return cost;
+    }
+
+    long[] GetCostOfBlockers(int[] blockerCounts)
+    {
+        long[] cost = new long[4];
+
+        for (int b = 0; b < blockerCounts.Length; b++)
+        {
+            cost[0] += blockerCounts[b] * Constants.blockerCosts[b, 0];
+            cost[1] += blockerCounts[b] * Constants.blockerCosts[b, 1];
+            cost[2] += blockerCounts[b] * Constants.blockerCosts[b, 2];
+            cost[3] += blockerCounts[b] * Constants.blockerCosts[b, 3];
         }
 
         return cost;
@@ -811,9 +1156,9 @@ public class GSPTesting : MonoBehaviour
     string GetTestResultStrings()
     {
         string entireResults = "-Test Results -        O=Pass X=Fail \n";
-                                                                                                    
-        label = new string[] { "NationUpdateTests: ", "SearchIslandsTest: ", "PurchaseUnitsTest: ", "CollectorPurchase: ", "BuildDefensesTest: " };
-        results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseDefensesResults };
+                                                                                                                           
+        label = new string[] { "NationUpdate     : ", "SearchIslands    : ", "PurchaseUnits    : ", "BuildCollectors   : ", "BuildBunkers     : ", "BuildBlocker      : ", "BuildBlonkers    : " };
+        results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults, purchaseBlockerResults, purchaseBlockerAndBunkerResults };
         
         for (int r = 0; r < results.Length; r++)
         {

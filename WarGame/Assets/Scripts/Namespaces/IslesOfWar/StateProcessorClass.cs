@@ -186,13 +186,14 @@ namespace IslesOfWar
             {
                 bool develop = true;
                 long[] updated = new long[currentResources.Length];
+                Array.Copy(currentResources, updated, currentResources.Length);
 
                 for (int t = 0; t < island.features.Length && develop; t++)
                 {
                     if (order[t] != ')')
                     {
                         if (develop)
-                            develop = IslandBuildUtility.CanBuildDefense(island.defenses[t], order[t]);
+                            develop = IslandBuildUtility.CanBuildDefenses(island.defenses[t], order[t]);
 
                         if (develop)
                         {
@@ -201,9 +202,10 @@ namespace IslesOfWar
 
                             int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
                             bool canOrderDefenses = false;
-                            updated = TryPurchaseBuildings(defenseOrder[0], currentResources, Constants.blockerCosts, out canOrderDefenses);
+                            updated = TryPurchaseBuildings(defenseOrder[0], updated, Constants.blockerCosts, out canOrderDefenses);
                             develop = develop && canOrderDefenses;
-                            updated = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out develop);
+                            updated = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out canOrderDefenses);
+                            develop = develop && canOrderDefenses;
                         }
                     }
                 }

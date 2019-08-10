@@ -360,10 +360,8 @@ namespace IslesOfWar
 
             public static int[][] GetDefenseTypes(int blocker, int bunkers)
             {
-                int[] blockerPart = new int[3];
-
-                if (blocker != 0)
-                    blockerPart[blocker - 1] = blocker;
+                int[] blockerPart = new int[1];
+                blockerPart[0] = blocker;
 
                 int[] bunkerPart = GetBaseTypes(bunkers);
 
@@ -476,14 +474,17 @@ namespace IslesOfWar
                 return false;
             }
 
-            public static bool CanBuildDefense(char existing, char ordered)
+            public static bool CanBuildDefenses(char existing, char ordered)
             {
-                int existingBlockerType = EncodeUtility.GetYType(existing);
+                return CanBuildBlocker(existing, ordered) && CanBuildBunkers(existing, ordered);
+            }
+
+            public static bool CanBuildBunkers(char existing, char ordered)
+            {
                 int existingBunkerType = EncodeUtility.GetXType(existing);
-                int orderedBlockerType = EncodeUtility.GetYType(ordered);
                 int orderedBunkerType = EncodeUtility.GetXType(ordered);
 
-                bool canBuild = existingBlockerType == 0 && orderedBlockerType > -1;
+                bool canBuild = true;
                 int bunkers = 0;
 
                 int[] existingBunkers = EncodeUtility.GetBaseTypes(existingBunkerType);
@@ -498,6 +499,14 @@ namespace IslesOfWar
                 }
 
                 return canBuild;
+            }
+
+            public static bool CanBuildBlocker(char existing, char ordered)
+            {
+                int existingBlockerType = EncodeUtility.GetYType(existing);
+                int orderedBlockerType = EncodeUtility.GetYType(ordered);
+
+                return (existingBlockerType == 0 && orderedBlockerType > 0) || orderedBlockerType == 0;
             }
 
         }
@@ -621,7 +630,7 @@ namespace IslesOfWar
                 attackableIsland = "";
             }
 
-            public PlayerState(string nation,long[] unitCounts, long[] resourceCounts, string[] islandIDs, string _attackableIsland)
+            public PlayerState(string nation, long[] unitCounts, long[] resourceCounts, string[] islandIDs, string _attackableIsland)
             {
                 nationCode = nation;
 
