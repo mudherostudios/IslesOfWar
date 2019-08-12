@@ -981,58 +981,189 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
-        int[][] pln = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 5, 6, 7 } };
+        Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+        int[][] pln = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 2, 6, 7 } };
         int[][] sqd = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+        int[][] maxPlan = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 2, 6, 7 }, new int[] { 8, 4, 9 }, new int[] { 11, 10, 6, 7 } };
+        int[][] maxSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
         int[][] bigPlan = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 2, 6, 7 }, new int[] { 8, 4, 9 }, new int[] { 11, 10, 6, 7 }, new int[] { 5, 1, 2, 6, 10, 9, 4 } };
         int[][] bigSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
 
 
         //Fail because id is null
-        processor.UpdateDefensePlan(null, new BattleCommand("cairo", pln, sqd));
-        bool passedFirst = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand(null , pln, sqd));
+        bool passedFirst = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedFirst);
 
         //Fail because pln is null
-        processor.UpdateDefensePlan("a", new BattleCommand("cairo", null, sqd));
-        bool passedSecond = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", null, sqd));
+        bool passedSecond = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedSecond);
 
         //Fail because sqd is null
-        processor.UpdateDefensePlan("a", new BattleCommand("cairo", pln, null));
-        bool passedThird = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", pln, null));
+        bool passedThird = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedThird);
 
         //Fail because id does not exist
-        processor.UpdateDefensePlan("z", new BattleCommand("cairo", pln, sqd));
-        bool passedFourth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("z", pln, sqd));
+        bool passedFourth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedFourth);
 
         //Fail because id does not belong to player
-        processor.UpdateDefensePlan("o", new BattleCommand("cairo", pln, sqd));
-        bool passedFifth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("o", pln, sqd));
+        bool passedFifth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedFifth);
 
         //Fail because pln length != sqd length
-        processor.UpdateDefensePlan("a", new BattleCommand("cairo", new int[][] { new int[] { 0, 1, 4 } }, sqd));
-        bool passedSixth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", new int[][] { new int[] { 0, 1, 4 } }, sqd));
+        bool passedSixth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedSixth);
 
         //Fail because pln length > 4
         processor.state.players["cairo"].units = new List<long>() { 0, 5, 10, 15, 20, 25, 30, 35, 40 };
         players["cairo"].units = new List<long>() { 0, 5, 10, 15, 20, 25, 30, 35, 40 };
-        processor.UpdateDefensePlan("a", new BattleCommand("cairo", bigPlan, bigSquad));
-        bool passedSeventh = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", bigPlan, bigSquad));
+        bool passedSeventh = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedSeventh);
 
         //Fail because sqd length != 9
         processor.state.players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         int[][] oddSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
-        processor.UpdateDefensePlan("a", new BattleCommand("cairo", pln, oddSquad));
-        bool passedEigth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", pln, oddSquad));
+        bool passedEigth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands)
+        && DefensePlansAreEqual(savedIslands, processor.state.islands);
         defenseUpdateResults += GetPassOrFail(passedEigth);
 
+        //Succeed in defending one hill tile with one squad
+        int[][] singlePlan = new int[][] { new int[] { 0, 1, 4 } };
+        int[][] singleSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
+        players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        alteredIslands["a"].squadCounts = new List<List<int>>() { new List<int>(){ 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+        alteredIslands["a"].squadPlans = new List<List<int>>() { new List<int>(){ 0, 1, 4} };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singlePlan, singleSquad));
+        bool passedNinth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedNinth);
 
+        //Succeed in defending multiple hill tiles with multiple squads
+        ResetTestData();
+        processor.state.players["cairo"].units = new List<long>() { 0, 4, 8, 12, 16, 20, 24, 28, 32 };
+        players["cairo"].units.Clear();
+        players["cairo"].units.AddRange( new long[9]);
+        alteredIslands["a"].squadCounts = new List<List<int>>() { new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+        alteredIslands["a"].squadPlans = new List<List<int>>() { new List<int> { 0, 1, 4 }, new List<int> { 3, 2, 6, 7 }, new List<int> { 8, 4, 9 }, new List<int> { 11, 10, 6, 7 } };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", maxPlan, maxSquad));
+        bool passedTenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedTenth);
+
+        //Succeed in defending single lake tile with squad
+        ResetTestData();
+        int[][] singleLakePlan = new int[][] { new int[] { 6, 2, 3, 5, 7, 10, 11 } };
+        int[][] singleLakeSquad = new int[][] { new int[] { 0, 1, 2, 0, 0, 0, 6, 7, 8 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 0, 0, 0, 6, 7, 8 };
+        players["cairo"].units.Clear();
+        players["cairo"].units.AddRange(new long[9]);
+        alteredIslands["a"].squadPlans = new List<List<int>>() { new List<int> { 6, 2, 3, 5, 7, 10, 11 } };
+        alteredIslands["a"].squadCounts = new List<List<int>>() { new List<int> { 0, 1, 2, 0, 0, 0, 6, 7, 8 } };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleLakePlan, singleLakeSquad));
+        bool passedEleventh = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedEleventh);
+
+        //Fail in defending single lake tile with squad and 1 light tank
+        ResetTestData();
+        int[][] singleLakeSquadFail = new int[][] { new int[] { 0, 1, 2, 1, 0, 0, 6, 7, 8 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 1, 0, 0, 6, 7, 8 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 1, 0, 0, 6, 7, 8 };
+        alteredIslands["a"].squadPlans = null;
+        alteredIslands["a"].squadCounts = null;
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleLakePlan, singleLakeSquadFail));
+        bool passedTwelfth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedTwelfth);
+
+        //Fail in defending single lake tile with squad and 1 medium tank
+        ResetTestData();
+        singleLakeSquadFail = new int[][] { new int[] { 0, 1, 2, 0, 1, 0, 6, 7, 8 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 0, 1, 0, 6, 7, 8 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 0, 1, 0, 6, 7, 8 };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleLakePlan, singleLakeSquadFail));
+        bool passedThirteenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedThirteenth);
+
+        //Fail in defending single lake tile with squad and 1 heavy tank
+        ResetTestData();
+        singleLakeSquadFail = new int[][] { new int[] { 0, 1, 2, 0, 0, 1, 6, 7, 8 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 0, 0, 1, 6, 7, 8 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 0, 0, 1, 6, 7, 8 };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleLakePlan, singleLakeSquadFail));
+        bool passedFourteenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedFourteenth);
+
+        //Succeed in defending mountain lake tile with squad
+        ResetTestData();
+        int[][] singleMountainPlan = new int[][] { new int[] { 10, 5, 6, 9, 11 } };
+        int[][] singleMountainSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 0, 0, 0 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 0, 0, 0 };
+        players["cairo"].units.Clear();
+        players["cairo"].units.AddRange(new long[9]);
+        alteredIslands["a"].squadPlans = new List<List<int>>() { new List<int> { 10, 5, 6, 9, 11 } };
+        alteredIslands["a"].squadCounts = new List<List<int>>() { new List<int> { 0, 1, 2, 3, 4, 5, 0, 0, 0 } };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleMountainPlan, singleMountainSquad));
+        bool passedFifteenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedFifteenth);
+
+        //Fail in defending single mountain tile with squad and 1 light fighter
+        ResetTestData();
+        int[][] singleMountainFail = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 1, 0, 0 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 1, 0, 0 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 1, 0, 0 };
+        alteredIslands["a"].squadPlans = null;
+        alteredIslands["a"].squadCounts = null;
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleMountainPlan, singleMountainFail));
+        bool passedSixteenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedSixteenth);
+
+        //Fail in defending single mountain tile with squad and 1 medium fighter
+        ResetTestData();
+        singleMountainFail = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 0, 1, 0 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 0, 1, 0 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 0, 1, 0 };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleMountainPlan, singleMountainFail));
+        bool passedSeventeen = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedSeventeen);
+
+        //Fail in defending single mountain tile with squad and 1 heavy bomber
+        ResetTestData();
+        singleMountainFail = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 0, 0, 1 } };
+        processor.state.players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 0, 0, 1 };
+        players["cairo"].units.Clear();
+        players["cairo"].units = new List<long>() { 0, 1, 2, 3, 4, 5, 0, 0, 1 };
+        processor.UpdateDefensePlan("cairo", new BattleCommand("a", singleMountainPlan, singleMountainFail));
+        bool passedEighteenth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(alteredIslands, processor.state.islands)
+        && DefensePlansAreEqual(alteredIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedEighteenth);
 
     }
 
@@ -1171,8 +1302,33 @@ public class GSPTesting : MonoBehaviour
             equal = equal && a.ContainsKey(pair.Key);
 
             if (equal)
-                equal = equal && a[pair.Key].collectors == b[pair.Key].collectors
-                && a[pair.Key].defenses == b[pair.Key].defenses && pair.Value.features == a[pair.Key].features;
+                equal = equal && a[pair.Key].collectors == pair.Value.collectors
+                && a[pair.Key].defenses == pair.Value.defenses && pair.Value.features == a[pair.Key].features
+                && a[pair.Key].owner == pair.Value.owner;
+        }
+
+        return equal;
+    }
+
+    bool DefensePlansAreEqual(Dictionary<string, Island> a, Dictionary<string, Island> b)
+    {
+        bool equal = true;
+
+        foreach (KeyValuePair<string, Island> pair in b)
+        {
+            equal = equal && a.ContainsKey(pair.Key);
+            bool countsIsNull = a[pair.Key].squadCounts == null || pair.Value.squadCounts == null;
+            bool plansIsNull =  a[pair.Key].squadPlans == null || pair.Value.squadPlans == null;
+
+            if (equal && !countsIsNull)
+                equal = equal && IsEqual(a[pair.Key].squadCounts, pair.Value.squadCounts);
+            else if (equal && countsIsNull)
+                equal = equal && a[pair.Key].squadCounts == pair.Value.squadCounts;
+
+            if (equal && !plansIsNull)
+                equal = equal && IsEqual(a[pair.Key].squadPlans, pair.Value.squadPlans);
+            else if (equal && plansIsNull)
+                equal = equal && a[pair.Key].squadPlans == pair.Value.squadPlans;
         }
 
         return equal;
@@ -1193,6 +1349,23 @@ public class GSPTesting : MonoBehaviour
         }
 
         return areEqual;
+    }
+
+    bool IsEqual(List<List<int>> a, List<List<int>> b)
+    {
+        bool equal = a.Count == b.Count;
+
+        for (int i = 0; i < a.Count && equal; i++)
+        {
+            equal = equal && a[i].Count == b[i].Count;
+
+            for (int j = 0; j < a[i].Count && equal; j++)
+            {
+                equal = equal && a[i][j] == b[i][j];
+            }
+        }
+
+        return equal;
     }
 
     bool IsEqual(long[] a, long[] b)

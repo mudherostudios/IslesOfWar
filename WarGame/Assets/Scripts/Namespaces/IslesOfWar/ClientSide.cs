@@ -255,13 +255,16 @@ namespace IslesOfWar
             {
                 long[] total = new long[9];
 
-                if (squadCounts.Count > 0)
+                if (squadCounts != null)
                 {
-                    for (int s = 0; s < squadCounts.Count; s++)
+                    if (squadCounts.Count > 0)
                     {
-                        for (int u = 0; u < squadCounts[s].Count; u++)
+                        for (int s = 0; s < squadCounts.Count; s++)
                         {
-                            total[u] += squadCounts[s][u];
+                            for (int u = 0; u < squadCounts[s].Count; u++)
+                            {
+                                total[u] += squadCounts[s][u];
+                            }
                         }
                     }
                 }
@@ -426,9 +429,9 @@ namespace IslesOfWar
             public static int GetYType(string type)
             {
 
-                if (")!@#$%^&*(".Contains(type))
+                if (")!@#$%^&".Contains(type))
                     return 0;
-                if ("01234567".Contains(type))
+                else if ("01234567".Contains(type))
                     return 1;
                 else if ("abcdefgh".Contains(type))
                     return 2;

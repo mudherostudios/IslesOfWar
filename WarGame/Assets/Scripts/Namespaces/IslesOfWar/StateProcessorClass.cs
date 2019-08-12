@@ -241,13 +241,16 @@ namespace IslesOfWar
                             for (int i = 0; i < defensePlan.pln.Count && canUpdate; i++)
                             {
                                 int pos = defensePlan.pln[i][0];
-                                canUpdate = TryPlaceUnitsOnFeature(island[pos], defenses[pos], defensePlan.sqd[i].ToArray());
+                                canUpdate = TryPlaceUnitsOnFeature(island[pos], defenses[pos], defensePlan.sqd[i].ToArray(), true);
                             }
                         }
 
                         if (canUpdate)
                         {
-                            //Make sure to remove units here from the player total units
+                            long[] totalUnitsToRemove = AddRange(defensePlan.sqd);
+                            long[] finalUnitCount = Subtract(state.players[player].allUnits, totalUnitsToRemove);
+                            state.players[player].units.Clear();
+                            state.players[player].units.AddRange(finalUnitCount);
                             state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
                             state.islands[defensePlan.id].squadPlans = defensePlan.pln;
                         }
@@ -535,11 +538,31 @@ namespace IslesOfWar
                 return placeable;
             }
 
-            bool TryPlaceUnitsOnFeature(char feature, char defenses, int[] units)
+            bool TryPlaceUnitsOnFeature(char feature, char defenses, int[] units, bool isDefender)
             {
                 int featureType = EncodeUtility.GetYType(feature);
                 int defenseType = EncodeUtility.GetYType(defenses);
-                return defenseType != 1 && defenseType != 2 && featureType != 1 && defenseType != 3 && featureType != 2;
+
+                bool canPlace = true;
+                bool troops = true; 
+                bool tanks  = featureType != 2; 
+                bool air    = featureType != 3;
+
+                if(!isDefender)
+                {
+                    troops  = troops && defenseType != 1;
+                    tanks   = tanks && defenseType != 2 && featureType != 2;
+                    air     = air && defenseType != 3 && featureType != 3;
+                }
+
+                if (!troops)
+                    canPlace = canPlace && units[0] == 0 && units[1] == 0 && units[2] == 0;
+                if (!tanks)
+                    canPlace = canPlace && units[3] == 0 && units[4] == 0 && units[5] == 0;
+                if (!air)
+                    canPlace = canPlace && units[6] == 0 && units[7] == 0 && units[8] == 0;
+
+                return canPlace;
             }
 
             int Conflict(int[] positions, int moveTarget)
@@ -719,8 +742,33 @@ namespace IslesOfWar
                 return a;
             }
 
+            long[] AddRange(List<List<int>> a)
+            {
+                long[] total = new long[a[0].Count];
+
+                for (int i = 0; i < a.Count; i++)
+                {
+                    for (int j = 0; j < 9; j++)
+                    {
+                        total[j] += a[i][j];
+                    }
+                }
+
+                return total;
+            }
+
             //Subtract b from a
             long[] Subtract(long[] a, int[] b)
+            {
+                for (int u = 0; u < a.Length && u < b.Length; u++)
+                {
+                    a[u] -= b[u];
+                }
+
+                return a;
+            }
+
+            long[] Subtract(long[] a, long[] b)
             {
                 for (int u = 0; u < a.Length && u < b.Length; u++)
                 {
