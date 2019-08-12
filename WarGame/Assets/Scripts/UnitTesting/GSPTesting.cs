@@ -24,6 +24,7 @@ public class GSPTesting : MonoBehaviour
     string purchaseBunkerResults = "";
     string purchaseBlockerResults = "";
     string purchaseBlockerAndBunkerResults = "";
+    string defenseUpdateResults = "";
     string[] label;
     string[] results;
     int[,] colCost = Constants.collectorCosts;
@@ -48,6 +49,7 @@ public class GSPTesting : MonoBehaviour
         PurchaseBunkersTests();
         BlockerPurchaseTest();
         BunkerAndBlockerPurchaseTest();
+        UpdateDefensesTests();
         Debug.Log(GetTestResultStrings());
     }
 
@@ -506,7 +508,7 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "1000000|0000", null));
         bool passedTwentyFourth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 0, 0 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
-        && PlayersAreEqualExcept("", players, processor.state.players);
+        && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentyFourth);
     }
 
@@ -971,6 +973,69 @@ public class GSPTesting : MonoBehaviour
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSeventeenth);
     }
 
+    void UpdateDefensesTests()
+    {
+        ResetTestData();
+        defenseUpdateResults = "";
+
+        processor.state.players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
+        players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
+        Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
+        int[][] pln = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 5, 6, 7 } };
+        int[][] sqd = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+        int[][] bigPlan = new int[][] { new int[] { 0, 1, 4 }, new int[] { 3, 2, 6, 7 }, new int[] { 8, 4, 9 }, new int[] { 11, 10, 6, 7 }, new int[] { 5, 1, 2, 6, 10, 9, 4 } };
+        int[][] bigSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 } };
+
+
+        //Fail because id is null
+        processor.UpdateDefensePlan(null, new BattleCommand("cairo", pln, sqd));
+        bool passedFirst = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedFirst);
+
+        //Fail because pln is null
+        processor.UpdateDefensePlan("a", new BattleCommand("cairo", null, sqd));
+        bool passedSecond = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedSecond);
+
+        //Fail because sqd is null
+        processor.UpdateDefensePlan("a", new BattleCommand("cairo", pln, null));
+        bool passedThird = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedThird);
+
+        //Fail because id does not exist
+        processor.UpdateDefensePlan("z", new BattleCommand("cairo", pln, sqd));
+        bool passedFourth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedFourth);
+
+        //Fail because id does not belong to player
+        processor.UpdateDefensePlan("o", new BattleCommand("cairo", pln, sqd));
+        bool passedFifth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedFifth);
+
+        //Fail because pln length != sqd length
+        processor.UpdateDefensePlan("a", new BattleCommand("cairo", new int[][] { new int[] { 0, 1, 4 } }, sqd));
+        bool passedSixth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedSixth);
+
+        //Fail because pln length > 4
+        processor.state.players["cairo"].units = new List<long>() { 0, 5, 10, 15, 20, 25, 30, 35, 40 };
+        players["cairo"].units = new List<long>() { 0, 5, 10, 15, 20, 25, 30, 35, 40 };
+        processor.UpdateDefensePlan("a", new BattleCommand("cairo", bigPlan, bigSquad));
+        bool passedSeventh = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedSeventh);
+
+        //Fail because sqd length != 9
+        processor.state.players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
+        players["cairo"].units = new List<long>() { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
+        int[][] oddSquad = new int[][] { new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+        processor.UpdateDefensePlan("a", new BattleCommand("cairo", pln, oddSquad));
+        bool passedEigth = PlayersAreEqualExcept("", players, processor.state.players) && IslandsAreEqual(savedIslands, processor.state.islands);
+        defenseUpdateResults += GetPassOrFail(passedEigth);
+
+
+
+    }
+
     void ResetTestData()
     {
         //Initialize Random Seed to get the same islands everytime.
@@ -1084,6 +1149,7 @@ public class GSPTesting : MonoBehaviour
             return "X ";
     }
 
+    //Need this just in case adding collectors to an island modified the features and IslandsAreEqual is excluding a player.
     bool IslandFeaturesWereNotAltered(Dictionary<string, Island> a, Dictionary<string, Island> b)
     {
         bool notAltered = true;
@@ -1106,7 +1172,7 @@ public class GSPTesting : MonoBehaviour
 
             if (equal)
                 equal = equal && a[pair.Key].collectors == b[pair.Key].collectors
-                && a[pair.Key].defenses == b[pair.Key].defenses;
+                && a[pair.Key].defenses == b[pair.Key].defenses && pair.Value.features == a[pair.Key].features;
         }
 
         return equal;
@@ -1157,8 +1223,10 @@ public class GSPTesting : MonoBehaviour
     {
         string entireResults = "-Test Results -        O=Pass X=Fail \n";
                                                                                                                            
-        label = new string[] { "NationUpdate     : ", "SearchIslands    : ", "PurchaseUnits    : ", "BuildCollectors   : ", "BuildBunkers     : ", "BuildBlocker      : ", "BuildBlonkers    : " };
-        results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults, purchaseBlockerResults, purchaseBlockerAndBunkerResults };
+        label = new string[] { "NationUpdate      : ", "SearchIslands     : ", "PurchaseUnits     : ", "BuildCollectors    : ", "BuildBunkers      : ",
+        "BuildBlocker       : ", "BuildBlonkers     : ", "UpdateDefenders: " };
+        results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults,
+        purchaseBlockerResults, purchaseBlockerAndBunkerResults, defenseUpdateResults };
         
         for (int r = 0; r < results.Length; r++)
         {

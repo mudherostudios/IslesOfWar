@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace IslesOfWar
 {
@@ -113,10 +114,23 @@ namespace IslesOfWar
                 resourceContributions = new Dictionary<string, ResourceContribution>();
                 depletedContributions = new Dictionary<string, string>();
 
-                players = allPlayers;
-                islands = allIslands;
+                players = GetDeepCopy(allPlayers);
+                islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
+            }
+
+            Dictionary<string, PlayerState> GetDeepCopy(Dictionary<string, PlayerState> original)
+            {
+                Dictionary<string, PlayerState> deepCopy = new Dictionary<string, PlayerState>();
+
+                foreach (KeyValuePair<string, PlayerState> pair in original)
+                {
+                    PlayerState state = new PlayerState(pair.Value.nationCode, pair.Value.allUnits, pair.Value.allResources, pair.Value.allIslands, pair.Value.attackableIsland);
+                    deepCopy.Add(pair.Key, state);
+                }
+
+                return deepCopy;
             }
 
             public Island[] allIslands

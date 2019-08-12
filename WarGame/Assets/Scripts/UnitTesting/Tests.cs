@@ -64,7 +64,6 @@ public class Tests : MonoBehaviour
         defend.id = "0";
         defend.pln = command.pln;
         defend.sqd = command.sqd;
-        defend.flw = new List<int> { 0, 1 };
 
         PlayerActions actions = new PlayerActions();
 

@@ -220,12 +220,12 @@ namespace IslesOfWar
 
             public void UpdateDefensePlan(string player, BattleCommand defensePlan)
             {
-                bool canUpdate = defensePlan.id != null && defensePlan.pln != null && defensePlan.sqd != null && defensePlan.flw != null;
+                bool canUpdate = defensePlan.id != null && defensePlan.pln != null && defensePlan.sqd != null;
 
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
-                    && defensePlan.pln.Count == defensePlan.flw.Count && defensePlan.sqd.Count <= 4;
+                    && defensePlan.sqd.Count <= 4;
 
                     if (canUpdate)
                     {

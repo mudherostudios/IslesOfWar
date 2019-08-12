@@ -39,16 +39,14 @@ namespace IslesOfWar
         {
             public int[][] squadPositions;
             public long[][] squadCounts;
-            public bool[] reactToNewlyAdjacent;
 
             public bool isAttacker;
 
-            public BattlePlan(int[][] positions, long[][] squads, bool attacker, bool[] react)
+            public BattlePlan(int[][] positions, long[][] squads, bool attacker)
             {
                 squadPositions = positions;
                 squadCounts = squads;
                 isAttacker = attacker;
-                reactToNewlyAdjacent = react;
 
             }
         }
@@ -163,7 +161,7 @@ namespace IslesOfWar
             {
                 get
                 {
-                    return new BattlePlan(squadMoves, squadCounts, true, null);
+                    return new BattlePlan(squadMoves, squadCounts, true);
                 }
             }
         }
@@ -230,7 +228,7 @@ namespace IslesOfWar
                         tempDefenses.Add(defensePositions[t].ToArray());
                     }
 
-                    return new BattlePlan(tempDefenses.ToArray(), squadCounts, false, reactToNewlyAdjacents);
+                    return new BattlePlan(tempDefenses.ToArray(), squadCounts, false);
                 }
             }
         }
