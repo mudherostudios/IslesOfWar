@@ -226,6 +226,7 @@ namespace IslesOfWar
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
                     && defensePlan.sqd.Count <= 4;
+                    
 
                     if (canUpdate)
                     {
@@ -248,7 +249,7 @@ namespace IslesOfWar
                         if (canUpdate)
                         {
                             long[] totalUnitsToRemove = AddRange(defensePlan.sqd);
-                            long[] finalUnitCount = Subtract(state.players[player].allUnits, totalUnitsToRemove);
+                            long[] finalUnitCount = Subtract(totalUnits, totalUnitsToRemove);
                             state.players[player].units.Clear();
                             state.players[player].units.AddRange(finalUnitCount);
                             state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
@@ -642,6 +643,8 @@ namespace IslesOfWar
             bool HasEnoughUnits(long[] units, List<List<int>> squadCounts)
             {
                 bool hasEnough = units.Length == 9;
+                long[] copiedUnits = new long[units.Length];
+                Array.Copy(units, copiedUnits, units.Length);
 
                 for (int s = 0; s < squadCounts.Count && hasEnough; s++)
                 {
@@ -651,17 +654,18 @@ namespace IslesOfWar
                         continue;
                     }
 
-                    units[0] -= squadCounts[s][0];
-                    units[1] -= squadCounts[s][1];
-                    units[2] -= squadCounts[s][2];
-                    units[3] -= squadCounts[s][3];
-                    units[4] -= squadCounts[s][4];
-                    units[5] -= squadCounts[s][5];
-                    units[6] -= squadCounts[s][6];
-                    units[7] -= squadCounts[s][7];
-                    units[8] -= squadCounts[s][8];
+                    copiedUnits[0] -= squadCounts[s][0];
+                    copiedUnits[1] -= squadCounts[s][1];
+                    copiedUnits[2] -= squadCounts[s][2];
+                    copiedUnits[3] -= squadCounts[s][3];
+                    copiedUnits[4] -= squadCounts[s][4];
+                    copiedUnits[5] -= squadCounts[s][5];
+                    copiedUnits[6] -= squadCounts[s][6];
+                    copiedUnits[7] -= squadCounts[s][7];
+                    copiedUnits[8] -= squadCounts[s][8];
 
-                    hasEnough = units[0] >= 0 && units[1] >= 0 && units[2] >= 0 && units[3] >= 0 && units[4] >= 0 && units[5] >= 0 && units[6] >= 0 && units[7] >= 0 && units[8] >= 0;
+                    hasEnough = copiedUnits[0] >= 0 && copiedUnits[1] >= 0 && copiedUnits[2] >= 0 && copiedUnits[3] >= 0 
+                    && copiedUnits[4] >= 0 && copiedUnits[5] >= 0 && copiedUnits[6] >= 0 && copiedUnits[7] >= 0 && copiedUnits[8] >= 0;
                 }
 
                 return hasEnough;
