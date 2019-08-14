@@ -25,7 +25,7 @@ namespace IslesOfWar
             }
         }
 
-        public class ResourceOrder //Deserialize needs Lists
+        public class ResourceOrder 
         {
             public int rsrc;
             public List<uint> amnt;

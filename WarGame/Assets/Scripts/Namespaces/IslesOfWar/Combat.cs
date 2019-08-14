@@ -20,13 +20,13 @@ namespace IslesOfWar
 
         public struct EngagementHistory
         {
-            public long[,] bluforHistory;
-            public long[,] opforHistory;
+            public double[,] bluforHistory;
+            public double[,] opforHistory;
 
             public string winner;
             public Squad remainingSquad;
 
-            public EngagementHistory(long[,] _bluforHistory, long[,] _opforHistory, string _winner, Squad winningSquad)
+            public EngagementHistory(double[,] _bluforHistory, double[,] _opforHistory, string _winner, Squad winningSquad)
             {
                 bluforHistory = _bluforHistory;
                 opforHistory = _opforHistory;
@@ -38,11 +38,11 @@ namespace IslesOfWar
         public struct BattlePlan
         {
             public int[][] squadPositions;
-            public long[][] squadCounts;
+            public double[][] squadCounts;
 
             public bool isAttacker;
 
-            public BattlePlan(int[][] positions, long[][] squads, bool attacker)
+            public BattlePlan(int[][] positions, double[][] squads, bool attacker)
             {
                 squadPositions = positions;
                 squadCounts = squads;
@@ -109,7 +109,7 @@ namespace IslesOfWar
 
         public class AttackPlanner
         {
-            private long[][] squadCounts = new long[3][];
+            private double[][] squadCounts = new double[3][];
             int[][] squadMoves = new int[3][];
             private int[] lastMoveIndex;
 
@@ -123,7 +123,7 @@ namespace IslesOfWar
                 }
             }
 
-            public void AddSquad(int squad, long[] squadCount)
+            public void AddSquad(int squad, double[] squadCount)
             {
                 squadCounts[squad] = squadCount;
                 squadMoves[squad] = new int[6] { -1, -1, -1, -1, -1, -1 };
@@ -168,7 +168,7 @@ namespace IslesOfWar
 
         public class DefensePlanner
         {
-            private long[][] squadCounts = new long[4][];
+            private double[][] squadCounts = new double[4][];
             private List<List<int>> defensePositions = new List<List<int>>();
             private bool[] reactToNewlyAdjacents = new bool[4];
 
@@ -180,7 +180,7 @@ namespace IslesOfWar
                 }
             }
 
-            public void AddSquad(int squad, long[] squadCount)
+            public void AddSquad(int squad, double[] squadCount)
             {
                 squadCounts[squad] = squadCount;
                 defensePositions.Add(new List<int>());
@@ -235,12 +235,12 @@ namespace IslesOfWar
 
         public class Squad
         {
-            public long riflemen, machineGunners, bazookamen;
-            public long lightTanks, mediumTanks, heavyTanks;
-            public long lightFighters, mediumFighters, bombers;
-            public long troopBunkers, tankBunkers, antiAircrafts;
+            public double riflemen, machineGunners, bazookamen;
+            public double lightTanks, mediumTanks, heavyTanks;
+            public double lightFighters, mediumFighters, bombers;
+            public double troopBunkers, tankBunkers, antiAircrafts;
             public double totalHealth, totalDamage;
-            public float[] unitProbabilities;
+            public double[] unitProbabilities;
             public int damagedUnit;
             public double remainingHealth;
 
@@ -279,7 +279,7 @@ namespace IslesOfWar
                 totalHealth = 0;
                 totalDamage = 0;
 
-                unitProbabilities = new float[12];
+                unitProbabilities = new double[12];
 
                 damagedUnit = -1;
                 remainingHealth = 0.0;
@@ -315,17 +315,53 @@ namespace IslesOfWar
                 totalHealth = 0;
                 totalDamage = 0;
 
-                unitProbabilities = new float[12];
+                unitProbabilities = new double[12];
 
                 damagedUnit = -1;
                 remainingHealth = 0.0;
             }
 
-            public long[] fullSquad
+            public Squad(double[] squadCounts)
+            {
+                riflemen = squadCounts[0];
+                machineGunners = squadCounts[1];
+                bazookamen = squadCounts[2];
+
+                lightTanks = squadCounts[3];
+                mediumTanks = squadCounts[4];
+                heavyTanks = squadCounts[5];
+
+                lightFighters = squadCounts[6];
+                mediumFighters = squadCounts[7];
+                bombers = squadCounts[8];
+
+                if (squadCounts.Length > 9)
+                {
+                    troopBunkers = squadCounts[9];
+                    tankBunkers = squadCounts[10];
+                    antiAircrafts = squadCounts[11];
+                }
+                else
+                {
+                    troopBunkers = 0;
+                    tankBunkers = 0;
+                    antiAircrafts = 0;
+                }
+
+                totalHealth = 0;
+                totalDamage = 0;
+
+                unitProbabilities = new double[12];
+
+                damagedUnit = -1;
+                remainingHealth = 0.0;
+            }
+
+            public double[] fullSquad
             {
                 get
                 {
-                    long[] squad = new long[]
+                    double[] squad = new double[]
                     {
                     riflemen, machineGunners, bazookamen,
                     lightTanks, mediumTanks, heavyTanks,
@@ -337,11 +373,11 @@ namespace IslesOfWar
                 }
             }
 
-            public long[] onlyUnits
+            public double[] onlyUnits
             {
                 get
                 {
-                    long[] squad = new long[]
+                    double[] squad = new double[]
                     {
                     riflemen, machineGunners, bazookamen,
                     lightTanks, mediumTanks, heavyTanks,
@@ -369,9 +405,9 @@ namespace IslesOfWar
 
             public void CalculateCasualties(Squad attacker)
             {
-                long[] units = fullSquad;
+                double[] units = fullSquad;
                 double cumulativeDamage = 0;
-                long unitCount = GetTotalUnitCount();
+                double unitCount = GetTotalUnitCount();
 
                 if (totalHealth > attacker.totalDamage)
                 {
@@ -420,7 +456,7 @@ namespace IslesOfWar
                 {
                     remainingHealth = 0;
                     damagedUnit = -1;
-                    units = new long[12];
+                    units = new double[12];
                 }
 
                 SetUnits(units);
@@ -449,11 +485,11 @@ namespace IslesOfWar
                 CalculateUnitProbabilities(fullSquad);
             }
 
-            public void CalculateUnitProbabilities(long[] units)
+            public void CalculateUnitProbabilities(double[] units)
             {
-                float[] relativeProbabilities = new float[units.Length];
-                float[] trueProbabilities = new float[units.Length];
-                float totalRelatives = 0;
+                double[] relativeProbabilities = new double[units.Length];
+                double[] trueProbabilities = new double[units.Length];
+                double totalRelatives = 0;
 
                 for (int r = 0; r < relativeProbabilities.Length; r++)
                 {
@@ -469,10 +505,10 @@ namespace IslesOfWar
                 unitProbabilities = trueProbabilities;
             }
 
-            long GetTotalUnitCount()
+            double GetTotalUnitCount()
             {
-                long total = 0;
-                long[] units = fullSquad;
+                double total = 0;
+                double[] units = fullSquad;
 
                 for (int u = 0; u < units.Length; u++)
                 {
@@ -482,7 +518,7 @@ namespace IslesOfWar
                 return total;
             }
 
-            public void SetUnits(long[] squad)
+            public void SetUnits(double[] squad)
             {
                 riflemen = squad[0];
                 machineGunners = squad[1];
@@ -525,8 +561,8 @@ namespace IslesOfWar
 
             public EngagementHistory ResolveEngagement()
             {
-                List<long[]> bluforHistory = new List<long[]>();
-                List<long[]> opforHistory = new List<long[]>();
+                List<double[]> bluforHistory = new List<double[]>();
+                List<double[]> opforHistory = new List<double[]>();
                 bool engagementIsOver = false;
                 string winner = "";
                 Squad winningSquad = new Squad();
@@ -571,8 +607,8 @@ namespace IslesOfWar
 
             double[] CalculateTotalHealth(Squad squadA, Squad squadB)
             {
-                long[] unitsA = squadA.fullSquad;
-                long[] unitsB = squadB.fullSquad;
+                double[] unitsA = squadA.fullSquad;
+                double[] unitsB = squadB.fullSquad;
                 double totalHealthA = 0;
                 double totalHealthB = 0;
 
@@ -587,12 +623,12 @@ namespace IslesOfWar
 
             double[] CalculateTotalDamage(Squad squadA, Squad squadB)
             {
-                long[] unitsA = squadA.fullSquad;
-                long[] unitsB = squadB.fullSquad;
+                double[] unitsA = squadA.fullSquad;
+                double[] unitsB = squadB.fullSquad;
                 double totalAttackA = 0;
                 double totalAttackB = 0;
-                long unitCountA = 0;
-                long unitCountB = 0;
+                double unitCountA = 0;
+                double unitCountB = 0;
 
                 for (int u = 0; u < unitsA.Length; u++)
                 {
@@ -628,9 +664,9 @@ namespace IslesOfWar
                 return -1;
             }
 
-            long[,] Get2DHistory(List<long[]> listHistory)
+            double[,] Get2DHistory(List<double[]> listHistory)
             {
-                long[,] history = new long[listHistory.Count, listHistory[0].Length];
+                double[,] history = new double[listHistory.Count, listHistory[0].Length];
 
                 for (int h = 0; h < history.GetLength(0); h++)
                 {

@@ -12,7 +12,7 @@ public class SquadGUI : WorldGUI
     public TextMeshPro[] unitInputs;
 
     public int[][] squads;
-    public long[] allUnits;
+    public double[] allUnits;
 
     private int selectedSquad = 0;
     private PlayerState playerState;

@@ -13,7 +13,6 @@ namespace IslesOfWar
         public class StateProcessor
         {
             public State state;
-            public int rate;
 
             public StateProcessor()
             {
@@ -43,26 +42,36 @@ namespace IslesOfWar
                         }
                     }
                 }
+
+                //Players get default resources.
+                foreach (KeyValuePair<string, PlayerState> pair in state.players)
+                {
+                    pair.Value.resources[0] += Constants.freeResourceRates[0];
+                    pair.Value.resources[1] += Constants.freeResourceRates[1];
+                    pair.Value.resources[2] += Constants.freeResourceRates[2];
+                    pair.Value.resources[3] += Constants.freeResourceRates[3];
+                }
             }
+
 
             void UpdatePlayerResources(string island, string player, int tile, int[] types)
             {
                 if (types[0] > 0 && state.islands[island].resources[tile][0] > 0)
                 {
-                    state.islands[island].resources[tile][0] -= rate;
-                    state.players[player].resources[0] += rate;
+                    state.islands[island].resources[tile][0]--;
+                    state.players[player].resources[1] += Constants.extractRates[0];
                 }
 
                 if (types[1] > 0 && state.islands[island].resources[tile][1] > 0)
                 {
-                    state.islands[island].resources[tile][1] -= rate;
-                    state.players[player].resources[1] += rate;
+                    state.islands[island].resources[tile][1]--;
+                    state.players[player].resources[2] += Constants.extractRates[1];
                 }
 
                 if (types[2] > 0 && state.islands[island].resources[tile][2] > 0)
                 {
-                    state.islands[island].resources[tile][2] -= rate;
-                    state.players[player].resources[2] += rate;
+                    state.islands[island].resources[tile][2]--;
+                    state.players[player].resources[3] += Constants.extractRates[2];
                 }
             }
 
@@ -86,7 +95,7 @@ namespace IslesOfWar
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
                     string discovered = IslandDiscovery.GetIsland(state.players, state.allIslandIDs, txid);
-                    long[] resources = Subtract(state.players[player].resources.ToArray(), Constants.islandSearchCost);
+                    double[] resources = Subtract(state.players[player].resources.ToArray(), Constants.islandSearchCost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
 
@@ -106,9 +115,9 @@ namespace IslesOfWar
 
             public void PurchaseUnits(string player, List<int> order)
             {
-                long[] resources = state.players[player].allResources;
-                long[] units = state.players[player].allUnits;
-                long[][] result = TryPurchaseUnits(order, resources, units);
+                double[] resources = state.players[player].allResources;
+                double[] units = state.players[player].allUnits;
+                double[][] result = TryPurchaseUnits(order, resources, units);
                 state.players[player].resources.Clear();
                 state.players[player].resources.AddRange(result[0]);
                 state.players[player].units.Clear();
@@ -131,7 +140,7 @@ namespace IslesOfWar
                         if (defensesOrdered)
                             defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
 
-                        long[] resources = new long[4];
+                        double[] resources = new double[4];
                         Array.Copy(state.players[player].allResources, resources, 4);
 
                         if(collectorsOrdered)
@@ -153,10 +162,10 @@ namespace IslesOfWar
                 }
             }
 
-            long[] DevelopCollectors(string order, Island island, long[] currentResources, out bool canDevelop)
+            double[] DevelopCollectors(string order, Island island, double[] currentResources, out bool canDevelop)
             {
                 bool develop = true;
-                long[] updated = new long[currentResources.Length];
+                double[] updated = new double[currentResources.Length];
                 Array.Copy(currentResources, updated, updated.Length);
 
                 for (int t = 0; t < island.features.Length && develop; t++)
@@ -182,10 +191,10 @@ namespace IslesOfWar
                     return currentResources;
             }
 
-            long[] DevelopDefenses(string order, Island island, long[] currentResources, out bool canDevelop)
+            double[] DevelopDefenses(string order, Island island, double[] currentResources, out bool canDevelop)
             {
                 bool develop = true;
-                long[] updated = new long[currentResources.Length];
+                double[] updated = new double[currentResources.Length];
                 Array.Copy(currentResources, updated, currentResources.Length);
 
                 for (int t = 0; t < island.features.Length && develop; t++)
@@ -230,7 +239,7 @@ namespace IslesOfWar
 
                     if (canUpdate)
                     {
-                        long[] totalUnits = state.players[player].allUnits;
+                        double[] totalUnits = state.players[player].allUnits;
                         totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
 
                         canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
@@ -248,8 +257,8 @@ namespace IslesOfWar
 
                         if (canUpdate)
                         {
-                            long[] totalUnitsToRemove = AddRange(defensePlan.sqd);
-                            long[] finalUnitCount = Subtract(totalUnits, totalUnitsToRemove);
+                            double[] totalUnitsToRemove = AddRange(defensePlan.sqd);
+                            double[] finalUnitCount = Subtract(totalUnits, totalUnitsToRemove);
                             state.players[player].units.Clear();
                             state.players[player].units.AddRange(finalUnitCount);
                             state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
@@ -325,11 +334,11 @@ namespace IslesOfWar
 
                                 if (defender > -1)
                                 {
-                                    long[] aUnits = attackerSquads[a].onlyUnits;
-                                    long[] dUnits = defenderSquads[defender].onlyUnits;
+                                    double[] aUnits = attackerSquads[a].onlyUnits;
+                                    double[] dUnits = defenderSquads[defender].onlyUnits;
 
-                                    long[] aReserve = new long[9];
-                                    long[] dReserve = new long[9];
+                                    double[] aReserve = new double[9];
+                                    double[] dReserve = new double[9];
 
                                     //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
                                     attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, out aReserve));
@@ -391,11 +400,11 @@ namespace IslesOfWar
                                     int[] bunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(defenses[reactPos]));
                                     int blockerType = EncodeUtility.GetYType(defenses[reactPos]);
 
-                                    long[] aUnits = attackerSquads[attackerIndex].onlyUnits;
-                                    long[] dUnits = defenderSquads[d].onlyUnits;
+                                    double[] aUnits = attackerSquads[attackerIndex].onlyUnits;
+                                    double[] dUnits = defenderSquads[d].onlyUnits;
 
-                                    long[] aReserve = new long[9];
-                                    long[] dReserve = new long[9];
+                                    double[] aReserve = new double[9];
+                                    double[] dReserve = new double[9];
 
                                     //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
                                     attackerSquads[attackerIndex] = new Squad(TryPlaceUnitsOnFeature(island[reactPos], defenses[reactPos], aUnits, out aReserve));
@@ -452,7 +461,7 @@ namespace IslesOfWar
                         //Update defending squads.
                         for (int d = 0; d < defenderSquads.Length; d++)
                         {
-                            long[] s = defenderSquads[d].onlyUnits;
+                            double[] s = defenderSquads[d].onlyUnits;
                             state.islands[island].squadCounts[d] = new List<int>() {
                                 (int)s[0], (int)s[1], (int)s[2],
                                 (int)s[3], (int)s[4], (int)s[5],
@@ -464,7 +473,7 @@ namespace IslesOfWar
                     //They might lose because they didn't find all squads so add them even if they lost.
                     for (int a = 0; a < attackerSquads.Length; a++)
                     {
-                        long[] units = attackerSquads[a].onlyUnits;
+                        double[] units = attackerSquads[a].onlyUnits;
 
                         for (int u = 0; u < state.players[player].units.Count; u++)
                         {
@@ -490,12 +499,12 @@ namespace IslesOfWar
                 return -1;
             }
 
-            long[] TryPlaceUnitsOnFeature(char feature, char defenses, long[] units, out long[] remainder)
+            double[] TryPlaceUnitsOnFeature(char feature, char defenses, double[] units, out double[] remainder)
             {
                 int featureType = EncodeUtility.GetYType(feature);
                 int defenseType = EncodeUtility.GetYType(defenses);
-                long[] placeable = new long[9];
-                remainder = new long[9];
+                double[] placeable = new double[9];
+                remainder = new double[9];
 
                 if (defenseType != 1)
                 {
@@ -597,7 +606,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                 {
-                    long[] units = state.players[player].allUnits;
+                    double[] units = state.players[player].allUnits;
                     canAttack = HasEnoughUnits(units, actions.attk.sqd) && AttackPlansAreAdjacent(actions.attk.pln);
                 }
 
@@ -640,10 +649,10 @@ namespace IslesOfWar
                 return adjacent;
             }
 
-            bool HasEnoughUnits(long[] units, List<List<int>> squadCounts)
+            bool HasEnoughUnits(double[] units, List<List<int>> squadCounts)
             {
                 bool hasEnough = units.Length == 9;
-                long[] copiedUnits = new long[units.Length];
+                double[] copiedUnits = new double[units.Length];
                 Array.Copy(units, copiedUnits, units.Length);
 
                 for (int s = 0; s < squadCounts.Count && hasEnough; s++)
@@ -671,12 +680,12 @@ namespace IslesOfWar
                 return hasEnough;
             }
 
-            long[][] TryPurchaseUnits(List<int> order, long[] currentResources, long[] currentUnits)
+            double[][] TryPurchaseUnits(List<int> order, double[] currentResources, double[] currentUnits)
             {
                 if (order.Count == 9)
                 {
-                    long[] updated = new long[currentResources.Length];
-                    long[] reinforced = new long[currentUnits.Length];
+                    double[] updated = new double[currentResources.Length];
+                    double[] reinforced = new double[currentUnits.Length];
                     Array.Copy(currentResources, updated, currentResources.Length);
                     Array.Copy(currentUnits, reinforced, currentUnits.Length);
                     bool canPurchase = true;
@@ -697,21 +706,21 @@ namespace IslesOfWar
                     }
 
                     if (!canPurchase)
-                        return new long[][] { currentResources, currentUnits };
+                        return new double[][] { currentResources, currentUnits };
 
-                    return new long[][] { updated, reinforced};
+                    return new double[][] { updated, reinforced};
                 }
                 else
                 {
-                    return new long[][] { currentResources, currentUnits };
+                    return new double[][] { currentResources, currentUnits };
                 }
 
             }
 
-            long[] TryPurchaseBuildings(int[] order, long[] currentResources, int[,] costs, out bool purchaseable)
+            double[] TryPurchaseBuildings(int[] order, double[] currentResources, int[,] costs, out bool purchaseable)
             {
                 bool canPurchase = true;
-                long[] updated = new long[currentResources.Length];
+                double[] updated = new double[currentResources.Length];
                 Array.Copy(currentResources,updated, currentResources.Length);
 
                 for (int o = 0; o < order.Length && canPurchase; o++)
@@ -736,7 +745,7 @@ namespace IslesOfWar
             }
 
             //Add b to a
-            long[] Add(long[] a, long[] b)
+            double[] Add(double[] a, double[] b)
             {
                 for (int u = 0; u < a.Length && u < b.Length; u++)
                 {
@@ -746,9 +755,9 @@ namespace IslesOfWar
                 return a;
             }
 
-            long[] AddRange(List<List<int>> a)
+            double[] AddRange(List<List<int>> a)
             {
-                long[] total = new long[a[0].Count];
+                double[] total = new double[a[0].Count];
 
                 for (int i = 0; i < a.Count; i++)
                 {
@@ -762,7 +771,17 @@ namespace IslesOfWar
             }
 
             //Subtract b from a
-            long[] Subtract(long[] a, int[] b)
+            double[] Subtract(double[] a, double[] b)
+            {
+                for (int u = 0; u < a.Length && u < b.Length; u++)
+                {
+                    a[u] -= b[u];
+                }
+
+                return a;
+            }
+
+            double[] Subtract(double[] a, int[] b)
             {
                 for (int u = 0; u < a.Length && u < b.Length; u++)
                 {

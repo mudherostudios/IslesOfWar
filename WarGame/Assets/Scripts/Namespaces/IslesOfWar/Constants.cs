@@ -136,5 +136,15 @@ namespace IslesOfWar
             {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
             {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
         };
+
+        public static float[,] minMaxResources = new float[,]
+        {
+            {1000, 100000},
+            {1000, 100000},
+            {1000, 100000}
+        };
+
+        public static float[] extractRates = new float[] { 10, 20, 30 };
+        public static float[] freeResourceRates = new float[] {1, 2, 3, 4 };
     }
 }

@@ -174,8 +174,36 @@ namespace IslesOfWar
                 collectors = _collectors;
                 defenses = _defenses;
             }
+            
+            //Think of resources as how many times extraction can be made rather than an actual amount.
+            public void SetResources()
+            {
+                if (resources == null && features != null)
+                {
+                    resources = new List<List<double>>();
 
-            //Does not check to see if it a legitimate build. Should be checked before it gets here.
+                    for (int t = 0; t < 12; t++)
+                    {
+                        resources.Add(new List<double>());
+                        int[] tileTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(features[t]));
+
+                        for (int r = 0; r < 3; r++)
+                        {
+                            if (tileTypes[r] > 0)
+                            {
+                                float rand = Random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]);
+                                rand = Mathf.Round(rand);
+                                resources[t].Add(rand);
+                            }
+                            else
+                            {
+                                resources[t].Add(0);
+                            }
+                        }
+                    }
+                }
+            }
+
             public void SetCollectors(string collectorOrder)
             {
                 char[] expandedExisting = collectors.ToCharArray();
@@ -251,9 +279,9 @@ namespace IslesOfWar
                 return true;
             }
 
-            public long[] GetTotalSquadMembers()
+            public double[] GetTotalSquadMembers()
             {
-                long[] total = new long[9];
+                double[] total = new double[9];
 
                 if (squadCounts != null)
                 {
@@ -629,30 +657,30 @@ namespace IslesOfWar
         public class PlayerState
         {
             public string nationCode;
-            public List<long> units;
-            public List<long> resources;
+            public List<double> units;
+            public List<double> resources;
             public List<string> islands;
             public string attackableIsland;
 
-            public long[] allUnits { get { return units.ToArray(); } }
-            public long[] allResources { get { return resources.ToArray(); } }
+            public double[] allUnits { get { return units.ToArray(); } }
+            public double[] allResources { get { return resources.ToArray(); } }
             public string[] allIslands { get { return islands.ToArray(); } }
 
             public PlayerState(string nation)
             {
                 nationCode = nation;
-                units = new List<long>();
-                resources = new List<long>();
+                units = new List<double>();
+                resources = new List<double>();
                 islands = new List<string>();
                 attackableIsland = "";
             }
 
-            public PlayerState(string nation, long[] unitCounts, long[] resourceCounts, string[] islandIDs, string _attackableIsland)
+            public PlayerState(string nation, double[] unitCounts, double[] resourceCounts, string[] islandIDs, string _attackableIsland)
             {
                 nationCode = nation;
 
-                units = new List<long>();
-                resources = new List<long>();
+                units = new List<double>();
+                resources = new List<double>();
                 islands = new List<string>();
                 
                 units.AddRange(unitCounts);

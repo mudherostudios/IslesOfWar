@@ -65,7 +65,7 @@ public class ScreenGUI : MonoBehaviour
         resourceContent[3].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[3]);
     }
 
-    string GetOrderOfMagnitudeString(long amount)
+    string GetOrderOfMagnitudeString(double amount)
     {
         string orderOfMag = "";
 
