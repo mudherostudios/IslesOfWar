@@ -97,22 +97,22 @@ namespace IslesOfWar
             public Dictionary<string, PlayerState> players;
             public Dictionary<string, Island> islands;
             public Dictionary<string, ResourceContribution> resourceContributions;
-            public Dictionary<string, string> depletedContributions;
+            public Dictionary<string, List<string>> depletedContributions;
 
             public State()
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
                 resourceContributions = new Dictionary<string, ResourceContribution>();
-                depletedContributions = new Dictionary<string, string>();
+                depletedContributions = new Dictionary<string, List<string>>();
             }
 
-            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, string> depContributions)
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, List<string>> depContributions)
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
                 resourceContributions = new Dictionary<string, ResourceContribution>();
-                depletedContributions = new Dictionary<string, string>();
+                depletedContributions = new Dictionary<string, List<string>>();
 
                 players = GetDeepCopy(allPlayers);
                 islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
@@ -126,7 +126,7 @@ namespace IslesOfWar
 
                 foreach (KeyValuePair<string, PlayerState> pair in original)
                 {
-                    PlayerState state = new PlayerState(pair.Value.nationCode, pair.Value.allUnits, pair.Value.allResources, pair.Value.allIslands, pair.Value.attackableIsland);
+                    PlayerState state = new PlayerState(pair.Value.nationCode, pair.Value.GetUnitArray(), pair.Value.GetResourceArray(), pair.Value.GetIslandArray(), pair.Value.attackableIsland);
                     deepCopy.Add(pair.Key, state);
                 }
 
@@ -662,9 +662,9 @@ namespace IslesOfWar
             public List<string> islands;
             public string attackableIsland;
 
-            public double[] allUnits { get { return units.ToArray(); } }
-            public double[] allResources { get { return resources.ToArray(); } }
-            public string[] allIslands { get { return islands.ToArray(); } }
+            public double[] GetUnitArray() {  return units.ToArray(); }
+            public double[] GetResourceArray() {  return resources.ToArray();  }
+            public string[] GetIslandArray() { return islands.ToArray();  }
 
             public PlayerState(string nation)
             {

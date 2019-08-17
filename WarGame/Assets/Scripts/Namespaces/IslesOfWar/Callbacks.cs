@@ -102,6 +102,9 @@ namespace IslesOfWar
 
                             if (actions.dfnd != null)
                                 processor.UpdateDefensePlan(player, actions.dfnd);
+
+                            if (actions.dep != null)
+                                processor.SubmitDepletedIslands(player, actions.dep);
                         }
                     }
 

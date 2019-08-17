@@ -115,8 +115,8 @@ namespace IslesOfWar
 
             public void PurchaseUnits(string player, List<int> order)
             {
-                double[] resources = state.players[player].allResources;
-                double[] units = state.players[player].allUnits;
+                double[] resources = state.players[player].GetResourceArray();
+                double[] units = state.players[player].GetUnitArray();
                 double[][] result = TryPurchaseUnits(order, resources, units);
                 state.players[player].resources.Clear();
                 state.players[player].resources.AddRange(result[0]);
@@ -141,7 +141,7 @@ namespace IslesOfWar
                             defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
 
                         double[] resources = new double[4];
-                        Array.Copy(state.players[player].allResources, resources, 4);
+                        Array.Copy(state.players[player].GetResourceArray(), resources, 4);
 
                         if(collectorsOrdered)
                             resources = DevelopCollectors(order.col, island, resources, out collectorsOrdered);
@@ -239,7 +239,7 @@ namespace IslesOfWar
 
                     if (canUpdate)
                     {
-                        double[] totalUnits = state.players[player].allUnits;
+                        double[] totalUnits = state.players[player].GetUnitArray();
                         totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
 
                         canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
@@ -265,6 +265,52 @@ namespace IslesOfWar
                             state.islands[defensePlan.id].squadPlans = defensePlan.pln;
                         }
                     }
+                }
+            }
+
+            public void SubmitDepletedIslands(string player, List<string> islands)
+            {
+                bool canSubmit = islands.Count <= state.players[player].islands.Count;
+
+                for (int i = 0; i < islands.Count && canSubmit; i++)
+                {
+                    canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]);
+
+                    for (int t = 0; t < state.islands[islands[i]].resources.Count && canSubmit; t++)
+                    {
+                        canSubmit = state.islands[islands[i]].resources[t][0] <= 0 && state.islands[islands[i]].resources[t][1] <= 0
+                        && state.islands[islands[i]].resources[t][1] <= 0;
+                    }
+                }
+
+                if (canSubmit)
+                {
+                    if(!state.depletedContributions.ContainsKey(player))
+                        state.depletedContributions.Add(player, new List<string>());
+
+                    for (int i = 0; i < islands.Count; i++)
+                    {
+                        RemoveSquadsFromIsland(player, islands[i]);
+                        state.islands.Remove(islands[i]);
+                        state.depletedContributions[player].Add(islands[i]);
+                        state.players[player].islands.Remove(islands[i]);
+                    }
+                }
+            }
+
+            void RemoveSquadsFromIsland(string player, string islandID)
+            {
+                if (state.islands[islandID].squadCounts != null)
+                {
+                    for (int s = 0; s < state.islands[islandID].squadCounts.Count; s++)
+                    {
+                        for (int u = 0; u < 9; u++)
+                        {
+                            state.players[player].units[u] += state.islands[islandID].squadCounts[s][u];
+                        }
+                    }
+
+                    state.islands[islandID].squadCounts.Clear();
                 }
             }
 
@@ -606,7 +652,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                 {
-                    double[] units = state.players[player].allUnits;
+                    double[] units = state.players[player].GetUnitArray();
                     canAttack = HasEnoughUnits(units, actions.attk.sqd) && AttackPlansAreAdjacent(actions.attk.pln);
                 }
 

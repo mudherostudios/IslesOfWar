@@ -144,7 +144,7 @@ namespace IslesOfWar
                 state = _state;
             }
 
-            public StateTracker(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> islands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, string> depContributions)
+            public StateTracker(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> islands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, List<string>> depContributions)
             {
                 state = new State(allPlayers, islands, resContributions, depContributions);
             }
