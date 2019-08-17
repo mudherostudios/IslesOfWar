@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -28,7 +29,15 @@ namespace IslesOfWar
         public class ResourceOrder 
         {
             public int rsrc;
-            public List<uint> amnt;
+            public List<double> amnt;
+
+            public ResourceOrder() { }
+
+            public ResourceOrder(int resourceType, List<double> amounts)
+            {
+                rsrc = resourceType;
+                amnt = amounts;
+            }
         }
 
         public class BattleCommand

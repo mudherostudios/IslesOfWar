@@ -27,7 +27,7 @@ public class SquadGUI : WorldGUI
             squads[s] = _squads[s];
         }
 
-        allUnits = playerState.GetUnitArray();
+        allUnits = playerState.allUnits;
     }
 
     public void AddUnitsToSquad(int type)

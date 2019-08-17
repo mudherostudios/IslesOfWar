@@ -15,63 +15,63 @@ namespace IslesOfWar
                 return unchecked((ulong)(longValue - long.MinValue));
             }
             
-            public static double GetPoolSize(Dictionary<string, ResourceContribution> contributions, string type)
+            public static double GetPoolSize(Dictionary<string, List<List<double>>> contributions, string type)
             {
                 double poolSize = 0;
 
                 if (type == "oil")
                 {
-                    foreach (KeyValuePair<string, ResourceContribution> pair in contributions)
+                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value.warbucks[0];
-                        poolSize += pair.Value.metal[0];
-                        poolSize += pair.Value.concrete[0];
+                        poolSize += pair.Value[0][0];
+                        poolSize += pair.Value[2][0];
+                        poolSize += pair.Value[3][0];
                     }
                 }
                 else if (type == "metal")
                 {
-                    foreach (KeyValuePair<string, ResourceContribution> pair in contributions)
+                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value.warbucks[1];
-                        poolSize += pair.Value.oil[0];
-                        poolSize += pair.Value.concrete[1];
+                        poolSize += pair.Value[0][1];
+                        poolSize += pair.Value[1][0];
+                        poolSize += pair.Value[1][1];
                     }
                 }
                 else if (type == "concrete")
                 {
-                    foreach (KeyValuePair<string, ResourceContribution> pair in contributions)
+                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value.warbucks[2];
-                        poolSize += pair.Value.oil[1];
-                        poolSize += pair.Value.metal[1];
+                        poolSize += pair.Value[0][2];
+                        poolSize += pair.Value[1][1];
+                        poolSize += pair.Value[1][1];
                     }
                 }
 
                 return poolSize;
             }
 
-            public static double GetPlayerContributedResources(ResourceContribution contribution, double[]modifiers, string type)
+            public static double GetPlayerContributedResources(List<List<double>> contribution, double[]modifiers, string type)
             { 
                 double playersContribution = 0;
 
-                playersContribution += contribution.warbucks[0] * modifiers[0]; //Oil
-                playersContribution += contribution.warbucks[1] * modifiers[1]; //Metal
-                playersContribution += contribution.warbucks[2] * modifiers[2]; //Concrete
-                playersContribution += contribution.oil[0] * modifiers[1];      //Metal
-                playersContribution += contribution.oil[1] * modifiers[2];      //Concrete
-                playersContribution += contribution.metal[0] * modifiers[0];    //Oil
-                playersContribution += contribution.metal[1] * modifiers[2];    //Concrete
-                playersContribution += contribution.concrete[0] * modifiers[0]; //Oil
-                playersContribution += contribution.concrete[1] * modifiers[1]; //Metal
+                playersContribution += contribution[0][0] * modifiers[0]; //Oil
+                playersContribution += contribution[0][1] * modifiers[1]; //Metal
+                playersContribution += contribution[0][2] * modifiers[2]; //Concrete
+                playersContribution += contribution[1][0] * modifiers[1]; //Metal
+                playersContribution += contribution[1][1] * modifiers[2]; //Concrete
+                playersContribution += contribution[2][0] * modifiers[0]; //Oil
+                playersContribution += contribution[2][1] * modifiers[2]; //Concrete
+                playersContribution += contribution[3][0] * modifiers[0]; //Oil
+                playersContribution += contribution[3][1] * modifiers[1]; //Metal
 
                 return playersContribution;
             }
 
-            public static double GetTotalContributedResources(Dictionary<string, ResourceContribution> contributions, double[] modifiers, string type)
+            public static double GetTotalContributedResources(Dictionary<string, List<List<double>>> contributions, double[] modifiers, string type)
             {
                 double playerContributions = 0;
 
-                foreach (KeyValuePair<string, ResourceContribution> pair in contributions)
+                foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                 {
                     playerContributions += GetPlayerContributedResources(pair.Value, modifiers, type);
                 }
@@ -96,41 +96,28 @@ namespace IslesOfWar
         {
             public Dictionary<string, PlayerState> players;
             public Dictionary<string, Island> islands;
-            public Dictionary<string, ResourceContribution> resourceContributions;
+            public Dictionary<string, List<List<double>>> resourceContributions;
             public Dictionary<string, List<string>> depletedContributions;
 
             public State()
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
-                resourceContributions = new Dictionary<string, ResourceContribution>();
+                resourceContributions = new Dictionary<string, List<List<double>>>();
                 depletedContributions = new Dictionary<string, List<string>>();
             }
 
-            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, List<string>> depContributions)
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions)
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
-                resourceContributions = new Dictionary<string, ResourceContribution>();
+                resourceContributions = new Dictionary<string, List<List<double>>>();
                 depletedContributions = new Dictionary<string, List<string>>();
 
-                players = GetDeepCopy(allPlayers);
+                players = JsonConvert.DeserializeObject<Dictionary<string, PlayerState>>(JsonConvert.SerializeObject(allPlayers));
                 islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
-            }
-
-            Dictionary<string, PlayerState> GetDeepCopy(Dictionary<string, PlayerState> original)
-            {
-                Dictionary<string, PlayerState> deepCopy = new Dictionary<string, PlayerState>();
-
-                foreach (KeyValuePair<string, PlayerState> pair in original)
-                {
-                    PlayerState state = new PlayerState(pair.Value.nationCode, pair.Value.GetUnitArray(), pair.Value.GetResourceArray(), pair.Value.GetIslandArray(), pair.Value.attackableIsland);
-                    deepCopy.Add(pair.Key, state);
-                }
-
-                return deepCopy;
             }
 
             public Island[] allIslands
@@ -662,9 +649,11 @@ namespace IslesOfWar
             public List<string> islands;
             public string attackableIsland;
 
-            public double[] GetUnitArray() {  return units.ToArray(); }
-            public double[] GetResourceArray() {  return resources.ToArray();  }
-            public string[] GetIslandArray() { return islands.ToArray();  }
+            public double[] allUnits { get { return units.ToArray(); } }
+            public double[] allResources { get { return resources.ToArray(); } }
+            public string[] allIslands { get { return islands.ToArray(); }  }
+
+            public PlayerState() { }
 
             public PlayerState(string nation)
             {

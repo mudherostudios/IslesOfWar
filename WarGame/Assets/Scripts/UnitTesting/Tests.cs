@@ -47,7 +47,7 @@ public class Tests : MonoBehaviour
 
         ResourceOrder order = new ResourceOrder();
         order.rsrc = 0;
-        order.amnt = new List<uint> { 0, 1000, 1000 };
+        order.amnt = new List<double> { 0, 1000, 1000 };
 
         List<string> depletedIslands = new List<string> { "0", "A3", "BB", "1" };
 

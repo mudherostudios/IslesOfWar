@@ -144,7 +144,7 @@ namespace IslesOfWar
                 state = _state;
             }
 
-            public StateTracker(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> islands, Dictionary<string, ResourceContribution> resContributions, Dictionary<string, List<string>> depContributions)
+            public StateTracker(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> islands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions)
             {
                 state = new State(allPlayers, islands, resContributions, depContributions);
             }
@@ -153,20 +153,20 @@ namespace IslesOfWar
             public State ContributeToPool(string playerName, Cost resources)
             {
                 if (!state.resourceContributions.ContainsKey(playerName))
-                    state.resourceContributions.Add(playerName, new ResourceContribution());
+                    state.resourceContributions.Add(playerName, new List<List<double>> { new List<double>(), new List<double>(), new List<double>(), new List<double>() } );
 
                 if (CanSpendResources(playerName, resources, true))
                 {
                     SpendResources(playerName, resources, true);
 
                     if (resources.type == "warbucksPool")
-                        state.resourceContributions[playerName].warbucks = new List<double>() { resources.oil, resources.metal, resources.concrete };
+                        state.resourceContributions[playerName][0] = new List<double>() { resources.oil, resources.metal, resources.concrete };
                     else if (resources.type == "oilPool")
-                        state.resourceContributions[playerName].oil = new List<double> { resources.metal, resources.concrete };
+                        state.resourceContributions[playerName][1] = new List<double> { resources.metal, resources.concrete };
                     else if (resources.type == "metalPool")
-                        state.resourceContributions[playerName].metal = new List<double> { resources.oil, resources.concrete };
+                        state.resourceContributions[playerName][2] = new List<double> { resources.oil, resources.concrete };
                     else if (resources.type == "concretePool")
-                        state.resourceContributions[playerName].concrete = new List<double> { resources.oil, resources.metal };
+                        state.resourceContributions[playerName][3] = new List<double> { resources.oil, resources.metal };
 
                     return state;
                 }

@@ -115,8 +115,8 @@ namespace IslesOfWar
 
             public void PurchaseUnits(string player, List<int> order)
             {
-                double[] resources = state.players[player].GetResourceArray();
-                double[] units = state.players[player].GetUnitArray();
+                double[] resources = state.players[player].allResources;
+                double[] units = state.players[player].allUnits;
                 double[][] result = TryPurchaseUnits(order, resources, units);
                 state.players[player].resources.Clear();
                 state.players[player].resources.AddRange(result[0]);
@@ -141,7 +141,7 @@ namespace IslesOfWar
                             defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
 
                         double[] resources = new double[4];
-                        Array.Copy(state.players[player].GetResourceArray(), resources, 4);
+                        Array.Copy(state.players[player].allResources, resources, 4);
 
                         if(collectorsOrdered)
                             resources = DevelopCollectors(order.col, island, resources, out collectorsOrdered);
@@ -239,7 +239,7 @@ namespace IslesOfWar
 
                     if (canUpdate)
                     {
-                        double[] totalUnits = state.players[player].GetUnitArray();
+                        double[] totalUnits = state.players[player].allUnits;
                         totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
 
                         canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
@@ -311,6 +311,46 @@ namespace IslesOfWar
                     }
 
                     state.islands[islandID].squadCounts.Clear();
+                }
+            }
+
+            public void SubmitResourcesToPool(string player, ResourceOrder order)
+            {
+                bool canSubmit = order.rsrc >= 0 && order.rsrc <= 3 && order.amnt != null;
+
+                if (canSubmit)
+                    canSubmit = order.amnt.Count == 3;
+
+                if (order.rsrc > 0 && canSubmit)
+                    canSubmit = order.amnt[order.rsrc - 1] == 0;
+
+                List<double> updatedResources = new List<double>();
+                updatedResources.Add(state.players[player].resources[0]);
+
+                if (canSubmit)
+                {
+                    for (int r = 0; r < order.amnt.Count && canSubmit; r++)
+                    {
+                        updatedResources.Add(state.players[player].resources[r + 1] - order.amnt[r]);
+                        canSubmit = updatedResources[r + 1] >= 0 && order.amnt[r] >= 0;
+                    }
+                }
+
+                if (canSubmit)
+                {
+                    state.players[player].resources.Clear();
+                    state.players[player].resources.AddRange(updatedResources);
+
+                    if (!state.resourceContributions.ContainsKey(player))
+                    {
+                        List<List<double>> contribution = new List<List<double>> { new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, };
+                        contribution[order.rsrc] = order.amnt;
+                        state.resourceContributions.Add(player, contribution);
+                    }
+                    else
+                    {
+                        state.resourceContributions[player][order.rsrc] = Add(state.resourceContributions[player][order.rsrc], order.amnt);
+                    }
                 }
             }
 
@@ -652,7 +692,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                 {
-                    double[] units = state.players[player].GetUnitArray();
+                    double[] units = state.players[player].allUnits;
                     canAttack = HasEnoughUnits(units, actions.attk.sqd) && AttackPlansAreAdjacent(actions.attk.pln);
                 }
 
@@ -791,6 +831,13 @@ namespace IslesOfWar
             }
 
             //Add b to a
+            List<double> Add(List<double> a, List<double> b)
+            {
+                List<double> addedLists = new List<double>();
+                addedLists.AddRange(Add(a.ToArray(), b.ToArray()));
+                return addedLists;
+            }
+
             double[] Add(double[] a, double[] b)
             {
                 for (int u = 0; u < a.Length && u < b.Length; u++)

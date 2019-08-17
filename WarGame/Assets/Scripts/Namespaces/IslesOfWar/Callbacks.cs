@@ -105,6 +105,10 @@ namespace IslesOfWar
 
                             if (actions.dep != null)
                                 processor.SubmitDepletedIslands(player, actions.dep);
+
+                            if (actions.pot != null)
+                                processor.SubmitResourcesToPool(player, actions.pot);
+
                         }
                     }
 

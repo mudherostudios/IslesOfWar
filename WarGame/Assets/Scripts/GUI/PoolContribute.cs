@@ -20,9 +20,9 @@ public class PoolContribute: WorldGUI
     private int hours, minutes;
     private float seconds, lastTime;
     private string poolStrType;
-    private Dictionary<string, ResourceContribution> resources;
+    private Dictionary<string, List<List<double>>> resources;
 
-    public void Initialize(string _player, Dictionary<string, ResourceContribution> _resources, float xayaTime)
+    public void Initialize(string _player, Dictionary<string, List<List<double>>> _resources, float xayaTime)
     {
         player = _player;
         resources = _resources;
