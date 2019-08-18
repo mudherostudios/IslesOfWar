@@ -59,10 +59,10 @@ namespace IslesOfWar
             {"WF","Wallis and Futuna"},{"EH","Western Sahara"},{"YE","Yemen"},{"ZM","Zambia"},{"ZW","Zimbabwe"}
         };
 
-        public static int[] islandSearchCost = new int[] { 1000, 2500, 0, 0 };
+        public static double[] islandSearchCost = new double[] { 1000, 2500, 0, 0 };
         
         //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
-        public static int[,] unitCosts = new int[,]
+        public static double[,] unitCosts = new double[,]
         {
             {10,    0,      10,     0},
             {50,    0,      20,     0},
@@ -75,21 +75,21 @@ namespace IslesOfWar
             {1000,  500,    200,    0}
         };
 
-        public static int[,] blockerCosts = new int[,]
+        public static double[,] blockerCosts = new double[,]
         {
             {1500, 100, 1000, 100 },
             {1500, 1000, 500, 500 },
             {1500, 500, 1000, 1000}
         };
 
-        public static int[,] bunkerCosts = new int[,]
+        public static double[,] bunkerCosts = new double[,]
         {
             {1500, 100, 1000, 100 },
             {1500, 1000, 500, 500 },
             {1500, 500, 1000, 1000}
         };
 
-        public static int[,] collectorCosts = new int[,]
+        public static double[,] collectorCosts = new double[,]
         {
             {1500, 500, 1000, 1000 },
             {1500, 1000, 500, 1000 },
@@ -139,12 +139,23 @@ namespace IslesOfWar
 
         public static float[,] minMaxResources = new float[,]
         {
-            {1000, 100000},
-            {1000, 100000},
-            {1000, 100000}
+            {28750, 80500},
+            {28750, 80500},
+            {28750, 80500}
         };
 
         public static float[] extractRates = new float[] { 10, 20, 30 };
-        public static float[] freeResourceRates = new float[] {1, 2, 3, 4 };
+        public static float[] freeResourceRates = new float[] {4, 3, 2, 1 };
+
+        //X = Warbucks Oil Metal Lime 
+        //Y = Units Collectors Defenses Search
+        public static double[,] purchaseToPoolPercents = new double[,]
+        {
+            {0.15, 0.05, 0.05, 0.05},
+            {0.15, 0.05, 0.05, 0.05},
+            {0.15, 0.05, 0.05, 0.05},
+            {0.15, 0.05, 0.05, 0.05}
+        };
+
     }
 }

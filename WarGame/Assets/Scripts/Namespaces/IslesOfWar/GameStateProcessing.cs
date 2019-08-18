@@ -352,10 +352,10 @@ namespace IslesOfWar
             //Phase out in client
             bool CanSpendResources(string player, Cost resources, bool isResourcePool)
             {
-                long w = resources.warbucks;
-                long o = resources.oil;
-                long m = resources.metal;
-                long c = resources.concrete;
+                double w = resources.warbucks;
+                double o = resources.oil;
+                double m = resources.metal;
+                double c = resources.concrete;
 
                 if (!isResourcePool)
                 {
@@ -376,10 +376,10 @@ namespace IslesOfWar
             //Phase out in client
             void SpendResources(string player, Cost resources, bool isResourcePool)
             {
-                long w = resources.warbucks;
-                long o = resources.oil;
-                long m = resources.metal;
-                long c = resources.concrete;
+                double w = resources.warbucks;
+                double o = resources.oil;
+                double m = resources.metal;
+                double c = resources.concrete;
 
                 if (!isResourcePool)
                 {

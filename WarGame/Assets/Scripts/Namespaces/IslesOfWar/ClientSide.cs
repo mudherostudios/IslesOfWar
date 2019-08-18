@@ -23,27 +23,27 @@ namespace IslesOfWar
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][0];
-                        poolSize += pair.Value[2][0];
-                        poolSize += pair.Value[3][0];
+                        poolSize += pair.Value[0][0]; //Warbucks pool Oil amount
+                        poolSize += pair.Value[2][0]; //Metal pool Oil amount
+                        poolSize += pair.Value[3][0]; //Lime pool Oil amount
                     }
                 }
                 else if (type == "metal")
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][1];
-                        poolSize += pair.Value[1][0];
-                        poolSize += pair.Value[1][1];
+                        poolSize += pair.Value[0][1]; //Warbucks pool Metal amount
+                        poolSize += pair.Value[1][1]; //Oil pool Metal amount
+                        poolSize += pair.Value[3][1]; //Lime pool Metal amount
                     }
                 }
                 else if (type == "concrete")
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][2];
-                        poolSize += pair.Value[1][1];
-                        poolSize += pair.Value[1][1];
+                        poolSize += pair.Value[0][2]; //Warbucks pool Lime amount
+                        poolSize += pair.Value[1][2]; //Oil pool Lime amount
+                        poolSize += pair.Value[2][2]; //Metal pool Lime amount
                     }
                 }
 
@@ -54,13 +54,20 @@ namespace IslesOfWar
             { 
                 double playersContribution = 0;
 
+                //Warbucks
                 playersContribution += contribution[0][0] * modifiers[0]; //Oil
                 playersContribution += contribution[0][1] * modifiers[1]; //Metal
                 playersContribution += contribution[0][2] * modifiers[2]; //Concrete
-                playersContribution += contribution[1][0] * modifiers[1]; //Metal
-                playersContribution += contribution[1][1] * modifiers[2]; //Concrete
+
+                //Oil
+                playersContribution += contribution[1][1] * modifiers[1]; //Metal
+                playersContribution += contribution[1][2] * modifiers[2]; //Concrete
+
+                //Metal
                 playersContribution += contribution[2][0] * modifiers[0]; //Oil
-                playersContribution += contribution[2][1] * modifiers[2]; //Concrete
+                playersContribution += contribution[2][2] * modifiers[2]; //Concrete
+
+                //Concrete
                 playersContribution += contribution[3][0] * modifiers[0]; //Oil
                 playersContribution += contribution[3][1] * modifiers[1]; //Metal
 
@@ -98,13 +105,17 @@ namespace IslesOfWar
             public Dictionary<string, Island> islands;
             public Dictionary<string, List<List<double>>> resourceContributions;
             public Dictionary<string, List<string>> depletedContributions;
+            public List<double> resourcePools;
 
-            public State()
+            public State() { }
+            
+            public void Init()
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
                 resourceContributions = new Dictionary<string, List<List<double>>>();
                 depletedContributions = new Dictionary<string, List<string>>();
+                resourcePools = new List<double> { 0, 0, 0, 0 };
             }
 
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions)
@@ -118,6 +129,21 @@ namespace IslesOfWar
                 islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
+                resourcePools = new List<double> { 0, 0, 0, 0 };
+            }
+
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions, List<double> resPools)
+            {
+                players = new Dictionary<string, PlayerState>();
+                islands = new Dictionary<string, Island>();
+                resourceContributions = new Dictionary<string, List<List<double>>>();
+                depletedContributions = new Dictionary<string, List<string>>();
+
+                players = JsonConvert.DeserializeObject<Dictionary<string, PlayerState>>(JsonConvert.SerializeObject(allPlayers));
+                islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
+                resourceContributions = resContributions;
+                depletedContributions = depContributions;
+                resourcePools = resPools;
             }
 
             public Island[] allIslands
@@ -161,7 +187,7 @@ namespace IslesOfWar
                 collectors = _collectors;
                 defenses = _defenses;
             }
-            
+
             //Think of resources as how many times extraction can be made rather than an actual amount.
             public void SetResources()
             {
@@ -307,11 +333,11 @@ namespace IslesOfWar
         //Phase out
         public struct Cost
         {
-            public int warbucks, oil, metal, concrete;
-            public long amount;
+            public double warbucks, oil, metal, concrete;
+            public double amount;
             public string type;
 
-            public Cost(int _warbucks, int _oil, int _metal, int _concrete, int _amount, string _type)
+            public Cost(double _warbucks, double _oil, double _metal, double _concrete, double _amount, string _type)
             {
                 warbucks = _warbucks;
                 oil = _oil;
@@ -321,7 +347,7 @@ namespace IslesOfWar
                 type = _type;
             }
 
-            public Cost(int[,] costs, int row, int _amount, string _type)
+            public Cost(double[,] costs, int row, double _amount, string _type)
             {
                 warbucks = costs[0, row];
                 oil = costs[1, row];

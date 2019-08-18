@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,11 +18,15 @@ namespace IslesOfWar
             public StateProcessor()
             {
                 state = new State();
+                state.Init();
             }
 
             public StateProcessor(State _state)
             {
                 state = _state;
+
+                if (state.resourcePools == null)
+                    state.Init();
             }
 
             public void UpdateIslandAndPlayerResources()
@@ -52,7 +57,6 @@ namespace IslesOfWar
                     pair.Value.resources[3] += Constants.freeResourceRates[3];
                 }
             }
-
 
             void UpdatePlayerResources(string island, string player, int tile, int[] types)
             {
@@ -98,6 +102,7 @@ namespace IslesOfWar
                     double[] resources = Subtract(state.players[player].resources.ToArray(), Constants.islandSearchCost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
+                    AddToPools(Constants.islandSearchCost, 3);
 
                     if (discovered == txid)
                     {
@@ -122,6 +127,7 @@ namespace IslesOfWar
                 state.players[player].resources.AddRange(result[0]);
                 state.players[player].units.Clear();
                 state.players[player].units.AddRange(result[1]);
+                AddToPools(result[2], 0);
             }
 
             public void DevelopIsland(string player, IslandBuildOrder order)
@@ -178,7 +184,9 @@ namespace IslesOfWar
                         if (develop)
                         {
                             int[] collectorOrder = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(order[t]));
-                            updated = TryPurchaseBuildings(collectorOrder, updated, Constants.collectorCosts, out develop);
+                            double[][] result = TryPurchaseBuildings(collectorOrder, updated, Constants.collectorCosts, out develop);
+                            updated = result[0];
+                            AddToPools(result[1], 1);
                         }
                     }
                 }
@@ -211,10 +219,14 @@ namespace IslesOfWar
 
                             int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
                             bool canOrderDefenses = false;
-                            updated = TryPurchaseBuildings(defenseOrder[0], updated, Constants.blockerCosts, out canOrderDefenses);
+                            double[][] bunkerResults = TryPurchaseBuildings(defenseOrder[0], updated, Constants.blockerCosts, out canOrderDefenses);
+                            updated = bunkerResults[0];
                             develop = develop && canOrderDefenses;
-                            updated = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out canOrderDefenses);
+                            double[][] blockerResults = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out canOrderDefenses);
+                            updated = blockerResults[0];
                             develop = develop && canOrderDefenses;
+                            AddToPools(bunkerResults[1], 2);
+                            AddToPools(blockerResults[1], 2);
                         }
                     }
                 }
@@ -276,10 +288,13 @@ namespace IslesOfWar
                 {
                     canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]);
 
-                    for (int t = 0; t < state.islands[islands[i]].resources.Count && canSubmit; t++)
+                    if (state.islands[islands[i]].resources != null)
                     {
-                        canSubmit = state.islands[islands[i]].resources[t][0] <= 0 && state.islands[islands[i]].resources[t][1] <= 0
-                        && state.islands[islands[i]].resources[t][1] <= 0;
+                        for (int t = 0; t < state.islands[islands[i]].resources.Count && canSubmit; t++)
+                        {
+                            canSubmit = state.islands[islands[i]].resources[t][0] <= 0 && state.islands[islands[i]].resources[t][1] <= 0
+                            && state.islands[islands[i]].resources[t][1] <= 0;
+                        }
                     }
                 }
 
@@ -352,6 +367,125 @@ namespace IslesOfWar
                         state.resourceContributions[player][order.rsrc] = Add(state.resourceContributions[player][order.rsrc], order.amnt);
                     }
                 }
+            }
+
+            public void RewardDepletedPool()
+            {
+                if (state.depletedContributions.Count >= 1)
+                {
+                    double[] ownership = new double[state.depletedContributions.Count];
+                    string[] owners = new string[ownership.Length];
+                    double total = 0;
+                    int counter = 0;
+                    
+                    foreach (KeyValuePair<string, List<string>> pair in state.depletedContributions)
+                    {
+                        ownership[counter] = pair.Value.Count;
+                        owners[counter] = pair.Key;
+                        total += pair.Value.Count;
+                        counter++;
+                    }
+
+                    for (int o = 0; o < owners.Length; o++)
+                    {
+                        state.players[owners[o]].resources[0] += Math.Floor(state.resourcePools[0] * (ownership[o] / total));
+                    }
+
+                    state.resourcePools[0] = 0;
+                }
+            }
+
+            public void RewardResourcePools()
+            {
+                double[] poolSizes = new double[3];
+                double[] totalPoints = new double[3];
+                double[] modifiers;
+                string[] owners;
+                double[][] ownership;
+
+                if (state.resourceContributions.Count >= 1)
+                {
+                    ownership = new double[state.resourceContributions.Count][];
+                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, "oil");
+                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, "metal");
+                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, "concrete");
+                    
+                    if (state.resourceContributions.Count > 1)
+                    {
+                        modifiers = CalculateResourcePoolModifiers(ref poolSizes);
+                        owners = state.resourceContributions.Keys.ToArray();
+
+                        //Calculate the point ownership of each contributor
+                        for (int o = 0; o < owners.Length; o++)
+                        {
+                            ownership[o] = new double[3];
+
+                            for (int p = 0; p < poolSizes.Length; p++)
+                            {
+                                int[] types = new int[2];
+
+                                if (p == 0)
+                                    types = new int[] { 1, 2 };
+                                else if (p == 1)
+                                    types = new int[] { 0, 2 };
+                                else if (p == 2)
+                                    types = new int[] { 0, 1 };
+
+                                ownership[o][p] += modifiers[(p * 2) + 0] * state.resourceContributions[owners[o]][p][types[0]];
+                                ownership[o][p] += modifiers[(p * 2) + 1] * state.resourceContributions[owners[o]][p][types[1]];
+                                totalPoints[p] += ownership[o][p];
+                            }
+                        }
+
+                        //Reward owners percentage
+                        for (int o = 0; o < owners.Length; o++)
+                        {
+                            state.players[owners[o]].resources[1] += Math.Floor(poolSizes[0] * ownership[o][0] / totalPoints[0]);
+                            state.players[owners[o]].resources[2] += Math.Floor(poolSizes[1] * ownership[o][1] / totalPoints[1]);
+                            state.players[owners[o]].resources[3] += Math.Floor(poolSizes[2] * ownership[o][2] / totalPoints[2]);
+                        }
+                    }
+                    else if (state.resourceContributions.Count == 1)
+                    {
+                        string winner = state.resourceContributions.Keys.ToArray()[0];
+                        List<double> resources = new List<double> { 0, poolSizes[0], poolSizes[1], poolSizes[2] };
+                        state.players[winner].resources = Add(resources, state.players[winner].resources);
+                    }
+                }
+            }
+
+            double[] CalculateResourcePoolModifiers(ref double[] poolSizes)
+            {
+                double[] modifiers = new double[6];
+                
+                for (int p = 0; p < poolSizes.Length; p++)
+                {
+                    int[] types = new int[2];
+
+                    if (p == 0)
+                        types = new int[] { 1, 2 };
+                    else if (p == 1)
+                        types = new int[] { 0, 2 };
+                    else if (p == 2)
+                        types = new int[] { 0, 1 };
+
+                    if (poolSizes[types[0]] <= 0)
+                        poolSizes[types[0]] = poolSizes[types[1]];
+
+                    if (poolSizes[types[1]] <= 0)
+                        poolSizes[types[1]] = poolSizes[types[0]];
+
+                    if (poolSizes[types[0]] <= 0)
+                    {
+                        poolSizes[types[0]] = 1.0;
+                        poolSizes[types[1]] = 1.0;
+                    }
+
+                    modifiers[0 + (p * 2)] = poolSizes[types[1]] / poolSizes[types[0]];
+                    modifiers[1 + (p * 2)] = poolSizes[types[0]] / poolSizes[types[1]];
+                }
+
+                return modifiers;
             }
 
             public void AttackIsland(string player, BattleCommand attackPlan)
@@ -570,6 +704,14 @@ namespace IslesOfWar
                 }
             }
 
+            void AddToPools(double[] resources, int multiplierType)
+            {
+                state.resourcePools[0] += resources[0] * Constants.purchaseToPoolPercents[multiplierType, 0];
+                state.resourcePools[1] += resources[1] * Constants.purchaseToPoolPercents[multiplierType, 1];
+                state.resourcePools[2] += resources[2] * Constants.purchaseToPoolPercents[multiplierType, 2];
+                state.resourcePools[3] += resources[3] * Constants.purchaseToPoolPercents[multiplierType, 3];
+            }
+
             int GetReactPosition(List<int> defenseZone, int[] attackerPositions, out int attackerIndex)
             {
                 for (int a = 0; a < attackerPositions.Length; a++)
@@ -771,6 +913,7 @@ namespace IslesOfWar
                 if (order.Count == 9)
                 {
                     double[] updated = new double[currentResources.Length];
+                    double[] cost = new double[currentResources.Length];
                     double[] reinforced = new double[currentUnits.Length];
                     Array.Copy(currentResources, updated, currentResources.Length);
                     Array.Copy(currentUnits, reinforced, currentUnits.Length);
@@ -785,6 +928,11 @@ namespace IslesOfWar
                             updated[2] -= Constants.unitCosts[u, 2] * order[u];
                             updated[3] -= Constants.unitCosts[u, 3] * order[u];
 
+                            cost[0] += Constants.unitCosts[u, 0] * order[u];
+                            cost[1] += Constants.unitCosts[u, 1] * order[u];
+                            cost[2] += Constants.unitCosts[u, 2] * order[u];
+                            cost[3] += Constants.unitCosts[u, 3] * order[u];
+
                             canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
 
                             reinforced[u] = currentUnits[u] + order[u];
@@ -792,21 +940,22 @@ namespace IslesOfWar
                     }
 
                     if (!canPurchase)
-                        return new double[][] { currentResources, currentUnits };
+                        return new double[][] { currentResources, currentUnits, cost };
 
-                    return new double[][] { updated, reinforced};
+                    return new double[][] { updated, reinforced, cost};
                 }
                 else
                 {
-                    return new double[][] { currentResources, currentUnits };
+                    return new double[][] { currentResources, currentUnits, new double[4]};
                 }
 
             }
 
-            double[] TryPurchaseBuildings(int[] order, double[] currentResources, int[,] costs, out bool purchaseable)
+            double[][] TryPurchaseBuildings(int[] order, double[] currentResources, double[,] costs, out bool purchaseable)
             {
                 bool canPurchase = true;
                 double[] updated = new double[currentResources.Length];
+                double[] cost = new double[currentResources.Length];
                 Array.Copy(currentResources,updated, currentResources.Length);
 
                 for (int o = 0; o < order.Length && canPurchase; o++)
@@ -817,6 +966,11 @@ namespace IslesOfWar
                         updated[1] -= costs[order[o] - 1, 1];
                         updated[2] -= costs[order[o] - 1, 2];
                         updated[3] -= costs[order[o] - 1, 3];
+
+                        cost[0] += costs[order[o] - 1, 0];
+                        cost[1] += costs[order[o] - 1, 1];
+                        cost[2] += costs[order[o] - 1, 2];
+                        cost[3] += costs[order[o] - 1, 3];
                     }
 
                     canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
@@ -825,9 +979,9 @@ namespace IslesOfWar
                 purchaseable = canPurchase;
 
                 if (!canPurchase)
-                    return currentResources;
+                    return new double[][] { currentResources, new double[4] };
 
-                return updated;
+                return new double[][] { updated, cost };
             }
 
             //Add b to a

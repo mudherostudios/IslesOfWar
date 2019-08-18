@@ -28,9 +28,10 @@ public class GSPTesting : MonoBehaviour
     string resourceUpdateResults = "";
     string depletedIslandResults = "";
     string resourcePoolResults = "";
+    string rewardDepletedResults = "";
     string[] label;
     string[] results;
-    int[,] colCost = Constants.collectorCosts;
+    double[,] colCost = Constants.collectorCosts;
     int passCount;
     int failCount;
 
@@ -62,6 +63,7 @@ public class GSPTesting : MonoBehaviour
         IncrementResourcesTest();
         TestDepletedIslandSubmissions();
         TestReourcePoolSubmission();
+        RewardDepletedPoolTest();
         Debug.Log(GetTestResultStrings());
     }
 
@@ -72,12 +74,14 @@ public class GSPTesting : MonoBehaviour
         //Adding and Updating One Player
         //Country Code Add Fail
         processor.state = new State();
+        processor.state.Init();
         processor.AddPlayerOrUpdateNation("cairo", "USA");
         bool passedFirst = processor.state.players.Count == 0 && !processor.state.players.ContainsKey("cairo");
         nationResults += GetPassOrFail(passedFirst);
 
         //Country Code Add Pass
         processor.state = new State();
+        processor.state.Init();
         processor.AddPlayerOrUpdateNation("cairo", "US");
         bool passedSecond = processor.state.players.Count == 1 && processor.state.players.ContainsKey("cairo") && processor.state.players["cairo"].nationCode == "US";
         nationResults += GetPassOrFail(passedSecond);
@@ -1783,8 +1787,111 @@ public class GSPTesting : MonoBehaviour
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedThirteenth);
+    }
 
+    void RewardDepletedPoolTest()
+    {
+        ResetTestData();
+        rewardDepletedResults = "";
 
+        //Succeed in transfering 15% of unit purchase to depleted pool.
+        processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        bool passedFirst = processor.state.resourcePools[0] == 2710.0 * 0.15;
+        rewardDepletedResults += GetPassOrFail(passedFirst);
+
+        //Succeed in transfering 15% of collector purchases to depleted pool
+        ResetTestData();
+        processor.state.players["cairo"].resources[0] = 10000;
+        processor.state.players["cairo"].resources[1] = 10000;
+        processor.state.players["cairo"].resources[2] = 10000;
+        processor.state.players["cairo"].resources[3] = 10000;
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", "))))))))))))"));
+        bool passedSecond = processor.state.resourcePools[0] == 4500.0 * 0.15;
+        rewardDepletedResults += GetPassOrFail(passedSecond);
+
+        //Succeed in transfering 15% of defense purchases to depleted pool
+        ResetTestData();
+        processor.state.players["cairo"].resources[0] = 10000;
+        processor.state.players["cairo"].resources[1] = 10000;
+        processor.state.players["cairo"].resources[2] = 10000;
+        processor.state.players["cairo"].resources[3] = 10000;
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "6)))))))))))"));
+        bool passedThird = processor.state.resourcePools[0] == 4500.0 * 0.15;
+        rewardDepletedResults += GetPassOrFail(passedThird);
+
+        //Succeed in transfering 15% of search purchase to depleted pool
+        ResetTestData();
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        bool passedFourth = processor.state.resourcePools[0] == 1000.0 * 0.15;
+        rewardDepletedResults += GetPassOrFail(passedFourth);
+
+        //Succeed in updating resource pool.
+        ResetTestData();
+        processor.state.players["cairo"].resources[0] = 20000;
+        processor.state.players["cairo"].resources[1] = 20000;
+        processor.state.players["cairo"].resources[2] = 20000;
+        processor.state.players["cairo"].resources[3] = 20000;
+        processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", "))))))))))))"));
+        processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "6)))))))))))"));
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        bool passedFifth = processor.state.resourcePools[0] == 12710.0 * 0.15;
+        rewardDepletedResults += GetPassOrFail(passedFifth);
+
+        //Succeed in updating resources with multiple users
+        processor.state.players["pimpMacD"].resources[0] = 20000;
+        processor.state.players["pimpMacD"].resources[1] = 20000;
+        processor.state.players["pimpMacD"].resources[2] = 20000;
+        processor.state.players["pimpMacD"].resources[3] = 20000;
+        processor.PurchaseUnits("pimpMacD", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.DevelopIsland("pimpMacD", new IslandBuildOrder("g", "300100000020", "))))))))))))"));
+        processor.DevelopIsland("pimpMacD", new IslandBuildOrder("e", "000000000000", "6)))))))))))"));
+        processor.DiscoverOrScoutIsland("pimpMacD", "norm", "q");
+        processor.state.players["nox"].resources[0] = 20000;
+        processor.state.players["nox"].resources[1] = 20000;
+        processor.state.players["nox"].resources[2] = 20000;
+        processor.state.players["nox"].resources[3] = 20000;
+        processor.PurchaseUnits("nox", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.DevelopIsland("nox", new IslandBuildOrder("m", "000003201000", "))))))))))))"));
+        processor.DevelopIsland("nox", new IslandBuildOrder("j", "000000000000", "6)))))))))))"));
+        processor.DiscoverOrScoutIsland("nox", "norm", "r");
+        bool passedSixth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
+        rewardDepletedResults += GetPassOrFail(passedSixth);
+
+        //Succeed in splitting with single player.
+        string savedState = JsonConvert.SerializeObject(processor.state);
+        processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
+        processor.RewardDepletedPool();
+        bool passedSeventh = (Math.Floor(12710.0 * 0.15 * 3.0) + (20000.0 - 12710.0)) == processor.state.players["cairo"].resources[0]
+        && processor.state.resourcePools[0] == 0;
+        rewardDepletedResults += GetPassOrFail(passedSeventh);
+
+        //Succeed in splitting with multiple players.
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
+        processor.SubmitDepletedIslands("pimpMacD", new List<string> { "e" });
+        processor.SubmitDepletedIslands("nox", new List<string> { "j" });
+        processor.RewardDepletedPool();
+        double share = Math.Floor((12710.0 * 0.15 * 3.0) * 1.0 / 3.0) + (20000.0 - 12710.0);
+        bool passedEighth = processor.state.players["cairo"].resources[0] == share && processor.state.players["pimpMacD"].resources[0] == share
+        && processor.state.players["nox"].resources[0] == share && processor.state.resourcePools[0] == 0;
+        rewardDepletedResults += GetPassOrFail(passedEighth);
+
+        //Succeed in no reward with no players
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.RewardDepletedPool();
+        bool passedNinth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
+        rewardDepletedResults += GetPassOrFail(passedNinth);
+
+        //Succeed in bigger reward added after reward failed because no players.
+        processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.PurchaseUnits("pimpMacD", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.PurchaseUnits("nox", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
+        processor.RewardDepletedPool();
+        bool passedTenth = processor.state.resourcePools[0] == 0 
+        && processor.state.players["cairo"].resources[0] == (15420.0 * 0.15 * 3.0) + (20000.0-15420.0);
+        rewardDepletedResults += GetPassOrFail(passedTenth);
     }
     
     void SetIslandResources()
@@ -2122,9 +2229,11 @@ public class GSPTesting : MonoBehaviour
         string entireResults = "-Test Results -        O=Pass X=Fail \n";
                                                                                                                            
         label = new string[] { "NationUpdate      : ", "SearchIslands     : ", "PurchaseUnits     : ", "BuildCollectors    : ", "BuildBunkers      : ",
-        "BuildBlocker       : ", "BuildBlonkers     : ", "UpdateDefenders: ", "UpdateResources: ", "SubmitDepleted  : ", "SubmitResources: " };
+        "BuildBlocker       : ", "BuildBlonkers     : ", "UpdateDefenders: ", "UpdateResources: ", "SubmitDepleted  : ", "SubmitResources: ",
+        "RewardDepleted : "};
         results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults,
-        purchaseBlockerResults, purchaseBlockerAndBunkerResults, defenseUpdateResults, resourceUpdateResults, depletedIslandResults, resourcePoolResults};
+        purchaseBlockerResults, purchaseBlockerAndBunkerResults, defenseUpdateResults, resourceUpdateResults, depletedIslandResults, resourcePoolResults,
+        rewardDepletedResults};
         
         for (int r = 0; r < results.Length; r++)
         {
