@@ -23,27 +23,24 @@ namespace IslesOfWar
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][0]; //Warbucks pool Oil amount
-                        poolSize += pair.Value[2][0]; //Metal pool Oil amount
-                        poolSize += pair.Value[3][0]; //Lime pool Oil amount
+                        poolSize += pair.Value[1][0]; //Metal pool Oil amount
+                        poolSize += pair.Value[2][0]; //Lime pool Oil amount
                     }
                 }
                 else if (type == "metal")
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][1]; //Warbucks pool Metal amount
-                        poolSize += pair.Value[1][1]; //Oil pool Metal amount
-                        poolSize += pair.Value[3][1]; //Lime pool Metal amount
+                        poolSize += pair.Value[0][1]; //Oil pool Metal amount
+                        poolSize += pair.Value[2][1]; //Lime pool Metal amount
                     }
                 }
                 else if (type == "concrete")
                 {
                     foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                     {
-                        poolSize += pair.Value[0][2]; //Warbucks pool Lime amount
-                        poolSize += pair.Value[1][2]; //Oil pool Lime amount
-                        poolSize += pair.Value[2][2]; //Metal pool Lime amount
+                        poolSize += pair.Value[0][2]; //Oil pool Lime amount
+                        poolSize += pair.Value[1][2]; //Metal pool Lime amount
                     }
                 }
 

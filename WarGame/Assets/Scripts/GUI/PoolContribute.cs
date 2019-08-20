@@ -67,8 +67,8 @@ public class PoolContribute: WorldGUI
             }
 
             modifiers[poolType - 1] = 0;
-            modifiers[tempTypeA] = (double)tempPools[tempTypeB] / tempPools[tempTypeA];
-            modifiers[tempTypeB] = (double)tempPools[tempTypeA] / tempPools[tempTypeB];
+            modifiers[tempTypeA] = tempPools[tempTypeB] / tempPools[tempTypeA];
+            modifiers[tempTypeB] = tempPools[tempTypeA] / tempPools[tempTypeB];
         }
 
         strModifiers[0] = string.Format("x {0:0.000}", modifiers[0]);

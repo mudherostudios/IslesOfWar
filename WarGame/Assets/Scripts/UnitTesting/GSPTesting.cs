@@ -28,7 +28,9 @@ public class GSPTesting : MonoBehaviour
     string resourceUpdateResults = "";
     string depletedIslandResults = "";
     string resourcePoolResults = "";
+    string transferResourcesResults = "";
     string rewardDepletedResults = "";
+    string rewardResourcePoolResults = "";
     string[] label;
     string[] results;
     double[,] colCost = Constants.collectorCosts;
@@ -63,7 +65,7 @@ public class GSPTesting : MonoBehaviour
         IncrementResourcesTest();
         TestDepletedIslandSubmissions();
         TestReourcePoolSubmission();
-        RewardDepletedPoolTest();
+        ResourceTransferTest();
         Debug.Log(GetTestResultStrings());
     }
 
@@ -1662,11 +1664,13 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         resourcePoolResults = "";
+        double[] holder = new double[] { 3000, 7500, 6000, 1500 };
+        List<List<double>> updatedContributions = new List<List<double>> { new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
 
-        //Succeed with oil submission to warbucks pool
-        players["cairo"].resources[1] = 5000;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> {2500, 0, 0 }));
-        List<List<double>> updatedContributions = new List<List<double>> { new List<double> { 2500, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
+        //Succeed in metal submission to oil pool
+        players["cairo"].resources[2] = 4000;
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0, 2000, 0 }));
+        updatedContributions[0][1] = 2000;
         bool passedFirst = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1675,10 +1679,10 @@ public class GSPTesting : MonoBehaviour
 
         resourcePoolResults += GetPassOrFail(passedFirst);
 
-        //Succeed with metal submission to warbucks pool
-        players["cairo"].resources[2] = 4000;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0, 2000, 0 }));
-        updatedContributions = new List<List<double>> { new List<double> { 2500, 2000, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
+        //Succeed in lime submission to metal pool
+        players["cairo"].resources[3] = 1000;
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 0, 0, 500 }));
+        updatedContributions[1][2] = 500;
         bool passedSecond = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1687,10 +1691,10 @@ public class GSPTesting : MonoBehaviour
 
         resourcePoolResults += GetPassOrFail(passedSecond);
 
-        //Succeed with lime submission to warbucks pool
-        players["cairo"].resources[3] = 1000;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0, 0, 500 }));
-        updatedContributions = new List<List<double>> { new List<double> { 2500, 2000, 500 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
+        //Succeed in lime submission to metal pool
+        players["cairo"].resources[1] = 5000;
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 2500, 0, 0 }));
+        updatedContributions[2][0] = 2500;
         bool passedThird = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1702,8 +1706,9 @@ public class GSPTesting : MonoBehaviour
         //Succeed with multiple submissions of metal and lime to the oil pool
         players["cairo"].resources[2] = 2000;
         players["cairo"].resources[3] = 500;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 0, 2000, 500 }));
-        updatedContributions = new List<List<double>> { new List<double> { 2500, 2000, 500 }, new List<double> { 0, 2000, 500 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0, 2000, 500 }));
+        updatedContributions[0][1] += 2000;
+        updatedContributions[0][2] += 500;
         bool passedFourth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1715,8 +1720,9 @@ public class GSPTesting : MonoBehaviour
         //Succeed with multiple submissions of oil and lime to the metal pool
         players["cairo"].resources[1] = 2500;
         players["cairo"].resources[3] = 0;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 2500, 0, 500 }));
-        updatedContributions = new List<List<double>> { new List<double> { 2500, 2000, 500 }, new List<double> { 0, 2000, 500 }, new List<double> { 2500, 0, 500 }, new List<double> { 0, 0, 0 } };
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 2500, 0, 500 }));
+        updatedContributions[1][0] += 2500;
+        updatedContributions[1][2] += 500;
         bool passedFifth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1728,8 +1734,9 @@ public class GSPTesting : MonoBehaviour
         //Succeed with multiple submissions of oil and metal to the lime pool
         players["cairo"].resources[1] = 0;
         players["cairo"].resources[2] = 0;
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(3, new List<double> { 2500, 2000, 0 }));
-        updatedContributions = new List<List<double>> { new List<double> { 2500, 2000, 500 }, new List<double> { 0, 2000, 500 }, new List<double> { 2500, 0, 500 }, new List<double> { 2500, 2000, 0 } };
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 2500, 2000, 0 }));
+        updatedContributions[2][0] += 2500;
+        updatedContributions[2][1] += 2000;
         bool passedSixth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 1
         && processor.state.resourceContributions.ContainsKey("cairo");
 
@@ -1740,64 +1747,65 @@ public class GSPTesting : MonoBehaviour
 
         //Fail with oil submission to oil pool
         ResetTestData();
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 2500, 0, 0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 2500, 0, 0 }));
         bool passedSeventh = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedSeventh);
 
         //Fail with multi submission to oil pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 2500, 2000, 500 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 2500, 2000, 500 }));
         bool passedEighth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedEighth);
 
         //Fail with metal submission to metal pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 0, 2000, 0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 0, 2000, 0 }));
         bool passedNinth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedNinth);
 
         //Fail with multi submission to metal pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 2500, 2000, 500 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 2500, 2000, 500 }));
         bool passedTenth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedTenth);
 
         //Fail with lime submission to lime pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(3, new List<double> { 0, 0, 500 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 0, 0, 500 }));
         bool passedEleventh = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedEleventh);
 
         //Fail with multi submission to lime pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(3, new List<double> { 2500, 2000, 500 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 2500, 2000, 500 }));
         bool passedTwelfth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedTwelfth);
 
-        //Fail with negative oil submission to warbucks pool
-        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { -2500, 0, 0 }));
+        //Fail with negative metal submission to oil pool
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0, -2500, 0 }));
         bool passedThirteenth = PlayersAreEqualExcept("", processor.state.players, players) && processor.state.resourceContributions.Count == 0
         && !processor.state.resourceContributions.ContainsKey("cairo");
 
         resourcePoolResults += GetPassOrFail(passedThirteenth);
     }
 
-    void RewardDepletedPoolTest()
+    void ResourceTransferTest()
     {
         ResetTestData();
-        rewardDepletedResults = "";
+        transferResourcesResults = "";
 
         //Succeed in transfering 15% of unit purchase to depleted pool.
         processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-        bool passedFirst = processor.state.resourcePools[0] == 2710.0 * 0.15;
-        rewardDepletedResults += GetPassOrFail(passedFirst);
+        bool passedFirst = processor.state.resourcePools[0] == 2710.0 * 0.15 && processor.state.resourcePools[1] == 1035.0 * 0.05
+        && processor.state.resourcePools[2] == 1175 * 0.05 && processor.state.resourcePools[3] == 0;
+        transferResourcesResults += GetPassOrFail(passedFirst);
 
         //Succeed in transfering 15% of collector purchases to depleted pool
         ResetTestData();
@@ -1806,8 +1814,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources[2] = 10000;
         processor.state.players["cairo"].resources[3] = 10000;
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", "))))))))))))"));
-        bool passedSecond = processor.state.resourcePools[0] == 4500.0 * 0.15;
-        rewardDepletedResults += GetPassOrFail(passedSecond);
+        bool passedSecond = processor.state.resourcePools[0] == 4500.0 * 0.15 && processor.state.resourcePools[1] == 2500.0 * 0.05
+        && processor.state.resourcePools[2] == 2500.0 * 0.05 && processor.state.resourcePools[3] == 2500.0 * 0.05;
+        transferResourcesResults += GetPassOrFail(passedSecond);
 
         //Succeed in transfering 15% of defense purchases to depleted pool
         ResetTestData();
@@ -1816,14 +1825,16 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources[2] = 10000;
         processor.state.players["cairo"].resources[3] = 10000;
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "6)))))))))))"));
-        bool passedThird = processor.state.resourcePools[0] == 4500.0 * 0.15;
-        rewardDepletedResults += GetPassOrFail(passedThird);
+        bool passedThird = processor.state.resourcePools[0] == 4500.0 * 0.15 && processor.state.resourcePools[1] == 1600.0 * 0.05
+        && processor.state.resourcePools[2] == 2500.0 * 0.05 && processor.state.resourcePools[3] == 1600.0 * 0.05;
+        transferResourcesResults += GetPassOrFail(passedThird);
 
         //Succeed in transfering 15% of search purchase to depleted pool
         ResetTestData();
         processor.DiscoverOrScoutIsland("cairo", "norm", "p");
-        bool passedFourth = processor.state.resourcePools[0] == 1000.0 * 0.15;
-        rewardDepletedResults += GetPassOrFail(passedFourth);
+        bool passedFourth = processor.state.resourcePools[0] == 1000.0 * 0.15 && processor.state.resourcePools[1] == 2500.0 * 0.05
+        && processor.state.resourcePools[2] == 0 && processor.state.resourcePools[3] == 0;
+        transferResourcesResults += GetPassOrFail(passedFourth);
 
         //Succeed in updating resource pool.
         ResetTestData();
@@ -1835,8 +1846,9 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", "))))))))))))"));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "6)))))))))))"));
         processor.DiscoverOrScoutIsland("cairo", "norm", "p");
-        bool passedFifth = processor.state.resourcePools[0] == 12710.0 * 0.15;
-        rewardDepletedResults += GetPassOrFail(passedFifth);
+        bool passedFifth = processor.state.resourcePools[0] == 12710.0 * 0.15 && processor.state.resourcePools[1] == 7635.0 * 0.05
+        && processor.state.resourcePools[2] == 6175.0 * 0.05 && processor.state.resourcePools[3] == 4100.0 * 0.05;
+        transferResourcesResults += GetPassOrFail(passedFifth);
 
         //Succeed in updating resources with multiple users
         processor.state.players["pimpMacD"].resources[0] = 20000;
@@ -1855,16 +1867,26 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("nox", new IslandBuildOrder("m", "000003201000", "))))))))))))"));
         processor.DevelopIsland("nox", new IslandBuildOrder("j", "000000000000", "6)))))))))))"));
         processor.DiscoverOrScoutIsland("nox", "norm", "r");
-        bool passedSixth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
-        rewardDepletedResults += GetPassOrFail(passedSixth);
+        bool passedSixth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0 && processor.state.resourcePools[1] == 7635.0 * 0.05 * 3.0
+        && processor.state.resourcePools[2] == 6175.0 * 0.05 * 3.0 && processor.state.resourcePools[3] == 4100.0 * 0.05 * 3.0;
+        transferResourcesResults += GetPassOrFail(passedSixth);
+
+        string savedState = JsonConvert.SerializeObject(processor.state);
+        RewardDepletedPool(savedState);
+        RewardResourcePool(savedState);
+    }
+
+    void RewardDepletedPool(string savedState)
+    {
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        rewardDepletedResults = "";
 
         //Succeed in splitting with single player.
-        string savedState = JsonConvert.SerializeObject(processor.state);
         processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
         processor.RewardDepletedPool();
-        bool passedSeventh = (Math.Floor(12710.0 * 0.15 * 3.0) + (20000.0 - 12710.0)) == processor.state.players["cairo"].resources[0]
+        bool passedFirst = (Math.Floor(12710.0 * 0.15 * 3.0) + (20000.0 - 12710.0)) == processor.state.players["cairo"].resources[0]
         && processor.state.resourcePools[0] == 0;
-        rewardDepletedResults += GetPassOrFail(passedSeventh);
+        rewardDepletedResults += GetPassOrFail(passedFirst);
 
         //Succeed in splitting with multiple players.
         processor.state = JsonConvert.DeserializeObject<State>(savedState);
@@ -1873,15 +1895,15 @@ public class GSPTesting : MonoBehaviour
         processor.SubmitDepletedIslands("nox", new List<string> { "j" });
         processor.RewardDepletedPool();
         double share = Math.Floor((12710.0 * 0.15 * 3.0) * 1.0 / 3.0) + (20000.0 - 12710.0);
-        bool passedEighth = processor.state.players["cairo"].resources[0] == share && processor.state.players["pimpMacD"].resources[0] == share
+        bool passedSecond = processor.state.players["cairo"].resources[0] == share && processor.state.players["pimpMacD"].resources[0] == share
         && processor.state.players["nox"].resources[0] == share && processor.state.resourcePools[0] == 0;
-        rewardDepletedResults += GetPassOrFail(passedEighth);
+        rewardDepletedResults += GetPassOrFail(passedSecond);
 
         //Succeed in no reward with no players
         processor.state = JsonConvert.DeserializeObject<State>(savedState);
         processor.RewardDepletedPool();
-        bool passedNinth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
-        rewardDepletedResults += GetPassOrFail(passedNinth);
+        bool passedThird = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
+        rewardDepletedResults += GetPassOrFail(passedThird);
 
         //Succeed in bigger reward added after reward failed because no players.
         processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
@@ -1889,9 +1911,101 @@ public class GSPTesting : MonoBehaviour
         processor.PurchaseUnits("nox", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
         processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
         processor.RewardDepletedPool();
-        bool passedTenth = processor.state.resourcePools[0] == 0 
+        bool passedFourth = processor.state.resourcePools[0] == 0 
         && processor.state.players["cairo"].resources[0] == (15420.0 * 0.15 * 3.0) + (20000.0-15420.0);
-        rewardDepletedResults += GetPassOrFail(passedTenth);
+        rewardDepletedResults += GetPassOrFail(passedFourth);
+    }
+
+    void RewardResourcePool(string savedState)
+    {
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        rewardResourcePoolResults = "";
+        double[] remainingPool = new double[] { processor.state.resourcePools[0], 0, 0, 0 };
+
+        //Succeed in creating correct modifiers.
+        double[] mods = processor.CalculateResourcePoolModifiers(new double[] { 1000, 2000, 4000 });
+        bool passedFirst = mods[0] == 2.0 && mods[1] == 0.5 && mods[2] == 4.0 && mods[3] == 0.25 && mods[4] == 2.0 && mods[5] == 0.5;
+        rewardResourcePoolResults += GetPassOrFail(passedFirst);
+
+        //Succeed in rewarding single player all pool types.
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> {0.0, 1.0, 0.0}));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> {1.0, 0.0, 0.0}));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> {1.0, 0.0, 0.0}));
+        processor.RewardResourcePools();
+        double[] target = new double[] { processor.state.players["cairo"].resources[0], Math.Floor(7635.0 * 0.05 * 3.0 + 2.0) + (20000.0 - 7637.0) ,
+        Math.Floor(6175.0 * 0.05 *3.0 + 1.0) + (20000.0 - 6176.0), Math.Floor(4100.0 * 0.05 * 3.0) + (20000.0 - 4100.0)};
+        bool passedSecond = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
+        rewardResourcePoolResults += GetPassOrFail(passedSecond);
+
+        //Succeed in rewarding multiple players of all pool types.
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.RewardResourcePools();
+        target = new double[] { processor.state.players["cairo"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
+        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
+        double[] pimpTarget = new double[] { processor.state.players["pimpMacD"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
+        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
+        double[] noxtarget = new double[] { processor.state.players["nox"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
+        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
+        bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) 
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), pimpTarget) && IsEqual(processor.state.players["nox"].resources.ToArray(), noxtarget)
+        && IsEqual(processor.state.resourcePools.ToArray(), remainingPool); 
+        rewardResourcePoolResults += GetPassOrFail(passedThird);
+
+        //Succeed in rewarding multiple players with one pool type each only.
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(0, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("pimpMacD", new ResourceOrder(2, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(0, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(1, new List<double> { 0.0, 0.0, 0.0 }));
+        processor.SubmitResourcesToPool("nox", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
+
+        target = processor.state.players["cairo"].resources.ToArray();
+        target[1] += Math.Floor(7635.0 * 0.05 * 3.0 + 2.0);
+        pimpTarget = processor.state.players["pimpMacD"].resources.ToArray();
+        pimpTarget[2] += Math.Floor(6175.0 * 0.05 * 3.0 + 1.0);
+        noxtarget = processor.state.players["nox"].resources.ToArray();
+        noxtarget[3] += Math.Floor(4100.0 * 0.05 * 3.0);
+
+        processor.RewardResourcePools();
+        
+        bool passedFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), target)
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), pimpTarget) && IsEqual(processor.state.players["nox"].resources.ToArray(), noxtarget)
+        && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
+        rewardResourcePoolResults += GetPassOrFail(passedFourth);
+
+        //Succeed in rewarding single player one pool type.
+        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
+        remainingPool = processor.state.resourcePools.ToArray();
+        remainingPool[1] = 0.0;
+        target = processor.state.players["cairo"].resources.ToArray();
+        target[1] += Math.Floor(7635.0 * 0.05 * 3.0);
+        processor.RewardResourcePools();
+        bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
+        rewardResourcePoolResults += GetPassOrFail(passedFifth);
+
+        //Succeed in rewarding no one and adding to pool.
+        processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        remainingPool[0] += 2710.0 * 0.15;
+        remainingPool[1] += 1035.0 * 0.05;
+        remainingPool[2] += 1175.0 * 0.05;
+        target = processor.state.players["cairo"].resources.ToArray();
+        processor.RewardResourcePools();
+        bool passedSixth = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
+        rewardResourcePoolResults += GetPassOrFail(passedSixth);
     }
     
     void SetIslandResources()
@@ -2230,10 +2344,10 @@ public class GSPTesting : MonoBehaviour
                                                                                                                            
         label = new string[] { "NationUpdate      : ", "SearchIslands     : ", "PurchaseUnits     : ", "BuildCollectors    : ", "BuildBunkers      : ",
         "BuildBlocker       : ", "BuildBlonkers     : ", "UpdateDefenders: ", "UpdateResources: ", "SubmitDepleted  : ", "SubmitResources: ",
-        "RewardDepleted : "};
+        "ResourceTransfer: ", "RewardDepleted  : ", "RewardResources: "};
         results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults,
         purchaseBlockerResults, purchaseBlockerAndBunkerResults, defenseUpdateResults, resourceUpdateResults, depletedIslandResults, resourcePoolResults,
-        rewardDepletedResults};
+        transferResourcesResults, rewardDepletedResults, rewardResourcePoolResults};
         
         for (int r = 0; r < results.Length; r++)
         {

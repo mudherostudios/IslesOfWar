@@ -331,13 +331,10 @@ namespace IslesOfWar
 
             public void SubmitResourcesToPool(string player, ResourceOrder order)
             {
-                bool canSubmit = order.rsrc >= 0 && order.rsrc <= 3 && order.amnt != null;
+                bool canSubmit = order.rsrc >= 0 && order.rsrc <= 2 && order.amnt != null;
 
                 if (canSubmit)
-                    canSubmit = order.amnt.Count == 3;
-
-                if (order.rsrc > 0 && canSubmit)
-                    canSubmit = order.amnt[order.rsrc - 1] == 0;
+                    canSubmit = order.amnt.Count == 3 && order.amnt[order.rsrc] == 0;
 
                 List<double> updatedResources = new List<double>();
                 updatedResources.Add(state.players[player].resources[0]);
@@ -358,7 +355,7 @@ namespace IslesOfWar
 
                     if (!state.resourceContributions.ContainsKey(player))
                     {
-                        List<List<double>> contribution = new List<List<double>> { new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, };
+                        List<List<double>> contribution = new List<List<double>> { new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 }, new List<double> { 0, 0, 0 } };
                         contribution[order.rsrc] = order.amnt;
                         state.resourceContributions.Add(player, contribution);
                     }
@@ -406,58 +403,59 @@ namespace IslesOfWar
                 if (state.resourceContributions.Count >= 1)
                 {
                     ownership = new double[state.resourceContributions.Count][];
-                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, "oil");
-                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, "metal");
-                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, "concrete");
+                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, "oil") + state.resourcePools[1];
+                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, "metal") + state.resourcePools[2];
+                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, "concrete") + state.resourcePools[3];
                     
-                    if (state.resourceContributions.Count > 1)
+                    modifiers = CalculateResourcePoolModifiers(poolSizes);
+                    owners = state.resourceContributions.Keys.ToArray();
+
+                    //Calculate the point ownership of each contributor
+                    for (int o = 0; o < owners.Length; o++)
                     {
-                        modifiers = CalculateResourcePoolModifiers(ref poolSizes);
-                        owners = state.resourceContributions.Keys.ToArray();
+                        ownership[o] = new double[3];
 
-                        //Calculate the point ownership of each contributor
-                        for (int o = 0; o < owners.Length; o++)
+                        for (int p = 0; p < poolSizes.Length; p++)
                         {
-                            ownership[o] = new double[3];
+                            int[] types = new int[2];
 
-                            for (int p = 0; p < poolSizes.Length; p++)
-                            {
-                                int[] types = new int[2];
+                            if (p == 0)
+                                types = new int[] { 1, 2 };
+                            else if (p == 1)
+                                types = new int[] { 0, 2 };
+                            else if (p == 2)
+                                types = new int[] { 0, 1 };
 
-                                if (p == 0)
-                                    types = new int[] { 1, 2 };
-                                else if (p == 1)
-                                    types = new int[] { 0, 2 };
-                                else if (p == 2)
-                                    types = new int[] { 0, 1 };
-
-                                ownership[o][p] += modifiers[(p * 2) + 0] * state.resourceContributions[owners[o]][p][types[0]];
-                                ownership[o][p] += modifiers[(p * 2) + 1] * state.resourceContributions[owners[o]][p][types[1]];
-                                totalPoints[p] += ownership[o][p];
-                            }
-                        }
-
-                        //Reward owners percentage
-                        for (int o = 0; o < owners.Length; o++)
-                        {
-                            state.players[owners[o]].resources[1] += Math.Floor(poolSizes[0] * ownership[o][0] / totalPoints[0]);
-                            state.players[owners[o]].resources[2] += Math.Floor(poolSizes[1] * ownership[o][1] / totalPoints[1]);
-                            state.players[owners[o]].resources[3] += Math.Floor(poolSizes[2] * ownership[o][2] / totalPoints[2]);
+                            ownership[o][p] += modifiers[(p * 2) + 0] * state.resourceContributions[owners[o]][p][types[0]];
+                            ownership[o][p] += modifiers[(p * 2) + 1] * state.resourceContributions[owners[o]][p][types[1]];
+                            totalPoints[p] += ownership[o][p];
                         }
                     }
-                    else if (state.resourceContributions.Count == 1)
+
+                    //Reward owners percentage
+                    for (int o = 0; o < owners.Length; o++)
                     {
-                        string winner = state.resourceContributions.Keys.ToArray()[0];
-                        List<double> resources = new List<double> { 0, poolSizes[0], poolSizes[1], poolSizes[2] };
-                        state.players[winner].resources = Add(resources, state.players[winner].resources);
+                        if(totalPoints[0] > 0)
+                            state.players[owners[o]].resources[1] += Math.Floor(poolSizes[0] * (ownership[o][0] / totalPoints[0]));
+                        if (totalPoints[1] > 0)
+                            state.players[owners[o]].resources[2] += Math.Floor(poolSizes[1] * (ownership[o][1] / totalPoints[1]));
+                        if (totalPoints[2] > 0)
+                            state.players[owners[o]].resources[3] += Math.Floor(poolSizes[2] * (ownership[o][2] / totalPoints[2]));
+                    }
+
+                    state.resourceContributions.Clear();
+                    for (int p = 0; p < totalPoints.Length; p++)
+                    {
+                        if (totalPoints[p] != 0)
+                            state.resourcePools[p + 1] = 0.0;
                     }
                 }
             }
 
-            double[] CalculateResourcePoolModifiers(ref double[] poolSizes)
+            public double[] CalculateResourcePoolModifiers( double[] poolSizes)
             {
                 double[] modifiers = new double[6];
-                
+                double[] tempPools = new double[] { poolSizes[0], poolSizes[1], poolSizes[2] };
                 for (int p = 0; p < poolSizes.Length; p++)
                 {
                     int[] types = new int[2];
@@ -470,19 +468,19 @@ namespace IslesOfWar
                         types = new int[] { 0, 1 };
 
                     if (poolSizes[types[0]] <= 0)
-                        poolSizes[types[0]] = poolSizes[types[1]];
+                        tempPools[types[0]] = poolSizes[types[1]];
 
                     if (poolSizes[types[1]] <= 0)
-                        poolSizes[types[1]] = poolSizes[types[0]];
+                        tempPools[types[1]] = poolSizes[types[0]];
 
                     if (poolSizes[types[0]] <= 0)
                     {
-                        poolSizes[types[0]] = 1.0;
-                        poolSizes[types[1]] = 1.0;
+                        tempPools[types[0]] = 1.0;
+                        tempPools[types[1]] = 1.0;
                     }
 
-                    modifiers[0 + (p * 2)] = poolSizes[types[1]] / poolSizes[types[0]];
-                    modifiers[1 + (p * 2)] = poolSizes[types[0]] / poolSizes[types[1]];
+                    modifiers[0 + (p * 2)] = tempPools[types[1]] / tempPools[types[0]];
+                    modifiers[1 + (p * 2)] = tempPools[types[0]] / tempPools[types[1]];
                 }
 
                 return modifiers;
