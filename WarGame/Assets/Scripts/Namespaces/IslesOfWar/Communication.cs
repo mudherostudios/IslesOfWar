@@ -128,6 +128,54 @@ namespace IslesOfWar
                 else
                     return false;
             }
+
+            public static bool AttackPlan(List<List<int>> plan)
+            {
+                bool isValid = plan.Count > 0 && plan.Count <= 3;
+
+                if (isValid)
+                {
+                    for (int squad = 0; squad < plan.Count && isValid; squad++)
+                    {
+                        isValid = plan[squad].Count == 6 && plan[squad][0] != 5 && plan[squad][0] != 6;
+
+                        for (int step = 0; step < plan[squad].Count && isValid; step++)
+                        {
+                            isValid = plan[squad][step] >= 0 && plan[squad][step] <= 11;
+
+                            if (isValid && step < 5)
+                                isValid = Combat.AdjacencyMatrix.IsAdjacent(plan[squad][step], plan[squad][step + 1]);
+                        }
+                    }
+                }
+
+                return isValid;
+            }
+
+            public static bool AttackSquad(List<List<int>> squad, double[] availableUnits)
+            {
+                bool isValid = squad.Count > 0 && squad.Count < 4;
+
+                for (int s = 0; s < squad.Count && isValid; s++)
+                {
+                    isValid = squad[s].Count == 9;
+                    bool enoughUnits = false;
+
+                    for (int u = 0; u < 9 && isValid; u++)
+                    {
+                        availableUnits[u] -= squad[s][u];
+
+                        isValid = availableUnits[u] >= 0;
+
+                        if (!enoughUnits && isValid)
+                            enoughUnits = squad[s][u] > 0;
+                    }
+                    
+                    isValid = isValid && enoughUnits;
+                }
+
+                return isValid;
+            }
         }
     }
 }

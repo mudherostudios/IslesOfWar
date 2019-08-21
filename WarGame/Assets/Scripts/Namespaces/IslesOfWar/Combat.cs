@@ -505,7 +505,7 @@ namespace IslesOfWar
                 unitProbabilities = trueProbabilities;
             }
 
-            double GetTotalUnitCount()
+            public double GetTotalUnitCount()
             {
                 double total = 0;
                 double[] units = fullSquad;

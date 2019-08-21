@@ -31,6 +31,8 @@ public class GSPTesting : MonoBehaviour
     string transferResourcesResults = "";
     string rewardDepletedResults = "";
     string rewardResourcePoolResults = "";
+    string attackTestingResults = "";
+    string terrainTestingResults = "";
     string[] label;
     string[] results;
     double[,] colCost = Constants.collectorCosts;
@@ -66,6 +68,8 @@ public class GSPTesting : MonoBehaviour
         TestDepletedIslandSubmissions();
         TestReourcePoolSubmission();
         ResourceTransferTest();
+        AttackCycleTesting();
+        MovementBlockTesting();
         Debug.Log(GetTestResultStrings());
     }
 
@@ -2007,7 +2011,282 @@ public class GSPTesting : MonoBehaviour
         bool passedSixth = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
         rewardResourcePoolResults += GetPassOrFail(passedSixth);
     }
-    
+
+    void AttackCycleTesting()
+    {
+        ResetTestData();
+        attackTestingResults = "";
+        string savedState = JsonConvert.SerializeObject(processor.state);
+        int[][] goodPlanMin = new int[][] { new int[] { 0, 1, 2, 3, 7, 6 } };
+        int[][] goodPlanMax = new int[][] { new int[] { 0, 1, 2, 3, 7, 6 }, new int[] { 11, 10, 9, 8, 4, 5 }, new int[] { 3, 6, 5, 4, 9, 10 } };
+        int[][] tooLongPlan = new int[][] { new int[] { 0, 1, 2, 3, 7, 6 }, new int[] { 11, 10, 9, 8, 4, 5 }, new int[] { 8, 4, 1, 5, 10, 6 }, new int[] { 3, 6, 5, 4, 9, 10 } };
+        int[][] notAdjacentPlan = new int[][] { new int[] { 0, 10, 2, 3, 7, 6 } };
+        int[][] notLandablePlan = new int[][] { new int[] { 5, 6, 7, 3, 2, 1 } };
+        int[][] goodForceMin = new int[][] { new int[] { 50, 25, 12, 0, 0, 0, 0, 0, 0 } };
+        int[][] tinyForceMin = new int[][] { new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        int[][] goodForceMax = new int[][] 
+        {
+            new int[] { 18, 9, 4, 0, 0, 0, 0, 0, 0 },
+            new int[] { 16, 8, 4, 0, 0, 0, 0, 0, 0 },
+            new int[] { 16, 8, 4, 0, 0, 0, 0, 0, 0 }
+        };
+        int[][] tooLongForce = new int[][]
+        {
+            new int[] { 12, 6, 3, 0, 0, 0, 0, 0, 0 },
+            new int[] { 12, 6, 3, 0, 0, 0, 0, 0, 0 },
+            new int[] { 12, 6, 3, 0, 0, 0, 0, 0, 0 },
+            new int[] { 13, 7, 3, 0, 0, 0, 0, 0, 0 }
+        };
+        int[][] notEnoughTroops = new int[][] { new int[] { 100, 25, 12, 0, 0, 0, 0, 0, 0 } };
+        int[][] badSquadSize = new int[][] { new int[] { 50, 25, 12, 0, 0, 0 } };
+
+        //Fail because bad id
+        State tempState = JsonConvert.DeserializeObject<State>(savedState);
+        processor.AttackIsland("pimpMacD", new BattleCommand("", goodPlanMin, goodForceMin));
+        bool passedFirst = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedFirst);
+
+        //Fail because id doesn't exist
+        processor.AttackIsland("pimpMacD", new BattleCommand("z", goodPlanMin, goodForceMin));
+        bool passedSecond = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedSecond);
+
+        //Fail because id belongs to self
+        processor.AttackIsland("pimpMacD", new BattleCommand("e", goodPlanMin, goodForceMin));
+        bool passedThird = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedThird);
+
+        //Fail because plan was too short
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", new int[][] { }, new int[][] { }));
+        bool passedFourth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedFourth);
+
+        //Fail because plan was too long
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", tooLongPlan, tooLongForce));
+        bool passedFifth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedFifth);
+
+        //Fail because plan does not match squads
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMax));
+        bool passedSixth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedSixth);
+
+        //Fail because plan is not adjacent
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", notAdjacentPlan, goodForceMin));
+        bool passedSeventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedSeventh);
+
+        //Fail because units can not start in center
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", notLandablePlan, goodForceMin));
+        bool passedEighth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedEighth);
+
+        //Fail because not enough units
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, notEnoughTroops));
+        bool passedNinth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedNinth);
+
+        //Fail because malformed squad
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, badSquadSize));
+        bool passedTenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedTenth);
+
+        //Succeed in capturing undefended island
+        tempState.islands["a"].owner = "pimpMacD";
+        tempState.players["cairo"].islands.Remove("a");
+        tempState.players["pimpMacD"].islands.Add("a");
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        bool passedEleventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedEleventh);
+
+        //Succeed in capturing defended island with minimum squad.
+        ResetTestData();
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5, 1, 2, 6, 4, 9, 10 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        bool passedTwelfth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedTwelfth);
+
+        //Succeed in capturing defended island while landing with minimum squad.
+        ResetTestData();
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 0, 1, 4 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        bool passedThirteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedThirteenth);
+
+        //Fail in capturing defended island while landing with minimum squad.
+        ResetTestData();
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 0, 1, 4 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 100, 100, 100, 0, 0, 0, 0, 0, 0 } };
+        tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
+        tempState.players["pimpMacD"].units[0]--;
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        bool passedFourteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedFourteenth);
+
+        //Fail in capturing defended island with minimum squad.
+        ResetTestData();
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5, 1, 2, 6, 4, 9, 10 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 100, 100, 100, 0, 0, 0, 0, 0, 0 } };
+        tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
+        tempState.players["pimpMacD"].units[0]--;
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        bool passedFifteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedFifteenth);
+
+        //Fail in capturing defended island with minimum squad because did not kill last squad.
+        ResetTestData();
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        bool passedSixteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedSixteenth);
+
+        //Fail in capturing defended island with minimum squad because both teams died.
+        ResetTestData();
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.players["pimpMacD"].units[0]--;
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 0 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        bool passedSeventeenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedSeventeenth);
+
+        //Succeed in capturing defended island with maximum squads vs multiple defenders.
+        ResetTestData();
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].owner = "pimpMacD";
+        tempState.players["cairo"].islands.Remove("a");
+        tempState.players["pimpMacD"].islands.Add("a");
+        processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 1, 0, 4, 5, 2 }, new List<int> { 9, 8, 4, 5, 10 } };
+        processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMax, goodForceMax));
+        bool passedEigthteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        attackTestingResults += GetPassOrFail(passedEigthteenth);
+    }
+
+    void MovementBlockTesting()
+    {
+        ResetTestData();
+        terrainTestingResults = "";
+        processor.state.players["pimpMacD"].units = new List<double> { 100, 100, 100, 100, 100, 100, 100, 100, 100 };
+        string savedState = JsonConvert.SerializeObject(processor.state);
+        int[][] allTerrainTypesPlan = new int[][] { new int[] { 3, 6, 10, 9, 8, 4 } };
+        int[][] dualAttack = new int[][] { new int[] { 1, 4, 8, 9, 5, 2 }, new int[] { 11, 10, 9, 9, 9, 9 } };
+        int[][] tinyTroopForce = new int[][] { new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        int[][] dualTinyTroopForce = new int[][] { new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        int[][] troopsHeavyForce = new int[][] { new int[] { 100, 100, 100, 0, 0, 0, 0, 0, 0 } };
+        int[][] tankHeavyForce = new int[][] { new int[] { 0, 0, 0, 100, 100, 100, 0, 0, 0 } };
+        int[][] airHeavyForce = new int[][] { new int[] { 0, 0, 0, 0, 0, 0, 100, 100, 100 } };
+
+        //Succeed in blocking troops with troop blocker
+        State tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 3 }, new List<int> { 6 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0}, new List<int> { 1000, 1000, 1000, 0, 0, 0, 0, 0, 100 } };
+        tempState.islands["a"].defenses = ")))0))))))))";
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, troopsHeavyForce));
+        bool passedFirst = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedFirst);
+
+        //Succeed in blocking tanks with tank blocker
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 3 }, new List<int> { 10 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 1000, 1000, 1000, 0, 0, 0, 0, 0, 100 } };
+        tempState.islands["a"].defenses = ")))a))))))))";
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce));
+        bool passedSecond = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedSecond);
+
+        //Succeed in blocking aircraft with air blocker
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 3 }, new List<int> { 6 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 0, 0, 0, 0, 0, 900, 900, 0 } };
+        tempState.islands["a"].defenses = ")))A))))))))";
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce));
+        bool passedThird = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedThird);
+
+        //Succeed in blocking tanks with lake feature
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 6 }, new List<int> { 10 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 } };
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce));
+        bool passedFourth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedFourth);
+
+        //Succeed in blocking aircraft with mountain feature
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 10 }, new List<int> { 9 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 500, 0, 0, 500, 0, 0, 500, 0 } };
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce));
+        bool passedFifth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedFifth);
+
+        //Succeed in blocking defender tanks with lake feature
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 11, 6 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 }};
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.state.islands["a"].defenses = "))))))))))a)";
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce));
+        bool passedSixth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedSixth);
+
+        //Succeed in blocking defender aircraft with mountain feature
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 11, 10 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 0, 0, 0, 500, 500, 500 } };
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        processor.state.islands["a"].defenses = ")))))))))a))";
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce));
+        bool passedSeventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedSeventh);
+
+        //Fail in defender attacking unit in non adjacent react zone
+        tempState = JsonConvert.DeserializeObject<State>(savedState);
+        tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5, 1, 10 } };
+        tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 } };
+        processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
+        tempState.players["pimpMacD"].units[0]--;
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", dualAttack, dualTinyTroopForce));
+        bool passedEighth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
+        && DefensePlansAreEqual(processor.state.islands, tempState.islands);
+        terrainTestingResults += GetPassOrFail(passedEighth);
+    }
+
+
     void SetIslandResources()
     {
         foreach (KeyValuePair<string, Island> pair in processor.state.islands)
@@ -2344,10 +2623,10 @@ public class GSPTesting : MonoBehaviour
                                                                                                                            
         label = new string[] { "NationUpdate      : ", "SearchIslands     : ", "PurchaseUnits     : ", "BuildCollectors    : ", "BuildBunkers      : ",
         "BuildBlocker       : ", "BuildBlonkers     : ", "UpdateDefenders: ", "UpdateResources: ", "SubmitDepleted  : ", "SubmitResources: ",
-        "ResourceTransfer: ", "RewardDepleted  : ", "RewardResources: "};
+        "ResourceTransfer: ", "RewardDepleted  : ", "RewardResources: ", "AttackTests         : ", "MoveBlocking      : "};
         results = new string[] { nationResults, searchIslandResults, purchaseUnitResults, purchaseCollectorsResults, purchaseBunkerResults,
         purchaseBlockerResults, purchaseBlockerAndBunkerResults, defenseUpdateResults, resourceUpdateResults, depletedIslandResults, resourcePoolResults,
-        transferResourcesResults, rewardDepletedResults, rewardResourcePoolResults};
+        transferResourcesResults, rewardDepletedResults, rewardResourcePoolResults, attackTestingResults, terrainTestingResults};
         
         for (int r = 0; r < results.Length; r++)
         {
