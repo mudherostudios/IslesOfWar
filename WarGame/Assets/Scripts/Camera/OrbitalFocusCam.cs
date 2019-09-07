@@ -52,6 +52,7 @@ public class OrbitalFocusCam : MonoBehaviour
 
                     if (didHit)
                     {
+                        Debug.Log(hit.transform.name);
                         if (hit.transform != null && hit.transform != focalTarget && hit.transform.tag == "WorldButton")
                         {
                             if (hit.transform.GetComponent<WorldButton>().buttonType == "IslandTile")
