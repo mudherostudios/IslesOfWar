@@ -173,6 +173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1155618855985929152}
   - component: {fileID: 7942944574925877121}
+  - component: {fileID: 4045868222522366368}
   m_Layer: 0
   m_Name: MetalOreMine
   m_TagString: Untagged
@@ -210,6 +211,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f26cee610d63f4a849db56a835324d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldAmounts: 
+  fields: []
+--- !u!65 &4045868222522366368
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155618855986350048}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.7883797, y: 1, z: 3.2593575}
+  m_Center: {x: -0.09216118, y: 0, z: -0.17992783}
 --- !u!1 &1155618855986350050
 GameObject:
   m_ObjectHideFlags: 0
@@ -5241,13 +5257,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2866144081321253680}
-  m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: -0.126, y: 0.488, z: -1.168}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalRotation: {x: -0.7008275, y: 0.28689578, z: 0.24742584, w: 0.6044105}
+  m_LocalPosition: {x: -0, y: 0.31, z: -0.51}
+  m_LocalScale: {x: 6.624853, y: 6.624853, z: 6.624853}
   m_Children: []
   m_Father: {fileID: 1155618855985929152}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: -90.00001, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: -98.449, y: 0, z: 44.524994}
 --- !u!33 &2866144081318119216
 MeshFilter:
   m_ObjectHideFlags: 0

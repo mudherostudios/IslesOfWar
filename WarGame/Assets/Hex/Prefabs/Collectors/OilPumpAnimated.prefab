@@ -1129,6 +1129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8354415792951783029}
   - component: {fileID: 7341281571428190319}
+  - component: {fileID: 1020047809103241768}
   m_Layer: 0
   m_Name: OilPumpAnimated
   m_TagString: Untagged
@@ -1166,6 +1167,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f26cee610d63f4a849db56a835324d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldAmounts: 
+  fields: []
+--- !u!65 &1020047809103241768
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8354415792951783030}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.01648066, y: 0.046073675, z: 0.07581531}
+  m_Center: {x: -0.0050562858, y: 0.016238976, z: 0.02019975}
 --- !u!1 &8354415792977341319
 GameObject:
   m_ObjectHideFlags: 0

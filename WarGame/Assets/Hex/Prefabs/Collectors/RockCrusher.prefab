@@ -196,6 +196,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6750488723060955412}
   - component: {fileID: 2339726905201723478}
+  - component: {fileID: 3856575543489401022}
   m_Layer: 0
   m_Name: RockCrusher
   m_TagString: Untagged
@@ -234,6 +235,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f26cee610d63f4a849db56a835324d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldAmounts: 
+  fields: []
+--- !u!65 &3856575543489401022
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5621200061322844125}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.069996655, y: 0.050754946, z: 0.06410037}
+  m_Center: {x: 0.015001684, y: -0.011648893, z: 0.0017307277}
 --- !u!1 &5977933283230223306
 GameObject:
   m_ObjectHideFlags: 0
