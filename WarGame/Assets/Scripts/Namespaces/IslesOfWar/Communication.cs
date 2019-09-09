@@ -251,7 +251,7 @@ namespace IslesOfWar
                 for (int s = 0; s < submission.Count; s++)
                 {
                     canSubmit = canSubmit && actualState.players[player].islands.Contains(submission[s])
-                    && actualState.islands[submission[s]].isDepleted;
+                    && actualState.islands[submission[s]].isDepleted();
                 }
 
                 return canSubmit;
@@ -341,7 +341,7 @@ namespace IslesOfWar
 
             public static bool AttackSquad(List<List<int>> squad, double[] availableUnits)
             {
-                bool isValid = squad.Count > 0 && squad.Count < 3;
+                bool isValid = squad.Count > 0 && squad.Count <= 3;
 
                 isValid = HasEnoughTroops(squad, availableUnits, isValid);
 

@@ -6,20 +6,17 @@ using UnityEngine;
 using IslesOfWar.Combat;
 using IslesOfWar.Communication;
 using IslesOfWar.ClientSide;
+using Newtonsoft.Json;
 
 namespace IslesOfWar
 {
     namespace GameStateProcessing
     {
-        public class StateProcessor
+        public class StateProcessor : MonoBehaviour
         {
             public State state;
 
-            public StateProcessor()
-            {
-                state = new State();
-                state.Init();
-            }
+            public StateProcessor() { }
 
             public StateProcessor(State _state)
             {

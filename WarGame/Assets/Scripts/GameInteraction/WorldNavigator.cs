@@ -89,6 +89,8 @@ public class WorldNavigator : MonoBehaviour
 
     private void Awake()
     {
+        gameStateProcessor = gameObject.AddComponent<StateProcessor>();
+        clientInterface = gameObject.AddComponent<ClientInterface>();
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
         discoveryScript = gameObject.AddComponent<IslandDiscoveryInteraction>();
@@ -96,7 +98,8 @@ public class WorldNavigator : MonoBehaviour
 
     private void Start()
     {
-        //Make sure we have some sort of GSP.Connect() here
+        //Make sure we have some sort of GSP.Connect() here.
+        CreateTestState();
         commandScript.enabled = true;
         managementScript.enabled = false;
         discoveryScript.enabled = false;
@@ -135,6 +138,43 @@ public class WorldNavigator : MonoBehaviour
         managementScript.Initialize();
 
         SetCommandMode();
+    }
+
+    void CreateTestState()
+    {
+        UnityEngine.Random.InitState(1337);
+        gameStateProcessor = new StateProcessor();
+
+        Dictionary<string, PlayerState>  players = new Dictionary<string, PlayerState>
+        {
+            {"cairo", new PlayerState("US", new double[9], new double[] {3000, 7500, 6000, 1500}, new string[] {"a", "b", "c", "d"}, "") },
+            {"pimpMacD", new PlayerState("US", new double[] {50, 25, 12, 5, 2, 1, 5, 2, 1 }, new double[] {1000, 2500, 2000, 500}, new string[] { "e", "f", "g", "h", "i"}, "") },
+            {"nox", new PlayerState("MX", new double[] {100, 50, 25, 10, 5, 2, 10, 5, 1 }, new double[] {0, 0, 0, 0}, new string[] { "j", "k", "l", "m", "n", "n"}, "") }
+        };
+
+        Dictionary<string, Island>  islands = new Dictionary<string, Island>
+        {
+            {"a", IslandGenerator.Generate("cairo")},
+            {"b", IslandGenerator.Generate("cairo")},
+            {"c", IslandGenerator.Generate("cairo")},
+            {"d", IslandGenerator.Generate("cairo")},
+            {"e", IslandGenerator.Generate("pimpMacD")},
+            {"f", IslandGenerator.Generate("pimpMacD")},
+            {"g", IslandGenerator.Generate("pimpMacD")},
+            {"h", IslandGenerator.Generate("pimpMacD")},
+            {"i", IslandGenerator.Generate("pimpMacD")},
+            {"j", IslandGenerator.Generate("nox")},
+            {"k", IslandGenerator.Generate("nox")},
+            {"l", IslandGenerator.Generate("nox")},
+            {"m", IslandGenerator.Generate("nox")},
+            {"n", IslandGenerator.Generate("nox")},
+            {"o", IslandGenerator.Generate("nox")}
+        };
+
+        gameStateProcessor.state = new State(players, islands);
+        clientInterface.gameStateProcessor = gameStateProcessor;
+        clientInterface.clientState = new State(players, islands);
+        clientInterface.player = "cairo";
     }
 
     private void Update()

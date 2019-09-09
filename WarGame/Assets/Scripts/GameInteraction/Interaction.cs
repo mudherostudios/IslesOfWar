@@ -144,6 +144,7 @@ public class Interaction : MonoBehaviour
     public void SetVariables(StateProcessor stateProcessor, ClientInterface client, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
     {
         gameStateProcessor = stateProcessor;
+        clientInterface = client;
         cam = _cam;
         orbital = _orbital;
         screenGUI = _screenGUI;

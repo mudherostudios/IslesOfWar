@@ -2352,6 +2352,8 @@ public class GSPTesting : MonoBehaviour
         //Changing this seed will break a lot of the tests.
         UnityEngine.Random.InitState(1337);
         processor = new StateProcessor();
+        processor.state = new State();
+        processor.state.Init();
 
         players = new Dictionary<string, PlayerState>
         {
@@ -2379,7 +2381,7 @@ public class GSPTesting : MonoBehaviour
             {IIDs[14], IslandGenerator.Generate("nox")}
         };
 
-        processor.state = new State(players, islands, new Dictionary<string, List<List<double>>>(), new Dictionary<string, List<string>>());
+        processor.state = new State(players, islands);
     }
 
     double[] Add(double[] a, double[] b)

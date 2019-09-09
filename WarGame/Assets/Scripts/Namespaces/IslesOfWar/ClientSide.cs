@@ -115,6 +115,18 @@ namespace IslesOfWar
                 resourcePools = new List<double> { 0, 0, 0, 0 };
             }
 
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands)
+            {
+                players = new Dictionary<string, PlayerState>();
+                islands = new Dictionary<string, Island>();
+                resourceContributions = new Dictionary<string, List<List<double>>>();
+                depletedContributions = new Dictionary<string, List<string>>();
+
+                players = JsonConvert.DeserializeObject<Dictionary<string, PlayerState>>(JsonConvert.SerializeObject(allPlayers));
+                islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
+                resourcePools = new List<double> { 0, 0, 0, 0 };
+            }
+
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions)
             {
                 players = new Dictionary<string, PlayerState>();
@@ -273,21 +285,18 @@ namespace IslesOfWar
                 }
             }
 
-            public bool isDepleted
+            public bool isDepleted()
             {
-                get
+                for (int t = 0; t < 12; t++)
                 {
-                    for (int t = 0; t < 12; t++)
+                    for (int r = 0; r < 3; r++)
                     {
-                        for (int r = 0; r < 3; r++)
-                        {
-                            if (resources[t][r] > 0)
-                                return false;
-                        }
+                        if (resources[t][r] > 0)
+                            return false;
                     }
-
-                    return true;
                 }
+
+                return true;
             }
 
             public double[] GetTotalSquadMembers()
