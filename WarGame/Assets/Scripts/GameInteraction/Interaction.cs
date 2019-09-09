@@ -4,12 +4,14 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using IslesOfWar.ClientSide;
+using IslesOfWar.GameStateProcessing;
 
 public class Interaction : MonoBehaviour
 {
     public Camera cam;
     public OrbitalFocusCam orbital;
-    public StateMaster stateMaster;
+    public StateProcessor gameStateProcessor;
+    public ClientInterface clientInterface;
     public ScreenGUI screenGUI;
 
     [Header("Button Types")]
@@ -139,9 +141,9 @@ public class Interaction : MonoBehaviour
         screenGUI.SetGUIContents();
     }
 
-    public void SetVariables(StateMaster _stateMaster, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
+    public void SetVariables(StateProcessor stateProcessor, ClientInterface client, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
     {
-        stateMaster = _stateMaster;
+        gameStateProcessor = stateProcessor;
         cam = _cam;
         orbital = _orbital;
         screenGUI = _screenGUI;

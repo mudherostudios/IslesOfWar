@@ -129,23 +129,15 @@ public class IslandDiscoveryInteraction : Interaction
 
     void DiscoverRandomIslands()
     {
-        IslandMessage islandData = stateMaster.SendIslandDiscoveryRequest();
-
-        if (islandData.success)
-        {
-            discoveredIsland = islandData.island;
-            orbital.ExploreMode(newIslandObservePoint, false);
-            orbital.SetNewObservePoint(newIslandObservePoint, newIslandFocus);
-        }
+        bool success = clientInterface.SearchIslands();
     }
 
+    //Remove. Only send command. Game State Processor must generate. Just view the one that it generates. 
     public void GenerateDiscoveryIslands()
     {
-        //Talks to Server
         Debug.Log("Remember to make this use a reliable random with seed.");
         DiscoverRandomIslands();
         discoveredIslandObject = new GameObject();
-
 
         Vector3 pos = spawnPosition.position + Vector3.Scale(maxPositionAdjustment, new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f)));
         Vector3 rot = new Vector3(0, Random.value * 360, 0);
@@ -153,10 +145,8 @@ public class IslandDiscoveryInteraction : Interaction
         IslandStats stats = discoveredIslandObject.transform.GetComponent<IslandStats>();
         stats.animator.enabled = false;
         stats.islandInfo = discoveredIsland;
-        stats.TurnOnIslandBadge(stateMaster.player);
+        stats.TurnOnIslandBadge(clientInterface.player);
         PlaceTiles(discoveredIsland, stats, discoveredIslandObject.transform);
-
-        
     }
 
     public void RemoveIslands()
@@ -168,14 +158,4 @@ public class IslandDiscoveryInteraction : Interaction
 
         discoveredIslandObject = null;
     }
-
-    /*
-    public void SubmitSelectedIsland()
-    {
-        if (stateMaster.SendDiscoveredIslandSelection(selectedDiscoveredIsland))
-        {
-            islands = stateMaster.playerState.islands;
-            islandCount = islands.Length;
-        }
-    }*/
 }

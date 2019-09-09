@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class WorldGUI : MonoBehaviour
 {
+    [SerializeField]
     protected int[] fieldAmounts;
+    [SerializeField]
     protected string[] fields;
 
     public void AddCharacter(string str, int ID)

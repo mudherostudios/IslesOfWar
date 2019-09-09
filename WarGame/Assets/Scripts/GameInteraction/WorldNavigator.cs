@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using IslesOfWar.ClientSide;
+using IslesOfWar.GameStateProcessing;
 
 //Orchestrates activity between the main island interaction, manageable island interaction, and discovery island interaction.
 public class WorldNavigator : MonoBehaviour
@@ -13,7 +14,8 @@ public class WorldNavigator : MonoBehaviour
     public IslandDiscoveryInteraction discoveryScript;
 
     [Header("Common Variables")]
-    public StateMaster stateMaster;
+    public StateProcessor gameStateProcessor;
+    public ClientInterface clientInterface;
     public Camera cam;
     public OrbitalFocusCam orbital;
     public ScreenGUI screenGUI;
@@ -90,12 +92,11 @@ public class WorldNavigator : MonoBehaviour
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
         discoveryScript = gameObject.AddComponent<IslandDiscoveryInteraction>();
-        stateMaster = gameObject.AddComponent<StateMaster>();
     }
 
     private void Start()
     {
-        stateMaster.Connect();
+        //Make sure we have some sort of GSP.Connect() here
         commandScript.enabled = true;
         managementScript.enabled = false;
         discoveryScript.enabled = false;
@@ -118,15 +119,15 @@ public class WorldNavigator : MonoBehaviour
         //Discovery Variables
         Transform[] cameraObservationPoints = new Transform[] { threeIslandObservationPoint, fiveIslandObservationPoint, threeIslandFocus, fiveIslandFocus };
 
-        commandScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
+        commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
-        commandScript.SetCommandVariables(unitPurchaseGUIs, poolContributeGUIs, commandCenter);
+        commandScript.SetCommandVariables(commandCenter);
 
-        managementScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
+        managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
 
-        discoveryScript.SetVariables(stateMaster, cam, orbital, screenGUI, buttonTypes);
+        discoveryScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPosition, maxPositionAdjustment);
         discoveryScript.SetObservationPoints(cameraObservationPoints);
 
