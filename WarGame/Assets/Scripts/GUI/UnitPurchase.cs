@@ -34,10 +34,10 @@ public class UnitPurchase: WorldGUI
         string formatM = "";
         string formatC = "";
         double amount = fieldAmounts[0];
-        double warbucks = amount * unitCost.warbucks;
-        double oil = amount * unitCost.oil;
-        double metal = amount * unitCost.metal;
-        double concrete = amount * unitCost.concrete;
+        double warbucks = amount * unitCost.costs[0];
+        double oil = amount * unitCost.costs[1];
+        double metal = amount * unitCost.costs[2];
+        double concrete = amount * unitCost.costs[3];
 
         if (warbucks > 10000)
             formatW = "G2";

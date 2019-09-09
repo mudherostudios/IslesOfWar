@@ -44,26 +44,10 @@ public class CommandIslandInteraction : Interaction
         }
 
         Typing();
-        UpdateTimers();
     }
 
-    public void SetCommandVariables(UnitPurchase[] unitGUIs, PoolContribute[] poolGUIs, Transform _commandCenter)
+    public void SetCommandVariables(Transform _commandCenter)
     {
-        riflemanPurchase = unitGUIs[0];
-        machineGunnerPurchase = unitGUIs[1];
-        bazookamanPurchase = unitGUIs[2];
-        lightTankPurchase = unitGUIs[3];
-        mediumTankPurchase = unitGUIs[4];
-        heavyTankPurchase = unitGUIs[5];
-        lightFighterPurchase = unitGUIs[6];
-        mediumFighterPurchase = unitGUIs[7];
-        bomberPurchase = unitGUIs[8];
-
-        warbucksPool = poolGUIs[0];
-        oilPool = poolGUIs[1];
-        metalPool = poolGUIs[2];
-        concretePool = poolGUIs[3];
-
         commandCenter = _commandCenter;
     }
 
@@ -132,46 +116,24 @@ public class CommandIslandInteraction : Interaction
 
     void InitializePoolGUIs()
     {
-        warbucksPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
-        oilPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
-        metalPool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
-        concretePool.Initialize(stateMaster.player, stateMaster.state.resourceContributions, 0);
+        //New Pool GUIs
     }
 
     void InitializeUnitGUIs()
     {
-        riflemanPurchase.Initialize(new Cost(Constants.unitCosts, 0, 1, "rifleman"));
-        machineGunnerPurchase.Initialize(new Cost(Constants.unitCosts, 1, 1, "machineGunner"));
-        bazookamanPurchase.Initialize(new Cost(Constants.unitCosts, 2, 1, "bazookaman"));
-
-        lightTankPurchase.Initialize(new Cost(Constants.unitCosts, 3, 1, "lightTank"));
-        mediumTankPurchase.Initialize(new Cost(Constants.unitCosts, 4, 1, "mediumTank"));
-        heavyTankPurchase.Initialize(new Cost(Constants.unitCosts, 5, 1, "heavyTank"));
-
-        lightFighterPurchase.Initialize(new Cost(Constants.unitCosts, 6, 1, "lightFighter"));
-        mediumFighterPurchase.Initialize(new Cost(Constants.unitCosts, 7, 1, "mediumFighter"));
-        bomberPurchase.Initialize(new Cost(Constants.unitCosts, 8, 1, "bomber"));
+       //New Unit GUIs
     }
 
     void UpdateAllPoolGUIs()
     {
-        warbucksPool.UpdateAllStats();
-        oilPool.UpdateAllStats();
-        metalPool.UpdateAllStats();
-        concretePool.UpdateAllStats();
-    }
-
-    void UpdateTimers()
-    {
-        if (selectedPoolContribute != null)
-            selectedPoolContribute.UpdateTimer();
+        //New Pool Updates (By block)
     }
 
     void Purchase(Cost purchaseAmount)
     {
         if (purchaseAmount.amount != 0)
         {
-            stateMaster.SendPurchaseRequest(stateMaster.player, purchaseAmount);
+            //Purchase Command to Network
             SetGUIContents();
         }
     }
@@ -180,7 +142,7 @@ public class CommandIslandInteraction : Interaction
     {
         if (sendAmount.amount != 0)
         {
-            stateMaster.SendResourcesToPool(stateMaster.player, sendAmount);
+            //Resource Pool Command to Network
             SetGUIContents();
         }
     }

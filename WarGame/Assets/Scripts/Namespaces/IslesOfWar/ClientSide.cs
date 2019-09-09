@@ -173,9 +173,7 @@ namespace IslesOfWar
             public List<List<int>> squadPlans; //Should be max 4 squads with max 7 zoneIDs of 0-11
             public List<List<int>> squadCounts; //Should be max 4 squads with max 9 slots for counts of unit types
 
-            public Island()
-            {
-            }
+            public Island(){}
 
             public Island(string _owner, string _features, string _collectors, string _defenses)
             {
@@ -275,18 +273,21 @@ namespace IslesOfWar
                 }
             }
 
-            public bool isDepleted()
+            public bool isDepleted
             {
-                for (int t = 0; t < 12; t++)
+                get
                 {
-                    for (int r = 0; r < 3; r++)
+                    for (int t = 0; t < 12; t++)
                     {
-                        if (resources[t][r] > 0)
-                            return false;
+                        for (int r = 0; r < 3; r++)
+                        {
+                            if (resources[t][r] > 0)
+                                return false;
+                        }
                     }
-                }
 
-                return true;
+                    return true;
+                }
             }
 
             public double[] GetTotalSquadMembers()
@@ -330,26 +331,20 @@ namespace IslesOfWar
         //Phase out
         public struct Cost
         {
-            public double warbucks, oil, metal, concrete;
             public double amount;
+            public double[] costs;
             public string type;
 
-            public Cost(double _warbucks, double _oil, double _metal, double _concrete, double _amount, string _type)
+            public Cost(double[,] _costs, int row, double _amount)
             {
-                warbucks = _warbucks;
-                oil = _oil;
-                metal = _metal;
-                concrete = _concrete;
+                costs = new double[] { _costs[row, 0], _costs[row, 1], _costs[row, 2], _costs[row, 3] };
                 amount = _amount;
-                type = _type;
+                type = row.ToString();
             }
 
-            public Cost(double[,] costs, int row, double _amount, string _type)
+            public Cost(double[] _costs, double _amount, string _type)
             {
-                warbucks = costs[0, row];
-                oil = costs[1, row];
-                metal = costs[2, row];
-                concrete = costs[3, row];
+                costs = _costs;
                 amount = _amount;
                 type = _type;
             }
@@ -359,18 +354,22 @@ namespace IslesOfWar
         public struct StructureCost
         {
             public string islandID;
-            public int warbucks, oil, metal, concrete;
             public int tileIndex, purchaseType;
 
-            public StructureCost(int _warbucks, int _oil, int _metal, int _concrete, string _islandID, int _tileIndex, int _purchaseType)
+            public StructureCost(string _islandID, int _tileIndex, int _purchaseType)
             {
-                warbucks = _warbucks;
-                oil = _oil;
-                metal = _metal;
-                concrete = _concrete;
                 islandID = _islandID;
                 tileIndex = _tileIndex;
                 purchaseType = _purchaseType;
+            }
+
+            public double[] resources
+            {
+                get
+                {
+                    return new double[] {Constants.collectorCosts[purchaseType,0], Constants.collectorCosts[purchaseType, 1],
+                    Constants.collectorCosts[purchaseType, 2], Constants.collectorCosts[purchaseType,3] };
+                }
             }
         }
 

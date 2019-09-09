@@ -98,7 +98,7 @@ public class PoolContribute: WorldGUI
         int.TryParse(tradeAmounts[2].text, out concrete);
         int contributions = (int)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
 
-        Cost cost = new Cost(0, oil, metal, concrete, contributions, poolStrType);
+        Cost cost = new Cost(new double[] {0, oil, metal, concrete }, contributions, poolStrType);
         Reset();
         return cost;
     }

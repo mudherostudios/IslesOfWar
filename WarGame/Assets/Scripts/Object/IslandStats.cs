@@ -20,7 +20,7 @@ public class IslandStats: MonoBehaviour
     {
         int type = 0;
 
-        if (islandInfo.isDepleted())
+        if (islandInfo.isDepleted)
             type = 2;
         else if (islandInfo.owner != player && islandInfo.owner != "")
             type = 1;

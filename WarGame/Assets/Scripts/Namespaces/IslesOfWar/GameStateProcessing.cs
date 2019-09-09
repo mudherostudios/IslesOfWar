@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using IslesOfWar.ClientSide;
+using IslesOfWar.Communication;
 
 namespace IslesOfWar
 {
@@ -155,18 +156,18 @@ namespace IslesOfWar
                 if (!state.resourceContributions.ContainsKey(playerName))
                     state.resourceContributions.Add(playerName, new List<List<double>> { new List<double>(), new List<double>(), new List<double>(), new List<double>() } );
 
-                if (CanSpendResources(playerName, resources, true))
+                if (Validity.HasEnoughResources(resources.costs, state.players[playerName].allResources))
                 {
                     SpendResources(playerName, resources, true);
 
                     if (resources.type == "warbucksPool")
-                        state.resourceContributions[playerName][0] = new List<double>() { resources.oil, resources.metal, resources.concrete };
+                        state.resourceContributions[playerName][0] = new List<double>() { resources.costs[1], resources.costs[2], resources.costs[3], };
                     else if (resources.type == "oilPool")
-                        state.resourceContributions[playerName][1] = new List<double> { resources.metal, resources.concrete };
+                        state.resourceContributions[playerName][1] = new List<double> { resources.costs[2], resources.costs[3] };
                     else if (resources.type == "metalPool")
-                        state.resourceContributions[playerName][2] = new List<double> { resources.oil, resources.concrete };
+                        state.resourceContributions[playerName][2] = new List<double> { resources.costs[1], resources.costs[3] };
                     else if (resources.type == "concretePool")
-                        state.resourceContributions[playerName][3] = new List<double> { resources.oil, resources.metal };
+                        state.resourceContributions[playerName][3] = new List<double> { resources.costs[1], resources.costs[2] };
 
                     return state;
                 }
@@ -199,7 +200,7 @@ namespace IslesOfWar
                     int[] resources = EncodeUtility.GetBaseTypes(resourceType);
                     int[] collectors = EncodeUtility.GetBaseTypes(collectorType);
 
-                    successfulPurchase = CanSpendResources(playerName, cost);
+                    successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].allResources);
 
                     for (int r = 0; r < resources.Length; r++)
                     {
@@ -235,7 +236,7 @@ namespace IslesOfWar
 
                     if (cost.purchaseType > 0 && cost.purchaseType <= tileDefenses.Length)
                     {
-                        successfulPurchase = CanSpendResources(playerName, cost);
+                       successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].allResources);
 
                         if (blockerType != 0 && cost.purchaseType <= 3)
                             successfulPurchase = false;
@@ -302,28 +303,10 @@ namespace IslesOfWar
             //Phase Out After Changed in Client
             public State PurchaseUnits(string playerName, Cost cost)
             {
-                if (CanSpendResources(playerName, cost, false))
+                if (Validity.HasEnoughResources(cost.costs, state.players[playerName].allResources))
                 {
                     SpendResources(playerName, cost, false);
-
-                    if (cost.type == "rifleman")
-                        state.players[playerName].units[0] += cost.amount;
-                    else if (cost.type == "machineGunner")
-                        state.players[playerName].units[1] += cost.amount;
-                    else if (cost.type == "bazookaman")
-                        state.players[playerName].units[2] += cost.amount;
-                    else if (cost.type == "lightTank")
-                        state.players[playerName].units[3] += cost.amount;
-                    else if (cost.type == "mediumTank")
-                        state.players[playerName].units[4] += cost.amount;
-                    else if (cost.type == "heavyTank")
-                        state.players[playerName].units[5] += cost.amount;
-                    else if (cost.type == "lightFighter")
-                        state.players[playerName].units[6] += cost.amount;
-                    else if (cost.type == "mediumFighter")
-                        state.players[playerName].units[7] += cost.amount;
-                    else if (cost.type == "bomber")
-                        state.players[playerName].units[8] += cost.amount;
+                    //Deleted name type costs
                 }
 
                 return state;
@@ -342,44 +325,12 @@ namespace IslesOfWar
             }
 
             //Phase out in client
-            bool CanSpendResources(string player, StructureCost resources)
-            {
-                Cost cost = new Cost(resources.warbucks, resources.oil, resources.metal, resources.concrete, 1, "ResourceCollector");
-
-                return CanSpendResources(player, cost, false);
-            }
-
-            //Phase out in client
-            bool CanSpendResources(string player, Cost resources, bool isResourcePool)
-            {
-                double w = resources.warbucks;
-                double o = resources.oil;
-                double m = resources.metal;
-                double c = resources.concrete;
-
-                if (!isResourcePool)
-                {
-                    w *= resources.amount;
-                    o *= resources.amount;
-                    m *= resources.amount;
-                    c *= resources.amount;
-                }
-
-                if (w <= state.players[player].resources[0] && o <= state.players[player].resources[1] && m <= state.players[player].resources[2] && c <= state.players[player].resources[3])
-                {
-                    return true;
-                }
-
-                return false;
-            }
-
-            //Phase out in client
             void SpendResources(string player, Cost resources, bool isResourcePool)
             {
-                double w = resources.warbucks;
-                double o = resources.oil;
-                double m = resources.metal;
-                double c = resources.concrete;
+                double w = resources.costs[0];
+                double o = resources.costs[1];
+                double m = resources.costs[2];
+                double c = resources.costs[3];
 
                 if (!isResourcePool)
                 {

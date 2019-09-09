@@ -69,12 +69,13 @@ public class IslandManagementInteraction: Interaction
         {
             CollectorPurchasePrompter prompter = selectedButton.gameObject.GetComponent<CollectorPurchasePrompter>();
             int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
-            string resourceType = stateMaster.state.islands[islandID].features[tileIndex].ToString();
-            string collectorType = stateMaster.state.islands[islandID].collectors[tileIndex].ToString();
+            string resourceType = gameStateProcessor.state.islands[islandID].features[tileIndex].ToString();
+            string collectorType = gameStateProcessor.state.islands[islandID].collectors[tileIndex].ToString();
             int purchaseType = prompter.purchaseType;
 
-            StructureCost cost = new StructureCost(0, 0, 0, 0, islandID, tileIndex, purchaseType);
-            if (stateMaster.SendPurchaseCollectorRequest(stateMaster.player, cost))
+            StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType);
+
+            if (clientInterface.PurchaseIslandCollector(cost))
             {
                 prompter.hiddenObject.SetActive(true);
                 prompter.gameObject.SetActive(false);
@@ -88,8 +89,9 @@ public class IslandManagementInteraction: Interaction
         int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
         int purchaseType = prompter.purchaseType;
 
-        StructureCost cost = new StructureCost(0, 0, 0, 0, islandID, tileIndex, purchaseType);
-        if (stateMaster.SendPurchaseDefenseRequest(stateMaster.player, cost))
+        StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType);
+
+        if (clientInterface.PurchaseIslandDefense(cost))
         {
             prompter.hiddenObject.SetActive(true);
             prompter.gameObject.SetActive(false);
@@ -124,12 +126,12 @@ public class IslandManagementInteraction: Interaction
 
     public void TurnOnIsland()
     {
-        islands = stateMaster.state.players[stateMaster.player].islands.ToArray();
+        islands = clientInterface.clientState.players[clientInterface.player].islands.ToArray();
         islandIndex = 0;
         islandID = islands[islandIndex];
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
-        PlaceTiles(stateMaster.state.islands[islandID], currentStats, currentIsland.transform);
+        PlaceTiles(clientInterface.clientState.islands[islandID], currentStats, currentIsland.transform);
     }
 
     public void TurnOffIsland()
@@ -176,7 +178,7 @@ public class IslandManagementInteraction: Interaction
 
             int possibleIndexes = islandCount;
 
-            if (stateMaster.state.players[stateMaster.player].attackableIsland != "")
+            if (clientInterface.clientState.players[clientInterface.player].attackableIsland != "")
                 possibleIndexes += 1;
 
             if (islandIndex + increment >= possibleIndexes)
@@ -189,9 +191,9 @@ public class IslandManagementInteraction: Interaction
             Island island = new Island();
 
             if (islandIndex < islandCount)
-                island = stateMaster.state.islands[islandID];
+                island = clientInterface.clientState.islands[islandID];
             else
-                island = stateMaster.state.islands[stateMaster.state.players[stateMaster.player].attackableIsland];
+                island = clientInterface.clientState.islands[clientInterface.clientState.players[clientInterface.player].attackableIsland];
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
         }
@@ -313,7 +315,7 @@ public class IslandManagementInteraction: Interaction
 
     public void Initialize()
     {
-        islands = stateMaster.state.players[stateMaster.player].islands.ToArray();
+        islands = clientInterface.clientState.players[clientInterface.player].islands.ToArray();
         islandIndex = 0;
         islandCount = islands.Length;
         direction = 0;
