@@ -79,6 +79,7 @@ public class IslandManagementInteraction: Interaction
             {
                 prompter.hiddenObject.SetActive(true);
                 prompter.gameObject.SetActive(false);
+                SetGUIContents();
             }
         }
     }
@@ -189,6 +190,7 @@ public class IslandManagementInteraction: Interaction
                 islandIndex += increment;
 
             Island island = new Island();
+            islandID = clientInterface.clientState.players[clientInterface.player].allIslands[islandIndex];
 
             if (islandIndex < islandCount)
                 island = clientInterface.clientState.islands[islandID];
