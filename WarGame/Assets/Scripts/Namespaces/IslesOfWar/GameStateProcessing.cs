@@ -63,9 +63,6 @@ namespace IslesOfWar
 
         public static class IslandGenerator
         {
-            public static float[] tileProbabilities = new float[] {0.65f, 0.25f, 0.1f};
-            public static float[] resourceProbabilities = new float[] {0.1f, 0.2f, 0.15f };
-
             public static Island Generate()
             {
                 return Generate("");
@@ -94,9 +91,9 @@ namespace IslesOfWar
                 int resource = 0;
                 int count = 0;
 
-                for (int p = 1; p < resourceProbabilities.Length + 1 && count < 3; p++)
+                for (int p = 1; p < Constants.resourceProbabilities.Length + 1 && count < 3; p++)
                 {
-                    if (Random.value < resourceProbabilities[p - 1])
+                    if (Random.value < Constants.resourceProbabilities[p - 1])
                     {
                         resource += p;
                         count++;
@@ -116,16 +113,16 @@ namespace IslesOfWar
                 float feature = Random.value;
                 float last = 0.0f;
 
-                for (int p = 0; p < tileProbabilities.Length; p++)
+                for (int p = 0; p < Constants.tileProbabilities.Length; p++)
                 {
-                    if (feature <= tileProbabilities[p] + last)
+                    if (feature <= Constants.tileProbabilities[p] + last)
                     {
                         type = p;
-                        p = tileProbabilities.Length;
+                        p = Constants.tileProbabilities.Length;
                     }
                     else
                     {
-                        last += tileProbabilities[p];
+                        last += Constants.tileProbabilities[p];
                     }
                 }
 

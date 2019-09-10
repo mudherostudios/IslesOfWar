@@ -11,7 +11,6 @@ public class WorldNavigator : MonoBehaviour
     [Header("Managed Scripts")]
     public CommandIslandInteraction commandScript;
     public IslandManagementInteraction managementScript;
-    public IslandDiscoveryInteraction discoveryScript;
 
     [Header("Common Variables")]
     public StateProcessor gameStateProcessor;
@@ -34,10 +33,6 @@ public class WorldNavigator : MonoBehaviour
     public Vector3 deleteRight;
     public float islandChangeSpeed;
 
-    [Header("Discovery Generation")]
-    public Transform spawnPosition;
-    public Vector3 maxPositionAdjustment;
-
     [Header("Command Island GUIs")]
     public UnitPurchase riflemanPurchase;
     public UnitPurchase machineGunnerPurchase;
@@ -56,14 +51,10 @@ public class WorldNavigator : MonoBehaviour
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
     public Transform managementObservationPoint;
-    public Transform threeIslandObservationPoint;
-    public Transform fiveIslandObservationPoint;
 
     [Header("Camera Focus Points")]
     public Transform commandFocusPoint;
     public Transform managementFocusPoint;
-    public Transform threeIslandFocus;
-    public Transform fiveIslandFocus;
 
     [Header("Command Mode Variables")]
     public Transform commandIsland;
@@ -72,13 +63,11 @@ public class WorldNavigator : MonoBehaviour
     [Header("Scene Cleaning")]
     public float commandCleanTimer;
     public float managementCleanTimer;
-    public float discoveryCleanTimer;
-
+    
     enum Mode
     {
         COMMAND,
         MANAGEMENT,
-        DISCOVERY,
         NONE
     }
 
@@ -93,16 +82,16 @@ public class WorldNavigator : MonoBehaviour
         clientInterface = gameObject.AddComponent<ClientInterface>();
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
-        discoveryScript = gameObject.AddComponent<IslandDiscoveryInteraction>();
     }
 
     private void Start()
     {
         //Make sure we have some sort of GSP.Connect() here.
         CreateTestState();
+        screenGUI.client = clientInterface;
+        screenGUI.SetGUIContents();
         commandScript.enabled = true;
         managementScript.enabled = false;
-        discoveryScript.enabled = false;
         orbital.ExploreMode(commandIsland, false);
         orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
 
@@ -119,9 +108,6 @@ public class WorldNavigator : MonoBehaviour
         //Management Variables
         Vector3[] positions = new Vector3[] { generateCenter, genereateRotation, deleteLeft, deleteRight };
 
-        //Discovery Variables
-        Transform[] cameraObservationPoints = new Transform[] { threeIslandObservationPoint, fiveIslandObservationPoint, threeIslandFocus, fiveIslandFocus };
-
         commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
         commandScript.SetCommandVariables(commandCenter);
@@ -129,10 +115,6 @@ public class WorldNavigator : MonoBehaviour
         managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
-
-        discoveryScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
-        discoveryScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, spawnPosition, maxPositionAdjustment);
-        discoveryScript.SetObservationPoints(cameraObservationPoints);
 
         commandScript.Initialize();
         managementScript.Initialize();
@@ -189,10 +171,6 @@ public class WorldNavigator : MonoBehaviour
             {
                 managementScript.TurnOffIsland();
             }
-            else if (cleanMode == Mode.DISCOVERY)
-            {
-                discoveryScript.RemoveIslands();
-            }
         }
 
         if (Input.GetKeyDown(KeyCode.M) && mode != Mode.MANAGEMENT)
@@ -202,10 +180,6 @@ public class WorldNavigator : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.C) && mode != Mode.COMMAND)
         {
             SetCommandMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.D) && mode != Mode.DISCOVERY)
-        {
-            SetDiscoveryMode(0);
         }
 
         if (mode == Mode.COMMAND && traversing && orbital.isAtTarget)
@@ -226,8 +200,6 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.MANAGEMENT)
             managementScript.enabled = false;
-        else if (mode == Mode.DISCOVERY)
-            discoveryScript.enabled = false;
 
         mode = Mode.COMMAND;
         commandScript.enabled = true;
@@ -248,8 +220,6 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.COMMAND)
             commandScript.enabled = false;
-        else if (mode == Mode.DISCOVERY)
-            discoveryScript.enabled = false;
 
         mode = Mode.MANAGEMENT;
 
@@ -258,28 +228,6 @@ public class WorldNavigator : MonoBehaviour
         managementScript.GotoObservationPoint();
 
         sceneCleanTimer = managementCleanTimer;
-    }
-
-    public void SetDiscoveryMode(int missionType)
-    {
-        traversing = true;
-
-        if (mode != cleanMode)
-            cleanMode = mode;
-        else
-            cleanMode = Mode.NONE;
-
-        if (mode == Mode.COMMAND)
-            commandScript.enabled = false;
-        else if (mode == Mode.MANAGEMENT)
-            managementScript.enabled = false;
-
-        mode = Mode.DISCOVERY;
-
-        discoveryScript.enabled = true;
-        discoveryScript.GenerateDiscoveryIslands();
-
-        sceneCleanTimer = discoveryCleanTimer;
     }
 
     bool isClean()
@@ -293,5 +241,15 @@ public class WorldNavigator : MonoBehaviour
         {
             return true;
         }
+    }
+
+    public void IncrementIslandMangementQueue(int increment)
+    {
+        managementScript.IncrementIslandIndex(increment);
+    }
+
+    public void ResumeIslandQueue()
+    {
+        managementScript.GotoObservationPoint();
     }
 }

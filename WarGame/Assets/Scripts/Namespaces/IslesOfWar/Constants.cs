@@ -147,6 +147,9 @@ namespace IslesOfWar
         public static float[] extractRates = new float[] { 10, 20, 30 };
         public static float[] freeResourceRates = new float[] {4, 3, 2, 1 };
 
+        public static float[] tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
+        public static float[] resourceProbabilities = new float[] { 0.1f, 0.2f, 0.15f };
+
         //X = Warbucks Oil Metal Lime 
         //Y = Units Collectors Defenses Search
         public static double[,] purchaseToPoolPercents = new double[,]
@@ -156,6 +159,7 @@ namespace IslesOfWar
             {0.15, 0.05, 0.05, 0.05},
             {0.15, 0.05, 0.05, 0.05}
         };
+
 
     }
 }

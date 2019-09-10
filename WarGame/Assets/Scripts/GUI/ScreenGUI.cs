@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ScreenGUI : MonoBehaviour
 {
-    public StateMaster stateMaster;
+    public ClientInterface client;
 
     [Header("GUI Elements")]
     public Text[] resourceContent;
@@ -59,10 +59,11 @@ public class ScreenGUI : MonoBehaviour
 
     public void SetGUIContents()
     {
-        resourceContent[0].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[0]);
-        resourceContent[1].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[1]);
-        resourceContent[2].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[2]);
-        resourceContent[3].text = GetOrderOfMagnitudeString(stateMaster.state.players[stateMaster.player].resources[3]);
+        double[] playerResources = client.playerResources;
+        resourceContent[0].text = GetOrderOfMagnitudeString(playerResources[0]);
+        resourceContent[1].text = GetOrderOfMagnitudeString(playerResources[1]);
+        resourceContent[2].text = GetOrderOfMagnitudeString(playerResources[2]);
+        resourceContent[3].text = GetOrderOfMagnitudeString(playerResources[3]);
     }
 
     string GetOrderOfMagnitudeString(double amount)

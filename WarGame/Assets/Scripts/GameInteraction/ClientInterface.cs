@@ -35,7 +35,7 @@ public class ClientInterface : MonoBehaviour
 
         if (gameStateProcessor.state.islands[cost.islandID].owner == player)
         {
-            string tileResources = clientState.islands[player].features[cost.tileIndex].ToString();
+            string tileResources = clientState.islands[cost.islandID].features[cost.tileIndex].ToString();
             string tileCollectors = clientState.islands[cost.islandID].collectors[cost.tileIndex].ToString();
 
             int resourceType = EncodeUtility.GetXType(tileResources);
@@ -46,7 +46,7 @@ public class ClientInterface : MonoBehaviour
 
             successfulPurchase = Validity.HasEnoughResources(cost.resources, clientState.players[player].allResources);
 
-            for (int r = 0; r < resources.Length; r++)
+            for (int r = 0; r < resources.Length && successfulPurchase; r++)
             {
                 //Minus 1 because types start at 1 not zero. Zero is no type.
                 if (collectors[r] != resources[r] && r == cost.purchaseType - 1)
@@ -58,6 +58,7 @@ public class ClientInterface : MonoBehaviour
 
             if (successfulPurchase)
             {
+                SpendResources(cost.resources);
                 collectors[cost.purchaseType - 1] = cost.purchaseType;
                 UpdateCollectors(cost.islandID, cost.tileIndex, collectors);
             }
@@ -131,6 +132,14 @@ public class ClientInterface : MonoBehaviour
         return Validity.HasEnoughResources(Constants.islandSearchCost, clientState.players[player].allResources);
     }
 
+    void SpendResources(double[] resources)
+    {
+        clientState.players[player].resources[0] -= resources[0];
+        clientState.players[player].resources[1] -= resources[1];
+        clientState.players[player].resources[2] -= resources[2];
+        clientState.players[player].resources[3] -= resources[3];
+    }
+
     public Island[] playerIslands
     {
         get
@@ -158,12 +167,12 @@ public class ClientInterface : MonoBehaviour
 
     public double[] playerResources
     {
-        get { return gameStateProcessor.state.players[player].allResources; }
+        get { return clientState.players[player].allResources; }
     }
 
     public double[] playerUnits
     {
-        get { return gameStateProcessor.state.players[player].allUnits; }
+        get { return clientState.players[player].allUnits; }
     }
 
     public bool[] QueueIsValid()

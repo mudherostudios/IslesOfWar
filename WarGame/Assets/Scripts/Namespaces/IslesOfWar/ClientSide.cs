@@ -376,8 +376,8 @@ namespace IslesOfWar
             {
                 get
                 {
-                    return new double[] {Constants.collectorCosts[purchaseType,0], Constants.collectorCosts[purchaseType, 1],
-                    Constants.collectorCosts[purchaseType, 2], Constants.collectorCosts[purchaseType,3] };
+                    return new double[] {Constants.collectorCosts[purchaseType-1,0], Constants.collectorCosts[purchaseType-1, 1],
+                    Constants.collectorCosts[purchaseType-1, 2], Constants.collectorCosts[purchaseType-1,3] };
                 }
             }
         }
