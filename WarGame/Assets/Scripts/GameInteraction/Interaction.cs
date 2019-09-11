@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using IslesOfWar.ClientSide;
 using IslesOfWar.GameStateProcessing;
 
@@ -35,11 +35,12 @@ public class Interaction : MonoBehaviour
             RaycastHit hit;
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit) && !EventSystem.current.IsPointerOverGameObject())
             {
                 if (hit.transform.tag == "WorldButton")
                 {
                     selectedButton = hit.transform.GetComponent<WorldButton>();
+                    selectedWorldUIObject = hit.transform;
                     clickedButtonType = selectedButton.buttonType;
 
                     if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[2])
@@ -66,7 +67,6 @@ public class Interaction : MonoBehaviour
         if (destination != null)
         {
             orbital.ExploreMode(destination, true);
-            selectedWorldUIObject = null;
             selectedWorldUI = null;
         }
     }

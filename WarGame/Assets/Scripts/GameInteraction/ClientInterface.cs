@@ -121,9 +121,22 @@ public class ClientInterface : MonoBehaviour
         return successfulPurchase;
     }
 
-    public void PurchaseUnits(Cost cost)
+    //Make sure to add queuedAction updates as well.
+    public void PurchaseUnits(int type, int amount)
     {
+        double[] spend = new double[4];
+        spend[0] = Constants.unitCosts[type, 0] * amount;
+        spend[1] = Constants.unitCosts[type, 1] * amount;
+        spend[2] = Constants.unitCosts[type, 2] * amount;
+        spend[3] = Constants.unitCosts[type, 3] * amount;
 
+        bool canSpend = Validity.HasEnoughResources(spend, clientState.players[player].allResources);
+
+        if (canSpend)
+        {
+            SpendResources(spend);
+            clientState.players[player].units[type] += amount;
+        }
     }
 
     //Make sure to add queuedAction updates as well.
