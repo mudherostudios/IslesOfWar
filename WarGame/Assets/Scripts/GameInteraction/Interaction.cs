@@ -15,7 +15,7 @@ public class Interaction : MonoBehaviour
     public ScreenGUI screenGUI;
 
     [Header("Button Types")]
-    public string[] buttonTypes = new string[] { "NavigationButton", "ObjectRevealer", "InputField", "IndexedNavigation"};
+    public string[] buttonTypes = new string[] { "NavigationButton", "ObjectRevealer", "IndexedNavigation"};
 
     private string clickedButtonType = "None";
     protected bool isTyping = false;
@@ -42,17 +42,13 @@ public class Interaction : MonoBehaviour
                     selectedButton = hit.transform.GetComponent<WorldButton>();
                     clickedButtonType = selectedButton.buttonType;
 
-                    if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[3])
+                    if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[2])
                     {
                         NavigateToDestination();
                     }
                     else if (clickedButtonType == buttonTypes[1])
                     {
                         RevealObject();
-                    }
-                    else if (clickedButtonType == buttonTypes[2])
-                    {
-                        SelectInputField();
                     }
                 }
             }
@@ -85,20 +81,6 @@ public class Interaction : MonoBehaviour
                 hiddenObject.SetActive(false);
             else if (!hiddenObject.activeSelf)
                 hiddenObject.SetActive(true);
-        }
-    }
-
-    //Fix "selectedWorldUI" logic in CommandIslandInteraction
-    //Currently uses whether or not it is null to reset guis
-    private void SelectInputField()
-    {
-        InputField inputField = selectedButton.GetComponent<InputField>();
-
-        if (inputField != null)
-        {
-            selectedWorldUI = inputField.guiParent;
-            isTyping = true;
-            fieldID = inputField.fieldID;
         }
     }
 

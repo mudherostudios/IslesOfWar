@@ -33,20 +33,12 @@ public class WorldNavigator : MonoBehaviour
     public Vector3 deleteRight;
     public float islandChangeSpeed;
 
-    [Header("Command Island GUIs")]
-    public UnitPurchase riflemanPurchase;
-    public UnitPurchase machineGunnerPurchase;
-    public UnitPurchase bazookamanPurchase;
-    public UnitPurchase lightTankPurchase;
-    public UnitPurchase mediumTankPurchase;
-    public UnitPurchase heavyTankPurchase;
-    public UnitPurchase lightFighterPurchase;
-    public UnitPurchase mediumFighterPurchase;
-    public UnitPurchase bomberPurchase;
-    public PoolContribute warbucksPool;
-    public PoolContribute oilPool;
-    public PoolContribute metalPool;
-    public PoolContribute concretePool;
+    [Header("Command Island GUIs and Variables")]
+    public GameObject unitPurchases;
+    public GameObject resourcePools;
+    public GameObject warbuxPool;
+    public int unitType;
+    public int resourceType;
 
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
@@ -96,9 +88,6 @@ public class WorldNavigator : MonoBehaviour
         orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
 
         //Command Variables
-        UnitPurchase[] unitPurchaseGUIs = new UnitPurchase[] { riflemanPurchase, machineGunnerPurchase, bazookamanPurchase, lightTankPurchase, mediumTankPurchase,
-            heavyTankPurchase, lightFighterPurchase, mediumFighterPurchase, bomberPurchase };
-        PoolContribute[] poolContributeGUIs = new PoolContribute[] { warbucksPool, oilPool, metalPool, concretePool };
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -116,7 +105,6 @@ public class WorldNavigator : MonoBehaviour
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
 
-        commandScript.Initialize();
         managementScript.Initialize();
 
         SetCommandMode();

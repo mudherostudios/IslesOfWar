@@ -1,43 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using IslesOfWar.ClientSide;
-using TMPro;
+using UnityEngine.UI;
+using IslesOfWar;
 
-public class UnitPurchase: WorldGUI
+public class UnitPurchase: MonoBehaviour
 {
-    public Cost unitCost;
-    public TextMeshPro[] resourceCosts;
-    public TextMeshPro purchaseAmount;
+    public Text[] resourceCosts;
+    public InputField purchaseAmount;
+    public CommandIslandInteraction commandScript;
+    int type = 0;
 
-    public void Initialize(Cost cost)
-    {
-        unitCost = cost;
-        fields = new string[] { "" };
-        fieldAmounts = new int[] { 0 };
-        UpdateAllStats();
-    }
-
-    public Cost TryPurchase()
-    {
-        Cost tryCost = unitCost;
-        unitCost.amount = fieldAmounts[0];
-        Reset();
-        return tryCost; 
-    }
-    
-
-    public void UpdateAllStats()
+    public void UpdateAllStats(int type)
     {
         string formatW = "";
         string formatO = "";
         string formatM = "";
-        string formatC = "";
-        double amount = fieldAmounts[0];
-        double warbucks = amount * unitCost.costs[0];
-        double oil = amount * unitCost.costs[1];
-        double metal = amount * unitCost.costs[2];
-        double concrete = amount * unitCost.costs[3];
+        string sAmount = purchaseAmount.text;
+        uint amount = 0;
+        uint.TryParse(sAmount, out amount);
+
+        double warbucks = amount * Constants.unitCosts[type, 0];
+        double oil = amount * Constants.unitCosts[type, 1];
+        double metal = amount * Constants.unitCosts[type, 2];
 
         if (warbucks > 10000)
             formatW = "G2";
@@ -45,13 +30,18 @@ public class UnitPurchase: WorldGUI
             formatO = "G2";
         if (metal > 10000)
             formatM = "G2";
-        if (concrete > 10000)
-            formatC = "G2";
 
         resourceCosts[0].text = warbucks.ToString(formatW);
         resourceCosts[1].text = oil.ToString(formatO);
         resourceCosts[2].text = metal.ToString(formatM);
-        resourceCosts[3].text = concrete.ToString(formatC);
-        purchaseAmount.text = fieldAmounts[0].ToString();
     }
+
+    public void QueuePurchase()
+    {
+        string sAmount = purchaseAmount.text;
+        int amount = 0;
+        int.TryParse(sAmount, out amount);
+        commandScript.PurchaseUnit(type, amount);
+    }
+
 }
