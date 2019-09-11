@@ -2402,8 +2402,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 88237295}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1 &102690933
 GameObject:
   m_ObjectHideFlags: 0
@@ -2631,8 +2631,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 105465475}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1001 &111760105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3654,6 +3654,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1475618245}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3723,16 +3733,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.7011108
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -6932,10 +6932,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!4 &289781844 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 223403346876549528, guid: 3670546425962dc4985e2cdb7a96dc50,
@@ -7337,10 +7337,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1 &302859017
 GameObject:
   m_ObjectHideFlags: 0
@@ -9606,10 +9606,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1 &379248509
 GameObject:
   m_ObjectHideFlags: 0
@@ -9800,8 +9800,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 386038453}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1 &397837459
 GameObject:
   m_ObjectHideFlags: 0
@@ -10943,10 +10943,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1 &440757303
 GameObject:
   m_ObjectHideFlags: 0
@@ -12213,8 +12213,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 455514868}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1001 &456446482
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14295,6 +14295,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1513186152}
     m_Modifications:
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_Name
+      value: 3BentPalmCluster
+      objectReference: {fileID: 0}
     - target: {fileID: 6288267192289693645, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -14364,11 +14369,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.48552498
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_Name
-      value: 3BentPalmCluster
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d53844984a783e74f9138dee6f913deb, type: 3}
@@ -14850,8 +14850,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 609052540}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1001 &611307304
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16126,6 +16126,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 316961750}
     m_Modifications:
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_Name
+      value: 3BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6288267192289693645, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -16195,16 +16205,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.4873469
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_Name
-      value: 3BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 2683771051742415798, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
@@ -18862,6 +18862,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 612824714}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -18931,11 +18936,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.6057128
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc6bab07c1dd8574796d81805e13e7bb, type: 3}
@@ -19733,10 +19733,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &785721539
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24561,6 +24561,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1433176114}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -24630,16 +24640,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.6886861
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -26327,6 +26327,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1394527351}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -26396,16 +26406,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 0.8483171
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -28053,6 +28053,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1394527351}
     m_Modifications:
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_Name
+      value: 3BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6288267192289693645, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -28122,16 +28132,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.33292055
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_Name
-      value: 3BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 2683771051742415798, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
@@ -28538,6 +28538,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1433176114}
     m_Modifications:
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_Name
+      value: 3BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6288267192289693645, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -28607,16 +28617,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.5099256
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_Name
-      value: 3BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 2683771051742415798, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
@@ -31286,18 +31286,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1079169408}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1082778790 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1082778790, guid: 9fc2cad695b829a4abfcf78a2a0d31f3,
-    type: 3}
-  m_PrefabInstance: {fileID: 1839912913}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1991073246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f8565b152055cc44a0c7a3dc305c66d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1083161964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38157,6 +38145,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1513186152}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -38226,11 +38219,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.7241681
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc6bab07c1dd8574796d81805e13e7bb, type: 3}
@@ -40272,10 +40260,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!114 &1376065614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42027,16 +42015,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
---- !u!20 &1487423425 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 8858845447725485688, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
-    type: 3}
-  m_PrefabInstance: {fileID: 1552454506}
-  m_PrefabAsset: {fileID: 0}
+  maxHeight: 0
 --- !u!1001 &1492746281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42521,26 +42503,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 1499981230}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1 &1508367260 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8858845447865777003, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
     type: 3}
   m_PrefabInstance: {fileID: 1552454506}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1508367262 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8858845447865777000, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
-    type: 3}
-  m_PrefabInstance: {fileID: 1552454506}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1508367260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7dfbdd5637fe7b41add5f44ff43c67b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1508367263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42553,9 +42523,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d3bca45e38648e4db1f0497812452b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectTag: Vehicles
-  probabilityOn: 0.25
-  setOnStart: 1
+  objectTag: 
+  probabilityOn: 0
+  setOnStart: 0
 --- !u!114 &1508367266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42572,43 +42542,35 @@ MonoBehaviour:
   managementScript: {fileID: 0}
   gameStateProcessor: {fileID: 0}
   clientInterface: {fileID: 0}
-  cam: {fileID: 1487423425}
-  orbital: {fileID: 1508367262}
-  screenGUI: {fileID: 1082778790}
+  cam: {fileID: 0}
+  orbital: {fileID: 0}
+  screenGUI: {fileID: 0}
   buttonTypes:
-  - NavigationButton
-  - ObjectRevealer
   - InputField
-  - IndexedNavigation
-  tileVariations:
-  - 01234567
-  - abcdefgh
-  - ABCDEFGH
-  tilePrefabs:
-  - {fileID: 966662464732721743, guid: 81c5787ba573e3945a7bf5893a94db42, type: 3}
-  - {fileID: 4241288242902112772, guid: 7f6438573c2bf5649bf44a950f8e364e, type: 3}
-  - {fileID: 6642530852249045017, guid: e4abd08bd7dd4a641b0817542edaedac, type: 3}
-  tileHolderPrefab: {fileID: 6300617430378523379, guid: 23a876c538437eb4ea81d54d88faa102,
-    type: 3}
-  offset: {x: 0, y: 1.6, z: 0}
+  - MenuRevealer
+  - Tile
+  tileVariations: []
+  tilePrefabs: []
+  tileHolderPrefab: {fileID: 0}
+  offset: {x: 0, y: 0, z: 0}
   generateCenter: {x: 0, y: 0, z: 0}
-  genereateRotation: {x: 0, y: -90, z: 0}
-  deleteLeft: {x: -88.5, y: 1, z: 0}
-  deleteRight: {x: 88.5, y: 1, z: 0}
-  islandChangeSpeed: 1
+  genereateRotation: {x: 0, y: 0, z: 0}
+  deleteLeft: {x: 0, y: 0, z: 0}
+  deleteRight: {x: 0, y: 0, z: 0}
+  islandChangeSpeed: 0
   unitPurchases: {fileID: 0}
   resourcePools: {fileID: 0}
   warbuxPool: {fileID: 0}
   unitType: 0
   resourceType: 0
-  commandObservationPoint: {fileID: 1784303693}
-  managementObservationPoint: {fileID: 1184216736}
-  commandFocusPoint: {fileID: 1990790838}
-  managementFocusPoint: {fileID: 1682141041}
-  commandIsland: {fileID: 948545342}
-  commandCenter: {fileID: 1990790838}
-  commandCleanTimer: 1
-  managementCleanTimer: 1
+  commandObservationPoint: {fileID: 0}
+  managementObservationPoint: {fileID: 0}
+  commandFocusPoint: {fileID: 0}
+  managementFocusPoint: {fileID: 0}
+  commandIsland: {fileID: 0}
+  commandCenter: {fileID: 0}
+  commandCleanTimer: 0
+  managementCleanTimer: 0
 --- !u!1 &1509922781
 GameObject:
   m_ObjectHideFlags: 0
@@ -43422,10 +43384,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &1586271519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44774,10 +44736,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &1650299070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45413,6 +45375,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1394527351}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -45482,16 +45454,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 0.5136498
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -47903,6 +47865,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1394527351}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -47972,16 +47944,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 0.6074404
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -48915,10 +48877,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!4 &1838805539 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 223403346876549528, guid: 3670546425962dc4985e2cdb7a96dc50,
@@ -53246,8 +53208,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 1990790838}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!1 &1991073246 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4722382196094387212, guid: 9fc2cad695b829a4abfcf78a2a0d31f3,
@@ -53266,10 +53228,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &1991434243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53496,10 +53458,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 50
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1 &1998011089
 GameObject:
   m_ObjectHideFlags: 0
@@ -53892,7 +53854,7 @@ PrefabInstance:
     - target: {fileID: 3849031124707546242, guid: 23a2757c28c76e546964164b115788d4,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3849031124707313826, guid: 23a2757c28c76e546964164b115788d4,
         type: 3}
@@ -54854,8 +54816,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207b5ca0d3d256943a35f7504d7b5d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: NavigationButton
-  navigationDestination: {fileID: 2080049276}
+  buttonType: 
+  navigationDestination: {fileID: 0}
 --- !u!4 &2104768800 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 223403346876549528, guid: 3670546425962dc4985e2cdb7a96dc50,
@@ -55127,10 +55089,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &2129315773
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55920,10 +55882,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fcd02a9ba31f44b337a936d1472a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: -100
-  verticalSpeed: 1
+  rotateSpeed: 0
+  verticalSpeed: 0
   minHeight: 0
-  maxHeight: 2
+  maxHeight: 0
 --- !u!1001 &2137947340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -81633,6 +81595,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1475618245}
     m_Modifications:
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_Name
+      value: 4BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 8331268318001164038, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -81702,16 +81674,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.51733905
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_Name
-      value: 4BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1430485225952265287, guid: dc6bab07c1dd8574796d81805e13e7bb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7752797539849314218, guid: dc6bab07c1dd8574796d81805e13e7bb,
         type: 3}
@@ -92497,6 +92459,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1475618245}
     m_Modifications:
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_Name
+      value: 3BentPalmCluster
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6288267192289693645, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -92566,16 +92538,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.z
       value: 0.41905648
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_Name
-      value: 3BentPalmCluster
-      objectReference: {fileID: 0}
-    - target: {fileID: 1521730605200724842, guid: d53844984a783e74f9138dee6f913deb,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 2683771051742415798, guid: d53844984a783e74f9138dee6f913deb,
         type: 3}
