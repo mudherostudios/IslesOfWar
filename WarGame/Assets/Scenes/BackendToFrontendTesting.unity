@@ -13442,6 +13442,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3849031124707546242, guid: 23a2757c28c76e546964164b115788d4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3849031124707313826, guid: 23a2757c28c76e546964164b115788d4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -39922,19 +39927,11 @@ MonoBehaviour:
   deleteLeft: {x: -88.5, y: 1, z: 0}
   deleteRight: {x: 88.5, y: 1, z: 0}
   islandChangeSpeed: 1
-  riflemanPurchase: {fileID: 0}
-  machineGunnerPurchase: {fileID: 0}
-  bazookamanPurchase: {fileID: 0}
-  lightTankPurchase: {fileID: 0}
-  mediumTankPurchase: {fileID: 0}
-  heavyTankPurchase: {fileID: 0}
-  lightFighterPurchase: {fileID: 0}
-  mediumFighterPurchase: {fileID: 0}
-  bomberPurchase: {fileID: 0}
-  warbucksPool: {fileID: 0}
-  oilPool: {fileID: 0}
-  metalPool: {fileID: 0}
-  concretePool: {fileID: 0}
+  unitPurchases: {fileID: 0}
+  resourcePools: {fileID: 0}
+  warbuxPool: {fileID: 0}
+  unitType: 0
+  resourceType: 0
   commandObservationPoint: {fileID: 1784303693}
   managementObservationPoint: {fileID: 1184216736}
   commandFocusPoint: {fileID: 1990790838}
@@ -40382,10 +40379,15 @@ PrefabInstance:
       propertyPath: m_TagString
       value: MainCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 8858845447725485691, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 8858845447725485694, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
         type: 3}
       propertyPath: volumeLayer.m_Bits
-      value: 1
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 8858845447725485689, guid: e1e367bb2e65b0241bcf7010ea37a7ca,
         type: 3}
@@ -45838,6 +45840,11 @@ PrefabInstance:
     - target: {fileID: 1959141752, guid: 9fc2cad695b829a4abfcf78a2a0d31f3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: IncrementIslandMangementQueue
+      objectReference: {fileID: 0}
+    - target: {fileID: 4728127300591080969, guid: 9fc2cad695b829a4abfcf78a2a0d31f3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9fc2cad695b829a4abfcf78a2a0d31f3, type: 3}

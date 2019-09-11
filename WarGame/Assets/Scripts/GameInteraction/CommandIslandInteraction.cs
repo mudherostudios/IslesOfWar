@@ -7,41 +7,21 @@ using IslesOfWar.ClientSide;
 
 public class CommandIslandInteraction : Interaction
 {
-    [Header("Purchase GUIs")]
-    public UnitPurchase riflemanPurchase;
-    public UnitPurchase machineGunnerPurchase;
-    public UnitPurchase bazookamanPurchase;
-    public UnitPurchase lightTankPurchase;
-    public UnitPurchase mediumTankPurchase;
-    public UnitPurchase heavyTankPurchase;
-    public UnitPurchase lightFighterPurchase;
-    public UnitPurchase mediumFighterPurchase;
-    public UnitPurchase bomberPurchase;
-
-    [Header("Pool GUIs")]
-    public PoolContribute warbucksPool;
-    public PoolContribute oilPool;
-    public PoolContribute metalPool;
-    public PoolContribute concretePool;
+    [Header("GUIs")]
+    public GameObject unitPurchase;
+    public GameObject warbucksPool;
+    public GameObject resourcePool;
 
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
-    private UnitPurchase selectedUnitPurchase;
-    private PoolContribute selectedPoolContribute;
-    private string[] commandButtonTypes = new string[] { "UnitPurchase", "PoolSend"};
+    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompt"};
 
     private void Update()
     {
-        MenuUpdates();
         bool clicked = Input.GetButtonDown("Fire1");
         WorldButtonCheck(clicked);
-
-        if (clicked)
-        {
-            CheckMainIslandGUIs();
-        }
 
         Typing();
     }
@@ -57,12 +37,6 @@ public class CommandIslandInteraction : Interaction
         focalPoint = focus;
     }
 
-    public void Initialize()
-    {
-        InitializeUnitGUIs();
-        InitializePoolGUIs();
-    }
-
     public void GotoCommandIsland()
     {
         orbital.ExploreMode(commandCenter, false);
@@ -74,64 +48,14 @@ public class CommandIslandInteraction : Interaction
         orbital.ExploreMode(commandCenter, true);
     }
 
-    void CheckMainIslandGUIs()
+    public void SetGUI()
     {
-        if (selectedWorldUI != null)
-        {
-            selectedUnitPurchase = selectedWorldUI.gameObject.GetComponent<UnitPurchase>();
-            selectedPoolContribute = selectedWorldUI.gameObject.GetComponent<PoolContribute>();
-            string peekedType = PeekButtonType();
 
-            if (peekedType == buttonTypes[2])
-            {
-                if (selectedUnitPurchase != null)
-                    selectedUnitPurchase.Reset();
-                if (selectedPoolContribute != null)
-                    selectedPoolContribute.Reset();
-            }
-
-            
-            if (peekedType == commandButtonTypes[0])
-            {
-                Purchase(selectedUnitPurchase.TryPurchase());
-            }
-            else if (peekedType == commandButtonTypes[1])
-            {
-                SendToPool(selectedPoolContribute.TrySend());
-                InitializePoolGUIs();
-            }
-        }
     }
 
-    void MenuUpdates()
+    public void PurchaseUnit(int type, int amount)
     {
-        if (isTyping && selectedWorldUI != null)
-        {
-            if (selectedUnitPurchase != null)
-                selectedUnitPurchase.UpdateAllStats();
-            else if (selectedPoolContribute != null)
-                selectedPoolContribute.UpdateAllStats();
-        }
-    }
-
-    void InitializePoolGUIs()
-    {
-        //New Pool GUIs
-    }
-
-    void InitializeUnitGUIs()
-    {
-       //New Unit GUIs
-    }
-
-    void UpdateAllPoolGUIs()
-    {
-        //New Pool Updates (By block)
-    }
-
-    void Purchase(Cost purchaseAmount)
-    {
-        if (purchaseAmount.amount != 0)
+        if (amount > 0)
         {
             //Purchase Command to Network
             SetGUIContents();
