@@ -24,7 +24,7 @@ public class CommandIslandInteraction : Interaction
     private void Update()
     {
         bool clicked = Input.GetButtonDown("Fire1");
-        WorldButtonCheck(clicked);
+        WorldButtonCheck(clicked, new List<string>{ commandButtonTypes[0] });
 
         if (clicked && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -43,9 +43,10 @@ public class CommandIslandInteraction : Interaction
         Typing();
     }
 
-    public void SetCommandVariables(Transform _commandCenter)
+    public void SetCommandVariables(Transform _commandCenter, string[] buttons)
     {
         commandCenter = _commandCenter;
+        commandButtonTypes = buttons;
     }
 
     public void SetObservationPoints(Transform observe, Transform focus)

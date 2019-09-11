@@ -19,6 +19,8 @@ public class WorldNavigator : MonoBehaviour
     public OrbitalFocusCam orbital;
     public ScreenGUI screenGUI;
     public string[] buttonTypes = new string[] { "InputField", "MenuRevealer", "Tile" };
+    public string[] commandButtons = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompt" };
+    public string[] managementButtons = new string[] {};
 
     [Header("IslandGeneration Variables")]
     public string[] tileVariations;
@@ -101,11 +103,12 @@ public class WorldNavigator : MonoBehaviour
 
         commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
-        commandScript.SetCommandVariables(commandCenter);
+        commandScript.SetCommandVariables(commandCenter, commandButtons);
 
         managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
+        //managementScript.SetManagementButtons(managementButtons);
 
         managementScript.Initialize();
 

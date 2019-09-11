@@ -30,6 +30,11 @@ public class Interaction : MonoBehaviour
 
     protected void WorldButtonCheck(bool didClick)
     {
+        WorldButtonCheck(didClick, null);
+    }
+
+    protected void WorldButtonCheck(bool didClick, List<string> navigators)
+    {
         if (didClick)
         {
             RaycastHit hit;
@@ -43,7 +48,7 @@ public class Interaction : MonoBehaviour
                     selectedWorldUIObject = hit.transform;
                     clickedButtonType = selectedButton.buttonType;
 
-                    if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[2])
+                    if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[2] || navigators.Contains(clickedButtonType))
                     {
                         NavigateToDestination();
                     }
