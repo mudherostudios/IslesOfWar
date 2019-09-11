@@ -34,7 +34,7 @@ public class WorldNavigator : MonoBehaviour
     public float islandChangeSpeed;
 
     [Header("Command Island GUIs and Variables")]
-    public GameObject unitPurchases;
+    public UnitPurchase unitPurchase;
     public GameObject resourcePools;
     public GameObject warbuxPool;
     public int unitType;
@@ -88,6 +88,8 @@ public class WorldNavigator : MonoBehaviour
         orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
 
         //Command Variables
+        commandScript.unitPurchase = unitPurchase;
+        unitPurchase.commandScript = commandScript;
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -239,5 +241,10 @@ public class WorldNavigator : MonoBehaviour
     public void ResumeIslandQueue()
     {
         managementScript.GotoObservationPoint();
+    }
+
+    public void SetUnitPurchaseGUI(int type)
+    {
+        commandScript.SetUnitGUI(type);
     }
 }
