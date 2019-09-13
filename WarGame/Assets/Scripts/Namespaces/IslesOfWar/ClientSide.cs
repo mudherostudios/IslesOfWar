@@ -15,72 +15,52 @@ namespace IslesOfWar
                 return unchecked((ulong)(longValue - long.MinValue));
             }
             
-            public static double GetPoolSize(Dictionary<string, List<List<double>>> contributions, string type)
+            public static double GetPoolSize(Dictionary<string, List<List<double>>> contributions, int type)
             {
                 double poolSize = 0;
 
-                if (type == "oil")
+                foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                 {
-                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
-                    {
-                        poolSize += pair.Value[1][0]; //Metal pool Oil amount
-                        poolSize += pair.Value[2][0]; //Lime pool Oil amount
-                    }
-                }
-                else if (type == "metal")
-                {
-                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
-                    {
-                        poolSize += pair.Value[0][1]; //Oil pool Metal amount
-                        poolSize += pair.Value[2][1]; //Lime pool Metal amount
-                    }
-                }
-                else if (type == "concrete")
-                {
-                    foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
-                    {
-                        poolSize += pair.Value[0][2]; //Oil pool Lime amount
-                        poolSize += pair.Value[1][2]; //Metal pool Lime amount
-                    }
+                    poolSize += pair.Value[0][type];
+                    poolSize += pair.Value[1][type];
+                    poolSize += pair.Value[2][type];
                 }
 
                 return poolSize;
             }
 
-            public static double GetPlayerContributedResources(List<List<double>> contribution, double[]modifiers, string type)
+            public static double[] GetPlayerContributedResources(List<List<double>> contribution, double[]modifiers)
             { 
-                double playersContribution = 0;
-
-                //Warbucks
-                playersContribution += contribution[0][0] * modifiers[0]; //Oil
-                playersContribution += contribution[0][1] * modifiers[1]; //Metal
-                playersContribution += contribution[0][2] * modifiers[2]; //Concrete
+                double[] playersContribution = new double[3];
 
                 //Oil
-                playersContribution += contribution[1][1] * modifiers[1]; //Metal
-                playersContribution += contribution[1][2] * modifiers[2]; //Concrete
+                playersContribution[0] += contribution[1][1] * modifiers[1]; //Metal
+                playersContribution[0] += contribution[1][2] * modifiers[2]; //Concrete
 
                 //Metal
-                playersContribution += contribution[2][0] * modifiers[0]; //Oil
-                playersContribution += contribution[2][2] * modifiers[2]; //Concrete
+                playersContribution[1] += contribution[2][0] * modifiers[0]; //Oil
+                playersContribution[1] += contribution[2][2] * modifiers[2]; //Concrete
 
                 //Concrete
-                playersContribution += contribution[3][0] * modifiers[0]; //Oil
-                playersContribution += contribution[3][1] * modifiers[1]; //Metal
+                playersContribution[2] += contribution[3][0] * modifiers[0]; //Oil
+                playersContribution[2] += contribution[3][1] * modifiers[1]; //Metal
 
                 return playersContribution;
             }
 
-            public static double GetTotalContributedResources(Dictionary<string, List<List<double>>> contributions, double[] modifiers, string type)
+            public static double[] GetTotalContributedResources(Dictionary<string, List<List<double>>> contributions, double[] modifiers)
             {
-                double playerContributions = 0;
+                double[] totalContributions = new double[3];
 
                 foreach (KeyValuePair<string, List<List<double>>> pair in contributions)
                 {
-                    playerContributions += GetPlayerContributedResources(pair.Value, modifiers, type);
+                    double[] tempContributes = GetPlayerContributedResources(pair.Value, modifiers);
+                    totalContributions[0] += tempContributes[0];
+                    totalContributions[1] += tempContributes[1];
+                    totalContributions[2] += tempContributes[2];
                 }
 
-                return 0;
+                return totalContributions;
             }
 
             public static string[] GetPlayerIslandKeyArray(string player, Dictionary<string, Island> dictionary)

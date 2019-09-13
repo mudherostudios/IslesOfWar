@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar;
@@ -186,6 +188,54 @@ public class ClientInterface : MonoBehaviour
     public double[] playerUnits
     {
         get { return clientState.players[player].allUnits; }
+    }
+
+    public double GetPoolSize(int type)
+    {
+        return PoolUtility.GetPoolSize(clientState.resourceContributions, type);
+    }
+
+    public double[] GetAllPoolSizes()
+    {
+        return new double[] { GetPoolSize(0), GetPoolSize(1), GetPoolSize(2) };
+    }
+
+    public double[] GetPlayerContributedResources(int type, double[] modifiers)
+    {
+        return PoolUtility.GetPlayerContributedResources(clientState.resourceContributions[player], modifiers);
+    }
+
+    public double[] GetTotalContributedResources(double[] modifiers)
+    {
+        return PoolUtility.GetTotalContributedResources(clientState.resourceContributions, modifiers);
+    }
+
+    public double[] GetResourceModifiers(double[] queuedAmounts)
+    {
+        double[] potentialPoolSizes = GetAllPoolSizes();
+        potentialPoolSizes[0] += queuedAmounts[0] + clientState.resourcePools[0];
+        potentialPoolSizes[1] += queuedAmounts[1] + clientState.resourcePools[1];
+        potentialPoolSizes[2] += queuedAmounts[2] + clientState.resourcePools[2];
+
+        return gameStateProcessor.CalculateResourcePoolModifiers(potentialPoolSizes);
+    }
+
+    //Just in case I want to do it this way rather than contributions then total.
+    public double GetOwnership(double[] modifiers, int type)
+    {
+        double[] totalPoints;
+        double[][] ownerships = gameStateProcessor.CalculateOwnershipOfPools(modifiers, gameStateProcessor.state.resourceContributions.Keys.ToArray(), out totalPoints);
+        int counter = 0;
+
+        foreach (KeyValuePair<string, List<List<double>>> pair in gameStateProcessor.state.resourceContributions)
+        {
+            if (pair.Key != player)
+                counter++;
+            else
+                continue;
+        }
+
+        return ownerships[counter][type]/totalPoints[type]; 
     }
 
     public bool[] QueueIsValid()

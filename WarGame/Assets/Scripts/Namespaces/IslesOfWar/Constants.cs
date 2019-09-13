@@ -160,6 +160,7 @@ namespace IslesOfWar
             {0.15, 0.05, 0.05, 0.05}
         };
 
-
+        public static int poolRewardBlocks = 7000;
+        public static int warbucksRewardBlocks = 7000;
     }
 }

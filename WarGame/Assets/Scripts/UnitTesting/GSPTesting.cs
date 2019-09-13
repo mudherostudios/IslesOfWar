@@ -67,6 +67,8 @@ public class GSPTesting : MonoBehaviour
         IncrementResourcesTest();
         TestDepletedIslandSubmissions();
         TestReourcePoolSubmission();
+        RewardDepletedPool();
+        RewardResourcePool();
         ResourceTransferTest();
         AttackCycleTesting();
         MovementBlockTesting();
@@ -1874,21 +1876,19 @@ public class GSPTesting : MonoBehaviour
         bool passedSixth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0 && processor.state.resourcePools[1] == 7635.0 * 0.05 * 3.0
         && processor.state.resourcePools[2] == 6175.0 * 0.05 * 3.0 && processor.state.resourcePools[3] == 4100.0 * 0.05 * 3.0;
         transferResourcesResults += GetPassOrFail(passedSixth);
-
-        string savedState = JsonConvert.SerializeObject(processor.state);
-        RewardDepletedPool(savedState);
-        RewardResourcePool(savedState);
     }
 
-    void RewardDepletedPool(string savedState)
+    void RewardDepletedPool()
     {
-        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        ResetTestData();
+        processor.state.resourcePools = new List<double> { 30000.5, 60000.5, 90000.5, 120000.5 };
+        string savedState = JsonConvert.SerializeObject(processor.state);
         rewardDepletedResults = "";
 
         //Succeed in splitting with single player.
         processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
         processor.RewardDepletedPool();
-        bool passedFirst = (Math.Floor(12710.0 * 0.15 * 3.0) + (20000.0 - 12710.0)) == processor.state.players["cairo"].resources[0]
+        bool passedFirst = (Math.Floor(30000.5) + 3000) == processor.state.players["cairo"].resources[0]
         && processor.state.resourcePools[0] == 0;
         rewardDepletedResults += GetPassOrFail(passedFirst);
 
@@ -1898,31 +1898,32 @@ public class GSPTesting : MonoBehaviour
         processor.SubmitDepletedIslands("pimpMacD", new List<string> { "e" });
         processor.SubmitDepletedIslands("nox", new List<string> { "j" });
         processor.RewardDepletedPool();
-        double share = Math.Floor((12710.0 * 0.15 * 3.0) * 1.0 / 3.0) + (20000.0 - 12710.0);
-        bool passedSecond = processor.state.players["cairo"].resources[0] == share && processor.state.players["pimpMacD"].resources[0] == share
+        double share = Math.Floor(30000.5 / 3.0);
+        bool passedSecond = processor.state.players["cairo"].resources[0] == share + 3000 && processor.state.players["pimpMacD"].resources[0] == share + 1000
         && processor.state.players["nox"].resources[0] == share && processor.state.resourcePools[0] == 0;
         rewardDepletedResults += GetPassOrFail(passedSecond);
 
         //Succeed in no reward with no players
         processor.state = JsonConvert.DeserializeObject<State>(savedState);
         processor.RewardDepletedPool();
-        bool passedThird = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0;
+        bool passedThird = processor.state.resourcePools[0] == 30000.5;
         rewardDepletedResults += GetPassOrFail(passedThird);
 
         //Succeed in bigger reward added after reward failed because no players.
         processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-        processor.PurchaseUnits("pimpMacD", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-        processor.PurchaseUnits("nox", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
         processor.SubmitDepletedIslands("cairo", new List<string> { "a" });
         processor.RewardDepletedPool();
+        double total = Math.Floor((30000.5) + (2710.0 * 0.15)) + (3000.0 - 2710.0);
         bool passedFourth = processor.state.resourcePools[0] == 0 
-        && processor.state.players["cairo"].resources[0] == (15420.0 * 0.15 * 3.0) + (20000.0-15420.0);
+        && processor.state.players["cairo"].resources[0] == total;
         rewardDepletedResults += GetPassOrFail(passedFourth);
     }
 
-    void RewardResourcePool(string savedState)
+    void RewardResourcePool()
     {
-        processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        ResetTestData();
+        processor.state.resourcePools = new List<double> { 30000, 1000, 2000, 4000 };
+        string savedState = JsonConvert.SerializeObject(processor.state);
         rewardResourcePoolResults = "";
         double[] remainingPool = new double[] { processor.state.resourcePools[0], 0, 0, 0 };
 
@@ -1936,12 +1937,12 @@ public class GSPTesting : MonoBehaviour
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> {1.0, 0.0, 0.0}));
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> {1.0, 0.0, 0.0}));
         processor.RewardResourcePools();
-        double[] target = new double[] { processor.state.players["cairo"].resources[0], Math.Floor(7635.0 * 0.05 * 3.0 + 2.0) + (20000.0 - 7637.0) ,
-        Math.Floor(6175.0 * 0.05 *3.0 + 1.0) + (20000.0 - 6176.0), Math.Floor(4100.0 * 0.05 * 3.0) + (20000.0 - 4100.0)};
+        double[] target = new double[] { processor.state.players["cairo"].resources[0], 1000.0 + 7500,
+        2000.0 + 6000.0, 4000 + 1500};
         bool passedSecond = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
         rewardResourcePoolResults += GetPassOrFail(passedSecond);
 
-        //Succeed in rewarding multiple players of all pool types.
+        //Succeed in rewarding multiple players of all pool types. Nox fails because no resources.
         processor.state = JsonConvert.DeserializeObject<State>(savedState);
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
@@ -1953,12 +1954,11 @@ public class GSPTesting : MonoBehaviour
         processor.SubmitResourcesToPool("nox", new ResourceOrder(1, new List<double> { 1.0, 0.0, 0.0 }));
         processor.SubmitResourcesToPool("nox", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
         processor.RewardResourcePools();
-        target = new double[] { processor.state.players["cairo"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
-        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
-        double[] pimpTarget = new double[] { processor.state.players["pimpMacD"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
-        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
-        double[] noxtarget = new double[] { processor.state.players["nox"].resources[0], Math.Floor(7635.0 * 0.05) + (20000.0 - 7635.0),
-        Math.Floor(6175.0 * 0.05) + (20000.0 - 6175.0), Math.Floor(4100.0 * 0.05) + (20000.0 - 4100.0)};
+        target = new double[] { processor.state.players["cairo"].resources[0], Math.Floor(1000.0 / 2.0) + 7500.0,
+        Math.Floor(2000.0/2.0) + 6000.0, Math.Floor(4000.0/2.0) + 1500};
+        double[] pimpTarget = new double[] { processor.state.players["pimpMacD"].resources[0], Math.Floor(1000.0 / 2.0) + 2500.0,
+        Math.Floor(2000.0/2.0) + 2000.0, Math.Floor(4000.0/2.0) + 500.0};
+        double[] noxtarget = new double[4];
         bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) 
         && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), pimpTarget) && IsEqual(processor.state.players["nox"].resources.ToArray(), noxtarget)
         && IsEqual(processor.state.resourcePools.ToArray(), remainingPool); 
@@ -1966,6 +1966,7 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in rewarding multiple players with one pool type each only.
         processor.state = JsonConvert.DeserializeObject<State>(savedState);
+        processor.state.players["nox"].resources[1] = 1.0;
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(0, new List<double> { 0.0, 1.0, 0.0 }));
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(1, new List<double> { 0.0, 0.0, 0.0 }));
         processor.SubmitResourcesToPool("cairo", new ResourceOrder(2, new List<double> { 0.0, 0.0, 0.0 }));
@@ -1977,11 +1978,11 @@ public class GSPTesting : MonoBehaviour
         processor.SubmitResourcesToPool("nox", new ResourceOrder(2, new List<double> { 1.0, 0.0, 0.0 }));
 
         target = processor.state.players["cairo"].resources.ToArray();
-        target[1] += Math.Floor(7635.0 * 0.05 * 3.0 + 2.0);
+        target[1] += 1002.0;
         pimpTarget = processor.state.players["pimpMacD"].resources.ToArray();
-        pimpTarget[2] += Math.Floor(6175.0 * 0.05 * 3.0 + 1.0);
+        pimpTarget[2] += 2001.0;
         noxtarget = processor.state.players["nox"].resources.ToArray();
-        noxtarget[3] += Math.Floor(4100.0 * 0.05 * 3.0);
+        noxtarget[3] += 4000.0;
 
         processor.RewardResourcePools();
         
@@ -1996,7 +1997,7 @@ public class GSPTesting : MonoBehaviour
         remainingPool = processor.state.resourcePools.ToArray();
         remainingPool[1] = 0.0;
         target = processor.state.players["cairo"].resources.ToArray();
-        target[1] += Math.Floor(7635.0 * 0.05 * 3.0);
+        target[1] += 1000.0;
         processor.RewardResourcePools();
         bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), target) && IsEqual(processor.state.resourcePools.ToArray(), remainingPool);
         rewardResourcePoolResults += GetPassOrFail(passedFifth);

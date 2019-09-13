@@ -392,7 +392,7 @@ namespace IslesOfWar
             public void RewardResourcePools()
             {
                 double[] poolSizes = new double[3];
-                double[] totalPoints = new double[3];
+                double[] totalPoints;
                 double[] modifiers;
                 string[] owners;
                 double[][] ownership;
@@ -400,34 +400,13 @@ namespace IslesOfWar
                 if (state.resourceContributions.Count >= 1)
                 {
                     ownership = new double[state.resourceContributions.Count][];
-                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, "oil") + state.resourcePools[1];
-                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, "metal") + state.resourcePools[2];
-                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, "concrete") + state.resourcePools[3];
+                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, 0) + state.resourcePools[1];
+                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, 1) + state.resourcePools[2];
+                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, 2) + state.resourcePools[3];
                     
                     modifiers = CalculateResourcePoolModifiers(poolSizes);
                     owners = state.resourceContributions.Keys.ToArray();
-
-                    //Calculate the point ownership of each contributor
-                    for (int o = 0; o < owners.Length; o++)
-                    {
-                        ownership[o] = new double[3];
-
-                        for (int p = 0; p < poolSizes.Length; p++)
-                        {
-                            int[] types = new int[2];
-
-                            if (p == 0)
-                                types = new int[] { 1, 2 };
-                            else if (p == 1)
-                                types = new int[] { 0, 2 };
-                            else if (p == 2)
-                                types = new int[] { 0, 1 };
-
-                            ownership[o][p] += modifiers[(p * 2) + 0] * state.resourceContributions[owners[o]][p][types[0]];
-                            ownership[o][p] += modifiers[(p * 2) + 1] * state.resourceContributions[owners[o]][p][types[1]];
-                            totalPoints[p] += ownership[o][p];
-                        }
-                    }
+                    ownership = CalculateOwnershipOfPools(modifiers, owners, out totalPoints);
 
                     //Reward owners percentage
                     for (int o = 0; o < owners.Length; o++)
@@ -447,6 +426,36 @@ namespace IslesOfWar
                             state.resourcePools[p + 1] = 0.0;
                     }
                 }
+            }
+
+            public double[][] CalculateOwnershipOfPools(double[] modifiers, string[] owners, out double[] totalPoints)
+            {
+                double[][] ownership = new double[state.resourceContributions.Count][];
+                totalPoints = new double[3];
+
+                //Calculate the point ownership of each contributor
+                for (int o = 0; o < owners.Length; o++)
+                {
+                    ownership[o] = new double[3];
+
+                    for (int p = 0; p < 3; p++)
+                    {
+                        int[] types = new int[2];
+
+                        if (p == 0)
+                            types = new int[] { 1, 2 };
+                        else if (p == 1)
+                            types = new int[] { 0, 2 };
+                        else if (p == 2)
+                            types = new int[] { 0, 1 };
+
+                        ownership[o][p] += modifiers[(p * 2) + 0] * state.resourceContributions[owners[o]][p][types[0]];
+                        ownership[o][p] += modifiers[(p * 2) + 1] * state.resourceContributions[owners[o]][p][types[1]];
+                        totalPoints[p] += ownership[o][p];
+                    }
+                }
+
+                return ownership;
             }
 
             public double[] CalculateResourcePoolModifiers( double[] poolSizes)
@@ -1035,7 +1044,10 @@ namespace IslesOfWar
             List<double> Add(List<double> a, List<double> b)
             {
                 List<double> addedLists = new List<double>();
-                addedLists.AddRange(Add(a.ToArray(), b.ToArray()));
+                double[] aArray = a.ToArray();
+                double[] bArray = b.ToArray();
+                double[] cArray = Add(aArray, bArray);
+                addedLists.AddRange(cArray);
                 return addedLists;
             }
 
