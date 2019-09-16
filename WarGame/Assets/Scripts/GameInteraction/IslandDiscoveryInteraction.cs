@@ -129,7 +129,7 @@ public class IslandDiscoveryInteraction : Interaction
 
     void DiscoverRandomIslands()
     {
-        bool success = clientInterface.SearchIslands();
+        bool success = true;
     }
 
     //Remove. Only send command. Game State Processor must generate. Just view the one that it generates. 

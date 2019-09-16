@@ -12,16 +12,17 @@ public class CommandIslandInteraction : Interaction
     public UnitPurchase unitPurchase;
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbucksPool;
+    public SearchIslands searchIslands;
 
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
-    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter"};
-    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter;
+    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter" };
+    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
-    private ObjectRevealer warbuxPrompter;
+    private ObjectRevealer genericPrompter;
 
     private void Update()
     {
@@ -32,13 +33,15 @@ public class CommandIslandInteraction : Interaction
         {
             unitPrompter = selectedWorldUIObject.GetComponent<UnitPurchasePrompter>();
             poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
-            warbuxPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
+            genericPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
             hasUnitPurchasePrompter = unitPrompter != null;
             hasPoolPrompter = poolPrompter != null;
-            hasWarbuxPrompter = warbuxPrompter != null && warbuxPrompter.buttonType == commandButtonTypes[2];
+            hasWarbuxPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[2];
+            hasSearchPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[3];
             unitPurchase.gameObject.SetActive(false);
             resourcePool.gameObject.SetActive(false);
             warbucksPool.gameObject.SetActive(false);
+            searchIslands.gameObject.SetActive(false);
         }
 
         if (Input.GetKeyDown(KeyCode.U) && hasUnitPurchasePrompter)
@@ -56,6 +59,10 @@ public class CommandIslandInteraction : Interaction
         else if (Input.GetKeyDown(KeyCode.W) && hasWarbuxPrompter)
         {
             warbucksPool.Show();
+        }
+        else if (Input.GetKeyDown(KeyCode.S) && hasSearchPrompter)
+        {
+            searchIslands.Show();
         }
     }
 
@@ -103,6 +110,21 @@ public class CommandIslandInteraction : Interaction
         }
     }
 
+    public void AddIslandToPool(string island)
+    {
+        clientInterface.AddIslandToPool(island);
+    }
+
+    public void SendToPool(int type, double[] resources)
+    {
+        clientInterface.SendResourcePoolContributions(type, resources);
+    }
+
+    public void SearchForIslands()
+    {
+        clientInterface.SearchForIslands();
+    }
+
     public double GetPoolSize(int poolType)
     {
         return clientInterface.GetContributionSize(poolType);
@@ -138,13 +160,9 @@ public class CommandIslandInteraction : Interaction
         return clientInterface.GetWarbucksPoolSize();
     }
 
-    public void AddIslandToPool(string island)
+    public double[] GetIslandSearchCost()
     {
-        clientInterface.AddIslandToPool(island);
+        return clientInterface.GetIslandSearchCost();
     }
-
-    public void SendToPool(int type, double[] resources)
-    {
-        clientInterface.SendResourcePoolContributions(type, resources);
-    }
+    
 }

@@ -151,9 +151,13 @@ public class ClientInterface : MonoBehaviour
     }
 
     //Make sure to add queuedAction updates as well.
-    public bool SearchIslands()
+    public void SearchForIslands()
     {
-        return Validity.HasEnoughResources(Constants.islandSearchCost, clientState.players[player].allResources);
+        double[] cost = IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
+        bool canSearch = Validity.HasEnoughResources(cost, clientState.players[player].allResources);
+
+        if (canSearch)
+            SpendResources(cost);
     }
 
     //Make sure to add queuedAction updates as well.
@@ -319,6 +323,11 @@ public class ClientInterface : MonoBehaviour
         return clientState.resourcePools[0];
     }
 
+    public double[] GetIslandSearchCost()
+    {
+        return IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
+    }
+
     public bool[] QueueIsValid()
     {
         bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true;
@@ -397,5 +406,7 @@ public class ClientInterface : MonoBehaviour
     {
         return new double[] { 0, resources[0], resources[1], resources[2] };
     }
+
+
 
 }

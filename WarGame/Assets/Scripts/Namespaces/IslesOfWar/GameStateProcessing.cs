@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -49,13 +50,13 @@ namespace IslesOfWar
             {
                 double possibleIslands = GetPossibleUndiscoveredIslands(players);
                 CalculateProbabilities(possibleIslands, islands.Length);
-                float choice = Random.value;
+                float choice = UnityEngine.Random.value;
 
                 if (choice > probabilities[1])
                     return txid;
                 else
                 {
-                    choice = Random.value * islands.Length;
+                    choice = UnityEngine.Random.value * islands.Length;
                     return islands[Mathf.FloorToInt(choice)];
                 }
             }
@@ -93,7 +94,7 @@ namespace IslesOfWar
 
                 for (int p = 1; p < Constants.resourceProbabilities.Length + 1 && count < 3; p++)
                 {
-                    if (Random.value < Constants.resourceProbabilities[p - 1])
+                    if (UnityEngine.Random.value < Constants.resourceProbabilities[p - 1])
                     {
                         resource += p;
                         count++;
@@ -110,7 +111,7 @@ namespace IslesOfWar
             {
                 int type = -1;
 
-                float feature = Random.value;
+                float feature = UnityEngine.Random.value;
                 float last = 0.0f;
 
                 for (int p = 0; p < Constants.tileProbabilities.Length; p++)
@@ -131,6 +132,43 @@ namespace IslesOfWar
 
                 return type;
             }
+        }
+
+        public static class IslandSearchCostUtility
+        {
+            public static double[] GetCost(int islandCount)
+            {
+                double[] cost = new double[4];
+                double modifier = Math.Pow(islandCount, 0.1);
+                cost[0] = Math.Ceiling(Constants.islandSearchCost[0] * modifier);
+                cost[1] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[0] * 12 * Constants.extractRates[0] * islandCount * modifier);
+                cost[2] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[1] * 12 * Constants.extractRates[1] * islandCount * modifier);
+                cost[3] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[2] * 12 * Constants.extractRates[2] * islandCount * modifier);
+
+                return cost;
+            }
+        }
+
+        public class Actions
+        {
+            public string blockhash { get; set; }
+            public string rngseed { get; set; }
+            public dynamic admin { get; set; }
+            public List<Move> moves { get; set; }
+        }
+
+        public class Transaction
+        {
+            public string txid { get; set; }
+            public int vout { get; set; }
+        }
+
+        public class Move
+        {
+            public List<Transaction> inputs { get; set; }
+            public dynamic move { get; set; }
+            public string name { get; set; }
+            public string txid { get; set; }
         }
 
         public class StateTracker
@@ -341,27 +379,6 @@ namespace IslesOfWar
                 state.players[player].resources[3] -= c;
             }
         }
-
-        public class Actions
-        {
-            public string blockhash { get; set; }
-            public string rngseed { get; set; }
-            public dynamic admin { get; set; }
-            public List<Move> moves { get; set; }
-        }
-
-        public class Transaction
-        {
-            public string txid { get; set; }
-            public int vout { get; set; }
-        }
-
-        public class Move
-        {
-            public List<Transaction> inputs { get; set; }
-            public dynamic move { get; set; }
-            public string name { get; set; }
-            public string txid { get; set; }
-        }
+        
     }
 }

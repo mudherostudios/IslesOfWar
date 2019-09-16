@@ -60,6 +60,7 @@ namespace IslesOfWar
         };
 
         public static double[] islandSearchCost = new double[] { 1000, 2500, 0, 0 };
+        public static double islandSearchReplenishTime = 150.0; //Estimated time in blocks it should take to get enough resources to search again.
         
         //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
         public static double[,] unitCosts = new double[,]

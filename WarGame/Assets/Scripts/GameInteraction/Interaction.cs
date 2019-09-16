@@ -30,7 +30,7 @@ public class Interaction : MonoBehaviour
 
     protected void WorldButtonCheck(bool didClick)
     {
-        WorldButtonCheck(didClick, null);
+        WorldButtonCheck(didClick, new List<string>());
     }
 
     protected void WorldButtonCheck(bool didClick, List<string> navigators)
