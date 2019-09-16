@@ -147,12 +147,32 @@ public class ClientInterface : MonoBehaviour
         return Validity.HasEnoughResources(Constants.islandSearchCost, clientState.players[player].allResources);
     }
 
-    void SpendResources(double[] resources)
+    //Make sure to add queuedAction updates as well.
+    public void SendResourcePoolContributions(int type, double[] resources)
     {
-        clientState.players[player].resources[0] -= resources[0];
-        clientState.players[player].resources[1] -= resources[1];
-        clientState.players[player].resources[2] -= resources[2];
-        clientState.players[player].resources[3] -= resources[3];
+        double[] fullResources = GetFullResources(resources);
+        bool canSend = Validity.HasEnoughResources(fullResources, clientState.players[player].allResources);
+
+        if (canSend)
+        {
+            if (!clientState.resourceContributions.ContainsKey(player))
+            {
+                List<List<double>> contributions = new List<List<double>>
+                {
+                    new List<double>{ 0.0, 0.0, 0.0, 0.0 },
+                    new List<double>{ 0.0, 0.0, 0.0, 0.0 },
+                    new List<double>{ 0.0, 0.0, 0.0, 0.0 }
+                };
+
+                clientState.resourceContributions.Add(player, contributions);
+            }
+
+            clientState.resourceContributions[player][type][0] += resources[0];
+            clientState.resourceContributions[player][type][1] += resources[1];
+            clientState.resourceContributions[player][type][2] += resources[2];
+
+            SpendResources(fullResources);
+        }
     }
 
     public Island[] playerIslands
@@ -313,5 +333,18 @@ public class ClientInterface : MonoBehaviour
 
         return new bool[] { nation, build, units, search, resource, depleted, attack, defend };
     }
-    
+
+    //Made this function to not confuse the use of index 1,2,3 instead of 0,1,2 in the SendPoolContributions Function
+    double[] GetFullResources(double[] resources)
+    {
+        return new double[] { 0, resources[0], resources[1], resources[2] };
+    }
+
+    void SpendResources(double[] resources)
+    {
+        clientState.players[player].resources[0] -= resources[0];
+        clientState.players[player].resources[1] -= resources[1];
+        clientState.players[player].resources[2] -= resources[2];
+        clientState.players[player].resources[3] -= resources[3];
+    }
 }

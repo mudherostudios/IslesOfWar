@@ -33,19 +33,26 @@ public class PoolContribute: MonoBehaviour
         UpdateTimer(0);
     }
 
-    public Cost TrySend()
+    public void Contribute()
     {
-        int oil = 0;
-        int metal = 0;
-        int concrete = 0;
-        int.TryParse(tradeAmounts[0].text, out oil);
-        int.TryParse(tradeAmounts[1].text, out metal);
-        int.TryParse(tradeAmounts[2].text, out concrete);
-        int contributions = (int)((oil * modifiers[0]) + (metal * modifiers[1]) + (concrete * modifiers[2]));
+        double[] resourcesToSend = new double[3];
+        double resourceTypeA = 0.0;
+        double resourceTypeB = 0.0;
 
-        //This is not how it should work garbage return.
-        Cost cost = new Cost(Constants.bunkerCosts, 2, 4);
-        return cost;
+        double.TryParse(tradeAmounts[0].text, out resourceTypeA);
+        double.TryParse(tradeAmounts[1].text, out resourceTypeB);
+
+        if (poolType == 0)
+            resourcesToSend = new double[] { 0, resourceTypeA, resourceTypeB };
+        else if (poolType == 1)
+            resourcesToSend = new double[] { resourceTypeA, 0, resourceTypeB };
+        else if (poolType == 2)
+            resourcesToSend = new double[] { resourceTypeA, resourceTypeB, 0 };
+
+        tradeAmounts[0].text = "0";
+        tradeAmounts[1].text = "0";
+        commandScript.SendToPool(poolType, resourcesToSend);
+        UpdateAllStats();
     }
 
     public void UpdateTimer(int currentXayaBlock)

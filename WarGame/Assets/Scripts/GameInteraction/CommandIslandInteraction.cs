@@ -117,12 +117,8 @@ public class CommandIslandInteraction : Interaction
         return clientInterface.GetTotalContributedResources(modifiers);
     }
 
-    void SendToPool(Cost sendAmount)
+    public void SendToPool(int type, double[] resources)
     {
-        if (sendAmount.amount != 0)
-        {
-            //Resource Pool Command to Network
-            SetGUIContents();
-        }
+        clientInterface.SendResourcePoolContributions(type, resources);
     }
 }
