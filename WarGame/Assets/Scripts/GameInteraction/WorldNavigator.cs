@@ -38,7 +38,7 @@ public class WorldNavigator : MonoBehaviour
     [Header("Command Island GUIs and Variables")]
     public UnitPurchase unitPurchase;
     public PoolContribute resourcePool;
-    public GameObject warbuxPool;
+    public WarbucksPoolContribute warbuxPool;
     public int unitType;
     public int resourceType;
 
@@ -92,8 +92,10 @@ public class WorldNavigator : MonoBehaviour
         //Command Variables
         commandScript.unitPurchase = unitPurchase;
         commandScript.resourcePool = resourcePool;
+        commandScript.warbucksPool = warbuxPool;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
+        warbuxPool.commandScript = commandScript;
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();

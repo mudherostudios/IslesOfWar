@@ -11,16 +11,17 @@ public class CommandIslandInteraction : Interaction
     [Header("GUIs")]
     public UnitPurchase unitPurchase;
     public PoolContribute resourcePool;
-    public GameObject warbucksPool;
+    public WarbucksPoolContribute warbucksPool;
 
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
-    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompt"};
-    private bool hasUnitPurchasePrompter = false, hasPoolPrompter;
+    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter"};
+    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
+    private ObjectRevealer warbuxPrompter;
 
     private void Update()
     {
@@ -31,10 +32,13 @@ public class CommandIslandInteraction : Interaction
         {
             unitPrompter = selectedWorldUIObject.GetComponent<UnitPurchasePrompter>();
             poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
+            warbuxPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
             hasUnitPurchasePrompter = unitPrompter != null;
             hasPoolPrompter = poolPrompter != null;
+            hasWarbuxPrompter = warbuxPrompter != null && warbuxPrompter.buttonType == commandButtonTypes[2];
             unitPurchase.gameObject.SetActive(false);
             resourcePool.gameObject.SetActive(false);
+            warbucksPool.gameObject.SetActive(false);
         }
 
         if (Input.GetKeyDown(KeyCode.U) && hasUnitPurchasePrompter)
@@ -49,8 +53,10 @@ public class CommandIslandInteraction : Interaction
             resourcePool.gameObject.SetActive(true);
             resourcePool.UpdateAllStats();
         }
-
-        Typing();
+        else if (Input.GetKeyDown(KeyCode.W) && hasWarbuxPrompter)
+        {
+            warbucksPool.Show();
+        }
     }
 
     public void SetCommandVariables(Transform _commandCenter, string[] buttons)
@@ -99,7 +105,7 @@ public class CommandIslandInteraction : Interaction
 
     public double GetPoolSize(int poolType)
     {
-        return clientInterface.GetPoolSize(poolType);
+        return clientInterface.GetContributionSize(poolType);
     }
 
     public double[] GetAllPoolSizes()
@@ -115,6 +121,26 @@ public class CommandIslandInteraction : Interaction
     public double[] GetTotalContributedResources(double[] modifiers)
     {
         return clientInterface.GetTotalContributedResources(modifiers);
+    }
+
+    public List<string> GetDepletedIslands()
+    {
+        return clientInterface.depletedIslands;
+    }
+
+    public double GetWarbucksOwnership()
+    {
+        return clientInterface.GetWarbucksOwnership();
+    }
+
+    public double GetWarbucksPoolSize()
+    {
+        return clientInterface.GetWarbucksPoolSize();
+    }
+
+    public void AddIslandToPool(string island)
+    {
+        clientInterface.AddIslandToPool(island);
     }
 
     public void SendToPool(int type, double[] resources)

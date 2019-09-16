@@ -31,6 +31,35 @@ public class ClientInterface : MonoBehaviour
         clientState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
     }
 
+    void SpendResources(double[] resources)
+    {
+        clientState.players[player].resources[0] -= resources[0];
+        clientState.players[player].resources[1] -= resources[1];
+        clientState.players[player].resources[2] -= resources[2];
+        clientState.players[player].resources[3] -= resources[3];
+    }
+
+    void UpdateCollectors(string islandID, int tileIndex, int[] updatedCollectorTypes)
+    {
+        int collectorType = 0;
+        int types = 0;
+
+        for (int c = 0; c < updatedCollectorTypes.Length; c++)
+        {
+            if (updatedCollectorTypes[c] != 0)
+                types++;
+
+            collectorType += updatedCollectorTypes[c];
+        }
+
+        if (types >= 2)
+            collectorType += 1;
+
+        clientState.islands[islandID].SetCollectors(tileIndex, collectorType.ToString()[0]);
+    }
+
+
+    //Make sure to add queuedAction updates as well.
     public bool PurchaseIslandCollector(StructureCost cost)
     {
         bool successfulPurchase = false;
@@ -67,26 +96,6 @@ public class ClientInterface : MonoBehaviour
         }
 
         return successfulPurchase;
-    }
-
-    //Make sure to add queuedAction updates as well.
-    void UpdateCollectors(string islandID, int tileIndex, int[] updatedCollectorTypes)
-    {
-        int collectorType = 0;
-        int types = 0;
-
-        for (int c = 0; c < updatedCollectorTypes.Length; c++)
-        {
-            if (updatedCollectorTypes[c] != 0)
-                types++;
-
-            collectorType += updatedCollectorTypes[c];
-        }
-
-        if (types >= 2)
-            collectorType += 1;
-
-        clientState.islands[islandID].SetCollectors(tileIndex, collectorType.ToString()[0]);
     }
 
     //Make sure to add queuedAction updates as well.
@@ -175,19 +184,47 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
+    //Make sure to add queuedAction updates as well.
+    public void AddIslandToPool(string island)
+    {
+        if (Validity.DepletedSubmissions(new List<string> { island }, gameStateProcessor.state, player))
+        {
+            clientState.players[player].islands.Remove(island);
+            clientState.islands.Remove(island);
+            clientState.depletedContributions[player].Add(island);
+        }
+    }
+
     public Island[] playerIslands
     {
         get
         {
-            List<string> playerIslands = gameStateProcessor.state.players[player].islands;
+            List<string> playerIslands = clientState.players[player].islands;
             Island[] islands = new Island[playerIslands.Count];
 
             for (int i = 0; i < islands.Length; i++)
             {
-                islands[i] = gameStateProcessor.state.islands[playerIslands[i]];
+                islands[i] = clientState.islands[playerIslands[i]];
             }
 
             return islands;
+        }
+    }
+
+    public List<string> depletedIslands
+    {
+        get
+        {
+            List<string> depleted = new List<string>();
+            List<string> islands = clientState.players[player].islands;
+
+            foreach(string island in islands)
+            {
+                if (clientState.islands[island].IsDepleted())
+                    depleted.Add(island);
+            }
+
+            return depleted;
         }
     }
 
@@ -210,14 +247,14 @@ public class ClientInterface : MonoBehaviour
         get { return clientState.players[player].allUnits; }
     }
 
-    public double GetPoolSize(int type)
+    public double GetContributionSize(int type)
     {
         return PoolUtility.GetPoolSize(clientState.resourceContributions, type);
     }
 
     public double[] GetAllPoolSizes()
     {
-        return new double[] { GetPoolSize(0), GetPoolSize(1), GetPoolSize(2) };
+        return new double[] { GetContributionSize(0), GetContributionSize(1), GetContributionSize(2) };
     }
 
     public double[] GetPlayerContributedResources(int type, double[] modifiers)
@@ -259,6 +296,27 @@ public class ClientInterface : MonoBehaviour
         }
 
         return ownerships[counter][type]/totalPoints[type]; 
+    }
+
+    public double GetWarbucksOwnership()
+    {
+        double total = 0;
+        double playerAmount = 0;
+
+        if (clientState.depletedContributions.ContainsKey(player))
+            playerAmount = clientState.depletedContributions[player].Count;
+
+        foreach (KeyValuePair<string, List<string>> pair in clientState.depletedContributions)
+        {
+            total += pair.Value.Count;
+        }
+
+        return playerAmount / total;
+    }
+
+    public double GetWarbucksPoolSize()
+    {
+        return clientState.resourcePools[0];
     }
 
     public bool[] QueueIsValid()
@@ -340,11 +398,4 @@ public class ClientInterface : MonoBehaviour
         return new double[] { 0, resources[0], resources[1], resources[2] };
     }
 
-    void SpendResources(double[] resources)
-    {
-        clientState.players[player].resources[0] -= resources[0];
-        clientState.players[player].resources[1] -= resources[1];
-        clientState.players[player].resources[2] -= resources[2];
-        clientState.players[player].resources[3] -= resources[3];
-    }
 }

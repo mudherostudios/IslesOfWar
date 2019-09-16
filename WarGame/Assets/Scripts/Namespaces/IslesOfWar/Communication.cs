@@ -251,7 +251,7 @@ namespace IslesOfWar
                 for (int s = 0; s < submission.Count; s++)
                 {
                     canSubmit = canSubmit && actualState.players[player].islands.Contains(submission[s])
-                    && actualState.islands[submission[s]].isDepleted();
+                    && actualState.islands[submission[s]].IsDepleted();
                 }
 
                 return canSubmit;

@@ -265,14 +265,15 @@ namespace IslesOfWar
                 }
             }
 
-            public bool isDepleted()
+            public bool IsDepleted()
             {
                 for (int t = 0; t < 12; t++)
                 {
                     for (int r = 0; r < 3; r++)
                     {
-                        if (resources[t][r] > 0)
-                            return false;
+                        if(resources != null)
+                            if (resources[t][r] > 0)
+                                return false;
                     }
                 }
 
