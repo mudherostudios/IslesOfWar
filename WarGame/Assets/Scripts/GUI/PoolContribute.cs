@@ -13,7 +13,7 @@ public class PoolContribute: MonoBehaviour
     public Text poolAmount;
     public Text poolTimer;
     public Text poolOwnership;
-    public ClientInterface client;
+    public CommandIslandInteraction commandScript;
 
     private string player;
     private int blocksLeft;
@@ -60,19 +60,18 @@ public class PoolContribute: MonoBehaviour
         string poolFormat = "";
         if (pool > 999999999)
             poolFormat = "G2";
-        poolAmount.text = pool.ToString(poolFormat);
+        poolAmount.text = (pool + commandScript.clientInterface.clientState.resourcePools[poolType]).ToString(poolFormat);
         poolOwnership.text = string.Format("{0:00.000}%", ownership);
 
         resourceModifiers[0].text = strModifiers[0];
         resourceModifiers[1].text = strModifiers[1];
-        resourceModifiers[2].text = strModifiers[2];
     }
 
     void CalculatePoolStates()
     {
         modifiers = new double[3];
         strModifiers = new string[3];
-        double[] tempPools = client.GetAllPoolSizes();
+        double[] tempPools = commandScript.GetAllPoolSizes();
 
         int tempTypeA = 0;
         int tempTypeB = 0;
@@ -93,13 +92,30 @@ public class PoolContribute: MonoBehaviour
             tempTypeB = 1;
         }
 
-        modifiers[poolType] = 0;
-        modifiers[tempTypeA] = tempPools[tempTypeB] / tempPools[tempTypeA];
-        modifiers[tempTypeB] = tempPools[tempTypeA] / tempPools[tempTypeB];
 
-        pool = client.GetPoolSize(poolType);
-        poolContributions = client.GetPlayerContributedResources(poolType, modifiers);
-        poolContributed = client.GetTotalContributedResources(modifiers);
-        ownership = poolContributions[poolType] / poolContributed[poolType];
+        modifiers[poolType] = 0;
+
+        if (tempPools[tempTypeA] == tempPools[tempTypeB])
+        {
+            modifiers[tempTypeA] = 1.0;
+            modifiers[tempTypeB] = 1.0;
+        }
+        else
+        {
+            modifiers[tempTypeA] = tempPools[tempTypeB] / tempPools[tempTypeA];
+            modifiers[tempTypeB] = tempPools[tempTypeA] / tempPools[tempTypeB];
+        }
+
+        strModifiers[0] = string.Format("x {0:0.00}", modifiers[tempTypeA]);
+        strModifiers[1] = string.Format("x {0:0.00}", modifiers[tempTypeB]);
+
+        pool = commandScript.GetPoolSize(poolType);
+        poolContributions = commandScript.GetPlayerContributedResources(poolType, modifiers);
+        poolContributed = commandScript.GetTotalContributedResources(modifiers);
+
+        if (poolContributions[poolType] == 0)
+            ownership = 0;
+        else
+            ownership = poolContributions[poolType] / poolContributed[poolType] * 100;
     }
 }

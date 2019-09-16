@@ -10,36 +10,46 @@ public class CommandIslandInteraction : Interaction
 {
     [Header("GUIs")]
     public UnitPurchase unitPurchase;
+    public PoolContribute resourcePool;
     public GameObject warbucksPool;
-    public GameObject resourcePool;
 
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
     private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompt"};
-    private bool hasUnitPurchasePrompter = false;
+    private bool hasUnitPurchasePrompter = false, hasPoolPrompter;
     private UnitPurchasePrompter unitPrompter;
+    private PoolPrompter poolPrompter;
 
     private void Update()
     {
         bool clicked = Input.GetButtonDown("Fire1");
         WorldButtonCheck(clicked, new List<string>{ commandButtonTypes[0] });
 
-        if (clicked && !EventSystem.current.IsPointerOverGameObject())
+        if (clicked && !EventSystem.current.IsPointerOverGameObject() && selectedWorldUIObject != null)
         {
             unitPrompter = selectedWorldUIObject.GetComponent<UnitPurchasePrompter>();
+            poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
             hasUnitPurchasePrompter = unitPrompter != null;
+            hasPoolPrompter = poolPrompter != null;
             unitPurchase.gameObject.SetActive(false);
+            resourcePool.gameObject.SetActive(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && hasUnitPurchasePrompter)
+        if (Input.GetKeyDown(KeyCode.U) && hasUnitPurchasePrompter)
         {
             unitPurchase.type = unitPrompter.possiblePurchaseTypes[0];
             unitPurchase.gameObject.SetActive(true);
             unitPurchase.UpdateAllStats();
         }
-        
+        else if (Input.GetKeyDown(KeyCode.R) && hasPoolPrompter)
+        {
+            resourcePool.poolType = poolPrompter.poolType;
+            resourcePool.gameObject.SetActive(true);
+            resourcePool.UpdateAllStats();
+        }
+
         Typing();
     }
 
@@ -85,6 +95,26 @@ public class CommandIslandInteraction : Interaction
         {
             clientInterface.PurchaseUnits(type, amount);
         }
+    }
+
+    public double GetPoolSize(int poolType)
+    {
+        return clientInterface.GetPoolSize(poolType);
+    }
+
+    public double[] GetAllPoolSizes()
+    {
+        return clientInterface.GetAllPoolSizes();
+    }
+
+    public double[] GetPlayerContributedResources(int poolType, double[] modifiers)
+    {
+        return clientInterface.GetPlayerContributedResources(poolType, modifiers);
+    }
+
+    public double[] GetTotalContributedResources(double[] modifiers)
+    {
+        return clientInterface.GetTotalContributedResources(modifiers);
     }
 
     void SendToPool(Cost sendAmount)

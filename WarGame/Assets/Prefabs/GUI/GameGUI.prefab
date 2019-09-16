@@ -5668,13 +5668,14 @@ GameObject:
   - component: {fileID: 5852142651361665256}
   - component: {fileID: 2667528275271165108}
   - component: {fileID: 3273239999619060554}
+  - component: {fileID: 2607010201552102340}
   m_Layer: 5
   m_Name: PoolUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5852142651361665256
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5738,6 +5739,31 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
+--- !u!114 &2607010201552102340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2628019699788174644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6416184b818ede458eefaea6415d290, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolType: 0
+  resourceModifiers:
+  - {fileID: 6082485735498070296}
+  - {fileID: 4569359182970660185}
+  tradeAmounts:
+  - {fileID: 6593318248879752518}
+  - {fileID: 971954665322679946}
+  poolAmount: {fileID: 1270281410680108856}
+  poolTimer: {fileID: 702948003844623792}
+  poolOwnership: {fileID: 7850916594934039207}
+  commandScript: {fileID: 0}
+  poolContributions: []
+  poolContributed: []
 --- !u!1 &2753292817505445778
 GameObject:
   m_ObjectHideFlags: 0

@@ -37,7 +37,7 @@ public class WorldNavigator : MonoBehaviour
 
     [Header("Command Island GUIs and Variables")]
     public UnitPurchase unitPurchase;
-    public GameObject resourcePools;
+    public PoolContribute resourcePool;
     public GameObject warbuxPool;
     public int unitType;
     public int resourceType;
@@ -91,7 +91,9 @@ public class WorldNavigator : MonoBehaviour
 
         //Command Variables
         commandScript.unitPurchase = unitPurchase;
+        commandScript.resourcePool = resourcePool;
         unitPurchase.commandScript = commandScript;
+        resourcePool.commandScript = commandScript;
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -146,9 +148,24 @@ public class WorldNavigator : MonoBehaviour
             {"o", IslandGenerator.Generate("nox")}
         };
 
-        gameStateProcessor.state = new State(players, islands);
+        Dictionary<string, List<List<double>>> resourceContributions = new Dictionary<string, List<List<double>>>
+        {
+            {"cairo", new List<List<double>> { new List<double> { 0, 0, 50 }, new List<double> {200, 0, 0 }, new List<double> {0, 100, 0 } } },
+            {"pimpMacD", new List<List<double>> { new List<double> { 0, 0, 25 }, new List<double> {400, 0, 0 }, new List<double> {0, 50, 0 } } },
+            {"nox", new List<List<double>> { new List<double> { 0, 0, 75 }, new List<double> {100, 0, 0 }, new List<double> {0, 50, 0 } } }
+        };
+
+        Dictionary<string, List<string>> depletedContributions = new Dictionary<string, List<string>>
+        {
+            {"cairo", new List<string> { "firstIsland", "secondIsland" } },
+            {"pimpMacD", new List<string> { "thirdIsland" } }
+        };
+
+        List<double> resourcePools = new List<double> {30000, 20000, 10000, 5000 };
+
+        gameStateProcessor.state = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
         clientInterface.gameStateProcessor = gameStateProcessor;
-        clientInterface.clientState = new State(players, islands);
+        clientInterface.clientState = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
         clientInterface.player = "cairo";
     }
 

@@ -151,20 +151,18 @@ namespace IslesOfWar
             public State ContributeToPool(string playerName, Cost resources)
             {
                 if (!state.resourceContributions.ContainsKey(playerName))
-                    state.resourceContributions.Add(playerName, new List<List<double>> { new List<double>(), new List<double>(), new List<double>(), new List<double>() } );
+                    state.resourceContributions.Add(playerName, new List<List<double>> { new List<double>(), new List<double>(), new List<double>() } );
 
                 if (Validity.HasEnoughResources(resources.costs, state.players[playerName].allResources))
                 {
                     SpendResources(playerName, resources, true);
 
-                    if (resources.type == "warbucksPool")
-                        state.resourceContributions[playerName][0] = new List<double>() { resources.costs[1], resources.costs[2], resources.costs[3], };
-                    else if (resources.type == "oilPool")
-                        state.resourceContributions[playerName][1] = new List<double> { resources.costs[2], resources.costs[3] };
+                    if (resources.type == "oilPool")
+                        state.resourceContributions[playerName][0] = new List<double> { resources.costs[2], resources.costs[3] };
                     else if (resources.type == "metalPool")
-                        state.resourceContributions[playerName][2] = new List<double> { resources.costs[1], resources.costs[3] };
+                        state.resourceContributions[playerName][1] = new List<double> { resources.costs[1], resources.costs[3] };
                     else if (resources.type == "concretePool")
-                        state.resourceContributions[playerName][3] = new List<double> { resources.costs[1], resources.costs[2] };
+                        state.resourceContributions[playerName][2] = new List<double> { resources.costs[1], resources.costs[2] };
 
                     return state;
                 }

@@ -202,7 +202,10 @@ public class ClientInterface : MonoBehaviour
 
     public double[] GetPlayerContributedResources(int type, double[] modifiers)
     {
-        return PoolUtility.GetPlayerContributedResources(clientState.resourceContributions[player], modifiers);
+        if (clientState.resourceContributions.ContainsKey(player))
+            return PoolUtility.GetPlayerContributedResources(clientState.resourceContributions[player], modifiers);
+        else
+            return new double[3];
     }
 
     public double[] GetTotalContributedResources(double[] modifiers)
