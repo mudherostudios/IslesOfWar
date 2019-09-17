@@ -43,6 +43,12 @@ public class WorldNavigator : MonoBehaviour
     public int unitType;
     public int resourceType;
 
+    [Header("Island Management GUIS and Variables")]
+    public EnableBuildButton enableBuildCollectorsButton;
+    public EnableBuildButton enableBuildBunkersButton;
+    public EnableBuildButton enableBuildBlockersButton;
+    public CostSlider costSlider;
+
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
     public Transform managementObservationPoint;
@@ -82,6 +88,7 @@ public class WorldNavigator : MonoBehaviour
     private void Start()
     {
         //Make sure we have some sort of GSP.Connect() here.
+        clientInterface = new ClientInterface();
         CreateTestState();
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
@@ -107,7 +114,14 @@ public class WorldNavigator : MonoBehaviour
 
         //Management Variables
         Vector3[] positions = new Vector3[] { generateCenter, genereateRotation, deleteLeft, deleteRight };
-
+        managementScript.enableBuildCollectorsButton = enableBuildCollectorsButton;
+        managementScript.enableBuildBunkersButton = enableBuildBunkersButton;
+        managementScript.enableBuildBlockersButton = enableBuildBlockersButton;
+        managementScript.costSlider = costSlider;
+        enableBuildCollectorsButton.managementScript = managementScript;
+        enableBuildBunkersButton.managementScript = managementScript;
+        enableBuildBlockersButton.managementScript = managementScript;
+        
         commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
         commandScript.SetCommandVariables(commandCenter, commandButtons);
@@ -169,9 +183,7 @@ public class WorldNavigator : MonoBehaviour
         List<double> resourcePools = new List<double> {30000, 20000, 10000, 5000 };
 
         gameStateProcessor.state = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
-        clientInterface.gameStateProcessor = gameStateProcessor;
-        clientInterface.clientState = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
-        clientInterface.player = "cairo";
+        clientInterface = new ClientInterface(gameStateProcessor, "cairo");
     }
 
     private void Update()
@@ -241,7 +253,7 @@ public class WorldNavigator : MonoBehaviour
         managementScript.enabled = true;
         managementScript.TurnOnIsland();
         managementScript.GotoObservationPoint();
-
+        managementScript.SetDefaultGUIStates();
         sceneCleanTimer = managementCleanTimer;
     }
 

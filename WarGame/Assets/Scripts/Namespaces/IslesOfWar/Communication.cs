@@ -352,6 +352,17 @@ namespace IslesOfWar
             {
                 return spend[0] <= has[0] && spend[1] <= has[1] && spend[2] <= has[2] && spend[3] <= has[3];
             }
+
+            public static bool UpdateSize(PlayerActions actions)
+            {
+                bool isLessThanOrEqualTo2048 = false;
+                JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+                string json = JsonConvert.SerializeObject(actions, settings);
+
+                isLessThanOrEqualTo2048 = json.Length <= 2048;
+
+                return isLessThanOrEqualTo2048;
+            }
         }
     }
 }

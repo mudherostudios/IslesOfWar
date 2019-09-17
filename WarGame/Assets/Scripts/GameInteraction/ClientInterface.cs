@@ -17,13 +17,14 @@ public class ClientInterface : MonoBehaviour
     public PlayerActions queuedActions;
     public string player;
 
-    public ClientInterface(){ }
+    public ClientInterface(){ queuedActions = new PlayerActions(); }
 
     public ClientInterface(StateProcessor gsp, string playerName)
     {
         gameStateProcessor = gsp;
         SetState(gsp.state);
         player = playerName;
+        queuedActions = new PlayerActions();
     }
 
     public void SetState(State state)
@@ -41,24 +42,19 @@ public class ClientInterface : MonoBehaviour
 
     void UpdateCollectors(string islandID, int tileIndex, int[] updatedCollectorTypes)
     {
-        int collectorType = 0;
-        int types = 0;
-
-        for (int c = 0; c < updatedCollectorTypes.Length; c++)
-        {
-            if (updatedCollectorTypes[c] != 0)
-                types++;
-
-            collectorType += updatedCollectorTypes[c];
-        }
-
-        if (types >= 2)
-            collectorType += 1;
-
+        int collectorType = EncodeUtility.GetDecodeIndex(updatedCollectorTypes);
         clientState.islands[islandID].SetCollectors(tileIndex, collectorType.ToString()[0]);
     }
 
+    void UpdateDefenses(string islandID, int tileIndex, int orderedBunkerType, int orderedBlockerType)
+    {
+        char[] fullOrder = "000000000000".ToCharArray();
+        char ordered = EncodeUtility.GetDefenseCode(orderedBlockerType, orderedBunkerType);
+        fullOrder[tileIndex] = ordered;
 
+        clientState.islands[islandID].SetDefenses(fullOrder.ToString());
+    }
+    
     //Make sure to add queuedAction updates as well.
     public bool PurchaseIslandCollector(StructureCost cost)
     {
@@ -99,33 +95,54 @@ public class ClientInterface : MonoBehaviour
     }
 
     //Make sure to add queuedAction updates as well.
-    public bool PurchaseIslandDefense(StructureCost cost)
+    public bool PurchaseIslandBunker(string islandID, int tileIndex, int purchaseType)
     {
         bool successfulPurchase = false;
 
-        if (clientState.islands[cost.islandID].owner == player)
+        if (clientState.islands[islandID].owner == player)
         {
-            string islandDefenses = clientState.islands[cost.islandID].defenses;
+            char existingDefense = clientState.islands[islandID].defenses[tileIndex];
+            char orderedDefense = EncodeUtility.GetDefenseCode(0, purchaseType);
+            successfulPurchase = IslandBuildUtility.CanBuildDefenses(existingDefense, orderedDefense);
+            double[] cost = new double[4];
 
-            int blockerType = EncodeUtility.GetYType(islandDefenses[cost.tileIndex]);
-            int bunkerCombo = EncodeUtility.GetXType(islandDefenses[cost.tileIndex]);
-            int[][] tileDefenses = EncodeUtility.GetDefenseTypes(blockerType, bunkerCombo);
+            if(successfulPurchase)
+                cost = new double[] {Constants.bunkerCosts[purchaseType-1 ,0], Constants.bunkerCosts[purchaseType - 1, 1],
+                Constants.bunkerCosts[purchaseType-1 ,2], Constants.bunkerCosts[purchaseType-1 ,3]};
 
-            if (cost.purchaseType > 0 && cost.purchaseType <= tileDefenses.Length)
-            {
-                successfulPurchase = Validity.HasEnoughResources(cost.resources, clientState.players[player].allResources);
-
-                if (blockerType != 0 && cost.purchaseType <= 3)
-                    successfulPurchase = false;
-
-                //if (tileDefenses[cost.purchaseType - 1] != 0)
-                //successfulPurchase = false;
-            }
+            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, clientState.players[player].allResources);
 
             if (successfulPurchase)
             {
-                //tileDefenses[cost.purchaseType - 1] = cost.purchaseType;
-                //UpdateDefenses(cost.islandID, cost.tileIndex, tileDefenses);
+                SpendResources(cost);
+                UpdateDefenses(islandID, tileIndex, purchaseType, 0);
+            }
+        }
+
+        return successfulPurchase;
+    }
+
+    public bool PurchaseIslandBlocker(string islandID, int tileIndex, int purchaseType)
+    {
+        bool successfulPurchase = false;
+
+        if (clientState.islands[islandID].owner == player)
+        {
+            char existingDefense = clientState.islands[islandID].defenses[tileIndex];
+            char orderedDefense = EncodeUtility.GetDefenseCode(0, purchaseType);
+            successfulPurchase = IslandBuildUtility.CanBuildDefenses(existingDefense, orderedDefense);
+            double[] cost = new double[4];
+
+            if (successfulPurchase)
+                cost = new double[] {Constants.blockerCosts[purchaseType-1 ,0], Constants.blockerCosts[purchaseType - 1, 1],
+                Constants.blockerCosts[purchaseType-1 ,2], Constants.blockerCosts[purchaseType-1 ,3]};
+
+            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, clientState.players[player].allResources);
+
+            if (successfulPurchase)
+            {
+                SpendResources(cost);
+                UpdateDefenses(islandID, tileIndex, 0, purchaseType);
             }
         }
 
@@ -241,15 +258,10 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
-    public double[] playerResources
-    {
-        get { return clientState.players[player].allResources; }
-    }
-
-    public double[] playerUnits
-    {
-        get { return clientState.players[player].allUnits; }
-    }
+    public double[] playerResources { get { return clientState.players[player].allResources; } }
+    public double[] playerUnits { get { return clientState.players[player].allUnits; } }
+    public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
+    public string islandInDevelopment { get { return queuedActions.bld.id; } }
 
     public double GetContributionSize(int type)
     {
@@ -330,7 +342,7 @@ public class ClientInterface : MonoBehaviour
 
     public bool[] QueueIsValid()
     {
-        bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true;
+        bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true, size = true;
 
         if (queuedActions.nat != null)
         {
@@ -398,7 +410,9 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.dfnd = null;
         }
 
-        return new bool[] { nation, build, units, search, resource, depleted, attack, defend };
+        size = Validity.UpdateSize(queuedActions);
+
+        return new bool[] { nation, build, units, search, resource, depleted, attack, defend, size };
     }
 
     //Made this function to not confuse the use of index 1,2,3 instead of 0,1,2 in the SendPoolContributions Function

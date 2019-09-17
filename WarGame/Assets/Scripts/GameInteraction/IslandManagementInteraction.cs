@@ -1,16 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using IslesOfWar;
 using IslesOfWar.ClientSide;
 
-public class IslandManagementInteraction: Interaction
+public class IslandManagementInteraction : Interaction
 {
     public string[] islands;
     public string[] tileVariations;
-    
+
     public Transform defaultObservePoint;
     public Transform defaultObservationFocus;
-    public string[] managementButtonTypes = new string[] { "CollectorPurchasePrompter", "DefensePurchasePrompter" };
+    public string[] managementButtonTypes = new string[] { "CollectorPurchasePrompter", "BunkerPurchasePrompter", "BlockerPurchasePrompter" };
+
+    [Header("GUI Variables")]
+    public EnableBuildButton enableBuildCollectorsButton;
+    public EnableBuildButton enableBuildBunkersButton;
+    public EnableBuildButton enableBuildBlockersButton;
+    public CostSlider costSlider;
 
     [Header("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -28,21 +36,37 @@ public class IslandManagementInteraction: Interaction
     private string islandID;
     private GameObject currentIsland, bufferedIsland;
     private IslandStats currentStats, bufferedStats;
+    private List<TileStats> islandTiles;
     private int direction;
+    private bool canBuildCollectors, canBuildBunkers, canBuildBlockers;
+    private float checkedTime;
+    private string lastPeekedButton = "None";
+
+    public void Awake()
+    {
+        islandTiles = new List<TileStats>();
+    }
 
     public void Update()
     {
         bool clicked = Input.GetButtonDown("Fire1");
         WorldButtonCheck(clicked);
 
-        if (clicked)
+        if (canBuildCollectors || canBuildBunkers || canBuildBlockers)
         {
-            string peekedType = PeekButtonType();
+            if (clicked)
+            {
+                string peekedType = PeekButtonType();
 
-            if (peekedType == managementButtonTypes[0])
-                CheckResourceSelection();
-            else if (peekedType == managementButtonTypes[1])
-                CheckDefenseSelection();
+                if (peekedType == managementButtonTypes[0])
+                    CheckResourceSelection();
+                else if (peekedType == managementButtonTypes[1])
+                    CheckBunkerSelection();
+                else if (peekedType == managementButtonTypes[2])
+                    CheckBlockerSelection();
+            }
+
+            CheckPrice();
         }
 
         //Island Movement
@@ -63,14 +87,29 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
+    public bool EnableBuildStructures(int type)
+    {
+        bool canBuild = !clientInterface.hasIslandDevelopmentInQueue || islandID == clientInterface.islandInDevelopment;
+
+        if (type == 0)
+        {
+            canBuildCollectors = canBuild;
+            ToggleAllTileResourcesAndCollectors(true);
+        }
+        else if (type == 1)
+            canBuildBunkers = canBuild;
+        else if (type == 2)
+            canBuildBlockers = canBuild;
+
+        return canBuild;
+    }
+
     void CheckResourceSelection()
     {
         if (selectedButton.gameObject.activeSelf)
         {
-            CollectorPurchasePrompter prompter = selectedButton.gameObject.GetComponent<CollectorPurchasePrompter>();
+            StructurePurchasePrompter prompter = selectedButton.gameObject.GetComponent<StructurePurchasePrompter>();
             int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
-            string resourceType = gameStateProcessor.state.islands[islandID].features[tileIndex].ToString();
-            string collectorType = gameStateProcessor.state.islands[islandID].collectors[tileIndex].ToString();
             int purchaseType = prompter.purchaseType;
 
             StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType);
@@ -84,18 +123,85 @@ public class IslandManagementInteraction: Interaction
         }
     }
 
-    void CheckDefenseSelection()
+    void CheckBunkerSelection()
     {
         PurchasePrompter prompter = selectedButton.gameObject.GetComponent<PurchasePrompter>();
         int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
         int purchaseType = prompter.purchaseType;
 
-        StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType);
-
-        if (clientInterface.PurchaseIslandDefense(cost))
+        if (clientInterface.PurchaseIslandBunker(islandID, tileIndex, purchaseType))
         {
             prompter.hiddenObject.SetActive(true);
             prompter.gameObject.SetActive(false);
+        }
+    }
+
+    void CheckBlockerSelection()
+    {
+        PurchasePrompter prompter = selectedButton.gameObject.GetComponent<PurchasePrompter>();
+        int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
+        int purchaseType = prompter.purchaseType;
+
+        if (clientInterface.PurchaseIslandBlocker(islandID, tileIndex, purchaseType))
+        {
+            prompter.hiddenObject.SetActive(true);
+            prompter.gameObject.SetActive(false);
+        }
+    }
+
+    void CheckPrice()
+    {
+        RaycastHit hit;
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        
+        if (Physics.Raycast(ray, out hit))
+        {
+            WorldButton button = hit.transform.GetComponent<WorldButton>();
+            StructurePurchasePrompter prompter = hit.transform.GetComponent<StructurePurchasePrompter>();
+            bool isStructure = hit.transform.tag == "WorldButton" && button != null && prompter != null;
+            bool isCollector = false;
+            bool isBunker = false;
+            bool isBlocker = false;
+
+            if (isStructure)
+            {
+                isCollector = button.buttonType == managementButtonTypes[0];
+                isBunker = button.buttonType == managementButtonTypes[1];
+                isBlocker = button.buttonType == managementButtonTypes[2];
+            }
+
+            if (isStructure)
+            {
+                double[] cost = new double[4];
+                int type = 0;
+
+                type = prompter.purchaseType;
+
+                if(isCollector)
+                    cost = new double[] {Constants.collectorCosts[type-1, 0], Constants.collectorCosts[type-1, 1],
+                    Constants.collectorCosts[type-1, 2] , Constants.collectorCosts[type-1, 3] };
+                else if(isBunker)
+                    cost = new double[] {Constants.bunkerCosts[type-1, 0], Constants.bunkerCosts[type-1, 1],
+                    Constants.bunkerCosts[type-1, 2] , Constants.bunkerCosts[type-1, 3] };
+                else if (isBlocker)
+                    cost = new double[] {Constants.blockerCosts[type-1, 0], Constants.blockerCosts[type-1, 1],
+                    Constants.blockerCosts[type-1, 2] , Constants.blockerCosts[type-1, 3] };
+
+                if (lastPeekedButton != button.buttonType)
+                {
+                    costSlider.SetCost(cost);
+                    costSlider.TurnOn(true);
+                    lastPeekedButton = button.buttonType;
+                }
+            }
+            else 
+            {
+                if (lastPeekedButton != "None")
+                {
+                    costSlider.TurnOn(false);
+                    lastPeekedButton = "None";
+                }
+            }
         }
     }
 
@@ -114,7 +220,7 @@ public class IslandManagementInteraction: Interaction
         {
             tilePrefabs[p] = prefabs[p];
         }
-        
+
         tileVariations = _tileVariations;
         offset = _offset;
 
@@ -123,6 +229,13 @@ public class IslandManagementInteraction: Interaction
         deleteLeft = positional[2];
         deleteRight = positional[3];
         islandChangeSpeed = changeSpeed;
+    }
+
+    public void SetDefaultGUIStates()
+    {
+        enableBuildCollectorsButton.Show();
+        enableBuildBunkersButton.Show();
+        enableBuildBlockersButton.Show();
     }
 
     public void TurnOnIsland()
@@ -137,6 +250,7 @@ public class IslandManagementInteraction: Interaction
 
     public void TurnOffIsland()
     {
+        islandTiles.Clear();
         Destroy(currentIsland);
         currentIsland = null;
         currentStats = null;
@@ -204,6 +318,7 @@ public class IslandManagementInteraction: Interaction
     void PlaceTiles(Island island, IslandStats islandStats, Transform tileParent)
     {
         IslandStats parent = tileParent.GetComponent<IslandStats>();
+        islandTiles.Clear();
 
         tileParent.GetComponent<IslandStats>().islandInfo = island;
 
@@ -232,8 +347,7 @@ public class IslandManagementInteraction: Interaction
 
             TileStats tempStats = tempTile.GetComponent<TileStats>();
             tempStats.SetIndexParent(islandStats.hexTiles[h].gameObject);
-
-            TurnOnResourcesAndCollectors(tempStats.resourceParents, tempStats.collectorParents, featString, collectorString);
+            
             TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
             TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
 
@@ -243,6 +357,24 @@ public class IslandManagementInteraction: Interaction
                 tempStructureProb = tempStats.structureProbabilities[0];
 
             ActivateRandomObject(tempStats.structures, tempStructureProb);
+            islandTiles.Add(tempStats);
+        }
+    }
+
+    void ToggleAllTileResourcesAndCollectors(bool on)
+    {
+        for (int t = 0; t < islandTiles.Count; t++)
+        {
+            if (on)
+            {
+                TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents,
+                currentStats.islandInfo.features[t].ToString(), currentStats.islandInfo.collectors[t].ToString());
+            }
+            else
+            {
+                islandTiles[t].ToggleOffCollectors();
+                islandTiles[t].ToggleOffResources();
+            }
         }
     }
 
