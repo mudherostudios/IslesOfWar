@@ -13,6 +13,7 @@ public class CommandIslandInteraction : Interaction
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbucksPool;
     public SearchIslands searchIslands;
+    public SquadGUI squadGUI;
 
     public Transform commandCenter;
     public Transform observePoint;
@@ -42,6 +43,8 @@ public class CommandIslandInteraction : Interaction
             resourcePool.gameObject.SetActive(false);
             warbucksPool.gameObject.SetActive(false);
             searchIslands.gameObject.SetActive(false);
+            squadGUI.Close();
+
         }
 
         if (Input.GetKeyDown(KeyCode.U) && hasUnitPurchasePrompter)

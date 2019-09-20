@@ -9,6 +9,8 @@ public class SquadGUI : MonoBehaviour
 {
     public Text[] unitCounts;
     public InputField[] unitInputs;
+    public Dropdown squadList;
+    public GameObject removeMenu;
     public CommandIslandInteraction commandScript;
     private int[] totalUnitsInSquads;
 
@@ -53,6 +55,26 @@ public class SquadGUI : MonoBehaviour
         }
 
         SetAllFieldsToZero();
+    }
+
+    public void UpdateSquadList()
+    {
+        squadList.ClearOptions();
+        squadList.AddOptions(GetKeys());
+    }
+
+    public void DisbandSquad()
+    {
+        List<string> keys = GetKeys();
+
+        if (keys.Count > 0)
+        {
+            string squad = keys[squadList.value];
+            keys.Remove(squad);
+            PlayerPrefs.DeleteKey(squad);
+            PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+        }
+
     }
 
     int[] GetTotalUnitsInSquads()
@@ -124,5 +146,11 @@ public class SquadGUI : MonoBehaviour
         {
             unitInputs[i].text = "0";
         }
+    }
+
+    public void Close()
+    {
+        removeMenu.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

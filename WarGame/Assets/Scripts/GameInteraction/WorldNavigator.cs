@@ -103,6 +103,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.resourcePool = resourcePool;
         commandScript.warbucksPool = warbuxPool;
         commandScript.searchIslands = searchIslands;
+        commandScript.squadGUI = squadFormation;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
         warbuxPool.commandScript = commandScript;
