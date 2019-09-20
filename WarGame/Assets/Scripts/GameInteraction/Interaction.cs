@@ -60,7 +60,8 @@ public class Interaction : MonoBehaviour
                             indexLocation = selectedWorldUIObject.GetComponent<IndexedNavigationButton>().index;
                         }
                     }
-                    else if (clickedButtonType == buttonTypes[1])
+
+                    if (clickedButtonType == buttonTypes[1])
                     {
                         RevealObject();
                     }

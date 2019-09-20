@@ -1,114 +1,128 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using IslesOfWar.Combat;
-using IslesOfWar.ClientSide;
-using TMPro;
+using UnityEngine.UI;
+using IslesOfWar;
+using Newtonsoft.Json;
 
-public class SquadGUI : WorldGUI
+public class SquadGUI : MonoBehaviour
 {
-    public TextMeshPro[] unitCounts;
-    public TextMeshPro[] squadCounts;
-    public TextMeshPro[] unitInputs;
+    public Text[] unitCounts;
+    public InputField[] unitInputs;
+    public CommandIslandInteraction commandScript;
+    private int[] totalUnitsInSquads;
 
-    public int[][] squads;
-    public double[] allUnits;
-
-    private int selectedSquad = 0;
-    private PlayerState playerState;
-
-    public void Initialize(PlayerState state, int[][] _squads)
+    public void CheckMax(int type)
     {
-        playerState = state;
-        squads = new int[squads.Length][];
-
-        for (int s = 0; s < _squads.Length; s++)
-        {
-            squads[s] = _squads[s];
-        }
-
-        allUnits = playerState.allUnits;
+        int parsedValue = CorrectedValue(type);
+        unitInputs[type].text = parsedValue.ToString();
     }
 
-    public void AddUnitsToSquad(int type)
+    public void CreateSquad()
     {
-        for (int f = 0; f < 3; f++)
+        if (CheckCanCreateSquad())
         {
-            int index = type * 3 + f;
-            int count = fieldAmounts[index];
+            List<int> squad = new List<int>();
 
-            if (count <= allUnits[index])
+            for (int u = 0; u < unitInputs.Length; u++)
             {
-                allUnits[index] -= count;
-                squads[selectedSquad][index] += count;
+                squad.Add(CorrectedValue(u));
             }
 
-            Reset(index);
-        }
-    }
+            string squadName = "";
+            bool stopLooking = GetSquadCount() >= Constants.randomSquadNames.Length;
+            int r = 0;
+            int loopCount = 0;
 
-    public void RemoveUnitsFromSquad(int type)
-    {
-        for (int f = 0; f < 3; f++)
-        {
-            int index = type * 3 + f;
-            int count = fieldAmounts[index];
-
-            if (count <= squads[selectedSquad][f])
+            while (stopLooking == false || loopCount > Constants.randomSquadNames.Length * 1.5)
             {
-                allUnits[index] += count;
-                squads[selectedSquad][index] -= count;
+                r = Random.Range(0, Constants.randomSquadNames.Length);
+                stopLooking = !PlayerPrefs.HasKey(Constants.randomSquadNames[r]);
+                loopCount++;
+            }
+
+            squadName = Constants.randomSquadNames[r];
+
+            if (!PlayerPrefs.HasKey(squadName))
+            {
+                List<string> keys = GetKeys();
+                keys.Add(squadName);
+                PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+                PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
             }
         }
+
+        SetAllFieldsToZero();
     }
 
-    public void SwitchToSquad(int squad)
+    int[] GetTotalUnitsInSquads()
     {
-        if (squad < 3 && squad >= 0)
+        List<string> keys = GetKeys();
+        int[] total = new int[9];
+
+        for (int k = 0; k < keys.Count; k++)
         {
-            selectedSquad = squad;
-            Reset();
+            int[] units = JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(keys[k])).ToArray();
+
+            for (int u = 0; u < 9; u++)
+            {
+                total[u] += units[u];
+            }
         }
+
+        return total;
     }
 
-    public void Cancel(int[][] _squads)
+    bool CheckCanCreateSquad()
     {
-        Reset();
-
-        for (int s = 0; s < squads.Length; s++)
+        for (int i = 0; i < unitInputs.Length; i++)
         {
-            squads[s] = _squads[s];
+            if (!unitInputs[i].text.Contains("-") && unitInputs[i].text != "0")
+                return true;
         }
+
+        return false;
     }
 
-    public Squad[] TrySubmit()
+    int GetSquadCount()
     {
-        Squad[] squadObjects = new Squad[squads.Length];
-
-        for (int s = 0; s < squads.Length; s++)
-        {
-            squadObjects[s] = new Squad(squads[s]);
-        }
-
-        return squadObjects;
+        return GetKeys().Count;
     }
 
-    public void UpdateAllStats()
+    List<string> GetKeys()
     {
-        for (int u = 0; u < allUnits.Length; u++)
+        if (PlayerPrefs.HasKey("keys"))
         {
-            string unitFormat = "";
-            string squadFormat = "";
+            string prefKeys = PlayerPrefs.GetString("keys");
+            return JsonConvert.DeserializeObject<List<string>>(prefKeys);
+        }
+        else
+            return new List<string>();
+    }
 
-            if (allUnits[u] > 999999999)
-                unitFormat = "G2";
-            if (squads[selectedSquad][u] > 999999999)
-                squadFormat = "G2";
+    int CorrectedValue(int type)
+    {
+        totalUnitsInSquads = GetTotalUnitsInSquads();
+        int parsedValue = 0;
+        int.TryParse(unitInputs[type].text, out parsedValue);
+        double unitCount = commandScript.GetUnitCount(type) - totalUnitsInSquads[type];
 
-            unitCounts[u].text = allUnits[u].ToString(unitFormat);
-            squadCounts[u].text = squads[selectedSquad][u].ToString(squadFormat);
-            unitInputs[u].text = fieldAmounts[u].ToString();
+        if (parsedValue > unitCount)
+        {
+            if (unitCount <= int.MaxValue)
+                parsedValue = (int)unitCount;
+            else
+                parsedValue = int.MaxValue;
         }
 
+        return parsedValue;
+    }
+
+    void SetAllFieldsToZero()
+    {
+        for (int i = 0; i < unitInputs.Length; i++)
+        {
+            unitInputs[i].text = "0";
+        }
     }
 }

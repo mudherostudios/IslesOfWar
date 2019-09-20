@@ -84,10 +84,7 @@ public class CommandIslandInteraction : Interaction
         orbital.SetNewObservePoint(observePoint, focalPoint);
     }
 
-    public void GotoCommandCenter()
-    {
-        orbital.ExploreMode(commandCenter, true);
-    }
+    public void GotoCommandCenter() { orbital.ExploreMode(commandCenter, true); }
 
     public void SetUnitGUI(int type)
     {
@@ -110,59 +107,18 @@ public class CommandIslandInteraction : Interaction
         }
     }
 
-    public void AddIslandToPool(string island)
-    {
-        clientInterface.AddIslandToPool(island);
-    }
+    public void AddIslandToPool(string island) { clientInterface.AddIslandToPool(island); }
+    public void SendToPool(int type, double[] resources) { clientInterface.SendResourcePoolContributions(type, resources); }
+    public void SearchForIslands() { clientInterface.SearchForIslands(); }
 
-    public void SendToPool(int type, double[] resources)
-    {
-        clientInterface.SendResourcePoolContributions(type, resources);
-    }
-
-    public void SearchForIslands()
-    {
-        clientInterface.SearchForIslands();
-    }
-
-    public double GetPoolSize(int poolType)
-    {
-        return clientInterface.GetContributionSize(poolType);
-    }
-
-    public double[] GetAllPoolSizes()
-    {
-        return clientInterface.GetAllPoolSizes();
-    }
-
-    public double[] GetPlayerContributedResources(int poolType, double[] modifiers)
-    {
-        return clientInterface.GetPlayerContributedResources(poolType, modifiers);
-    }
-
-    public double[] GetTotalContributedResources(double[] modifiers)
-    {
-        return clientInterface.GetTotalContributedResources(modifiers);
-    }
-
-    public List<string> GetDepletedIslands()
-    {
-        return clientInterface.depletedIslands;
-    }
-
-    public double GetWarbucksOwnership()
-    {
-        return clientInterface.GetWarbucksOwnership();
-    }
-
-    public double GetWarbucksPoolSize()
-    {
-        return clientInterface.GetWarbucksPoolSize();
-    }
-
-    public double[] GetIslandSearchCost()
-    {
-        return clientInterface.GetIslandSearchCost();
-    }
+    public double GetPoolSize(int poolType) { return clientInterface.GetContributionSize(poolType); }
+    public double[] GetAllPoolSizes() { return clientInterface.GetAllPoolSizes(); }
+    public double[] GetPlayerContributedResources(int poolType, double[] modifiers) { return clientInterface.GetPlayerContributedResources(poolType, modifiers); }
+    public double[] GetTotalContributedResources(double[] modifiers) { return clientInterface.GetTotalContributedResources(modifiers); }
+    public List<string> GetDepletedIslands() { return clientInterface.depletedIslands; }
+    public double GetWarbucksOwnership() { return clientInterface.GetWarbucksOwnership(); }
+    public double GetWarbucksPoolSize(){return clientInterface.GetWarbucksPoolSize();}
+    public double[] GetIslandSearchCost() { return clientInterface.GetIslandSearchCost(); }
+    public double GetUnitCount(int type) { return clientInterface.playerUnits[type]; }
     
 }

@@ -40,6 +40,7 @@ public class WorldNavigator : MonoBehaviour
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbuxPool;
     public SearchIslands searchIslands;
+    public SquadGUI squadFormation;
     public int unitType;
     public int resourceType;
 
@@ -106,6 +107,7 @@ public class WorldNavigator : MonoBehaviour
         resourcePool.commandScript = commandScript;
         warbuxPool.commandScript = commandScript;
         searchIslands.commandScript = commandScript;
+        squadFormation.commandScript = commandScript;
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -143,7 +145,7 @@ public class WorldNavigator : MonoBehaviour
 
         Dictionary<string, PlayerState>  players = new Dictionary<string, PlayerState>
         {
-            {"cairo", new PlayerState("US", new double[9], new double[] {10000, 10000, 10000, 10000}, new string[] {"a", "b", "c", "d"}, "") },
+            {"cairo", new PlayerState("US", new double[] {100, 50, 25, 10, 5, 1, 10, 5, 1 }, new double[] {10000, 10000, 10000, 10000}, new string[] {"a", "b", "c", "d"}, "") },
             {"pimpMacD", new PlayerState("US", new double[] {50, 25, 12, 5, 2, 1, 5, 2, 1 }, new double[] {1000, 2500, 2000, 500}, new string[] { "e", "f", "g", "h", "i"}, "") },
             {"nox", new PlayerState("MX", new double[] {100, 50, 25, 10, 5, 2, 10, 5, 1 }, new double[] {0, 0, 0, 0}, new string[] { "j", "k", "l", "m", "n", "n"}, "") }
         };
