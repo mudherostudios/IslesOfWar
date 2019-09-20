@@ -41,6 +41,7 @@ public class IslandManagementInteraction : Interaction
     private bool canBuildCollectors, canBuildBunkers, canBuildBlockers;
     private float checkedTime;
     private string lastPeekedButton = "None";
+    private string lastPeekedName = "None";
 
     public void Awake()
     {
@@ -51,6 +52,25 @@ public class IslandManagementInteraction : Interaction
     {
         bool clicked = Input.GetButtonDown("Fire1");
         WorldButtonCheck(clicked);
+
+        if (clicked && indexLocation != lastIndexLocation)
+        {
+            if (canBuildBunkers)
+            {
+                char bunkerChar = clientInterface.playerIslands[islandIndex].defenses[indexLocation];
+                int bunkerType = EncodeUtility.GetXType(bunkerChar);
+                int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
+                islandTiles[lastIndexLocation].ToggleBunkerSystem(false, new int[1]);
+                islandTiles[indexLocation].ToggleBunkerSystem(true, existingBunkers);
+            }
+            else if (canBuildBlockers)
+            {
+                char blockerChar = clientInterface.playerIslands[islandIndex].defenses[indexLocation];
+                int blockerType = EncodeUtility.GetYType(blockerChar);
+                islandTiles[lastIndexLocation].ToggleBlockerSystem(false, 0);
+                islandTiles[indexLocation].ToggleBlockerSystem(true, blockerType);
+            }
+        }
 
         if (canBuildCollectors || canBuildBunkers || canBuildBlockers)
         {
@@ -133,6 +153,7 @@ public class IslandManagementInteraction : Interaction
         {
             prompter.hiddenObject.SetActive(true);
             prompter.gameObject.SetActive(false);
+            SetGUIContents();
         }
     }
 
@@ -146,6 +167,7 @@ public class IslandManagementInteraction : Interaction
         {
             prompter.hiddenObject.SetActive(true);
             prompter.gameObject.SetActive(false);
+            SetGUIContents();
         }
     }
 
@@ -187,19 +209,21 @@ public class IslandManagementInteraction : Interaction
                     cost = new double[] {Constants.blockerCosts[type-1, 0], Constants.blockerCosts[type-1, 1],
                     Constants.blockerCosts[type-1, 2] , Constants.blockerCosts[type-1, 3] };
 
-                if (lastPeekedButton != button.buttonType)
+                if (lastPeekedButton != button.buttonType || lastPeekedName != button.name)
                 {
                     costSlider.SetCost(cost);
                     costSlider.TurnOn(true);
                     lastPeekedButton = button.buttonType;
+                    lastPeekedName = button.name;
                 }
             }
             else 
             {
-                if (lastPeekedButton != "None")
+                if (lastPeekedButton != "None" || lastPeekedName != button.name)
                 {
                     costSlider.TurnOn(false);
                     lastPeekedButton = "None";
+                    lastPeekedName = "None";
                 }
             }
         }
@@ -367,8 +391,9 @@ public class IslandManagementInteraction : Interaction
         {
             if (on)
             {
-                TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents,
-                currentStats.islandInfo.features[t].ToString(), currentStats.islandInfo.collectors[t].ToString());
+                string feature = clientInterface.clientState.islands[islandID].features[t].ToString();
+                string collector = clientInterface.clientState.islands[islandID].collectors[t].ToString();
+                TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents, feature, collector);
             }
             else
             {

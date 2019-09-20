@@ -539,7 +539,7 @@ namespace IslesOfWar
                     if (existingBunkers[d] > 0 || orderedBunkers[d] > 0)
                         bunkers++;
 
-                    canBuild = bunkers <= 2 && orderedBunkers[d] != existingBunkers[d] || orderedBunkers[d] == 0;
+                    canBuild = bunkers <= 2 && (orderedBunkers[d] != existingBunkers[d] || orderedBunkers[d] == 0);
                 }
 
                 return canBuild;
@@ -552,7 +552,6 @@ namespace IslesOfWar
 
                 return (existingBlockerType == 0 && orderedBlockerType > 0) || orderedBlockerType == 0;
             }
-
         }
         
         public class PlayerState
@@ -565,7 +564,7 @@ namespace IslesOfWar
 
             public double[] allUnits { get { return units.ToArray(); } }
             public double[] allResources { get { return resources.ToArray(); } }
-            public string[] allIslands { get { return islands.ToArray(); }  }
+            public string[] allIslands { get { return islands.ToArray(); } }
 
             public PlayerState() { }
 

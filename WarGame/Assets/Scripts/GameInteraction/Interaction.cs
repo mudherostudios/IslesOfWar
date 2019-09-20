@@ -27,6 +27,8 @@ public class Interaction : MonoBehaviour
 
     protected Vector3 targetPosition;
     protected bool isAtTarget;
+    protected int indexLocation = 4;
+    protected int lastIndexLocation = 11;
 
     protected void WorldButtonCheck(bool didClick)
     {
@@ -51,6 +53,12 @@ public class Interaction : MonoBehaviour
                     if (clickedButtonType == buttonTypes[0] || clickedButtonType == buttonTypes[2] || navigators.Contains(clickedButtonType))
                     {
                         NavigateToDestination();
+
+                        if (clickedButtonType == buttonTypes[2])
+                        {
+                            lastIndexLocation = indexLocation;
+                            indexLocation = selectedWorldUIObject.GetComponent<IndexedNavigationButton>().index;
+                        }
                     }
                     else if (clickedButtonType == buttonTypes[1])
                     {

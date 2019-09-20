@@ -26,6 +26,35 @@ public class TileStats : MonoBehaviour
     [Header("Type Info")]
     public GameObject indexParent;
 
+    void ToggleAllCollection(bool on, bool toggleChildren, GameObject[] collection)
+    {
+        foreach (GameObject parent in collection)
+        {
+            for (int c = 0; c < parent.transform.childCount && toggleChildren; c++)
+            {
+                parent.transform.GetChild(c).gameObject.SetActive(on);
+            }
+
+            if (!toggleChildren)
+                parent.SetActive(on);
+        }
+    }
+
+    void ToggleOnValidCollection(bool toggleChildren, GameObject[] collection, int[] validIndices)
+    {
+        for (int c = 0; c < collection.Length; c++)
+        {
+            for (int t = 0; t < collection[c].transform.childCount && toggleChildren; t++)
+            {
+                if (validIndices[t] == 1)
+                    collection[c].transform.GetChild(t).gameObject.SetActive(true);
+            }
+
+            if (!toggleChildren && validIndices[c] > 0)
+                collection[c].SetActive(true);
+        }
+    }
+
     public void SetIndexParent(GameObject _indexParent)
     {
         indexParent = _indexParent;
@@ -40,29 +69,64 @@ public class TileStats : MonoBehaviour
             metalMines[n].indexParent = indexParent;
             limeNodes[n].indexParent = indexParent;
         }
-    }
 
-    void ToggleAllCollection(bool on, GameObject[] collection)
-    {
-        if (!on)
+        for (int p = 0; p < bunkerPrompters.Length; p++)
         {
-            foreach (GameObject parent in collection)
-            {
-                for (int c = 0; c < parent.transform.childCount; c++)
-                {
-                    parent.transform.GetChild(c).gameObject.SetActive(false);
-                }
-            }
+            StructurePurchasePrompter prompter = bunkerPrompters[p].GetComponent<StructurePurchasePrompter>();
+            prompter.indexParent = indexParent;
+        }
+
+        for (int p = 0; p < blockerPrompters.Length; p++)
+        {
+            StructurePurchasePrompter prompter = blockerPrompters[p].GetComponent<StructurePurchasePrompter>();
+            prompter.indexParent = indexParent;
         }
     }
 
-    public void ToggleOffCollectors() { ToggleAllCollection(false, collectorParents); }
-    public void ToggleOffResources() { ToggleAllCollection(false, resourceParents); }
-    public void ToggleBunkers(bool on) { ToggleAllCollection(on, bunkers); }
-    public void ToggleBlockers(bool on) { ToggleAllCollection(on, blockers); }
-    public void ToggleBunkerPrompters(bool on) { ToggleAllCollection(on, bunkerPrompters); }
-    public void ToggleBlockerPrompters(bool on) { ToggleAllCollection(on, blockerPrompters); }
-    
+    public void ToggleOffCollectors() { ToggleAllCollection(false, true, collectorParents); }
+    public void ToggleOffResources() { ToggleAllCollection(false, true, resourceParents); }
+    public void ToggleBunkers(bool on) { ToggleAllCollection(on, false, bunkers); }
+    public void ToggleBlockers(bool on) { ToggleAllCollection(on, false, blockers); }
+    public void ToggleBunkerPrompters(bool on) { ToggleAllCollection(on, false, bunkerPrompters); }
+    public void ToggleBlockerPrompters(bool on) { ToggleAllCollection(on, false, blockerPrompters); }
+
+    public void ToggleBunkerSystem(bool on, int[] validIndices)
+    {
+        if (!on)
+        {
+            ToggleBunkers(false);
+            ToggleBunkerPrompters(false);
+        }
+        else
+        {
+            int[] validPrompters = new int[validIndices.Length];
+
+            for (int p = 0; p < validPrompters.Length; p++)
+            {
+                if (validIndices[p] == 0)
+                    validPrompters[p] = 1;
+            }
+
+            ToggleOnValidCollection(false, bunkers, validIndices);
+            ToggleOnValidCollection(false, bunkerPrompters, validPrompters);
+        }
+    }
+
+    public void ToggleBlockerSystem(bool on, int type)
+    {
+        if (on)
+        {
+            if (type == 0)
+                ToggleBlockerPrompters(true);
+            else
+                blockers[type-1].SetActive(true);
+        }
+        else
+        {
+            ToggleBlockers(false);
+            ToggleBlockerPrompters(false);
+        }
+    }
 
     StructurePurchasePrompter[] GetChildren(Transform parent)
     {

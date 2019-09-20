@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2720452436662868998}
   - component: {fileID: 5786074959548390807}
   - component: {fileID: 3287716878082898506}
-  - component: {fileID: 3698092461190511837}
   m_Layer: 0
   m_Name: Black_Parts
   m_TagString: Untagged
@@ -80,20 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &3698092461190511837
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 329306556672406113}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 4300002, guid: 46b806058c5569240b069becf6d6bb0a, type: 3}
 --- !u!1 &5001060427115280703
 GameObject:
   m_ObjectHideFlags: 0
@@ -105,7 +90,6 @@ GameObject:
   - component: {fileID: 6972182022775906069}
   - component: {fileID: 8600524106667478286}
   - component: {fileID: 8502235189274131654}
-  - component: {fileID: 7275676060513439396}
   m_Layer: 0
   m_Name: Silver_Parts_001
   m_TagString: Untagged
@@ -172,20 +156,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &7275676060513439396
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5001060427115280703}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 4300000, guid: 46b806058c5569240b069becf6d6bb0a, type: 3}
 --- !u!1 &5621200061322844125
 GameObject:
   m_ObjectHideFlags: 0
@@ -195,8 +165,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6750488723060955412}
-  - component: {fileID: 2339726905201723478}
-  - component: {fileID: 3856575543489401022}
   m_Layer: 0
   m_Name: RockCrusher
   m_TagString: Untagged
@@ -223,33 +191,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2339726905201723478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5621200061322844125}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67f26cee610d63f4a849db56a835324d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fieldAmounts: 
-  fields: []
---- !u!65 &3856575543489401022
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5621200061322844125}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.069996655, y: 0.050754946, z: 0.06410037}
-  m_Center: {x: 0.015001684, y: -0.011648893, z: 0.0017307277}
 --- !u!1 &5977933283230223306
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +202,6 @@ GameObject:
   - component: {fileID: 2516337444015145007}
   - component: {fileID: 4653526740181402729}
   - component: {fileID: 5854808234144632814}
-  - component: {fileID: 907913558471224266}
   m_Layer: 0
   m_Name: Orange_Parts
   m_TagString: Untagged
@@ -328,20 +268,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &907913558471224266
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5977933283230223306}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 4300004, guid: 46b806058c5569240b069becf6d6bb0a, type: 3}
 --- !u!1001 &901473998149214244
 PrefabInstance:
   m_ObjectHideFlags: 0

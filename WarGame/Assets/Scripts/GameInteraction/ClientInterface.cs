@@ -48,11 +48,11 @@ public class ClientInterface : MonoBehaviour
 
     void UpdateDefenses(string islandID, int tileIndex, int orderedBunkerType, int orderedBlockerType)
     {
-        char[] fullOrder = "000000000000".ToCharArray();
+        char[] fullOrder = "))))))))))))".ToCharArray();
         char ordered = EncodeUtility.GetDefenseCode(orderedBlockerType, orderedBunkerType);
         fullOrder[tileIndex] = ordered;
 
-        clientState.islands[islandID].SetDefenses(fullOrder.ToString());
+        clientState.islands[islandID].SetDefenses(new string(fullOrder));
     }
     
     //Make sure to add queuedAction updates as well.
@@ -129,7 +129,7 @@ public class ClientInterface : MonoBehaviour
         if (clientState.islands[islandID].owner == player)
         {
             char existingDefense = clientState.islands[islandID].defenses[tileIndex];
-            char orderedDefense = EncodeUtility.GetDefenseCode(0, purchaseType);
+            char orderedDefense = EncodeUtility.GetDefenseCode(purchaseType, 0);
             successfulPurchase = IslandBuildUtility.CanBuildDefenses(existingDefense, orderedDefense);
             double[] cost = new double[4];
 
@@ -220,12 +220,12 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            List<string> playerIslands = clientState.players[player].islands;
-            Island[] islands = new Island[playerIslands.Count];
+            List<string> playerIslandIDs = clientState.players[player].islands;
+            Island[] islands = new Island[playerIslandIDs.Count];
 
             for (int i = 0; i < islands.Length; i++)
             {
-                islands[i] = clientState.islands[playerIslands[i]];
+                islands[i] = clientState.islands[playerIslandIDs[i]];
             }
 
             return islands;
