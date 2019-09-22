@@ -233,6 +233,7 @@ namespace IslesOfWar
             }
         }
 
+        //Eventually remove all of the named variables and convert it to just a double array
         public class Squad
         {
             public double riflemen, machineGunners, bazookamen;

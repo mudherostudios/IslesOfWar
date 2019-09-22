@@ -5,12 +5,13 @@ using UnityEngine.UI;
 using IslesOfWar.ClientSide;
 using IslesOfWar.GameStateProcessing;
 
-//Orchestrates activity between the main island interaction, manageable island interaction, and discovery island interaction.
+//Orchestrates activity between the main island interaction, manageable island interaction, and battle plan interaction.
 public class WorldNavigator : MonoBehaviour
 {
     [Header("Managed Scripts")]
     public CommandIslandInteraction commandScript;
     public IslandManagementInteraction managementScript;
+    public BattlePlanInteraction battleScript;
 
     [Header("Common Variables")]
     public StateProcessor gameStateProcessor;
@@ -20,20 +21,28 @@ public class WorldNavigator : MonoBehaviour
     public ScreenGUI screenGUI;
     public string[] buttonTypes = new string[] { "InputField", "MenuRevealer", "Tile" };
     public string[] commandButtons = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompt" };
-    public string[] managementButtons = new string[] {};
+    public string[] managementButtons = new string[] { };
+    public string[] battleButtons = new string[] { };
 
-    [Header("IslandGeneration Variables")]
+    [Header("Island Generation Variables")]
     public string[] tileVariations;
     public GameObject[] tilePrefabs;
     public GameObject tileHolderPrefab;
     public Vector3 offset;
 
-    [Header("Managed Generation")]
+    [Header("Island Management Generation")]
     public Vector3 generateCenter;
     public Vector3 genereateRotation;
     public Vector3 deleteLeft;
     public Vector3 deleteRight;
     public float islandChangeSpeed;
+
+    [Header("Battle Variables")]
+    public GameObject battleIsland;
+    public IslandStats battleIslandStats;
+    public Transform[] squadMarkerWaitPositions;
+    public GameObject squadMarkerPrefab;
+    public GameObject planMarkerPrefab;
 
     [Header("Command Island GUIs and Variables")]
     public UnitPurchase unitPurchase;
@@ -53,10 +62,12 @@ public class WorldNavigator : MonoBehaviour
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
     public Transform managementObservationPoint;
+    public Transform battleObservationPoint;
 
     [Header("Camera Focus Points")]
     public Transform commandFocusPoint;
     public Transform managementFocusPoint;
+    public Transform battleFocusPoint;
 
     [Header("Command Mode Variables")]
     public Transform commandIsland;
@@ -65,11 +76,13 @@ public class WorldNavigator : MonoBehaviour
     [Header("Scene Cleaning")]
     public float commandCleanTimer;
     public float managementCleanTimer;
+    public float battleCleanTimer;
     
     enum Mode
     {
         COMMAND,
         MANAGEMENT,
+        BATTLE,
         NONE
     }
 
@@ -84,6 +97,7 @@ public class WorldNavigator : MonoBehaviour
         clientInterface = gameObject.AddComponent<ClientInterface>();
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
+        battleScript = gameObject.AddComponent<BattlePlanInteraction>();
     }
 
     private void Start()
@@ -95,6 +109,7 @@ public class WorldNavigator : MonoBehaviour
         screenGUI.SetGUIContents();
         commandScript.enabled = true;
         managementScript.enabled = false;
+        battleScript.enabled = false;
         orbital.ExploreMode(commandIsland, false);
         orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
 
@@ -124,7 +139,12 @@ public class WorldNavigator : MonoBehaviour
         enableBuildCollectorsButton.managementScript = managementScript;
         enableBuildBunkersButton.managementScript = managementScript;
         enableBuildBlockersButton.managementScript = managementScript;
-        
+
+        //Battle Variables
+        List<GameObject> battleIslandGenerationPrefabs = new List<GameObject>();
+        battleIslandGenerationPrefabs.AddRange(tilePrefabs);
+        battleIslandGenerationPrefabs.Add(battleIsland);
+
         commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
         commandScript.SetCommandVariables(commandCenter, commandButtons);
@@ -132,9 +152,12 @@ public class WorldNavigator : MonoBehaviour
         managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
-        //managementScript.SetManagementButtons(managementButtons);
-
         managementScript.Initialize();
+
+        battleScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
+        battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
+        battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
+        battleScript.SetBattleVariables(squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
 
         SetCommandMode();
     }
@@ -201,6 +224,10 @@ public class WorldNavigator : MonoBehaviour
             {
                 managementScript.TurnOffIsland();
             }
+            else if (cleanMode == Mode.BATTLE)
+            {
+                battleScript.TurnOffIsland();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.M) && mode != Mode.MANAGEMENT)
@@ -210,6 +237,11 @@ public class WorldNavigator : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.C) && mode != Mode.COMMAND)
         {
             SetCommandMode();
+        }
+        else if (Input.GetKeyDown(KeyCode.B) && mode != Mode.BATTLE)
+        {
+            Debug.Log("Remember to change this to get islandID from menu.");
+            SetBattleMode("a");
         }
 
         if (mode == Mode.COMMAND && traversing && orbital.isAtTarget)
@@ -230,6 +262,8 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.MANAGEMENT)
             managementScript.enabled = false;
+        else if (mode == Mode.BATTLE)
+            battleScript.enabled = false;
 
         mode = Mode.COMMAND;
         commandScript.enabled = true;
@@ -250,6 +284,8 @@ public class WorldNavigator : MonoBehaviour
 
         if (mode == Mode.COMMAND)
             commandScript.enabled = false;
+        else if (mode == Mode.BATTLE)
+            battleScript.enabled = false;
 
         mode = Mode.MANAGEMENT;
 
@@ -258,6 +294,28 @@ public class WorldNavigator : MonoBehaviour
         managementScript.GotoObservationPoint();
         managementScript.SetDefaultGUIStates();
         sceneCleanTimer = managementCleanTimer;
+    }
+
+    public void SetBattleMode(string islandID)
+    {
+        traversing = true;
+
+        if (mode != cleanMode)
+            cleanMode = mode;
+        else
+            cleanMode = Mode.NONE;
+
+        if (mode == Mode.COMMAND)
+            commandScript.enabled = false;
+        else if (mode == Mode.MANAGEMENT)
+            managementScript.enabled = false;
+
+        mode = Mode.BATTLE;
+
+        battleScript.enabled = true;
+        battleScript.TurnOnIsland(islandID);
+        battleScript.GotToObservePoint();
+        sceneCleanTimer = battleCleanTimer;
     }
 
     bool isClean()

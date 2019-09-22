@@ -232,6 +232,18 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
+    public Island attackableIsland
+    {
+        get
+        {
+            string attackableID = gameStateProcessor.state.players[player].attackableIsland;
+            return gameStateProcessor.state.islands[attackableID];
+        }
+    }
+
+    public List<string> playerIslandIDs { get { return clientState.players[player].islands; } }
+    public string attackableIslandID { get { return clientState.players[player].attackableIsland; } }
+
     public List<string> depletedIslands
     {
         get
@@ -248,20 +260,21 @@ public class ClientInterface : MonoBehaviour
             return depleted;
         }
     }
-
-    public Island attackableIsland
-    {
-        get
-        {
-            string attackableID = gameStateProcessor.state.players[player].attackableIsland;
-            return gameStateProcessor.state.islands[attackableID];
-        }
-    }
-
+    
     public double[] playerResources { get { return clientState.players[player].allResources; } }
     public double[] playerUnits { get { return clientState.players[player].allUnits; } }
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
     public string islandInDevelopment { get { return queuedActions.bld.id; } }
+
+    public bool IslandExists(string islandID)
+    {
+        return clientState.islands.ContainsKey(islandID);
+    }
+
+    public Island GetIsland(string islandID)
+    {
+        return clientState.islands[islandID];
+    }
 
     public double GetContributionSize(int type)
     {

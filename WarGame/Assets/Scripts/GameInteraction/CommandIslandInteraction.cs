@@ -87,7 +87,10 @@ public class CommandIslandInteraction : Interaction
         orbital.SetNewObservePoint(observePoint, focalPoint);
     }
 
-    public void GotoCommandCenter() { orbital.ExploreMode(commandCenter, true); }
+    public void GotoCommandCenter()
+    {
+        orbital.ExploreMode(commandCenter, true);
+    }
 
     public void SetUnitGUI(int type)
     {

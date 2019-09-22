@@ -2,40 +2,58 @@
 using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar.ClientSide;
-using IslesOfWar.Combat;
+using IslesOfWar.Communication;
+using Newtonsoft.Json;
 
 public class BattlePlanInteraction : Interaction
 {
     public enum Mode
     {
         ATTACK,
-        DEFEND
+        DEFEND,
+        NONE
     }
 
-    public Mode mode = Mode.ATTACK;
-    public string[] battleButtonTypes = new string[] { "SquadMarker" };
-    public GameObject markerPrefab;
-    public GameObject trailPointPrefab;
+    public string[] battleButtonTypes = new string[] { "SquadMarker", "PlanMarker" };
+
+    [Header("Marker Interaction Variables")]
+    public Mode mode = Mode.NONE;
+    public GameObject squadMarkerPrefab;
+    public GameObject planMarkerPrefab;
+
+    [Header("Marker Generation Variables")]
+    public Transform[] squadMarkerWaitPositions;
     public Vector3 spawnOffset;
+    public Vector3 spawnRotation;
     public IslandStats islandStats;
 
-    private List<GameObject> squadMarkers;
+    [Header("Observation Variables")]
+    public Transform observePoint;
+    public Transform focusPoint;
+
+    [Header("Island Variables")]
+    public GameObject hexIsland;
+    public GameObject[] tilePrefabs;
+    public Vector3 offset;
+    public string[] tileVariations;
+    public string islandID;
+
+    //Tracking variables
     private int currentSquad = -1;
+    private int lastSquad = -2;
     private SquadMarker selectedSquad;
-    private BattlePlan battlePlan;
-    private AttackPlanner attackPlanner;
-    private DefensePlanner defensePlanner;
+    private List<TileStats> islandTiles;
+
+    //Variables used to submit actions.
+    private List<GameObject> squadMarkers;
+    private List<List<double>> squadCounts;
+    private List<List<int>> squadPlans;
+    private List<string> squadNames;
+    private List<GameObject> planMarkers;
 
     private void Start()
     {
-        Squad[] tempSquads = new Squad[]
-        {
-            new Squad(new long[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
-            new Squad(new long[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 })
-        };
-
-        attackPlanner = new AttackPlanner(tempSquads);
-        defensePlanner = new DefensePlanner(tempSquads);
+        
     }
 
     private void Update()
@@ -50,109 +68,359 @@ public class BattlePlanInteraction : Interaction
 
             if (peeked == battleButtonTypes[0])
             {
+                bool show = lastSquad != currentSquad || planMarkers.Count == 0;
+                selectedSquad = selectedButton.GetComponent<SquadMarker>();
+                lastSquad = currentSquad;
+
                 if (currentSquad >= 0)
                     CloseCurrentSquad();
-
-                selectedSquad = selectedButton.GetComponent<SquadMarker>();
+                
                 currentSquad = selectedSquad.squad;
 
-                if (mode == Mode.DEFEND)
-                    ViewCurrentDefenseSquad();
-                else if (mode == Mode.ATTACK)
-                    ViewCurrentAttackSquad();
+                if(show)
+                    ViewCurrentSquad();
+            }
+
+            if (peeked == battleButtonTypes[1] && clicked)
+            {
+                RemoveSquadPoint(selectedButton.GetComponent<PlanMarker>().index);
             }
 
             if (currentSquad >= 0 && peeked == buttonTypes[3] && affected)
             {
                 int position = selectedButton.GetComponent<IndexedNavigationButton>().index;
-                Debug.Log(position);
-
-                if (mode == Mode.ATTACK)
-                {
-                    PlanAttack(position);
-                }
-                else if (mode == Mode.DEFEND)
-                {
-                    PlanDefense(position);
-                }
+                Plan(position);
             }
         }
-
-        if (Input.GetButtonDown("Boost"))
-        {
-            battlePlan = defensePlanner.defensePlan;
-        }
-    }
-
-    public void ToggleReactCommand()
-    {
-        if (mode == Mode.DEFEND)
-            defensePlanner.ToggleSquadReactCommand(currentSquad);
     }
 
     public void SetMode(bool isAttack)
     {
         if (isAttack)
-        {
             mode = Mode.ATTACK;
-        }
         else
-        {
             mode = Mode.DEFEND;
+    }
+
+    //------------------------------------------------------------------------------
+    //Squad Management Section
+    //------------------------------------------------------------------------------
+    
+    public void AddSquad(string squadName, double[] counts)
+    {
+        int maxSquads = 3;
+
+        if (mode == Mode.DEFEND)
+            maxSquads = 4;
+
+        if (!squadNames.Contains(squadName) && squadNames.Count <= maxSquads)
+        {
+            List<double> unitCounts = new List<double>();
+            unitCounts.AddRange(counts);
+
+            int positionIndex = 0;
+
+            if (squadMarkers.Count > 0)
+                positionIndex = squadMarkers.Count - 1;
+
+            Vector3 markerPosition = squadMarkerWaitPositions[positionIndex].position;
+            squadMarkers.Add(Instantiate(squadMarkerPrefab, markerPosition, Quaternion.Euler(spawnRotation.x,spawnRotation.y,spawnRotation.z)));
+            squadMarkers[squadMarkers.Count - 1].SetActive(false);
+            squadCounts.Add(unitCounts);
+            squadPlans.Add(new List<int>());
+            squadNames.Add(squadName);
         }
     }
 
-    public void CloseCurrentSquad()
+    public void RemoveSquad(int index)
     {
-        battlePlan = defensePlanner.defensePlan;
+        if (currentSquad == index)
+            CloseCurrentSquad();
 
-        for (int p = 0; p < battlePlan.squadPositions[currentSquad].Length; p++)
-        {
-            selectedSquad.RemovePosition(battlePlan.squadPositions[currentSquad][p]);
-        }
-
-        selectedSquad.Reset();
+        Destroy(squadMarkers[index]);
+        squadMarkers.RemoveAt(index);
+        squadCounts.RemoveAt(index);
+        squadPlans.RemoveAt(index);
+        squadNames.RemoveAt(index);
     }
 
-    public void ViewCurrentAttackSquad()
+    void CloseCurrentSquad()
     {
-        battlePlan = attackPlanner.attackPlan;
-
-        for (int p = 0; p < battlePlan.squadPositions[currentSquad].Length; p++)
+        foreach (GameObject marker in planMarkers)
         {
-            int tileIndex = battlePlan.squadPositions[currentSquad][p];
+            Destroy(marker);
+        }
+        planMarkers.Clear();
+    }
 
-            if (tileIndex != -1)
+    void ViewCurrentSquad()
+    {
+        int index = 0;
+
+        for (int p = 0; p < squadPlans[currentSquad].Count; p++)
+        {
+            index = squadPlans[currentSquad][p];
+            Vector3 position = new Vector3(islandStats.hexTiles[index].position.x, islandStats.hexTiles[index].position.y, islandStats.hexTiles[index].position.z);
+            position = new Vector3(position.x + spawnOffset.x, position.y + spawnOffset.y, position.z + spawnOffset.z);
+            GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
+            planMarker.GetComponentInChildren<PlanMarker>().index = p;
+            planMarkers.Add(planMarker);
+        }
+
+        index = -1;
+
+        if (squadPlans[currentSquad].Count > 0)
+        {
+            if (mode == Mode.ATTACK)
             {
-                selectedSquad.AddNewPosition(tileIndex, spawnOffset + islandStats.hexTiles[tileIndex].position, trailPointPrefab);
+                int tilesInSquadPlan = squadPlans[currentSquad].Count;
+                index = squadPlans[currentSquad][tilesInSquadPlan - 1];
+            }
+            else if (mode == Mode.DEFEND)
+                index = squadPlans[currentSquad][0];
+        }
+
+        if (index >= 0)
+            selectedSquad.transform.position = islandStats.hexTiles[index].position;
+        else
+            selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
+    }
+
+    //------------------------------------------------------------------------------
+    //Battleplan Section
+    //------------------------------------------------------------------------------
+    void Plan(int position)
+    {
+        bool canPlan = squadPlans[currentSquad].Count < 7;
+
+        if (squadPlans[currentSquad].Count > 0)
+            canPlan = canPlan && squadPlans[currentSquad][squadPlans[currentSquad].Count - 1] != position;
+
+        if (canPlan)
+        {
+            List<List<int>> plan = JsonConvert.DeserializeObject<List<List<int>>>(JsonConvert.SerializeObject(squadPlans));
+            plan[currentSquad].Add(position);
+
+            bool valid = false;
+            List<List<int>> singleSquadPlan = new List<List<int>>() { FillRemainderOfPlan(plan[currentSquad]) };
+
+            if (mode == Mode.ATTACK)
+                valid = Validity.AdjacentAttackPlan(singleSquadPlan, true);
+            else if (mode == Mode.DEFEND)
+                valid = Validity.AdjacentDefendPlan(singleSquadPlan, true);
+
+            if (valid)
+            {
+                squadPlans = plan;
+
+                if (squadPlans[currentSquad].Count == 1 || mode == Mode.ATTACK)
+                    squadMarkers[currentSquad].transform.position = islandStats.hexTiles[position].position;
+
+                AddSquadPoint(position);
             }
         }
     }
 
-    public void ViewCurrentDefenseSquad()
+    List<int> FillRemainderOfPlan(List<int> plan)
     {
-        battlePlan = defensePlanner.defensePlan;
+        List<int> incompletePlan = JsonConvert.DeserializeObject<List<int>>(JsonConvert.SerializeObject(plan));
+        int last = incompletePlan[incompletePlan.Count - 1];
 
-        for (int p = 0; p < battlePlan.squadPositions[currentSquad].Length; p++)
+        for (int r = 6 - incompletePlan.Count; r > 0; r--)
         {
-            int tileIndex = battlePlan.squadPositions[currentSquad][p];
-            selectedSquad.AddNewPosition(tileIndex, spawnOffset + islandStats.hexTiles[tileIndex].position, trailPointPrefab);
+            incompletePlan.Add(last);
+        }
+
+        return incompletePlan;
+    }
+
+    void RemoveSquadPoint(int index)
+    {
+        if (mode == Mode.ATTACK || index == 0)
+            squadPlans[currentSquad].RemoveRange(index, squadPlans[currentSquad].Count - index);
+        else if (mode == Mode.DEFEND)
+            squadPlans[currentSquad].RemoveAt(index);
+
+        CloseCurrentSquad();
+        ViewCurrentSquad();
+    }
+
+    void AddSquadPoint(int indexPosition)
+    {
+        Vector3 position = islandStats.hexTiles[indexPosition].position;
+        position = new Vector3(position.x + spawnOffset.x, position.y + spawnOffset.y, position.z + spawnOffset.z);
+        GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
+        planMarker.GetComponentInChildren<PlanMarker>().index = planMarkers.Count;
+        planMarkers.Add(planMarker);
+        CloseCurrentSquad();
+        ViewCurrentSquad();
+    }
+
+    //------------------------------------------------------------------------------
+    //Camera Movement Section
+    //------------------------------------------------------------------------------
+    public void SetObservationPoints(Transform observation, Transform focus)
+    {
+        observePoint = observation;
+        focusPoint = focus;
+    }
+
+    public void GotToObservePoint()
+    {
+        orbital.ExploreMode(observePoint, false);
+        orbital.SetNewObservePoint(observePoint, focusPoint);
+    }
+
+    //------------------------------------------------------------------------------
+    //Island Section
+    //------------------------------------------------------------------------------
+    void PlaceTiles(Island island)
+    {
+        islandTiles.Clear();
+        islandStats.islandInfo = island;
+
+        for (int h = 0; h < island.features.Length; h++)
+        {
+            int r = Mathf.FloorToInt(Random.Range(0, 6));
+            string featString = island.features[h].ToString();
+            string collectorString = island.collectors[h].ToString();
+            GameObject tempTile = null;
+
+            if (tileVariations[0].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[0], islandStats.hexTiles[h].position + offset, hexIsland.transform.rotation);
+            }
+            else if (tileVariations[1].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[1], islandStats.hexTiles[h].position + offset, hexIsland.transform.rotation);
+            }
+            else if (tileVariations[2].Contains(featString))
+            {
+                tempTile = Instantiate(tilePrefabs[2], islandStats.hexTiles[h].position + offset, hexIsland.transform.rotation);
+            }
+
+            tempTile.transform.Rotate(Vector3.up, 60 * r);
+            tempTile.transform.SetParent(hexIsland.transform);
+
+            TileStats tempStats = tempTile.GetComponent<TileStats>();
+            tempStats.SetIndexParent(islandStats.hexTiles[h].gameObject);
+
+            TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
+            TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
+
+            float tempStructureProb = 0;
+
+            if (tempStats.structureProbabilities.Length != tempStats.structures.Length && tempStats.structureProbabilities != null)
+                tempStructureProb = tempStats.structureProbabilities[0];
+
+            ActivateRandomObject(tempStats.structures, tempStructureProb);
+            islandTiles.Add(tempStats);
         }
     }
 
-    void PlanAttack(int position)
+    void TurnOnDetails(GameObject[] details, float[] detailProbs)
     {
-        if(attackPlanner.AddMove(currentSquad, position))
-            selectedSquad.AddNewPosition(position, spawnOffset + selectedButton.transform.position, trailPointPrefab);
-    }
-    
-    void PlanDefense(int position)
-    {
-        defensePlanner.ToggleDefenseZone(currentSquad, position);
+        if (details != null)
+        {
+            for (int d = 0; d < details.Length; d++)
+            {
+                float threshold = Random.value;
 
-        if (defensePlanner.GetStateOfPosition(currentSquad, position))
-            selectedSquad.AddNewPosition(position, spawnOffset + selectedButton.transform.position, trailPointPrefab);
-        else
-            selectedSquad.RemovePosition(position);
+                if (threshold <= detailProbs[d])
+                    details[d].SetActive(true);
+            }
+        }
+    }
+
+    void ActivateRandomObject(GameObject[] objects, float noneProbability)
+    {
+        if (objects != null)
+        {
+            int paddedTotal = objects.Length;
+
+            if (noneProbability > 0)
+                paddedTotal = (int)((float)objects.Length / noneProbability);
+
+            int r = (int)Mathf.Floor(Random.value * paddedTotal);
+            if (r < objects.Length && r >= 0)
+                objects[r].SetActive(true);
+        }
+    }
+
+    public void TurnOffIsland()
+    {
+        CloseCurrentSquad();
+
+        foreach (GameObject squad in squadMarkers)
+        {
+            Destroy(squad);
+        }
+
+        foreach (TileStats stats in islandTiles)
+        {
+            Destroy(stats.gameObject);
+        }
+        
+        squadMarkers.Clear();
+        islandTiles.Clear();
+        squadCounts.Clear();
+        squadPlans.Clear();
+        squadNames.Clear();
+        hexIsland.SetActive(false);
+        mode = Mode.NONE;
+    }
+
+    public bool TurnOnIsland(string _islandID)
+    {
+        if (clientInterface.IslandExists(_islandID))
+        {
+            squadMarkers = new List<GameObject>();
+            squadCounts = new List<List<double>>();
+            squadPlans = new List<List<int>>();
+            squadNames = new List<string>();
+            planMarkers = new List<GameObject>();
+            islandTiles = new List<TileStats>();
+
+            if (clientInterface.attackableIslandID == _islandID)
+                mode = Mode.ATTACK;
+            else if (clientInterface.playerIslandIDs.Contains(_islandID))
+                mode = Mode.DEFEND;
+            else
+                mode = Mode.NONE;
+
+            if (mode != Mode.NONE)
+            {
+                Debug.Log("Adding Tester Squad");
+                AddSquad("Tester", new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0 });
+                islandID = _islandID;
+                Island island = clientInterface.GetIsland(islandID);
+                hexIsland.SetActive(true);
+                PlaceTiles(island);
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    //------------------------------------------------------------------------------
+    //Misc Section
+    //------------------------------------------------------------------------------
+    public void SetIslandVariables(GameObject[] islandObjects, IslandStats stats, string[] variations, Vector3 generationOffset)
+    {
+        hexIsland = islandObjects[3];
+        tilePrefabs = new GameObject[] { islandObjects[0], islandObjects[1], islandObjects[2] };
+        islandStats = stats;
+        tileVariations = variations;
+        offset = generationOffset;
+    }
+
+    public void SetBattleVariables(Transform[] squadWaitPositions, GameObject _squadMarkerPrefab, GameObject _planMarkerPrefab)
+    {
+        squadMarkerWaitPositions = squadWaitPositions;
+        squadMarkerPrefab = _squadMarkerPrefab;
+        planMarkerPrefab = _planMarkerPrefab;
     }
 }
