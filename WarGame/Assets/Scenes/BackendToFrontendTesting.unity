@@ -3300,7 +3300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ccecf9f1bb8cbc4db08d9249227f224, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: ObjectRevealer
+  buttonType: DefendPrompter
   hiddenObject: {fileID: 386369335}
 --- !u!114 &128675139
 MonoBehaviour:
@@ -13474,7 +13474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ccecf9f1bb8cbc4db08d9249227f224, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: ObjectRevealer
+  buttonType: AttackPrompter
   hiddenObject: {fileID: 1544580596}
 --- !u!114 &549018837
 MonoBehaviour:
@@ -30095,7 +30095,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1839912913}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1564973903}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f8565b152055cc44a0c7a3dc305c66d, type: 3}
@@ -40987,6 +40987,8 @@ MonoBehaviour:
   - ResourcePrompt
   - WarbuxPrompter
   - SearchPrompter
+  - DefendPrompter
+  - AttackPrompter
   managementButtons: []
   battleButtons: []
   tileVariations:
@@ -41012,6 +41014,8 @@ MonoBehaviour:
   - {fileID: 1154247195}
   - {fileID: 534772640}
   - {fileID: 1563612894}
+  markerPositionOffset: {x: 0, y: 4.6, z: 0}
+  markerRotationOffset: {x: 0, y: 60, z: 0}
   squadMarkerPrefab: {fileID: 7189933443953462733, guid: 867bc746451d9fe4c92e206b2efff558,
     type: 3}
   planMarkerPrefab: {fileID: 1191142348500081091, guid: 9f6f7d991cc180a4686a469403efdf36,
@@ -41020,6 +41024,7 @@ MonoBehaviour:
   resourcePool: {fileID: 1055659790}
   warbuxPool: {fileID: 1008148622}
   searchIslands: {fileID: 648262128}
+  battleIslandsGUI: {fileID: 1839912914}
   squadFormation: {fileID: 542727057}
   unitType: 0
   resourceType: 0
@@ -41682,6 +41687,29 @@ Transform:
   m_Father: {fileID: 780278390}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1564973903 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4722382196094387212, guid: 9fc2cad695b829a4abfcf78a2a0d31f3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1839912913}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1564973908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564973903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3d4521c8d812b7468a52bcefeebfe81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  islandList: {fileID: 0}
+  defendMenu: {fileID: 0}
+  attackMenu: {fileID: 0}
+  battleScript: {fileID: 0}
+  navigator: {fileID: 0}
 --- !u!4 &1575466666 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4292221059895232, guid: 5aab7d351d10f4cdfbf7aba3c71237d1,
@@ -47220,6 +47248,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9fc2cad695b829a4abfcf78a2a0d31f3, type: 3}
+--- !u!114 &1839912914 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 375380683958466789, guid: 9fc2cad695b829a4abfcf78a2a0d31f3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1839912913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3d4521c8d812b7468a52bcefeebfe81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1841695989
 PrefabInstance:
   m_ObjectHideFlags: 0

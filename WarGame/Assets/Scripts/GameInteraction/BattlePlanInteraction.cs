@@ -65,7 +65,6 @@ public class BattlePlanInteraction : Interaction
         if (clicked || affected)
         {
             string peeked = PeekButtonType();
-
             if (peeked == battleButtonTypes[0])
             {
                 bool show = lastSquad != currentSquad || planMarkers.Count == 0;
@@ -81,12 +80,12 @@ public class BattlePlanInteraction : Interaction
                     ViewCurrentSquad();
             }
 
-            if (peeked == battleButtonTypes[1] && clicked)
+            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost"))
             {
                 RemoveSquadPoint(selectedButton.GetComponent<PlanMarker>().index);
             }
 
-            if (currentSquad >= 0 && peeked == buttonTypes[3] && affected)
+            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected)
             {
                 int position = selectedButton.GetComponent<IndexedNavigationButton>().index;
                 Plan(position);
@@ -125,7 +124,9 @@ public class BattlePlanInteraction : Interaction
 
             Vector3 markerPosition = squadMarkerWaitPositions[positionIndex].position;
             squadMarkers.Add(Instantiate(squadMarkerPrefab, markerPosition, Quaternion.Euler(spawnRotation.x,spawnRotation.y,spawnRotation.z)));
-            squadMarkers[squadMarkers.Count - 1].SetActive(false);
+            squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
+            squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
             squadCounts.Add(unitCounts);
             squadPlans.Add(new List<int>());
             squadNames.Add(squadName);
@@ -142,6 +143,29 @@ public class BattlePlanInteraction : Interaction
         squadCounts.RemoveAt(index);
         squadPlans.RemoveAt(index);
         squadNames.RemoveAt(index);
+
+        RenumberSquads(index);
+    }
+
+    void RenumberSquads(int index)
+    {
+        if (index < squadMarkers.Count)
+        {
+            foreach (GameObject squad in squadMarkers)
+            {
+                SquadMarker marker = squad.GetComponent<SquadMarker>();
+
+                if (marker.squad > index)
+                    marker.squad--;
+
+                currentSquad = marker.squad;
+                selectedSquad = marker;
+                CloseCurrentSquad();
+                ViewCurrentSquad();
+            }
+
+            currentSquad = 0;
+        }
     }
 
     void CloseCurrentSquad()
@@ -160,8 +184,7 @@ public class BattlePlanInteraction : Interaction
         for (int p = 0; p < squadPlans[currentSquad].Count; p++)
         {
             index = squadPlans[currentSquad][p];
-            Vector3 position = new Vector3(islandStats.hexTiles[index].position.x, islandStats.hexTiles[index].position.y, islandStats.hexTiles[index].position.z);
-            position = new Vector3(position.x + spawnOffset.x, position.y + spawnOffset.y, position.z + spawnOffset.z);
+            Vector3 position =  AddOffset(islandStats.hexTiles[index].position);
             GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
             planMarker.GetComponentInChildren<PlanMarker>().index = p;
             planMarkers.Add(planMarker);
@@ -181,7 +204,7 @@ public class BattlePlanInteraction : Interaction
         }
 
         if (index >= 0)
-            selectedSquad.transform.position = islandStats.hexTiles[index].position;
+            selectedSquad.transform.position = AddOffset(islandStats.hexTiles[index].position);
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }
@@ -214,7 +237,7 @@ public class BattlePlanInteraction : Interaction
                 squadPlans = plan;
 
                 if (squadPlans[currentSquad].Count == 1 || mode == Mode.ATTACK)
-                    squadMarkers[currentSquad].transform.position = islandStats.hexTiles[position].position;
+                    squadMarkers[currentSquad].transform.position = AddOffset(islandStats.hexTiles[position].position);
 
                 AddSquadPoint(position);
             }
@@ -247,8 +270,7 @@ public class BattlePlanInteraction : Interaction
 
     void AddSquadPoint(int indexPosition)
     {
-        Vector3 position = islandStats.hexTiles[indexPosition].position;
-        position = new Vector3(position.x + spawnOffset.x, position.y + spawnOffset.y, position.z + spawnOffset.z);
+        Vector3 position = AddOffset(islandStats.hexTiles[indexPosition].position);
         GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
         planMarker.GetComponentInChildren<PlanMarker>().index = planMarkers.Count;
         planMarkers.Add(planMarker);
@@ -390,8 +412,6 @@ public class BattlePlanInteraction : Interaction
 
             if (mode != Mode.NONE)
             {
-                Debug.Log("Adding Tester Squad");
-                AddSquad("Tester", new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0 });
                 islandID = _islandID;
                 Island island = clientInterface.GetIsland(islandID);
                 hexIsland.SetActive(true);
@@ -406,7 +426,7 @@ public class BattlePlanInteraction : Interaction
     }
 
     //------------------------------------------------------------------------------
-    //Misc Section
+    //Setup Section
     //------------------------------------------------------------------------------
     public void SetIslandVariables(GameObject[] islandObjects, IslandStats stats, string[] variations, Vector3 generationOffset)
     {
@@ -417,10 +437,26 @@ public class BattlePlanInteraction : Interaction
         offset = generationOffset;
     }
 
-    public void SetBattleVariables(Transform[] squadWaitPositions, GameObject _squadMarkerPrefab, GameObject _planMarkerPrefab)
+    public void SetBattleVariables(Vector3 markerOffset, Vector3 markerRotation, Transform[] squadWaitPositions, GameObject _squadMarkerPrefab, GameObject _planMarkerPrefab)
     {
         squadMarkerWaitPositions = squadWaitPositions;
         squadMarkerPrefab = _squadMarkerPrefab;
         planMarkerPrefab = _planMarkerPrefab;
+        spawnOffset = markerOffset;
+        spawnRotation = markerRotation;
     }
+
+    //------------------------------------------------------------------------------
+    //Utility Section
+    //------------------------------------------------------------------------------
+    Vector3 AddOffset(Vector3 position)
+    {
+        return spawnOffset + position;
+    }
+
+    //------------------------------------------------------------------------------
+    //ClientInterface Section
+    //------------------------------------------------------------------------------
+    public List<string> GetIslands() { return clientInterface.playerIslandIDs; }
+    public string GetAttackableIsland() { return clientInterface.attackableIslandID; }
 }

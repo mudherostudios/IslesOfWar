@@ -13,14 +13,16 @@ public class CommandIslandInteraction : Interaction
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbucksPool;
     public SearchIslands searchIslands;
+    public BattleIslandsGUI battleIslandsGUI;
     public SquadGUI squadGUI;
 
+    [Header("Camera Variables")]
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
-    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter" };
-    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter;
+    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter" };
+    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
     private ObjectRevealer genericPrompter;
@@ -39,12 +41,14 @@ public class CommandIslandInteraction : Interaction
             hasPoolPrompter = poolPrompter != null;
             hasWarbuxPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[2];
             hasSearchPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[3];
+            hasDefendPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[4];
+            hasAttackPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[5];
             unitPurchase.gameObject.SetActive(false);
             resourcePool.gameObject.SetActive(false);
             warbucksPool.gameObject.SetActive(false);
             searchIslands.gameObject.SetActive(false);
+            battleIslandsGUI.gameObject.SetActive(false);
             squadGUI.Close();
-
         }
 
         if (Input.GetKeyDown(KeyCode.U) && hasUnitPurchasePrompter)
@@ -67,6 +71,14 @@ public class CommandIslandInteraction : Interaction
         {
             searchIslands.Show();
         }
+        else if (Input.GetKeyDown(KeyCode.D) && hasDefendPrompter)
+        {
+            battleIslandsGUI.ShowDefendMenu();
+        }
+        else if (Input.GetKeyDown(KeyCode.A) && hasAttackPrompter)
+        {
+            battleIslandsGUI.ShowAttackMenu();
+        }
     }
 
     public void SetCommandVariables(Transform _commandCenter, string[] buttons)
@@ -79,6 +91,12 @@ public class CommandIslandInteraction : Interaction
     {
         observePoint = observe;
         focalPoint = focus;
+    }
+
+    public void SetBattleVariables(WorldNavigator navigator, BattlePlanInteraction battleScript )
+    {
+        battleIslandsGUI.navigator = navigator;
+        battleIslandsGUI.battleScript = battleScript;
     }
 
     public void GotoCommandIsland()
@@ -119,11 +137,14 @@ public class CommandIslandInteraction : Interaction
 
     public double GetPoolSize(int poolType) { return clientInterface.GetContributionSize(poolType); }
     public double[] GetAllPoolSizes() { return clientInterface.GetAllPoolSizes(); }
+
     public double[] GetPlayerContributedResources(int poolType, double[] modifiers) { return clientInterface.GetPlayerContributedResources(poolType, modifiers); }
     public double[] GetTotalContributedResources(double[] modifiers) { return clientInterface.GetTotalContributedResources(modifiers); }
+
     public List<string> GetDepletedIslands() { return clientInterface.depletedIslands; }
     public double GetWarbucksOwnership() { return clientInterface.GetWarbucksOwnership(); }
     public double GetWarbucksPoolSize(){return clientInterface.GetWarbucksPoolSize();}
+
     public double[] GetIslandSearchCost() { return clientInterface.GetIslandSearchCost(); }
     public double GetUnitCount(int type) { return clientInterface.playerUnits[type]; }
     

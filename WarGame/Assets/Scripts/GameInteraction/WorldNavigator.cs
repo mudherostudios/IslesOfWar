@@ -41,6 +41,8 @@ public class WorldNavigator : MonoBehaviour
     public GameObject battleIsland;
     public IslandStats battleIslandStats;
     public Transform[] squadMarkerWaitPositions;
+    public Vector3 markerPositionOffset;
+    public Vector3 markerRotationOffset;
     public GameObject squadMarkerPrefab;
     public GameObject planMarkerPrefab;
 
@@ -49,6 +51,7 @@ public class WorldNavigator : MonoBehaviour
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbuxPool;
     public SearchIslands searchIslands;
+    public BattleIslandsGUI battleIslandsGUI;
     public SquadGUI squadFormation;
     public int unitType;
     public int resourceType;
@@ -118,6 +121,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.resourcePool = resourcePool;
         commandScript.warbucksPool = warbuxPool;
         commandScript.searchIslands = searchIslands;
+        commandScript.battleIslandsGUI = battleIslandsGUI;
         commandScript.squadGUI = squadFormation;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
@@ -148,6 +152,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
         commandScript.SetCommandVariables(commandCenter, commandButtons);
+        commandScript.SetBattleVariables(this, battleScript);
 
         managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
@@ -157,7 +162,7 @@ public class WorldNavigator : MonoBehaviour
         battleScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
         battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
-        battleScript.SetBattleVariables(squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
+        battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
 
         SetCommandMode();
     }
@@ -209,6 +214,7 @@ public class WorldNavigator : MonoBehaviour
         List<double> resourcePools = new List<double> {30000, 20000, 10000, 5000 };
 
         gameStateProcessor.state = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
+        gameStateProcessor.state.players["cairo"].attackableIsland = "j";
         clientInterface = new ClientInterface(gameStateProcessor, "cairo");
     }
 

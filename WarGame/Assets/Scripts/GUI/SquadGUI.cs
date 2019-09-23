@@ -74,7 +74,6 @@ public class SquadGUI : MonoBehaviour
             PlayerPrefs.DeleteKey(squad);
             PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
         }
-
     }
 
     int[] GetTotalUnitsInSquads()
