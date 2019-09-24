@@ -21,13 +21,10 @@ namespace MudHero
                 cInfo = info;
             }
 
-            public bool Connect()
+            public ConnectionLog Connect()
             {
-                return Connect(false);
-            }
+                ConnectionLog log = new ConnectionLog();
 
-            public bool Connect(bool DEBUG)
-            {
                 if (xayaService == null)
                 {
                     xayaService = new XAYAService(cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword, cInfo.walletPassword);
@@ -37,17 +34,18 @@ namespace MudHero
                     else
                         connected = false;
 
-                    if (DEBUG && connected)
-                        Debug.Log("Connected to XayaServices with " + cInfo.GetHTTPCompatibleURL(true));
-                    else if (DEBUG && !connected)
-                        Debug.Log(string.Format("Could not make connection to {0} with {1} & {2}.", cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword));
+                    if (connected)
+                        log.message = string.Format("Connected to XayaServices with {0}.",cInfo.GetHTTPCompatibleURL(true));
+                    else if (!connected)
+                        log.message = string.Format("Could not make connection to {0} with {1} & {2}.", cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword);
                 }
-                else if(DEBUG)
+                else 
                 {
-                    Debug.Log("Xaya Service Already Exists! You are trying to recreate it.");
+                    log.message = "Xaya Service Already Exists! You are trying to recreate it.";
                 }
 
-                return connected;
+                log.success = connected;
+                return log;
             }
 
             public void SetPlayerWalletName(string name)
@@ -62,12 +60,22 @@ namespace MudHero
                     playerName = playerNames[index];
             }
 
-            public string ExecutePlayerCommand(string command)
+            public ConnectionLog ExecutePlayerCommand(string command)
             {
+                ConnectionLog log = new ConnectionLog();
                 if (xayaService == null || networkBlockCount == 0)
-                    return "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya daemon";
+                {
+                    log.success = false;
+                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya daemon";
+                    return log;
+                }
                 else
-                    return "Success!";
+                {
+                    //Do Xaya Name Update Here
+                    log.success = true;
+                    log.message = "Success!";
+                    return log;
+                }
             }
 
             public int GetBlockHeight(string hash)
