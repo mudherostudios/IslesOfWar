@@ -123,9 +123,9 @@ GameObject:
   - component: {fileID: 976587963}
   - component: {fileID: 976587962}
   - component: {fileID: 976587961}
-  - component: {fileID: 976587964}
   - component: {fileID: 976587965}
   - component: {fileID: 976587966}
+  - component: {fileID: 976587967}
   m_Layer: 0
   m_Name: MainLogic
   m_TagString: MainCamera
@@ -197,33 +197,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &976587964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 976587960}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0facab1ac5c206f4ab2efeef9e9b64f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  network: 0
-  gameSpace: mv
-  storageType: memory
-  xayaDaemonIP: 127.0.0.1
-  xayaDaemonPort: 8396
-  xayaDaemonWalletPath: /wallet/game.dat
-  gsrIP: 127.0.0.1
-  gsrPort: 8900
-  username: xaya
-  userpassword: bm4rxrmr8b
-  walletPassword: 
-  libraryPath: /../XayaStateProcessor/
-  logsPath: /../XayaStateProcessor/glogs/
-  databasePath: /../XayaStateProcessor/database/
-  databaseName: mover.db
 --- !u!114 &976587965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,7 +204,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976587960}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021c31cec1a53ea4580bb94f9c52146c, type: 3}
   m_Name: 
@@ -255,3 +228,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec718754e0bf1fa4bb36d2a3eda9314a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &976587967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976587960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 238057da085fad74da0b2c396fe4aa67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathToTestBlockData: C:\Users\Caz\Documents\GitHub\combat-game\WarGame\Assets\Scripts\UnitTesting\testData.json
+  blocksToGenerate: 0
+  lastHeight: 190
+  lastTime: 1572
+  nameData: \"cairo\"
+  moveData: \"buy\":[10,5,1,1,1,1,1,1,0]
+  blockData: []

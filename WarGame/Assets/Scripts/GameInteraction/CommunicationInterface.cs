@@ -57,7 +57,6 @@ public class CommunicationInterface : MonoBehaviour
     {
         blockProgress = xayaCommands.GetBlockHeight(hash);
         blockCount = xayaCommands.networkBlockCount;
-        Debug.Log(gameState);
     }
     
 

@@ -572,7 +572,9 @@ namespace IslesOfWar
             {
                 nationCode = nation;
                 units = new List<double>();
+                units.AddRange(new double[9]);
                 resources = new List<double>();
+                resources.AddRange(new double[4]);
                 islands = new List<string>();
                 attackableIsland = "";
             }

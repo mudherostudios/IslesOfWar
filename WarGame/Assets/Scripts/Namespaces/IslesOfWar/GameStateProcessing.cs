@@ -75,14 +75,31 @@ namespace IslesOfWar
                 string collectors = "000000000000";
                 string defenses = "))))))))))))";
                 int[] resourceTypes = new int[12];
+                List<List<double>> resourceAmounts = new List<List<double>>();
 
                 for (int t = 0; t < 12; t++)
                 {
                     resourceTypes[t] = GetResourceType();
                     features += EncodeUtility.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
+                    List<double> tileResources = new List<double>();
+                    int[] types = EncodeUtility.GetBaseTypes(resourceTypes[t]);
+
+                    for (int r = 0; r < 3; r++)
+                    {
+                        double amount = 0;
+
+                        if (types[r] > 0)
+                            amount = Mathf.Round(UnityEngine.Random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]));
+                        
+                        tileResources.Add(amount);
+                    }
+
+                    resourceAmounts.Add(tileResources);
                 }
+                
 
                 Island island = new Island(owner, features, collectors, defenses);
+                island.resources = resourceAmounts;
                 return island;
             }
 

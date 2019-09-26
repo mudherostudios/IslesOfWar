@@ -2638,6 +2638,6 @@ public class GSPTesting : MonoBehaviour
 
         string testTotals = string.Format("\n- TestTotals - \nPasses : {0} \nFails    : {1} \nPercent: {2:00.00}%\n", passCount, failCount, ((float)passCount/(passCount+failCount))*100);
 
-        return entireResults + testTotals;
+        return string.Format("{0:00.00}%\n{1}{2}", ((float)passCount / (passCount + failCount)) * 100, entireResults, testTotals);
     }
 }

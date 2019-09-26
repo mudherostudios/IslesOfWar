@@ -89,22 +89,21 @@ namespace IslesOfWar
 
             public void DiscoverOrScoutIsland(string player, string searchCommand, string txid)
             {
-                bool hasEnoughMoney = state.players[player].resources[0] >= Constants.islandSearchCost[0]
-                && state.players[player].resources[1] >= Constants.islandSearchCost[1] && state.players[player].resources[2] >= Constants.islandSearchCost[2]
-                && state.players[player].resources[3] >= Constants.islandSearchCost[3];
+                double[] cost = IslandSearchCostUtility.GetCost(state.players[player].islands.Count);
+                bool hasEnoughMoney = state.players[player].resources[0] >= cost[0] && state.players[player].resources[1] >= cost[1] 
+                && state.players[player].resources[2] >= cost[2] && state.players[player].resources[3] >= cost[3];
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
                     string discovered = IslandDiscovery.GetIsland(state.players, state.allIslandIDs, txid);
-                    double[] resources = Subtract(state.players[player].resources.ToArray(), Constants.islandSearchCost);
+                    double[] resources = Subtract(state.players[player].resources.ToArray(), cost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
                     AddToPools(Constants.islandSearchCost, 3);
 
                     if (discovered == txid)
                     {
-                        Island freshIsland = new Island();
-                        freshIsland.owner = player;
+                        Island freshIsland = IslandGenerator.Generate(player);
                         state.islands.Add(txid, freshIsland);
                         state.players[player].islands.Add(discovered);
                     }
