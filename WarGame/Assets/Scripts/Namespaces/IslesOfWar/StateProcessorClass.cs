@@ -877,7 +877,7 @@ namespace IslesOfWar
                 bool canAttack = state.players.ContainsKey(player) && actions != null;
 
                 if (canAttack)
-                    canAttack = state.players[player].attackableIsland != null && actions.attk.id != null;
+                    canAttack = state.players[player].attackableIsland != null && actions.attk != null;
 
                 if (canAttack)
                     canAttack = actions.attk.id != "" && state.players[player].attackableIsland == actions.attk.id && !state.players[player].islands.Contains(actions.attk.id);

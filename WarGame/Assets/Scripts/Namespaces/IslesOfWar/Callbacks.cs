@@ -10,30 +10,10 @@ namespace IslesOfWar
     {
         public static class Callback
         {
-            public static int chain = 0;
+            public static int chain = 2;
 
             public static string SetGenesisInfo(out int height, out string hashHex)
             {
-                //Set block genesis information here.
-                //Change all of this, it was for Vuteka
-                /*if (chain == 0) // Mainnet
-                {
-                    height = 961667;
-                    hashHex = "001514ada12a520b258b20259d1f849a6bd229c0b689d95d5de6c4430fdc1c15";
-                }
-                else if (chain == 1) // Testnet
-                {
-                    height = 30000;
-                    hashHex = "cb767a9d1e056d793bcba3e9d6ad397df3ed87020012fa693672c784c4b8ef1f";
-                }
-                else // Regtestnet
-                {
-                    height = 123;
-                    hashHex = "7c03bb7a1d04ff3d32d6562f5066ee61d74eea2d2cefbc7d06936f2bcd9a3469";
-                }
-
-                return "";*/
-
                 //Mover Block Heights Temporary to test out stuff.
                 if (chain == 0) // Mainnet
                 {
@@ -57,12 +37,14 @@ namespace IslesOfWar
             //Passes the moves data to the processor and tracks undo data.
             public static string PlayState(string currentState, string blockData, string undoData, out string updatedData)
             {
+                string tempState = "";
+
                 if (blockData.Length > 1)
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(blockData);
-                    string moves = JsonConvert.SerializeObject(data["moves"]);
-                    string admin = JsonConvert.SerializeObject(data["admin"]);
-                    string rng = JsonConvert.SerializeObject(data["block"]["rngseed"]);
+                    dynamic moves = data["moves"];
+                    dynamic admin = data["admin"];
+                    dynamic rng = data["block"]["rngseed"];
                     StateProcessor processor;
 
                     //Admin commands would be processed here first.
@@ -70,7 +52,10 @@ namespace IslesOfWar
                     if (currentState.Length > 2)
                         processor = new StateProcessor(JsonConvert.DeserializeObject<State>(currentState));
                     else
+                    {
                         processor = new StateProcessor(new State());
+                        processor.state.Init();
+                    }
 
                     //Resource Loop
                     processor.UpdateIslandAndPlayerResources();
@@ -78,11 +63,11 @@ namespace IslesOfWar
                     //Main Loop
                     foreach (dynamic element in moves)
                     {
-                        string player = element["name"];
+                        string player = element["name"].ToString();
                         PlayerActions actions = new PlayerActions();
 
-                        if (Validity.JSON(element["move"]))
-                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"]);
+                        if (Validity.JSON(element["move"].ToString()))
+                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
                         else
                             continue;
 
@@ -115,11 +100,11 @@ namespace IslesOfWar
                     //Attack Loop
                     foreach (dynamic element in moves)
                     {
-                        string player = element["name"];
+                        string player = element["name"].ToString();
                         PlayerActions actions = new PlayerActions();
 
-                        if (Validity.JSON(element["move"]))
-                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"]);
+                        if (Validity.JSON(element["move"].ToString()))
+                            actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
                         else
                             continue;
 
@@ -128,15 +113,19 @@ namespace IslesOfWar
                             processor.AttackIsland(player, actions.attk);
                         }
                     }
+
+                    tempState = JsonConvert.SerializeObject(processor.state);
                 }
 
-                updatedData = currentState;
-                return "";
+                undoData = currentState;
+                updatedData = tempState;
+                return undoData;
             }
 
             public static string RewindState(string updatedData, string blockData, string undoData)
             {
-                return "";
+                updatedData = undoData;
+                return updatedData;
             }
 
         }   

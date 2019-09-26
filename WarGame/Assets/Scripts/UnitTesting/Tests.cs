@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 //TestNameUpdates & TestActionParsing
+using IslesOfWar.ClientSide;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 
@@ -21,7 +23,7 @@ public class Tests : MonoBehaviour
 
     private void Start()
     {
-        Random.InitState(1337);
+        UnityEngine.Random.InitState(1337);
     }
 
     // Update is called once per frame
@@ -32,7 +34,9 @@ public class Tests : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
             TestActionParsing();
         if (Input.GetKeyDown(KeyCode.Alpha3))
-            Debug.Log(Random.value);
+            Debug.Log(UnityEngine.Random.value);
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+            PlayState();
         
     }
 
@@ -129,5 +133,20 @@ public class Tests : MonoBehaviour
         {
             Debug.Log("Failed to Parse Player Actions");
         }
+    }
+
+    public struct Move
+    {
+        public string m;
+    }
+
+    //Passes the moves data to the processor and tracks undo data.
+    public void PlayState()
+    {
+        string blockData = "{\"block\": {\"hash\": \"dda7eccde4857742e5000bd66cf72154ce26c22876582654bc8b8d78dadbce8c\",\"height\": 558369,\"parent\": \"18f72c91c7b9223e9c7d0525216277e4016d748a2c81be4ba9d4a2b30eaed92d\",\"rngseed\": \"b36747498ce183b9da32b3ab6e0d72f2a17aa06859c08cf1d1e91907cb09dddc\",\"timestamp\": 1549056526},\"moves\": [{\"move\": {\"nat\": \"US\"},\"name\": \"ALICE\",\"out\": {\"CMBPmRos5QADg2T8kvkQhMaMV5WzpzfedR\": 3443.7832612},\"txid\": \"edd0d7a7662a1b5f8ded16e333f114eb5bea343a432e6c72dfdbdcfef6bf4d44\"}],\"reqtoken\": \"1fba0f4f9e76a65b1f09f3ea40a59af8\"}";
+        string updatedState = "";
+        string undoData = Callback.PlayState("", blockData, "", out updatedState);
+
+        Debug.Log(updatedState);
     }
 }

@@ -32,9 +32,8 @@ public class CommunicationInterface : MonoBehaviour
     private StateProcessorPathInfo pathInfo;
     private XayaCommander xayaCommands;
     private GameStateRetriever stateRetriever;
-
-    public int totalBlocks = 0;
-    public int blockProgress = 0;
+    private int blockProgress = 0;
+    private int blockCount = 0;
 
     public bool isConnectedToXayaDaemon
     {
@@ -46,6 +45,21 @@ public class CommunicationInterface : MonoBehaviour
                 return false;
         }
     }
+
+    public string[] nameList { get { return xayaCommands.names; } }
+
+    public int[] GetProgress()
+    {
+        return new int[] { blockProgress, blockCount };
+    }
+
+    public void UpdateBlockProgress(string hash, string gameState)
+    {
+        blockProgress = xayaCommands.GetBlockHeight(hash);
+        blockCount = xayaCommands.networkBlockCount;
+        Debug.Log(gameState);
+    }
+    
 
     public ConnectionLog Connect(string user, string password, string wallet)
     {
@@ -66,11 +80,11 @@ public class CommunicationInterface : MonoBehaviour
 
         if (useCookies)
             Debug.Log("Use Cookies Somehow Here. Don't forget to put this option in.");
-
+        
         SetConnectionInfo();
         SetupConnectionObjects();
         LaunchGameStateRetriever();
-        ConnectToXayaDaemon();
+        log = ConnectToXayaDaemon();
 
         return log;
     }

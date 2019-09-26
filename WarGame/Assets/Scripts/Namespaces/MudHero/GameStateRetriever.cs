@@ -80,18 +80,16 @@ namespace MudHero
                 {
                     if (communicator.isConnectedToXayaDaemon && wrapper != null)
                     {
+                        //Hangs/Crashes here for some reason if sqlite mode is selected.
                         wrapper.xayaGameService.WaitForChange();
 
                         GameStateResult actualState = wrapper.xayaGameService.GetCurrentState();
 
                         if (actualState != null)
                         {
-                            if (actualState.gamestate != null)
-                            {
-                                yield return Ninja.JumpToUnity;
-                                //communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate); 
-                                yield return Ninja.JumpBack;
-                            }
+                            yield return Ninja.JumpToUnity;
+                            communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate); 
+                            yield return Ninja.JumpBack;
 
                             yield return null;
                         }
