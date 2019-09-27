@@ -5,31 +5,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar;
 using IslesOfWar.ClientSide;
-using IslesOfWar.Combat;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 using Newtonsoft.Json;
 
 public class ClientInterface : MonoBehaviour
 {
-    public StateProcessor gameStateProcessor;
+    public State chainState;
     public State clientState;
+    public CommunicationInterface communication;
     public PlayerActions queuedActions;
     public string player;
 
     public ClientInterface(){ queuedActions = new PlayerActions(); }
 
-    public ClientInterface(StateProcessor gsp, string playerName)
+    public ClientInterface(CommunicationInterface comms)
     {
-        gameStateProcessor = gsp;
-        SetState(gsp.state);
-        player = playerName;
+        communication = comms;
+        InitStates(communication.state);
+        player = comms.player;
         queuedActions = new PlayerActions();
     }
 
-    public void SetState(State state)
+    void InitStates(State state)
     {
+        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
         clientState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
+    }
+
+    //Also eventually check to see if queued actions are still valid.
+    public void UpdateState()
+    {
+        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
     }
 
     void SpendResources(double[] resources)
@@ -60,7 +67,7 @@ public class ClientInterface : MonoBehaviour
     {
         bool successfulPurchase = false;
 
-        if (gameStateProcessor.state.islands[cost.islandID].owner == player)
+        if (clientState.islands[cost.islandID].owner == player)
         {
             string tileResources = clientState.islands[cost.islandID].features[cost.tileIndex].ToString();
             string tileCollectors = clientState.islands[cost.islandID].collectors[cost.tileIndex].ToString();
@@ -208,7 +215,7 @@ public class ClientInterface : MonoBehaviour
     //Make sure to add queuedAction updates as well.
     public void AddIslandToPool(string island)
     {
-        if (Validity.DepletedSubmissions(new List<string> { island }, gameStateProcessor.state, player))
+        if (Validity.DepletedSubmissions(new List<string> { island }, clientState, player))
         {
             clientState.players[player].islands.Remove(island);
             clientState.islands.Remove(island);
@@ -236,8 +243,8 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            string attackableID = gameStateProcessor.state.players[player].attackableIsland;
-            return gameStateProcessor.state.islands[attackableID];
+            string attackableID = clientState.players[player].attackableIsland;
+            return clientState.islands[attackableID];
         }
     }
 
@@ -261,8 +268,8 @@ public class ClientInterface : MonoBehaviour
         }
     }
     
-    public double[] playerResources { get { return clientState.players[player].allResources; } }
-    public double[] playerUnits { get { return clientState.players[player].allUnits; } }
+    public double[] playerResources { get { return chainState.players[player].allResources; } }
+    public double[] playerUnits { get { return chainState.players[player].allUnits; } }
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
     public string islandInDevelopment { get { return queuedActions.bld.id; } }
 
@@ -306,17 +313,17 @@ public class ClientInterface : MonoBehaviour
         potentialPoolSizes[1] += queuedAmounts[1] + clientState.resourcePools[1];
         potentialPoolSizes[2] += queuedAmounts[2] + clientState.resourcePools[2];
 
-        return gameStateProcessor.CalculateResourcePoolModifiers(potentialPoolSizes);
+        return PoolUtility.CalculateResourcePoolModifiers(potentialPoolSizes);
     }
 
     //Just in case I want to do it this way rather than contributions then total.
     public double GetOwnership(double[] modifiers, int type)
     {
         double[] totalPoints;
-        double[][] ownerships = gameStateProcessor.CalculateOwnershipOfPools(modifiers, gameStateProcessor.state.resourceContributions.Keys.ToArray(), out totalPoints);
+        double[][] ownerships = PoolUtility.CalculateOwnershipOfPools(clientState.resourceContributions, modifiers, out totalPoints);
         int counter = 0;
 
-        foreach (KeyValuePair<string, List<List<double>>> pair in gameStateProcessor.state.resourceContributions)
+        foreach (KeyValuePair<string, List<List<double>>> pair in clientState.resourceContributions)
         {
             if (pair.Key != player)
                 counter++;
@@ -367,7 +374,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.bld != null)
         {
-            build = Validity.BuildOrder(queuedActions.bld, gameStateProcessor.state, player);
+            build = Validity.BuildOrder(queuedActions.bld, chainState, player);
 
             if(!build)
                 queuedActions.bld = null;
@@ -375,7 +382,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.buy != null)
         {
-            units = Validity.PurchaseUnits(queuedActions.buy, gameStateProcessor.state.players[player].allResources);
+            units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].allResources);
 
             if (!units)
                 queuedActions.buy = null;
@@ -391,7 +398,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.pot != null)
         {
-            resource = Validity.ResourceSubmissions(queuedActions.pot, gameStateProcessor.state.players[player].allResources);
+            resource = Validity.ResourceSubmissions(queuedActions.pot, chainState.players[player].allResources);
 
             if (!resource)
                 queuedActions.pot = null;
@@ -399,7 +406,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.dep != null)
         {
-            depleted = Validity.DepletedSubmissions(queuedActions.dep, gameStateProcessor.state, player);
+            depleted = Validity.DepletedSubmissions(queuedActions.dep, chainState, player);
 
             if (!depleted)
                 queuedActions.dep = null;
@@ -407,8 +414,8 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.attk != null)
         {
-            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, gameStateProcessor.state.players[player].allUnits)
-            && gameStateProcessor.state.players[player].attackableIsland == queuedActions.attk.id;
+            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].allUnits)
+            && chainState.players[player].attackableIsland == queuedActions.attk.id;
 
             if (!attack)
                 queuedActions.attk = null;
@@ -416,8 +423,8 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.dfnd != null)
         {
-            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, gameStateProcessor.state.players[player].allUnits)
-            && gameStateProcessor.state.players[player].islands.Contains(queuedActions.dfnd.id);
+            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].allUnits)
+            && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
 
             if (!defend)
                 queuedActions.dfnd = null;

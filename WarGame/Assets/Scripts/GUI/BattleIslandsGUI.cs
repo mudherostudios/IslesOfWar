@@ -39,4 +39,10 @@ public class BattleIslandsGUI : MonoBehaviour
     }
 
     public void ShowAttackMenu() { attackMenu.SetActive(true); }
+
+    public void HideMenus()
+    {
+        attackMenu.SetActive(false);
+        defendMenu.SetActive(false);
+    }
 }

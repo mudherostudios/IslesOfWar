@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IslesOfWar.ClientSide;
 using MudHero.XayaCommunication;
 using Newtonsoft.Json;
 
@@ -32,9 +33,19 @@ public class CommunicationInterface : MonoBehaviour
     private StateProcessorPathInfo pathInfo;
     private XayaCommander xayaCommands;
     private GameStateRetriever stateRetriever;
-    private int blockProgress = 0;
+    public int blockProgress = 0;
     private int blockCount = 0;
+    private string selectedUser = "";
+    private bool checkedScene = true;
+    private string gameState = "";
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+    
+    public State state { get { return JsonConvert.DeserializeObject<State>(gameState); } }
+    public string player { get { return selectedUser.Substring(2); } }
     public bool isConnectedToXayaDaemon
     {
         get
@@ -46,17 +57,33 @@ public class CommunicationInterface : MonoBehaviour
         }
     }
 
-    public string[] nameList { get { return xayaCommands.names; } }
+    public string[] nameList
+    {
+        get
+        {
+            string[] names = xayaCommands.names;
+            List<string> validNames = new List<string>();
+
+            for (int n = 0; n < names.Length; n++)
+            {
+                if (names[n][0] == 'p')
+                    validNames.Add(names[n]);
+            }
+
+            return validNames.ToArray();
+        }
+    }
 
     public int[] GetProgress()
     {
         return new int[] { blockProgress, blockCount };
     }
 
-    public void UpdateBlockProgress(string hash, string gameState)
+    public void UpdateBlockProgress(string hash, string _gameState)
     {
         blockProgress = xayaCommands.GetBlockHeight(hash);
         blockCount = xayaCommands.networkBlockCount;
+        gameState = _gameState;
     }
     
 
@@ -137,6 +164,12 @@ public class CommunicationInterface : MonoBehaviour
         }
 
         return log;
+    }
+
+    public void SelectUser(string name)
+    {
+        selectedUser = name;
+        checkedScene = false;
     }
 
     public void Disconnect()

@@ -17,11 +17,6 @@ public class ScreenGUI : MonoBehaviour
     void Update()
     {
         ToolTip();
-
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            SetGUIContents();
-        }
     }
 
     void ToolTip()

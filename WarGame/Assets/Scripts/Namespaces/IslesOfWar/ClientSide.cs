@@ -74,6 +74,72 @@ namespace IslesOfWar
 
                 return keys.ToArray();
             }
+
+            public static double[] CalculateResourcePoolModifiers(double[] poolSizes)
+            {
+                double[] modifiers = new double[6];
+                double[] tempPools = new double[] { poolSizes[0], poolSizes[1], poolSizes[2] };
+                for (int p = 0; p < poolSizes.Length; p++)
+                {
+                    int[] types = new int[2];
+
+                    if (p == 0)
+                        types = new int[] { 1, 2 };
+                    else if (p == 1)
+                        types = new int[] { 0, 2 };
+                    else if (p == 2)
+                        types = new int[] { 0, 1 };
+
+                    if (poolSizes[types[0]] <= 0)
+                        tempPools[types[0]] = poolSizes[types[1]];
+
+                    if (poolSizes[types[1]] <= 0)
+                        tempPools[types[1]] = poolSizes[types[0]];
+
+                    if (poolSizes[types[0]] <= 0)
+                    {
+                        tempPools[types[0]] = 1.0;
+                        tempPools[types[1]] = 1.0;
+                    }
+
+                    modifiers[0 + (p * 2)] = tempPools[types[1]] / tempPools[types[0]];
+                    modifiers[1 + (p * 2)] = tempPools[types[0]] / tempPools[types[1]];
+                }
+
+                return modifiers;
+            }
+
+            public static double[][] CalculateOwnershipOfPools(Dictionary<string, List<List<double>>> contributions, double[] modifiers, out double[] totalPoints)
+            {
+                string[] owners = contributions.Keys.ToArray();
+                double[][] ownership = new double[owners.Length][];
+                totalPoints = new double[3];
+
+                //Calculate the point ownership of each contributor
+                for (int o = 0; o < owners.Length; o++)
+                {
+                    ownership[o] = new double[3];
+
+                    for (int p = 0; p < 3; p++)
+                    {
+                        int[] types = new int[2];
+
+                        if (p == 0)
+                            types = new int[] { 1, 2 };
+                        else if (p == 1)
+                            types = new int[] { 0, 2 };
+                        else if (p == 2)
+                            types = new int[] { 0, 1 };
+
+                        ownership[o][p] += modifiers[(p * 2) + 0] * contributions[owners[o]][p][types[0]];
+                        ownership[o][p] += modifiers[(p * 2) + 1] * contributions[owners[o]][p][types[1]];
+                        totalPoints[p] += ownership[o][p];
+                    }
+                }
+
+                return ownership;
+            }
+
         }
 
         public class State

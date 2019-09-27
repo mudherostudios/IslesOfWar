@@ -12,9 +12,9 @@ public class WorldNavigator : MonoBehaviour
     public CommandIslandInteraction commandScript;
     public IslandManagementInteraction managementScript;
     public BattlePlanInteraction battleScript;
+    public CommunicationInterface communicationScript;
 
     [Header("Common Variables")]
-    public StateProcessor gameStateProcessor;
     public ClientInterface clientInterface;
     public Camera cam;
     public OrbitalFocusCam orbital;
@@ -93,10 +93,10 @@ public class WorldNavigator : MonoBehaviour
     private Mode cleanMode = Mode.NONE;
     private float sceneCleanTimer = 0;
     private bool traversing = false;
+    private int lastProgress = 0;
 
     private void Awake()
     {
-        gameStateProcessor = gameObject.AddComponent<StateProcessor>();
         clientInterface = gameObject.AddComponent<ClientInterface>();
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
@@ -105,9 +105,10 @@ public class WorldNavigator : MonoBehaviour
 
     private void Start()
     {
-        //Make sure we have some sort of GSP.Connect() here.
         clientInterface = new ClientInterface();
-        CreateTestState();
+        GameObject commObject = GameObject.FindGameObjectWithTag("CommunicationInterface");
+        communicationScript = commObject.GetComponent<CommunicationInterface>();
+        SetState();
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
         commandScript.enabled = true;
@@ -149,17 +150,17 @@ public class WorldNavigator : MonoBehaviour
         battleIslandGenerationPrefabs.AddRange(tilePrefabs);
         battleIslandGenerationPrefabs.Add(battleIsland);
 
-        commandScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
+        commandScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
         commandScript.SetCommandVariables(commandCenter, commandButtons);
         commandScript.SetBattleVariables(this, battleScript);
 
-        managementScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
+        managementScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         managementScript.SetObservationPoints(managementObservationPoint, managementFocusPoint);
         managementScript.SetGenerationVariables(islandGenerationPrefabs.ToArray(), tileVariations, offset, positions, islandChangeSpeed);
         managementScript.Initialize();
 
-        battleScript.SetVariables(gameStateProcessor, clientInterface, cam, orbital, screenGUI, buttonTypes);
+        battleScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
         battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
@@ -167,55 +168,9 @@ public class WorldNavigator : MonoBehaviour
         SetCommandMode();
     }
 
-    void CreateTestState()
+    void SetState()
     {
-        UnityEngine.Random.InitState(1337);
-        gameStateProcessor = new StateProcessor();
-
-        Dictionary<string, PlayerState>  players = new Dictionary<string, PlayerState>
-        {
-            {"cairo", new PlayerState("US", new double[] {100, 50, 25, 10, 5, 1, 10, 5, 1 }, new double[] {10000, 10000, 10000, 10000}, new string[] {"a", "b", "c", "d"}, "") },
-            {"pimpMacD", new PlayerState("US", new double[] {50, 25, 12, 5, 2, 1, 5, 2, 1 }, new double[] {1000, 2500, 2000, 500}, new string[] { "e", "f", "g", "h", "i"}, "") },
-            {"nox", new PlayerState("MX", new double[] {100, 50, 25, 10, 5, 2, 10, 5, 1 }, new double[] {0, 0, 0, 0}, new string[] { "j", "k", "l", "m", "n", "n"}, "") }
-        };
-
-        Dictionary<string, Island>  islands = new Dictionary<string, Island>
-        {
-            {"a", IslandGenerator.Generate("cairo")},
-            {"b", IslandGenerator.Generate("cairo")},
-            {"c", IslandGenerator.Generate("cairo")},
-            {"d", IslandGenerator.Generate("cairo")},
-            {"e", IslandGenerator.Generate("pimpMacD")},
-            {"f", IslandGenerator.Generate("pimpMacD")},
-            {"g", IslandGenerator.Generate("pimpMacD")},
-            {"h", IslandGenerator.Generate("pimpMacD")},
-            {"i", IslandGenerator.Generate("pimpMacD")},
-            {"j", IslandGenerator.Generate("nox")},
-            {"k", IslandGenerator.Generate("nox")},
-            {"l", IslandGenerator.Generate("nox")},
-            {"m", IslandGenerator.Generate("nox")},
-            {"n", IslandGenerator.Generate("nox")},
-            {"o", IslandGenerator.Generate("nox")}
-        };
-
-        Dictionary<string, List<List<double>>> resourceContributions = new Dictionary<string, List<List<double>>>
-        {
-            {"cairo", new List<List<double>> { new List<double> { 0, 0, 50 }, new List<double> {200, 0, 0 }, new List<double> {0, 100, 0 } } },
-            {"pimpMacD", new List<List<double>> { new List<double> { 0, 0, 25 }, new List<double> {400, 0, 0 }, new List<double> {0, 50, 0 } } },
-            {"nox", new List<List<double>> { new List<double> { 0, 0, 75 }, new List<double> {100, 0, 0 }, new List<double> {0, 50, 0 } } }
-        };
-
-        Dictionary<string, List<string>> depletedContributions = new Dictionary<string, List<string>>
-        {
-            {"cairo", new List<string> { "firstIsland", "secondIsland" } },
-            {"pimpMacD", new List<string> { "thirdIsland" } }
-        };
-
-        List<double> resourcePools = new List<double> {30000, 20000, 10000, 5000 };
-
-        gameStateProcessor.state = new State(players, islands, resourceContributions, depletedContributions, resourcePools);
-        gameStateProcessor.state.players["cairo"].attackableIsland = "j";
-        clientInterface = new ClientInterface(gameStateProcessor, "cairo");
+        clientInterface = new ClientInterface(communicationScript);
     }
 
     private void Update()
@@ -254,6 +209,13 @@ public class WorldNavigator : MonoBehaviour
         {
             traversing = false;
             commandScript.GotoCommandCenter();
+        }
+
+        if (lastProgress != communicationScript.blockProgress)
+        {
+            lastProgress = communicationScript.blockProgress;
+            clientInterface.UpdateState();
+            screenGUI.SetGUIContents();
         }
     }
 

@@ -10,7 +10,6 @@ public class Interaction : MonoBehaviour
 {
     public Camera cam;
     public OrbitalFocusCam orbital;
-    public StateProcessor gameStateProcessor;
     public ClientInterface clientInterface;
     public ScreenGUI screenGUI;
 
@@ -137,9 +136,8 @@ public class Interaction : MonoBehaviour
         screenGUI.SetGUIContents();
     }
 
-    public void SetVariables(StateProcessor stateProcessor, ClientInterface client, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
+    public void SetVariables(ClientInterface client, Camera _cam, OrbitalFocusCam _orbital, ScreenGUI _screenGUI, string[] _buttonTypes)
     {
-        gameStateProcessor = stateProcessor;
         clientInterface = client;
         cam = _cam;
         orbital = _orbital;

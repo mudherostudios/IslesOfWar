@@ -1928,7 +1928,7 @@ public class GSPTesting : MonoBehaviour
         double[] remainingPool = new double[] { processor.state.resourcePools[0], 0, 0, 0 };
 
         //Succeed in creating correct modifiers.
-        double[] mods = processor.CalculateResourcePoolModifiers(new double[] { 1000, 2000, 4000 });
+        double[] mods = PoolUtility.CalculateResourcePoolModifiers(new double[] { 1000, 2000, 4000 });
         bool passedFirst = mods[0] == 2.0 && mods[1] == 0.5 && mods[2] == 4.0 && mods[3] == 0.25 && mods[4] == 2.0 && mods[5] == 0.5;
         rewardResourcePoolResults += GetPassOrFail(passedFirst);
 

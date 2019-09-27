@@ -47,7 +47,7 @@ public class CommandIslandInteraction : Interaction
             resourcePool.gameObject.SetActive(false);
             warbucksPool.gameObject.SetActive(false);
             searchIslands.gameObject.SetActive(false);
-            battleIslandsGUI.gameObject.SetActive(false);
+            battleIslandsGUI.HideMenus();
             squadGUI.Close();
         }
 
