@@ -234,11 +234,11 @@ namespace IslesOfWar
 
             public static bool ResourceSubmissions(ResourceOrder order, double[] actualResources)
             {
-                bool canSubmit = order.amnt.Count == 4 && order.rsrc >= 0 && order.rsrc <= 3;
+                bool canSubmit = order.amnt.Count == 3 && order.rsrc >= 0 && order.rsrc <= 2;
 
                 for (int r = 0; r < order.amnt.Count && canSubmit; r++)
                 {
-                    canSubmit = canSubmit && order.amnt[r] <= actualResources[r];
+                    canSubmit = canSubmit && order.amnt[r] <= actualResources[r+1];
                 }
 
                 return canSubmit;

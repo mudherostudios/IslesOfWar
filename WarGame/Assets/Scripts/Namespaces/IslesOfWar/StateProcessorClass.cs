@@ -87,15 +87,14 @@ namespace IslesOfWar
                 }
             }
 
-            public void DiscoverOrScoutIsland(string player, string searchCommand, string txid)
+            public void DiscoverOrScoutIsland(string player, string searchCommand, string txid, ref MudHeroRandom random)
             {
                 double[] cost = IslandSearchCostUtility.GetCost(state.players[player].islands.Count);
-                bool hasEnoughMoney = state.players[player].resources[0] >= cost[0] && state.players[player].resources[1] >= cost[1] 
-                && state.players[player].resources[2] >= cost[2] && state.players[player].resources[3] >= cost[3];
+                bool hasEnoughMoney = Validity.HasEnoughResources(cost, state.players[player].resources.ToArray());
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
-                    string discovered = IslandDiscovery.GetIsland(state.players, state.allIslandIDs, txid);
+                    string discovered = IslandDiscovery.GetIsland(state.players, state.allIslandIDs, txid, ref random);
                     double[] resources = Subtract(state.players[player].resources.ToArray(), cost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
@@ -103,7 +102,7 @@ namespace IslesOfWar
 
                     if (discovered == txid)
                     {
-                        Island freshIsland = IslandGenerator.Generate(player);
+                        Island freshIsland = IslandGenerator.Generate(player, ref random);
                         state.islands.Add(txid, freshIsland);
                         state.players[player].islands.Add(discovered);
                     }
@@ -282,7 +281,8 @@ namespace IslesOfWar
 
                 for (int i = 0; i < islands.Count && canSubmit; i++)
                 {
-                    canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]);
+                    canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]) &&
+                    state.islands[islands[i]].IsDepleted();
 
                     if (state.islands[islands[i]].resources != null)
                     {
@@ -327,11 +327,13 @@ namespace IslesOfWar
 
             public void SubmitResourcesToPool(string player, ResourceOrder order)
             {
-                bool canSubmit = order.rsrc >= 0 && order.rsrc <= 2 && order.amnt != null;
+                bool canSubmit = order.amnt != null;
 
                 if (canSubmit)
-                    canSubmit = order.amnt.Count == 3 && order.amnt[order.rsrc] == 0;
-
+                    canSubmit = Validity.ResourceSubmissions(order, state.players[player].allResources);
+                
+                //This section is both creating an updated resources array and checking if its valid
+                //I would like if it were cleaner.
                 List<double> updatedResources = new List<double>();
                 updatedResources.Add(state.players[player].resources[0]);
 
@@ -339,8 +341,8 @@ namespace IslesOfWar
                 {
                     for (int r = 0; r < order.amnt.Count && canSubmit; r++)
                     {
-                        updatedResources.Add(state.players[player].resources[r + 1] - order.amnt[r]);
-                        canSubmit = updatedResources[r + 1] >= 0 && order.amnt[r] >= 0;
+                        updatedResources.Add(state.players[player].resources[r] - order.amnt[r]);
+                        canSubmit = updatedResources[r] >= 0 && order.amnt[r] >= 0;
                     }
                 }
 
@@ -381,10 +383,10 @@ namespace IslesOfWar
 
                     for (int o = 0; o < owners.Length; o++)
                     {
-                        state.players[owners[o]].resources[0] += Math.Floor(state.resourcePools[0] * (ownership[o] / total));
+                        state.players[owners[o]].resources[0] += Math.Floor(state.warbucksPool * (ownership[o] / total));
                     }
 
-                    state.resourcePools[0] = 0;
+                    state.warbucksPool = 0;
                 }
             }
 
@@ -399,9 +401,9 @@ namespace IslesOfWar
                 if (state.resourceContributions.Count >= 1)
                 {
                     ownership = new double[state.resourceContributions.Count][];
-                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, 0) + state.resourcePools[1];
-                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, 1) + state.resourcePools[2];
-                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, 2) + state.resourcePools[3];
+                    poolSizes[0] = PoolUtility.GetPoolSize(state.resourceContributions, 0) + state.resourcePools[0];
+                    poolSizes[1] = PoolUtility.GetPoolSize(state.resourceContributions, 1) + state.resourcePools[1];
+                    poolSizes[2] = PoolUtility.GetPoolSize(state.resourceContributions, 2) + state.resourcePools[2];
                     
                     modifiers = PoolUtility.CalculateResourcePoolModifiers(poolSizes);
                     owners = state.resourceContributions.Keys.ToArray();
@@ -697,12 +699,15 @@ namespace IslesOfWar
 
             void AddToPools(double[] resources, int multiplierType)
             {
-                state.resourcePools[0] += resources[0] * Constants.purchaseToPoolPercents[multiplierType, 0];
-                state.resourcePools[1] += resources[1] * Constants.purchaseToPoolPercents[multiplierType, 1];
-                state.resourcePools[2] += resources[2] * Constants.purchaseToPoolPercents[multiplierType, 2];
-                state.resourcePools[3] += resources[3] * Constants.purchaseToPoolPercents[multiplierType, 3];
+                state.warbucksPool += resources[0] * Constants.purchaseToPoolPercents[multiplierType, 0];
+                state.resourcePools[0] += resources[1] * Constants.purchaseToPoolPercents[multiplierType, 1];
+                state.resourcePools[1] += resources[2] * Constants.purchaseToPoolPercents[multiplierType, 2];
+                state.resourcePools[2] += resources[3] * Constants.purchaseToPoolPercents[multiplierType, 3];
             }
 
+            //--------------------------------------------------------------------------------------
+            //Utility/Support Functions (all vital but small simple functions that are reusable)
+            //--------------------------------------------------------------------------------------
             int GetReactPosition(List<int> defenseZone, int[] attackerPositions, bool[] canAttacks, out int attackerIndex)
             {
                 for (int a = 0; a < attackerPositions.Length; a++)

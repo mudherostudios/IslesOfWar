@@ -7,7 +7,7 @@ using IslesOfWar;
 
 public class NationSelect : MonoBehaviour
 {
-    public WorldNavigator navigator;
+    public CommandIslandInteraction commandScript;
     public Image flag;
     public float maxSize;
     public Dropdown countryList;
@@ -49,7 +49,7 @@ public class NationSelect : MonoBehaviour
             flag.gameObject.SetActive(true);
         }
         else
-            Debug.Log(string.Format("Flag {0} Does Not Exist!", countryCode));
+            Debug.Log(string.Format("Flag File {0} Does Not Exist!", countryCode));
     }
 
     public void SetList()
@@ -64,5 +64,12 @@ public class NationSelect : MonoBehaviour
         }
 
         countryList.AddOptions(options);
+    }
+
+    public void SubmitFlag()
+    {
+        int index = countryList.value;
+        string countryCode = keys[index];
+        commandScript.ChangeNation(countryCode);
     }
 }

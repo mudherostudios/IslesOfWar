@@ -149,6 +149,7 @@ namespace IslesOfWar
             public Dictionary<string, List<List<double>>> resourceContributions;
             public Dictionary<string, List<string>> depletedContributions;
             public List<double> resourcePools;
+            public double warbucksPool;
 
             public State() { }
             
@@ -158,7 +159,8 @@ namespace IslesOfWar
                 islands = new Dictionary<string, Island>();
                 resourceContributions = new Dictionary<string, List<List<double>>>();
                 depletedContributions = new Dictionary<string, List<string>>();
-                resourcePools = new List<double> { 0, 0, 0, 0 };
+                resourcePools = new List<double> { 0, 0, 0 };
+                warbucksPool = 0;
             }
 
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands)
@@ -170,7 +172,8 @@ namespace IslesOfWar
 
                 players = JsonConvert.DeserializeObject<Dictionary<string, PlayerState>>(JsonConvert.SerializeObject(allPlayers));
                 islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
-                resourcePools = new List<double> { 0, 0, 0, 0 };
+                resourcePools = new List<double> { 0, 0, 0 };
+                warbucksPool = 0;
             }
 
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions)
@@ -184,10 +187,11 @@ namespace IslesOfWar
                 islands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(allIslands));
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
-                resourcePools = new List<double> { 0, 0, 0, 0 };
+                resourcePools = new List<double> { 0, 0, 0 };
+                warbucksPool = 0;
             }
 
-            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions, List<double> resPools)
+            public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands, Dictionary<string, List<List<double>>> resContributions, Dictionary<string, List<string>> depContributions, List<double> resPools, double warPool)
             {
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
@@ -199,6 +203,7 @@ namespace IslesOfWar
                 resourceContributions = resContributions;
                 depletedContributions = depContributions;
                 resourcePools = resPools;
+                warbucksPool = warPool;
             }
 
             public Island[] allIslands

@@ -142,6 +142,11 @@ public class OrbitalFocusCam : MonoBehaviour
             camTargetPos = exploreOffset;
     }
 
+    public void Defocus()
+    {
+        dof.focusDistance.value = 0.0f;
+    }
+
     public void SetNewObservePoint(Transform newObservePoint, Transform newFocalTarget)
     {
         if(newObservePoint != null)

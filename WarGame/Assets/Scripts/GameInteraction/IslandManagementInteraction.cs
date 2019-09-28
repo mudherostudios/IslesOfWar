@@ -474,7 +474,7 @@ public class IslandManagementInteraction : Interaction
 
     public void Initialize()
     {
-        islands = clientInterface.clientState.players[clientInterface.player].islands.ToArray();
+        islands = clientInterface.playerIslandIDs.ToArray();
         islandIndex = 0;
         islandCount = islands.Length;
         direction = 0;

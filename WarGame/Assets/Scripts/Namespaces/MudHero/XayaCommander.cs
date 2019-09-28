@@ -60,7 +60,7 @@ namespace MudHero
                     playerName = playerNames[index];
             }
 
-            public ConnectionLog ExecutePlayerCommand(string command)
+            public ConnectionLog ExecutePlayerCommand(string player, string command)
             {
                 ConnectionLog log = new ConnectionLog();
                 if (xayaService == null || networkBlockCount == 0)
@@ -71,9 +71,8 @@ namespace MudHero
                 }
                 else
                 {
-                    //Do Xaya Name Update Here
+                    log.message = xayaService.NameUpdate(player, command, new object());
                     log.success = true;
-                    log.message = "Success!";
                     return log;
                 }
             }

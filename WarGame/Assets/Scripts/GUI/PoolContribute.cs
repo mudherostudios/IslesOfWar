@@ -61,6 +61,13 @@ public class PoolContribute: MonoBehaviour
         string text = string.Format("{0} blocks left.", blocksLeft);
     }
 
+    public void ShowMenu(int type)
+    {
+        poolType = type;
+        gameObject.SetActive(true);
+        UpdateAllStats();
+    }
+
     public void UpdateAllStats()
     {
         CalculatePoolStates();

@@ -56,7 +56,7 @@ public class StateMaster : MonoBehaviour
 
     public IslandMessage SendIslandDiscoveryRequest()
     {
-        IslandMessage islandData = server.DiscoverIslands();
+        IslandMessage islandData = new IslandMessage();
         return islandData;
     }
     //End GSP/RPC Calls

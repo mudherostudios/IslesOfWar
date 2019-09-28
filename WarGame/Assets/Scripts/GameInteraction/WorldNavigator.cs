@@ -47,12 +47,14 @@ public class WorldNavigator : MonoBehaviour
     public GameObject planMarkerPrefab;
 
     [Header("Command Island GUIs and Variables")]
+    public GameObject showMenuButton;
     public UnitPurchase unitPurchase;
     public PoolContribute resourcePool;
     public WarbucksPoolContribute warbuxPool;
     public SearchIslands searchIslands;
     public BattleIslandsGUI battleIslandsGUI;
     public SquadGUI squadFormation;
+    public NationSelect nationSelect;
     public int unitType;
     public int resourceType;
 
@@ -109,6 +111,11 @@ public class WorldNavigator : MonoBehaviour
         GameObject commObject = GameObject.FindGameObjectWithTag("CommunicationInterface");
         communicationScript = commObject.GetComponent<CommunicationInterface>();
         SetState();
+
+        if (clientInterface.isPlaying)
+            nationSelect.gameObject.SetActive(false);
+
+        
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
         commandScript.enabled = true;
@@ -124,11 +131,13 @@ public class WorldNavigator : MonoBehaviour
         commandScript.searchIslands = searchIslands;
         commandScript.battleIslandsGUI = battleIslandsGUI;
         commandScript.squadGUI = squadFormation;
+        commandScript.nationSelect = nationSelect;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
         warbuxPool.commandScript = commandScript;
         searchIslands.commandScript = commandScript;
         squadFormation.commandScript = commandScript;
+        nationSelect.commandScript = commandScript;
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -152,7 +161,7 @@ public class WorldNavigator : MonoBehaviour
 
         commandScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);
-        commandScript.SetCommandVariables(commandCenter, commandButtons);
+        commandScript.SetCommandVariables(commandCenter, commandButtons, showMenuButton);
         commandScript.SetBattleVariables(this, battleScript);
 
         managementScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
@@ -191,20 +200,6 @@ public class WorldNavigator : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.M) && mode != Mode.MANAGEMENT)
-        {
-            SetManageMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.C) && mode != Mode.COMMAND)
-        {
-            SetCommandMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.B) && mode != Mode.BATTLE)
-        {
-            Debug.Log("Remember to change this to get islandID from menu.");
-            SetBattleMode("a");
-        }
-
         if (mode == Mode.COMMAND && traversing && orbital.isAtTarget)
         {
             traversing = false;
@@ -217,6 +212,12 @@ public class WorldNavigator : MonoBehaviour
             clientInterface.UpdateState();
             screenGUI.SetGUIContents();
         }
+        
+    }
+
+    public void ShowCommandInteractionMenu()
+    {
+        commandScript.ShowMenu();
     }
 
     public void SetCommandMode()

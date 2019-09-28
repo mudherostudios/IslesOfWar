@@ -8,6 +8,10 @@ using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 using Newtonsoft.Json;
 
+//Currently all failures should be because of new random number generation method.
+//Still going to suck redesigning the test to succeed though
+
+
 public class GSPTesting : MonoBehaviour
 {
     StateProcessor processor;
@@ -137,12 +141,12 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         searchIslandResults = "";
-        UnityEngine.Random.InitState(1337);
+        MudHeroRandom random = new MudHeroRandom(1337);
 
         //Got lucky with seed 1337, allowed me to try all of the combinations first shot with minimum calls, so don't change that.
         //Don't test any random non existent names because that is checked before it passes to this.
         //Fail to find island because found self
-        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
         bool passedFirst = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == ""
         && processor.state.players["cairo"].resources[0] == 2000 && processor.state.players["cairo"].resources[1] == 5000
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -156,7 +160,7 @@ public class GSPTesting : MonoBehaviour
         searchIslandResults += GetPassOrFail(passedFirst);
 
         //Find attackable island
-        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
         bool passedSecond = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
         && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -170,7 +174,7 @@ public class GSPTesting : MonoBehaviour
         searchIslandResults += GetPassOrFail(passedSecond);
 
         //Find new island
-        processor.DiscoverOrScoutIsland("pimpMacD", "norm", "p");
+        processor.DiscoverOrScoutIsland("pimpMacD", "norm", "p", ref random);
         bool passedThird = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
         && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -184,7 +188,7 @@ public class GSPTesting : MonoBehaviour
         searchIslandResults += GetPassOrFail(passedThird);
 
         //Fail to find island because you a broke ass
-        processor.DiscoverOrScoutIsland("nox", "norm", "q");
+        processor.DiscoverOrScoutIsland("nox", "norm", "q", ref random);
         bool passedFourth = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
         && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -198,7 +202,7 @@ public class GSPTesting : MonoBehaviour
         searchIslandResults += GetPassOrFail(passedFourth);
 
         //Fail to find island because of bad search command
-        processor.DiscoverOrScoutIsland("cairo", "non-norm", "q");
+        processor.DiscoverOrScoutIsland("cairo", "non-norm", "q", ref random);
         bool passedFifth = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
         && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -212,7 +216,7 @@ public class GSPTesting : MonoBehaviour
         searchIslandResults += GetPassOrFail(passedFifth);
 
         //Failed to find island because of already existing txid (1/1.15e+77 chances but just incase)
-        processor.DiscoverOrScoutIsland("cairo", "norm", "a");
+        processor.DiscoverOrScoutIsland("cairo", "norm", "a", ref random);
         bool passedSixth = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
         && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
         && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
@@ -1806,6 +1810,7 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         transferResourcesResults = "";
+        MudHeroRandom random = new MudHeroRandom(1337);
 
         //Succeed in transfering 15% of unit purchase to depleted pool.
         processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
@@ -1837,7 +1842,7 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in transfering 15% of search purchase to depleted pool
         ResetTestData();
-        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
         bool passedFourth = processor.state.resourcePools[0] == 1000.0 * 0.15 && processor.state.resourcePools[1] == 2500.0 * 0.05
         && processor.state.resourcePools[2] == 0 && processor.state.resourcePools[3] == 0;
         transferResourcesResults += GetPassOrFail(passedFourth);
@@ -1851,7 +1856,7 @@ public class GSPTesting : MonoBehaviour
         processor.PurchaseUnits("cairo", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", "))))))))))))"));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "000000000000", "6)))))))))))"));
-        processor.DiscoverOrScoutIsland("cairo", "norm", "p");
+        processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
         bool passedFifth = processor.state.resourcePools[0] == 12710.0 * 0.15 && processor.state.resourcePools[1] == 7635.0 * 0.05
         && processor.state.resourcePools[2] == 6175.0 * 0.05 && processor.state.resourcePools[3] == 4100.0 * 0.05;
         transferResourcesResults += GetPassOrFail(passedFifth);
@@ -1864,7 +1869,7 @@ public class GSPTesting : MonoBehaviour
         processor.PurchaseUnits("pimpMacD", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
         processor.DevelopIsland("pimpMacD", new IslandBuildOrder("g", "300100000020", "))))))))))))"));
         processor.DevelopIsland("pimpMacD", new IslandBuildOrder("e", "000000000000", "6)))))))))))"));
-        processor.DiscoverOrScoutIsland("pimpMacD", "norm", "q");
+        processor.DiscoverOrScoutIsland("pimpMacD", "norm", "q", ref random);
         processor.state.players["nox"].resources[0] = 20000;
         processor.state.players["nox"].resources[1] = 20000;
         processor.state.players["nox"].resources[2] = 20000;
@@ -1872,7 +1877,7 @@ public class GSPTesting : MonoBehaviour
         processor.PurchaseUnits("nox", new List<int> { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
         processor.DevelopIsland("nox", new IslandBuildOrder("m", "000003201000", "))))))))))))"));
         processor.DevelopIsland("nox", new IslandBuildOrder("j", "000000000000", "6)))))))))))"));
-        processor.DiscoverOrScoutIsland("nox", "norm", "r");
+        processor.DiscoverOrScoutIsland("nox", "norm", "r", ref random);
         bool passedSixth = processor.state.resourcePools[0] == 12710.0 * 0.15 * 3.0 && processor.state.resourcePools[1] == 7635.0 * 0.05 * 3.0
         && processor.state.resourcePools[2] == 6175.0 * 0.05 * 3.0 && processor.state.resourcePools[3] == 4100.0 * 0.05 * 3.0;
         transferResourcesResults += GetPassOrFail(passedSixth);
@@ -2351,7 +2356,7 @@ public class GSPTesting : MonoBehaviour
     {
         //Initialize Random Seed to get the same islands everytime.
         //Changing this seed will break a lot of the tests.
-        UnityEngine.Random.InitState(1337);
+        MudHeroRandom random = new MudHeroRandom(1337);
         processor = new StateProcessor();
         processor.state = new State();
         processor.state.Init();
@@ -2365,21 +2370,21 @@ public class GSPTesting : MonoBehaviour
 
         islands = new Dictionary<string, Island>
         {
-            {IIDs[0], IslandGenerator.Generate("cairo")},
-            {IIDs[1], IslandGenerator.Generate("cairo")},
-            {IIDs[2], IslandGenerator.Generate("cairo")},
-            {IIDs[3], IslandGenerator.Generate("cairo")},
-            {IIDs[4], IslandGenerator.Generate("pimpMacD")},
-            {IIDs[5], IslandGenerator.Generate("pimpMacD")},
-            {IIDs[6], IslandGenerator.Generate("pimpMacD")},
-            {IIDs[7], IslandGenerator.Generate("pimpMacD")},
-            {IIDs[8], IslandGenerator.Generate("pimpMacD")},
-            {IIDs[9], IslandGenerator.Generate("nox")},
-            {IIDs[10], IslandGenerator.Generate("nox")},
-            {IIDs[11], IslandGenerator.Generate("nox")},
-            {IIDs[12], IslandGenerator.Generate("nox")},
-            {IIDs[13], IslandGenerator.Generate("nox")},
-            {IIDs[14], IslandGenerator.Generate("nox")}
+            {IIDs[0], IslandGenerator.Generate("cairo", ref random)},
+            {IIDs[1], IslandGenerator.Generate("cairo", ref random)},
+            {IIDs[2], IslandGenerator.Generate("cairo", ref random)},
+            {IIDs[3], IslandGenerator.Generate("cairo", ref random)},
+            {IIDs[4], IslandGenerator.Generate("pimpMacD", ref random)},
+            {IIDs[5], IslandGenerator.Generate("pimpMacD", ref random)},
+            {IIDs[6], IslandGenerator.Generate("pimpMacD", ref random)},
+            {IIDs[7], IslandGenerator.Generate("pimpMacD", ref random)},
+            {IIDs[8], IslandGenerator.Generate("pimpMacD", ref random)},
+            {IIDs[9], IslandGenerator.Generate("nox", ref random)},
+            {IIDs[10], IslandGenerator.Generate("nox", ref random)},
+            {IIDs[11], IslandGenerator.Generate("nox", ref random)},
+            {IIDs[12], IslandGenerator.Generate("nox", ref random)},
+            {IIDs[13], IslandGenerator.Generate("nox", ref random)},
+            {IIDs[14], IslandGenerator.Generate("nox", ref random)}
         };
 
         processor.state = new State(players, islands);

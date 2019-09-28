@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine;
 using IslesOfWar.ClientSide;
 using IslesOfWar.Communication;
 
@@ -46,17 +46,17 @@ namespace IslesOfWar
                 return total / players.Count;
             }
 
-            public static string GetIsland(Dictionary<string, PlayerState> players, string[] islands, string txid)
+            public static string GetIsland(Dictionary<string, PlayerState> players, string[] islands, string txid, ref MudHeroRandom random)
             {
                 double possibleIslands = GetPossibleUndiscoveredIslands(players);
                 CalculateProbabilities(possibleIslands, islands.Length);
-                float choice = UnityEngine.Random.value;
+                float choice = random.Value();
 
                 if (choice > probabilities[1])
                     return txid;
                 else
                 {
-                    choice = UnityEngine.Random.value * islands.Length;
+                    choice = random.Value() * islands.Length;
                     return islands[Mathf.FloorToInt(choice)];
                 }
             }
@@ -64,12 +64,12 @@ namespace IslesOfWar
 
         public static class IslandGenerator
         {
-            public static Island Generate()
+            public static Island Generate(ref MudHeroRandom random)
             {
-                return Generate("");
+                return Generate("", ref random);
             }
 
-            public static Island Generate(string owner)
+            public static Island Generate(string owner, ref MudHeroRandom random)
             {
                 string features = "";
                 string collectors = "000000000000";
@@ -79,8 +79,8 @@ namespace IslesOfWar
 
                 for (int t = 0; t < 12; t++)
                 {
-                    resourceTypes[t] = GetResourceType();
-                    features += EncodeUtility.GetFeatureCode(GetTileType(), resourceTypes[t]).ToString();
+                    resourceTypes[t] = GetResourceType(random);
+                    features += EncodeUtility.GetFeatureCode(GetTileType(random), resourceTypes[t]).ToString();
                     List<double> tileResources = new List<double>();
                     int[] types = EncodeUtility.GetBaseTypes(resourceTypes[t]);
 
@@ -89,7 +89,7 @@ namespace IslesOfWar
                         double amount = 0;
 
                         if (types[r] > 0)
-                            amount = Mathf.Round(UnityEngine.Random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]));
+                            amount = Mathf.Round(random.Range((int)Constants.minMaxResources[r, 0], (int)Constants.minMaxResources[r, 1]));
                         
                         tileResources.Add(amount);
                     }
@@ -104,14 +104,14 @@ namespace IslesOfWar
             }
 
             //Make a matrix of unique resource combinations to understand this math.
-            static int GetResourceType()
+            static int GetResourceType(MudHeroRandom random)
             {
                 int resource = 0;
                 int count = 0;
 
                 for (int p = 1; p < Constants.resourceProbabilities.Length + 1 && count < 3; p++)
                 {
-                    if (UnityEngine.Random.value < Constants.resourceProbabilities[p - 1])
+                    if (random.Value() < Constants.resourceProbabilities[p - 1])
                     {
                         resource += p;
                         count++;
@@ -124,11 +124,11 @@ namespace IslesOfWar
                 return resource;
             }
 
-            static int GetTileType()
+            static int GetTileType(MudHeroRandom random)
             {
                 int type = -1;
 
-                float feature = UnityEngine.Random.value;
+                float feature = random.Value();
                 float last = 0.0f;
 
                 for (int p = 0; p < Constants.tileProbabilities.Length; p++)
@@ -367,9 +367,9 @@ namespace IslesOfWar
                 return state;
             }
 
-            public IslandMessage DiscoverIslands()
+            public IslandMessage DiscoverIslands(ref MudHeroRandom random)
             {
-                Island discoveredIsland = IslandGenerator.Generate();
+                Island discoveredIsland = IslandGenerator.Generate(ref random);
 
                 return new IslandMessage(discoveredIsland, true);
             }

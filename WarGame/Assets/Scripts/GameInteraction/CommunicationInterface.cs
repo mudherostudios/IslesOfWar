@@ -84,6 +84,7 @@ public class CommunicationInterface : MonoBehaviour
         blockProgress = xayaCommands.GetBlockHeight(hash);
         blockCount = xayaCommands.networkBlockCount;
         gameState = _gameState;
+        Debug.Log(gameState);
     }
     
 
@@ -170,6 +171,11 @@ public class CommunicationInterface : MonoBehaviour
     {
         selectedUser = name;
         checkedScene = false;
+    }
+
+    public void SendCommand(string command)
+    {
+        Debug.Log(xayaCommands.ExecutePlayerCommand(selectedUser, command).message);
     }
 
     public void Disconnect()

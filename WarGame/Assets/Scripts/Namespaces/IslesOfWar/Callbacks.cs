@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using IslesOfWar.Communication;
 using IslesOfWar.ClientSide;
+using MudHero;
 
 namespace IslesOfWar
 {
@@ -44,8 +45,10 @@ namespace IslesOfWar
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(blockData);
                     dynamic moves = data["moves"];
                     dynamic admin = data["admin"];
-                    dynamic rng = data["block"]["rngseed"];
+                    string rng = data["block"]["rngseed"];
                     StateProcessor processor;
+                    int seed = HexToInt.Get(rng.Substring(0,8));
+                    MudHeroRandom random = new MudHeroRandom(seed);
 
                     //Admin commands would be processed here first.
 
@@ -80,7 +83,7 @@ namespace IslesOfWar
                             if (processor.state.players.ContainsKey(player)) // Make Sure Player Exists
                             {
                                 if (actions.srch != null)
-                                    processor.DiscoverOrScoutIsland(player, actions.srch, JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(element["txid"])));
+                                    processor.DiscoverOrScoutIsland(player, actions.srch, JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(element["txid"])), ref random);
 
                                 if (actions.buy != null)
                                     processor.PurchaseUnits(player, actions.buy);

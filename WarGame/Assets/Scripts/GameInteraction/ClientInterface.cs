@@ -37,6 +37,7 @@ public class ClientInterface : MonoBehaviour
     public void UpdateState()
     {
         chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
+        clientState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
     }
 
     void SpendResources(double[] resources)
@@ -61,7 +62,20 @@ public class ClientInterface : MonoBehaviour
 
         clientState.islands[islandID].SetDefenses(new string(fullOrder));
     }
-    
+
+    //------------------------------------------------------------------
+    //Xaya Name Updates and Action Queueing
+    //------------------------------------------------------------------
+    //Make sure to remove immediate submit.
+    public void ChangeNation(string nationCode)
+    {
+        if (Validity.Nation(nationCode))
+        {
+            queuedActions.nat = nationCode;
+            SubmitQueuedActions();
+        }
+    }
+
     //Make sure to add queuedAction updates as well.
     public bool PurchaseIslandCollector(StructureCost cost)
     {
@@ -129,6 +143,7 @@ public class ClientInterface : MonoBehaviour
         return successfulPurchase;
     }
 
+    //Make sure to add queuedAction updates as well.
     public bool PurchaseIslandBlocker(string islandID, int tileIndex, int purchaseType)
     {
         bool successfulPurchase = false;
@@ -156,7 +171,7 @@ public class ClientInterface : MonoBehaviour
         return successfulPurchase;
     }
 
-    //Make sure to add queuedAction updates as well.
+    //Make sure to remove immediate submit.
     public void PurchaseUnits(int type, int amount)
     {
         double[] spend = new double[4];
@@ -171,20 +186,27 @@ public class ClientInterface : MonoBehaviour
         {
             SpendResources(spend);
             clientState.players[player].units[type] += amount;
+            queuedActions.buy = new List<int>(new int[9]);
+            queuedActions.buy[type] = amount;
+            SubmitQueuedActions();
         }
     }
 
-    //Make sure to add queuedAction updates as well.
+    //Make sure to remove immediate submit.
     public void SearchForIslands()
     {
         double[] cost = IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
         bool canSearch = Validity.HasEnoughResources(cost, clientState.players[player].allResources);
 
         if (canSearch)
+        {
             SpendResources(cost);
+            queuedActions.srch = Constants.islandSearchOptions[0];
+            SubmitQueuedActions();
+        }
     }
 
-    //Make sure to add queuedAction updates as well.
+    //Make sure to remove immediate submit and account for adding more resources to the pot.
     public void SendResourcePoolContributions(int type, double[] resources)
     {
         double[] fullResources = GetFullResources(resources);
@@ -196,9 +218,9 @@ public class ClientInterface : MonoBehaviour
             {
                 List<List<double>> contributions = new List<List<double>>
                 {
-                    new List<double>{ 0.0, 0.0, 0.0, 0.0 },
-                    new List<double>{ 0.0, 0.0, 0.0, 0.0 },
-                    new List<double>{ 0.0, 0.0, 0.0, 0.0 }
+                    new List<double>{ 0.0, 0.0, 0.0 },
+                    new List<double>{ 0.0, 0.0, 0.0 },
+                    new List<double>{ 0.0, 0.0, 0.0 }
                 };
 
                 clientState.resourceContributions.Add(player, contributions);
@@ -209,10 +231,12 @@ public class ClientInterface : MonoBehaviour
             clientState.resourceContributions[player][type][2] += resources[2];
 
             SpendResources(fullResources);
+            queuedActions.pot = new ResourceOrder(type, new List<double>(resources));
+            SubmitQueuedActions();
         }
     }
 
-    //Make sure to add queuedAction updates as well.
+    //Make sure to remove immediate submit and account for adding more islands before submission.
     public void AddIslandToPool(string island)
     {
         if (Validity.DepletedSubmissions(new List<string> { island }, clientState, player))
@@ -220,22 +244,54 @@ public class ClientInterface : MonoBehaviour
             clientState.players[player].islands.Remove(island);
             clientState.islands.Remove(island);
             clientState.depletedContributions[player].Add(island);
+            queuedActions.dep = new List<string>() { island };
+            SubmitQueuedActions();
         }
     }
 
+    public void SubmitQueuedActions()
+    {
+        JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+        string command = JsonConvert.SerializeObject(queuedActions, Formatting.None, settings);
+        command = string.Format("{{\"g\":{{\"iow\":{0}}}}}", command);
+        Debug.Log(command);
+        bool isValid = true;
+        bool[] validities = QueueIsValid();
+
+        for (int b = 0; b < validities.Length; b++)
+        {
+            isValid = isValid && validities[b];
+        }
+
+        if (isValid)
+        {
+            communication.SendCommand(command);
+            queuedActions = new PlayerActions();
+        }
+    }
+
+    //**************************************************************************************************
+    //Variables from the processed gamestate - Also Make sure you decide to use chain or client state.
+    //**************************************************************************************************
+    public bool isPlaying { get { return chainState.players.Keys.Contains(player); } }
     public Island[] playerIslands
     {
         get
         {
-            List<string> playerIslandIDs = clientState.players[player].islands;
-            Island[] islands = new Island[playerIslandIDs.Count];
-
-            for (int i = 0; i < islands.Length; i++)
+            if (isPlaying)
             {
-                islands[i] = clientState.islands[playerIslandIDs[i]];
-            }
+                List<string> playerIslandIDs = clientState.players[player].islands;
+                Island[] islands = new Island[playerIslandIDs.Count];
 
-            return islands;
+                for (int i = 0; i < islands.Length; i++)
+                {
+                    islands[i] = clientState.islands[playerIslandIDs[i]];
+                }
+
+                return islands;
+            }
+            else
+                return new Island[0];
         }
     }
 
@@ -243,49 +299,102 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            string attackableID = clientState.players[player].attackableIsland;
-            return clientState.islands[attackableID];
+            if (isPlaying)
+            {
+                string attackableID = clientState.players[player].attackableIsland;
+                return clientState.islands[attackableID];
+            }
+            else
+                return new Island();
         }
     }
 
-    public List<string> playerIslandIDs { get { return clientState.players[player].islands; } }
-    public string attackableIslandID { get { return clientState.players[player].attackableIsland; } }
+    public List<string> playerIslandIDs
+    {
+        get
+        {
+            if (isPlaying)
+                return clientState.players[player].islands;
+            else
+                return new List<string>();
+        }
+    }
+    public string attackableIslandID
+    {
+        get
+        {
+            if (isPlaying)
+                return clientState.players[player].attackableIsland;
+            else
+                return "";
+        }
+    }
 
     public List<string> depletedIslands
     {
         get
         {
             List<string> depleted = new List<string>();
-            List<string> islands = clientState.players[player].islands;
 
-            foreach(string island in islands)
+            if (isPlaying)
             {
-                if (clientState.islands[island].IsDepleted())
-                    depleted.Add(island);
+                List<string> islands = clientState.players[player].islands;
+
+                foreach (string island in islands)
+                {
+                    if (clientState.islands[island].IsDepleted())
+                        depleted.Add(island);
+                }
             }
 
             return depleted;
         }
     }
     
-    public double[] playerResources { get { return chainState.players[player].allResources; } }
-    public double[] playerUnits { get { return chainState.players[player].allUnits; } }
+    public double[] playerResources
+    {
+        get
+        {
+            if (isPlaying)
+                return chainState.players[player].allResources;
+            else
+                return new double[4];
+        }
+    }
+
+    public double[] playerUnits
+    {
+        get
+        {
+            if (isPlaying)
+                return chainState.players[player].allUnits;
+            else
+                return new double[9];
+        }
+    }
+
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
     public string islandInDevelopment { get { return queuedActions.bld.id; } }
 
     public bool IslandExists(string islandID)
     {
-        return clientState.islands.ContainsKey(islandID);
+        if (isPlaying)
+            return clientState.islands.ContainsKey(islandID);
+        else
+            return false;
     }
 
     public Island GetIsland(string islandID)
     {
-        return clientState.islands[islandID];
+        if (isPlaying)
+            return clientState.islands[islandID];
+        else
+            return new Island();
     }
 
     public double GetContributionSize(int type)
     {
-        return PoolUtility.GetPoolSize(clientState.resourceContributions, type);
+       return PoolUtility.GetPoolSize(clientState.resourceContributions, type);
     }
 
     public double[] GetAllPoolSizes()
@@ -352,14 +461,20 @@ public class ClientInterface : MonoBehaviour
 
     public double GetWarbucksPoolSize()
     {
-        return clientState.resourcePools[0];
+        return clientState.warbucksPool;
     }
 
     public double[] GetIslandSearchCost()
     {
-        return IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
+        if (isPlaying)
+            return IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
+        else
+            return new double[4];
     }
 
+    //------------------------------------------------------------------
+    //Utility functions
+    //------------------------------------------------------------------
     public bool[] QueueIsValid()
     {
         bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true, size = true;

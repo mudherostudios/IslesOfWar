@@ -42,6 +42,13 @@ public class UnitPurchase: MonoBehaviour
         resourceCosts[2].text = metal.ToString(formatM);
     }
 
+    public void ShowMenu(int unitType)
+    {
+        type = unitType;
+        gameObject.SetActive(true);
+        UpdateAllStats();
+    }
+
     void SetTitle()
     {
         string title = "";
