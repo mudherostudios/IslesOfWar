@@ -11,6 +11,7 @@ public class UnitPurchase: MonoBehaviour
     public InputField purchaseAmount;
     public CommandIslandInteraction commandScript;
     public int type = 0;
+    public int[] relativeTypes;
 
     public void UpdateAllStats() { UpdateAllStats(type); }
 
@@ -44,9 +45,15 @@ public class UnitPurchase: MonoBehaviour
 
     public void ShowMenu(int unitType)
     {
-        type = unitType;
+        type = relativeTypes[unitType];
         gameObject.SetActive(true);
         UpdateAllStats();
+    }
+
+    public void SetMenu(int[] possibleTypes)
+    {
+        relativeTypes = possibleTypes;
+        ShowMenu(0);
     }
 
     void SetTitle()
@@ -96,5 +103,4 @@ public class UnitPurchase: MonoBehaviour
         int.TryParse(sAmount, out amount);
         commandScript.PurchaseUnit(type, amount);
     }
-
 }

@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using IslesOfWar.ClientSide;
-using IslesOfWar.GameStateProcessing;
-
+using Newtonsoft.Json;
 //Orchestrates activity between the main island interaction, manageable island interaction, and battle plan interaction.
 public class WorldNavigator : MonoBehaviour
 {
@@ -55,6 +52,7 @@ public class WorldNavigator : MonoBehaviour
     public BattleIslandsGUI battleIslandsGUI;
     public SquadGUI squadFormation;
     public NationSelect nationSelect;
+    public GameObject commandCenterMenu;
     public int unitType;
     public int resourceType;
 
@@ -63,6 +61,7 @@ public class WorldNavigator : MonoBehaviour
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton;
 
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
@@ -132,6 +131,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.battleIslandsGUI = battleIslandsGUI;
         commandScript.squadGUI = squadFormation;
         commandScript.nationSelect = nationSelect;
+        commandScript.commandCenterMenu = commandCenterMenu;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
         warbuxPool.commandScript = commandScript;
@@ -150,6 +150,9 @@ public class WorldNavigator : MonoBehaviour
         managementScript.enableBuildBunkersButton = enableBuildBunkersButton;
         managementScript.enableBuildBlockersButton = enableBuildBlockersButton;
         managementScript.costSlider = costSlider;
+        managementScript.selectionButtons = selectionButtons;
+        managementScript.backToCommandCenterButton = backToCommandCenterButton;
+        managementScript.resumeIslandQueueButton = resumeIslandQueueButton;
         enableBuildCollectorsButton.managementScript = managementScript;
         enableBuildBunkersButton.managementScript = managementScript;
         enableBuildBlockersButton.managementScript = managementScript;
@@ -198,6 +201,8 @@ public class WorldNavigator : MonoBehaviour
             {
                 battleScript.TurnOffIsland();
             }
+
+            cleanMode = Mode.NONE;
         }
 
         if (mode == Mode.COMMAND && traversing && orbital.isAtTarget)
@@ -230,9 +235,16 @@ public class WorldNavigator : MonoBehaviour
             cleanMode = Mode.NONE;
 
         if (mode == Mode.MANAGEMENT)
+        {
             managementScript.enabled = false;
+            managementScript.SetExitMode();
+        }
         else if (mode == Mode.BATTLE)
+        {
+            battleScript.SetExitMode();
+            battleIslandsGUI.hud.Hide();
             battleScript.enabled = false;
+        }
 
         mode = Mode.COMMAND;
         commandScript.enabled = true;
@@ -244,25 +256,28 @@ public class WorldNavigator : MonoBehaviour
 
     public void SetManageMode()
     {
-        traversing = true;
+        if (clientInterface.playerIslandIDs.Count > 0)
+        {
+            traversing = true;
 
-        if (mode != cleanMode)
-            cleanMode = mode;
-        else
-            cleanMode = Mode.NONE;
+            if (mode != cleanMode)
+                cleanMode = mode;
+            else
+                cleanMode = Mode.NONE;
 
-        if (mode == Mode.COMMAND)
-            commandScript.enabled = false;
-        else if (mode == Mode.BATTLE)
-            battleScript.enabled = false;
+            if (mode == Mode.COMMAND)
+                commandScript.enabled = false;
+            else if (mode == Mode.BATTLE)
+                battleScript.enabled = false;
 
-        mode = Mode.MANAGEMENT;
+            mode = Mode.MANAGEMENT;
 
-        managementScript.enabled = true;
-        managementScript.TurnOnIsland();
-        managementScript.GotoObservationPoint();
-        managementScript.SetDefaultGUIStates();
-        sceneCleanTimer = managementCleanTimer;
+            managementScript.enabled = true;
+            managementScript.TurnOnIsland();
+            managementScript.GotoObservationPoint();
+            managementScript.SetDefaultGUIStates();
+            sceneCleanTimer = managementCleanTimer;
+        }
     }
 
     public void SetBattleMode(string islandID)
@@ -313,5 +328,11 @@ public class WorldNavigator : MonoBehaviour
     public void SetUnitPurchaseGUI(int type)
     {
         commandScript.SetUnitGUI(type);
+    }
+
+    public void SubmitQueuedActions()
+    {
+        Debug.Log(JsonConvert.SerializeObject(clientInterface.queuedActions));
+        //clientInterface.SubmitQueuedActions();
     }
 }

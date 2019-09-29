@@ -49,30 +49,27 @@ namespace IslesOfWar
 
             public BattleCommand() { }
 
+            public BattleCommand(string _id)
+            {
+                id = _id;
+                pln = new List<List<int>>();
+                sqd = new List<List<int>>();
+            }
+
             public BattleCommand(string _id, int[][] plan, int[][] squad)
             {
                 id = _id;
-
-                if(plan != null)
-                    pln = new List<List<int>>();
-
-                if(squad != null)
-                    sqd = new List<List<int>>();
-
-                if (pln != null)
+                pln = new List<List<int>>();
+                sqd = new List<List<int>>();
+                
+                for (int s = 0; s < plan.Length; s++)
                 {
-                    for (int s = 0; s < plan.Length; s++)
-                    {
-                        pln.Add(new List<int>(plan[s]));
-                    }
+                    pln.Add(new List<int>(plan[s]));
                 }
-
-                if (sqd != null)
+                    
+                for (int s = 0; s < squad.Length; s++)
                 {
-                    for (int s = 0; s < squad.Length; s++)
-                    {
-                        sqd.Add(new List<int>(squad[s]));
-                    }
+                    sqd.Add(new List<int>(squad[s]));
                 }
             }
         }

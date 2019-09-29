@@ -13,6 +13,7 @@ public class PoolContribute: MonoBehaviour
     public Text poolAmount;
     public Text poolTimer;
     public Text poolOwnership;
+    public Text poolTitle;
     public CommandIslandInteraction commandScript;
 
     private string player;
@@ -58,13 +59,30 @@ public class PoolContribute: MonoBehaviour
     public void UpdateTimer(int currentXayaBlock)
     {
         blocksLeft = Constants.poolRewardBlocks - (currentXayaBlock % Constants.poolRewardBlocks);
-        string text = string.Format("{0} blocks left.", blocksLeft);
+        poolTimer.text = string.Format("{0} blocks left.", blocksLeft);
     }
 
     public void ShowMenu(int type)
     {
         poolType = type;
         gameObject.SetActive(true);
+
+        switch (type)
+        {
+            case 0:
+                poolTitle.text = "Oil Pool";
+                break;
+            case 1:
+                poolTitle.text = "Metal Pool";
+                break;
+            case 2:
+                poolTitle.text = "Concrete Pool";
+                break;
+            default:
+                poolTitle.text = "Error - Do Not Submit!";
+                break;
+        }
+
         UpdateAllStats();
     }
 
@@ -88,42 +106,29 @@ public class PoolContribute: MonoBehaviour
         modifiers = new double[3];
         strModifiers = new string[3];
         double[] tempPools = commandScript.GetAllPoolSizes();
+        modifiers = commandScript.GetResourceModifiers(tempPools);
 
         int tempTypeA = 0;
         int tempTypeB = 0;
 
-        if (poolType == 0)
+        if (pool == 0)
         {
             tempTypeA = 1;
             tempTypeB = 2;
         }
-        else if (poolType == 1)
+        else if (pool == 1)
         {
             tempTypeA = 0;
             tempTypeB = 2;
         }
-        else if (poolType == 2)
+        else if (pool == 2)
         {
             tempTypeA = 0;
             tempTypeB = 1;
         }
 
-
-        modifiers[poolType] = 0;
-
-        if (tempPools[tempTypeA] == tempPools[tempTypeB])
-        {
-            modifiers[tempTypeA] = 1.0;
-            modifiers[tempTypeB] = 1.0;
-        }
-        else
-        {
-            modifiers[tempTypeA] = tempPools[tempTypeB] / tempPools[tempTypeA];
-            modifiers[tempTypeB] = tempPools[tempTypeA] / tempPools[tempTypeB];
-        }
-
-        strModifiers[0] = string.Format("x {0:0.00}", modifiers[tempTypeA]);
-        strModifiers[1] = string.Format("x {0:0.00}", modifiers[tempTypeB]);
+        strModifiers[0] = string.Format("x {0:0.00} Broken", modifiers[tempTypeA]);
+        strModifiers[1] = string.Format("x {0:0.00} Broken", modifiers[tempTypeB]);
 
         pool = commandScript.GetPoolSize(poolType);
         poolContributions = commandScript.GetPlayerContributedResources(poolType, modifiers);

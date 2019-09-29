@@ -46,9 +46,9 @@ public class BattlePlanInteraction : Interaction
 
     //Variables used to submit actions.
     private List<GameObject> squadMarkers;
-    private List<List<double>> squadCounts;
+    private List<List<int>> squadCounts;
     private List<List<int>> squadPlans;
-    private List<string> squadNames;
+    public List<string> squadNames;
     private List<GameObject> planMarkers;
 
     private void Start()
@@ -99,13 +99,49 @@ public class BattlePlanInteraction : Interaction
             mode = Mode.ATTACK;
         else
             mode = Mode.DEFEND;
+
+        clientInterface.InitBattleSquads(isAttack, islandID);
+    }
+
+    public void Clean()
+    {
+        mode = Mode.NONE;
+        CloseCurrentSquad();
+
+        for (int s = 0; s < squadMarkers.Count; s++)
+        {
+            Destroy(squadMarkers[s]);
+        }
+
+        squadCounts.Clear();
+        squadMarkers.Clear();
+        squadPlans.Clear();
+    }
+
+    public void StartWithOldPlan()
+    {
+        BattleCommand command = new BattleCommand();
+        if (mode == Mode.ATTACK)
+            command = clientInterface.queuedActions.attk;
+        else
+            command = clientInterface.queuedActions.dfnd;
+
+        islandID = command.id; 
+        squadCounts = new List<List<int>>(command.sqd);
+        squadPlans = new List<List<int>>(command.pln);
+
+        for (int s = 0; s < squadCounts.Count; s++)
+        {
+            squadMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[s].position, Quaternion.identity));
+            squadMarkers[s].GetComponent<SquadMarker>().squad = s;
+        }
     }
 
     //------------------------------------------------------------------------------
     //Squad Management Section
     //------------------------------------------------------------------------------
     
-    public void AddSquad(string squadName, double[] counts)
+    public void AddSquad(string squadName, int[] counts)
     {
         int maxSquads = 3;
 
@@ -114,7 +150,7 @@ public class BattlePlanInteraction : Interaction
 
         if (!squadNames.Contains(squadName) && squadNames.Count <= maxSquads)
         {
-            List<double> unitCounts = new List<double>();
+            List<int> unitCounts = new List<int>();
             unitCounts.AddRange(counts);
 
             int positionIndex = 0;
@@ -130,6 +166,8 @@ public class BattlePlanInteraction : Interaction
             squadCounts.Add(unitCounts);
             squadPlans.Add(new List<int>());
             squadNames.Add(squadName);
+
+            clientInterface.AddSquad(mode == Mode.ATTACK, unitCounts);
         }
     }
 
@@ -145,6 +183,7 @@ public class BattlePlanInteraction : Interaction
         squadNames.RemoveAt(index);
 
         RenumberSquads(index);
+        clientInterface.RemoveSquad(mode == Mode.ATTACK, index);
     }
 
     void RenumberSquads(int index)
@@ -264,6 +303,8 @@ public class BattlePlanInteraction : Interaction
         else if (mode == Mode.DEFEND)
             squadPlans[currentSquad].RemoveAt(index);
 
+        clientInterface.ChangePlan(mode == Mode.ATTACK, currentSquad, squadPlans[currentSquad]);
+
         CloseCurrentSquad();
         ViewCurrentSquad();
     }
@@ -274,6 +315,9 @@ public class BattlePlanInteraction : Interaction
         GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
         planMarker.GetComponentInChildren<PlanMarker>().index = planMarkers.Count;
         planMarkers.Add(planMarker);
+
+        clientInterface.UpdatePlan(mode == Mode.ATTACK, currentSquad, indexPosition);
+
         CloseCurrentSquad();
         ViewCurrentSquad();
     }
@@ -291,6 +335,13 @@ public class BattlePlanInteraction : Interaction
     {
         orbital.ExploreMode(observePoint, false);
         orbital.SetNewObservePoint(observePoint, focusPoint);
+    }
+
+    //This function exists just incase I want to add more than just cleaning.
+    //Likely something with clientInterface
+    public void SetExitMode()
+    {
+        Clean();
     }
 
     //------------------------------------------------------------------------------
@@ -371,8 +422,7 @@ public class BattlePlanInteraction : Interaction
 
     public void TurnOffIsland()
     {
-        CloseCurrentSquad();
-
+        Clean();
         foreach (GameObject squad in squadMarkers)
         {
             Destroy(squad);
@@ -383,13 +433,8 @@ public class BattlePlanInteraction : Interaction
             Destroy(stats.gameObject);
         }
         
-        squadMarkers.Clear();
         islandTiles.Clear();
-        squadCounts.Clear();
-        squadPlans.Clear();
-        squadNames.Clear();
         hexIsland.SetActive(false);
-        mode = Mode.NONE;
     }
 
     public bool TurnOnIsland(string _islandID)
@@ -397,11 +442,13 @@ public class BattlePlanInteraction : Interaction
         if (clientInterface.IslandExists(_islandID))
         {
             squadMarkers = new List<GameObject>();
-            squadCounts = new List<List<double>>();
+            squadCounts = new List<List<int>>();
             squadPlans = new List<List<int>>();
-            squadNames = new List<string>();
             planMarkers = new List<GameObject>();
             islandTiles = new List<TileStats>();
+
+            if (squadNames == null)
+                squadNames = new List<string>();
 
             if (clientInterface.attackableIslandID == _islandID)
                 mode = Mode.ATTACK;
@@ -412,6 +459,11 @@ public class BattlePlanInteraction : Interaction
 
             if (mode != Mode.NONE)
             {
+                if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
+                    clientInterface.InitBattleSquads(mode == Mode.ATTACK, _islandID);
+                else
+                    StartWithOldPlan();
+
                 islandID = _islandID;
                 Island island = clientInterface.GetIsland(islandID);
                 hexIsland.SetActive(true);

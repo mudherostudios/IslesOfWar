@@ -19,6 +19,7 @@ public class IslandManagementInteraction : Interaction
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton;
 
     [Header("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -51,7 +52,7 @@ public class IslandManagementInteraction : Interaction
     public void Update()
     {
         bool clicked = Input.GetButtonDown("Fire1");
-        WorldButtonCheck(clicked);
+        WorldButtonCheck(clicked && (canBuildBlockers || canBuildBunkers || canBuildCollectors));
 
         if (clicked && indexLocation != lastIndexLocation)
         {
@@ -106,24 +107,7 @@ public class IslandManagementInteraction : Interaction
             }
         }
     }
-
-    public bool EnableBuildStructures(int type)
-    {
-        bool canBuild = !clientInterface.hasIslandDevelopmentInQueue || islandID == clientInterface.islandInDevelopment;
-
-        if (type == 0)
-        {
-            canBuildCollectors = canBuild;
-            ToggleAllTileResourcesAndCollectors(true);
-        }
-        else if (type == 1)
-            canBuildBunkers = canBuild;
-        else if (type == 2)
-            canBuildBlockers = canBuild;
-
-        return canBuild;
-    }
-
+    
     void CheckResourceSelection()
     {
         if (selectedButton.gameObject.activeSelf)
@@ -231,6 +215,7 @@ public class IslandManagementInteraction : Interaction
 
     public void GotoObservationPoint()
     {
+        SetDefaultGUIStates();
         orbital.ExploreMode(defaultObservePoint, false);
         orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
     }
@@ -255,11 +240,71 @@ public class IslandManagementInteraction : Interaction
         islandChangeSpeed = changeSpeed;
     }
 
+    public void EnableBuildStructures(int type)
+    {
+        bool canBuild = !clientInterface.hasIslandDevelopmentInQueue || islandID == clientInterface.islandInDevelopment;
+
+        if (type == 0)
+        {
+            canBuildCollectors = canBuild;
+            ToggleAllTileResourcesAndCollectors(true);
+        }
+        else if (type == 1)
+            canBuildBunkers = canBuild;
+        else if (type == 2)
+            canBuildBlockers = canBuild;
+
+        SetEditGUIState();
+    }
+
     public void SetDefaultGUIStates()
     {
-        enableBuildCollectorsButton.Show();
-        enableBuildBunkersButton.Show();
-        enableBuildBlockersButton.Show();
+        SetExitMode();
+        SetEditButtons();
+        selectionButtons.SetActive(true);
+        backToCommandCenterButton.SetActive(true);
+        resumeIslandQueueButton.SetActive(false);
+    }
+
+    public void SetEditGUIState()
+    {
+        HideGUI();
+        resumeIslandQueueButton.SetActive(true);
+    }
+
+    void HideGUI()
+    {
+        enableBuildCollectorsButton.Show(false);
+        enableBuildBunkersButton.Show(false);
+        enableBuildBlockersButton.Show(false);
+        selectionButtons.SetActive(false);
+        backToCommandCenterButton.SetActive(false);
+        resumeIslandQueueButton.SetActive(false);
+    }
+
+    void SetEditButtons()
+    {
+        if (!clientInterface.hasIslandDevelopmentInQueue || islandID == clientInterface.islandInDevelopment)
+        {
+            enableBuildCollectorsButton.Show(true);
+            enableBuildBunkersButton.Show(true);
+            enableBuildBlockersButton.Show(true);
+        }
+    }
+
+    public void SetExitMode()
+    {
+        if (canBuildCollectors)
+            ToggleAllTileResourcesAndCollectors(false);
+        else if (canBuildBlockers)
+            islandTiles[indexLocation].ToggleBlockerSystem(false, 0);
+        else if(canBuildBunkers)
+            islandTiles[indexLocation].ToggleBunkerSystem(false, new int[1]);
+
+        canBuildCollectors = false;
+        canBuildBunkers = false;
+        canBuildBlockers = false;
+        HideGUI();
     }
 
     public void TurnOnIsland()
@@ -336,6 +381,7 @@ public class IslandManagementInteraction : Interaction
                 island = clientInterface.clientState.islands[clientInterface.clientState.players[clientInterface.player].attackableIsland];
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
+            SetEditButtons();
         }
     }
     
