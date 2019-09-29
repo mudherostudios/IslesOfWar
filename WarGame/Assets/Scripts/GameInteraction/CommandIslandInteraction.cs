@@ -16,14 +16,16 @@ public class CommandIslandInteraction : Interaction
     public BattleIslandsGUI battleIslandsGUI;
     public SquadGUI squadGUI;
     public NationSelect nationSelect;
+    public GameObject commandCenterMenu;
 
     [Header("Camera Variables")]
     public Transform commandCenter;
     public Transform observePoint;
     public Transform focalPoint;
     
-    private string[] commandButtonTypes = new string[] { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter" };
-    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter;
+    private string[] commandButtonTypes = new string[] 
+    { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter", "CommandPrompter" };
+    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter, hasCommandPromtper;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
     private ObjectRevealer genericPrompter;
@@ -33,6 +35,12 @@ public class CommandIslandInteraction : Interaction
     {
         bool clicked = Input.GetButtonDown("Fire1");
         WorldButtonCheck(clicked, new List<string> { commandButtonTypes[0] });
+
+        if (resourcePool.gameObject.activeSelf)
+            resourcePool.UpdateTimer(GetCurrentXayaBlock());
+
+        if (warbucksPool.gameObject.activeSelf)
+            warbucksPool.UpdateTimer(GetCurrentXayaBlock());
 
         if (clicked && !EventSystem.current.IsPointerOverGameObject() && selectedWorldUIObject != null)
         {
@@ -46,17 +54,19 @@ public class CommandIslandInteraction : Interaction
             hasSearchPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[3];
             hasDefendPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[4];
             hasAttackPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[5];
-
-            if (clientInterface.isPlaying)
-                nationSelect.gameObject.SetActive(false);
-
+            hasCommandPromtper = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[6];
+           
             showMenuButton.SetActive(true);
+            //Close all of the menus.
             unitPurchase.gameObject.SetActive(false);
             resourcePool.gameObject.SetActive(false);
             warbucksPool.gameObject.SetActive(false);
             searchIslands.gameObject.SetActive(false);
+            commandCenterMenu.SetActive(false);
             battleIslandsGUI.HideMenus();
             squadGUI.Close();
+            if (clientInterface.isPlaying)
+                nationSelect.gameObject.SetActive(false);
         }
     }
 
@@ -64,16 +74,18 @@ public class CommandIslandInteraction : Interaction
     {
         if (hasWarbuxPrompter)
             warbucksPool.Show();
-        else if(hasPoolPrompter)
+        else if (hasPoolPrompter)
             resourcePool.ShowMenu(poolPrompter.poolType);
-        else if(hasUnitPurchasePrompter)
-            unitPurchase.ShowMenu(unitPrompter.possiblePurchaseTypes[0]);
+        else if (hasUnitPurchasePrompter)
+            unitPurchase.SetMenu(unitPrompter.possiblePurchaseTypes);
         else if (hasSearchPrompter)
             searchIslands.Show();
         else if (hasDefendPrompter)
             battleIslandsGUI.ShowDefendMenu();
         else if (hasAttackPrompter)
             battleIslandsGUI.ShowAttackMenu();
+        else if (hasCommandPromtper)
+            commandCenterMenu.SetActive(true);
         
         orbital.Defocus();
     }
@@ -137,13 +149,13 @@ public class CommandIslandInteraction : Interaction
     public void SearchForIslands() { clientInterface.SearchForIslands(); }
     public void ChangeNation(string nationCode) { clientInterface.ChangeNation(nationCode); }
     public void SubmitAllActions() { clientInterface.SubmitQueuedActions(); }
-
+    public int GetCurrentXayaBlock() { return clientInterface.currentBlock; }
     //----------------------------------------------------------------------
     //Gamestate Variables
     //----------------------------------------------------------------------
     public double GetPoolSize(int poolType) { return clientInterface.GetContributionSize(poolType); }
     public double[] GetAllPoolSizes() { return clientInterface.GetAllPoolSizes(); }
-
+    public double[] GetResourceModifiers(double[] queuedAmounts) { return clientInterface.GetResourceModifiers(queuedAmounts); }
     public double[] GetPlayerContributedResources(int poolType, double[] modifiers) { return clientInterface.GetPlayerContributedResources(poolType, modifiers); }
     public double[] GetTotalContributedResources(double[] modifiers) { return clientInterface.GetTotalContributedResources(modifiers); }
 
@@ -153,5 +165,4 @@ public class CommandIslandInteraction : Interaction
 
     public double[] GetIslandSearchCost() { return clientInterface.GetIslandSearchCost(); }
     public double GetUnitCount(int type) { return clientInterface.playerUnits[type]; }
-    
 }

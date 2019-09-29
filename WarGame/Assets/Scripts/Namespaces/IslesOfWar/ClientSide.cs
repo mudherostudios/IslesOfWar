@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MudHero;
 using Newtonsoft.Json;
 
 namespace IslesOfWar
@@ -450,10 +451,10 @@ namespace IslesOfWar
 
             public static char[,] encodeTable = new char[,]
             {
-            { ')', '!', '@', '#', '$', '%', '^', '&' },
-            { '0', '1', '2', '3', '4', '5', '6', '7' },
-            { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' },
-            { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
+                { ')', '!', '@', '#', '$', '%', '^', '&' },
+                { '0', '1', '2', '3', '4', '5', '6', '7' },
+                { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' },
+                { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
             };
 
 
@@ -487,7 +488,7 @@ namespace IslesOfWar
 
             public static int[] GetBaseTypes(int type)
             {
-                return decodeTable[type];
+                return Deep.Copy(decodeTable[type]);
             }
 
             public static int GetXType(char type)

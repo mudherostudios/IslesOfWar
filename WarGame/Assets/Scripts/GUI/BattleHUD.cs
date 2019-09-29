@@ -12,10 +12,9 @@ public class BattleHUD : MonoBehaviour
     
     public void AddSquad()
     {
-        if (deployedSquads == null)
-            deployedSquads = new List<string>();
+        deployedSquads = new List<string>(battleScript.squadNames);
 
-        if (availableSquadsList.options.Count > 0 && deployedSquads.Count <= 4)
+        if (deployedSquads.Count <= 4)
         {
             int squadIndex = availableSquadsList.value;
             List<string> squads = GetKeys();
@@ -23,7 +22,7 @@ public class BattleHUD : MonoBehaviour
 
             if (!deployedSquads.Contains(squadToDelpoy))
             {
-                double[] squadCounts = JsonConvert.DeserializeObject<List<double>>(PlayerPrefs.GetString(squadToDelpoy)).ToArray();
+                int[] squadCounts = JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(squadToDelpoy)).ToArray();
                 battleScript.AddSquad(squadToDelpoy, squadCounts);
                 deployedSquads.Add(squadToDelpoy);
             }
@@ -32,6 +31,8 @@ public class BattleHUD : MonoBehaviour
 
     public void RemoveSquad()
     {
+        deployedSquads = battleScript.squadNames;
+
         if (availableSquadsList.options.Count > 0 && deployedSquads.Count > 0)
         {
             int squadIndex = availableSquadsList.value;
@@ -57,6 +58,12 @@ public class BattleHUD : MonoBehaviour
     {
         availableSquadsList.AddOptions(GetKeys());
         gameObject.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        availableSquadsList.ClearOptions();
+        gameObject.SetActive(false);
     }
 
     List<string> GetKeys()

@@ -7,6 +7,7 @@ using IslesOfWar;
 using IslesOfWar.ClientSide;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
+using MudHero;
 using Newtonsoft.Json;
 
 public class ClientInterface : MonoBehaviour
@@ -66,17 +67,12 @@ public class ClientInterface : MonoBehaviour
     //------------------------------------------------------------------
     //Xaya Name Updates and Action Queueing
     //------------------------------------------------------------------
-    //Make sure to remove immediate submit.
     public void ChangeNation(string nationCode)
     {
         if (Validity.Nation(nationCode))
-        {
             queuedActions.nat = nationCode;
-            SubmitQueuedActions();
-        }
     }
-
-    //Make sure to add queuedAction updates as well.
+    
     public bool PurchaseIslandCollector(StructureCost cost)
     {
         bool successfulPurchase = false;
@@ -109,13 +105,17 @@ public class ClientInterface : MonoBehaviour
                 SpendResources(cost.resources);
                 collectors[cost.purchaseType - 1] = cost.purchaseType;
                 UpdateCollectors(cost.islandID, cost.tileIndex, collectors);
+
+                if (queuedActions.bld == null)
+                    queuedActions.bld = new IslandBuildOrder(cost.islandID, "000000000000", "))))))))))))");
+
+                queuedActions.bld.col = UpdateCollectorOrder(cost.tileIndex, EncodeUtility.GetBaseTypes(cost.purchaseType), queuedActions.bld.col);
             }
         }
 
         return successfulPurchase;
     }
-
-    //Make sure to add queuedAction updates as well.
+    
     public bool PurchaseIslandBunker(string islandID, int tileIndex, int purchaseType)
     {
         bool successfulPurchase = false;
@@ -137,13 +137,17 @@ public class ClientInterface : MonoBehaviour
             {
                 SpendResources(cost);
                 UpdateDefenses(islandID, tileIndex, purchaseType, 0);
+
+                if (queuedActions.bld == null)
+                    queuedActions.bld = new IslandBuildOrder(islandID, "000000000000", "))))))))))))");
+
+                queuedActions.bld.def = UpdateDefenseOrder(tileIndex, 0, purchaseType, queuedActions.bld.def);
             }
         }
 
         return successfulPurchase;
     }
-
-    //Make sure to add queuedAction updates as well.
+    
     public bool PurchaseIslandBlocker(string islandID, int tileIndex, int purchaseType)
     {
         bool successfulPurchase = false;
@@ -165,13 +169,17 @@ public class ClientInterface : MonoBehaviour
             {
                 SpendResources(cost);
                 UpdateDefenses(islandID, tileIndex, 0, purchaseType);
+
+                if (queuedActions.bld == null)
+                    queuedActions.bld = new IslandBuildOrder(islandID, "000000000000", "))))))))))))");
+
+                queuedActions.bld.def = UpdateDefenseOrder(tileIndex, purchaseType, 0, queuedActions.bld.def);
             }
         }
 
         return successfulPurchase;
     }
-
-    //Make sure to remove immediate submit.
+    
     public void PurchaseUnits(int type, int amount)
     {
         double[] spend = new double[4];
@@ -186,13 +194,14 @@ public class ClientInterface : MonoBehaviour
         {
             SpendResources(spend);
             clientState.players[player].units[type] += amount;
-            queuedActions.buy = new List<int>(new int[9]);
-            queuedActions.buy[type] = amount;
-            SubmitQueuedActions();
+
+            if(queuedActions.buy == null)
+                queuedActions.buy = new List<int>(new int[9]);
+
+            queuedActions.buy[type] += amount;
         }
     }
-
-    //Make sure to remove immediate submit.
+    
     public void SearchForIslands()
     {
         double[] cost = IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
@@ -202,11 +211,9 @@ public class ClientInterface : MonoBehaviour
         {
             SpendResources(cost);
             queuedActions.srch = Constants.islandSearchOptions[0];
-            SubmitQueuedActions();
         }
     }
-
-    //Make sure to remove immediate submit and account for adding more resources to the pot.
+    
     public void SendResourcePoolContributions(int type, double[] resources)
     {
         double[] fullResources = GetFullResources(resources);
@@ -232,11 +239,9 @@ public class ClientInterface : MonoBehaviour
 
             SpendResources(fullResources);
             queuedActions.pot = new ResourceOrder(type, new List<double>(resources));
-            SubmitQueuedActions();
         }
     }
-
-    //Make sure to remove immediate submit and account for adding more islands before submission.
+    
     public void AddIslandToPool(string island)
     {
         if (Validity.DepletedSubmissions(new List<string> { island }, clientState, player))
@@ -245,9 +250,69 @@ public class ClientInterface : MonoBehaviour
             clientState.islands.Remove(island);
             clientState.depletedContributions[player].Add(island);
             queuedActions.dep = new List<string>() { island };
-            SubmitQueuedActions();
         }
     }
+
+    //Battle Planning - Start
+    //Remember in this battle planning section that you will need to update the clientState to reflect troop counts.
+    public void InitBattleSquads(bool isAttack, string islandID)
+    {
+        if (isAttack)
+            queuedActions.attk = new BattleCommand(islandID);
+        else
+            queuedActions.dfnd = new BattleCommand(islandID);
+    }
+    
+    public void UpdatePlan(bool isAttack, int squad, int tile)
+    {
+        if (isAttack)
+            queuedActions.attk.pln[squad].Add(tile);
+        else
+            queuedActions.dfnd.pln[squad].Add(tile);
+    }
+
+    public void ChangePlan(bool isAttack, int squad, List<int> plan)
+    {
+        if (isAttack)
+        {
+            queuedActions.attk.pln[squad].Clear();
+            queuedActions.attk.pln[squad].AddRange(plan.ToArray());
+        }
+        else
+        {
+            queuedActions.dfnd.pln[squad].Clear();
+            queuedActions.dfnd.pln[squad].AddRange(plan.ToArray());
+        }
+    }
+
+    public void RemoveSquad(bool isAttack, int squad)
+    {
+        if (isAttack)
+        {
+            queuedActions.attk.sqd.RemoveAt(squad);
+            queuedActions.attk.pln.RemoveAt(squad);
+        }
+        else
+        {
+            queuedActions.dfnd.sqd.RemoveAt(squad);
+            queuedActions.dfnd.pln.RemoveAt(squad);
+        }
+    }
+
+    public void AddSquad(bool isAttack, List<int> squad)
+    {
+        if (isAttack)
+        {
+            queuedActions.attk.sqd.Add(squad);
+            queuedActions.attk.pln.Add(new List<int>());
+        }
+        else
+        {
+            queuedActions.dfnd.sqd.Add(squad);
+            queuedActions.dfnd.pln.Add(new List<int>());
+        }
+    }
+    //Battle Planning - End
 
     public void SubmitQueuedActions()
     {
@@ -274,6 +339,7 @@ public class ClientInterface : MonoBehaviour
     //Variables from the processed gamestate - Also Make sure you decide to use chain or client state.
     //**************************************************************************************************
     public bool isPlaying { get { return chainState.players.Keys.Contains(player); } }
+    public int currentBlock { get { return communication.blockProgress; } }
     public Island[] playerIslands
     {
         get
@@ -456,7 +522,14 @@ public class ClientInterface : MonoBehaviour
             total += pair.Value.Count;
         }
 
-        return playerAmount / total;
+        double ownership = 1.0f;
+
+        if (playerAmount == 0.0f)
+            ownership = 0.0f;
+        else
+            ownership = playerAmount / total;
+            
+        return ownership;
     }
 
     public double GetWarbucksPoolSize()
@@ -556,6 +629,25 @@ public class ClientInterface : MonoBehaviour
         return new double[] { 0, resources[0], resources[1], resources[2] };
     }
 
+    string UpdateCollectorOrder(int tileIndex, int[] ordered, string existing)
+    {
+        char[] collectorArray = existing.ToCharArray();
+        int[] existingAtIndex = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(collectorArray[tileIndex]));
+        int updatedCollector = EncodeUtility.GetDecodeIndex(Deep.Merge(ordered, existingAtIndex));
+        collectorArray[tileIndex] = updatedCollector.ToString()[0];
+        return new string(collectorArray);
+    }
 
-
+    string UpdateDefenseOrder(int tileIndex, int orderedBlocker, int orderedBunkers, string existing)
+    {
+        char[] defenseArray = existing.ToCharArray();
+        int updatedBlocker = EncodeUtility.GetYType(existing[tileIndex]) + orderedBlocker;
+        int[] existingBunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(existing[tileIndex]));
+        int[] orderedBunkerSet = EncodeUtility.GetBaseTypes(orderedBunkers);
+        int[] mergedBunkerSet = Deep.Merge(existingBunkers, orderedBunkerSet);
+        int updatedBunkerComboType = EncodeUtility.GetDecodeIndex(mergedBunkerSet);
+        char updatedDefense = EncodeUtility.GetDefenseCode(updatedBlocker, updatedBunkerComboType);
+        defenseArray[tileIndex] = updatedDefense;
+        return new string(defenseArray);
+    }
 }

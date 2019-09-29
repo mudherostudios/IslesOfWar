@@ -8,14 +8,11 @@ public class EnableBuildButton : MonoBehaviour
 
     public void EnableBuild(int type)
     {
-       bool canBuild = managementScript.EnableBuildStructures(type);
-
-        if (canBuild)
-            gameObject.SetActive(false);
+       managementScript.EnableBuildStructures(type);
     }
 
-    public void Show()
+    public void Show(bool show)
     {
-        gameObject.SetActive(true);
+        gameObject.SetActive(show);
     }
 }
