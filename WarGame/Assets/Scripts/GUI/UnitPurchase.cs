@@ -7,7 +7,6 @@ using IslesOfWar;
 public class UnitPurchase: MonoBehaviour
 {
     public Text[] resourceCosts;
-    public Text titleText;
     public InputField purchaseAmount;
     public CommandIslandInteraction commandScript;
     public int type = 0;
@@ -92,8 +91,6 @@ public class UnitPurchase: MonoBehaviour
             default:
                 break;
         }
-
-        titleText.text = title;
     }
 
     public void QueuePurchase()
