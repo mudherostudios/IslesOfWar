@@ -90,7 +90,9 @@ namespace IslesOfWar
             "Weasel", "Whale", "Whitefish", "Wildcat", "Wildebeest", "Wolf", "Wolverine", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra"
         };
 
-        public static double[] islandSearchCost = new double[] { 1000, 2500, 0, 0 };
+        public static double[] islandSearchCost = new double[] { 1000, 0, 0, 0 };
+        public static int islandUndiscoveredMinimum = 10;
+        public static double undiscoveredFalloffRate = 0.3;
         public static double islandSearchReplenishTime = 150.0; //Estimated time in blocks it should take to get enough resources to search again.
         public static string[] islandSearchOptions = new string[] { "norm" };
         
@@ -177,11 +179,11 @@ namespace IslesOfWar
             {28750, 80500}
         };
 
-        public static float[] extractRates = new float[] { 10, 20, 30 };
-        public static float[] freeResourceRates = new float[] {4, 3, 2, 1 };
+        public static float[] extractRates = new float[] { 10, 20, 5 };
+        public static float[] freeResourceRates = new float[] {5, 1, 1, 1 };
 
         public static float[] tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
-        public static float[] resourceProbabilities = new float[] { 0.1f, 0.2f, 0.15f };
+        public static float[] resourceProbabilities = new float[] { 0.15f, 0.2f, 0.1f };
 
         //X = Warbucks Oil Metal Lime 
         //Y = Units Collectors Defenses Search

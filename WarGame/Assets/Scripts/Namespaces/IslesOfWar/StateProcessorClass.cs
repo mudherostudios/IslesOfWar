@@ -94,11 +94,11 @@ namespace IslesOfWar
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
-                    string discovered = IslandDiscovery.GetIsland(state.players, state.allIslandIDs, txid, ref random);
+                    string discovered = IslandDiscovery.GetIsland(state.players[player].islands.Count, state.allIslandIDs, txid, ref random);
                     double[] resources = Subtract(state.players[player].resources.ToArray(), cost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
-                    AddToPools(Constants.islandSearchCost, 3);
+                    AddToPools(cost, 3);
 
                     if (discovered == txid)
                     {

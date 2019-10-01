@@ -147,7 +147,7 @@ public class CommandIslandInteraction : Interaction
     public void AddIslandToPool(string island) { clientInterface.AddIslandToPool(island); }
     public void SendToPool(int type, double[] resources) { clientInterface.SendResourcePoolContributions(type, resources); }
     public void SearchForIslands() { clientInterface.SearchForIslands(); }
-    public void ChangeNation(string nationCode) { clientInterface.ChangeNation(nationCode); }
+    public void ChangeNation(string nationCode, bool immediately) { clientInterface.ChangeNation(nationCode, immediately); }
     public void SubmitAllActions() { clientInterface.SubmitQueuedActions(); }
     public int GetCurrentXayaBlock() { return clientInterface.currentBlock; }
     //----------------------------------------------------------------------
@@ -165,4 +165,6 @@ public class CommandIslandInteraction : Interaction
 
     public double[] GetIslandSearchCost() { return clientInterface.GetIslandSearchCost(); }
     public double GetUnitCount(int type) { return clientInterface.playerUnits[type]; }
+
+    public bool isPlaying { get { return clientInterface.isPlaying; } }
 }

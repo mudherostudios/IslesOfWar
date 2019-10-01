@@ -79,6 +79,10 @@ public class ConnectGUI : MonoBehaviour
 
         usernamesList.ClearOptions();
         usernamesList.AddOptions(names);
+
+        if (PlayerPrefs.HasKey("User"))
+            usernamesList.value = PlayerPrefs.GetInt("User");
+
         userPanel.SetActive(true);
         loginButton.SetActive(true);
         blockLabel.SetActive(false);
@@ -92,6 +96,7 @@ public class ConnectGUI : MonoBehaviour
 
     public void Login()
     {
+        PlayerPrefs.SetInt("User", usernamesList.value);
         comms.SelectUser(comms.nameList[usernamesList.value]);
         messages.text = "Loading...";
         userPanel.SetActive(false);

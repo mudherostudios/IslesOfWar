@@ -312,6 +312,7 @@ public class IslandManagementInteraction : Interaction
         islands = clientInterface.clientState.players[clientInterface.player].islands.ToArray();
         islandIndex = 0;
         islandID = islands[islandIndex];
+        islandCount = islands.Length;
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
         PlaceTiles(clientInterface.clientState.islands[islandID], currentStats, currentIsland.transform);
@@ -333,6 +334,7 @@ public class IslandManagementInteraction : Interaction
 
     public void IncrementIslandIndex(int increment)
     {
+
         if (bufferedStats == null)
         {
             direction = increment;

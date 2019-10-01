@@ -114,14 +114,17 @@ public class WorldNavigator : MonoBehaviour
         if (clientInterface.isPlaying)
             nationSelect.gameObject.SetActive(false);
 
-        
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
         commandScript.enabled = true;
         managementScript.enabled = false;
         battleScript.enabled = false;
-        orbital.ExploreMode(commandIsland, false);
-        orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
+
+        /*if (clientInterface.isPlaying)
+        { 
+            orbital.ExploreMode(commandIsland, false);
+            orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
+        }*/
 
         //Command Variables
         commandScript.unitPurchase = unitPurchase;
@@ -176,7 +179,8 @@ public class WorldNavigator : MonoBehaviour
         battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
         battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
-
+        
+        
         SetCommandMode();
     }
 
@@ -332,7 +336,6 @@ public class WorldNavigator : MonoBehaviour
 
     public void SubmitQueuedActions()
     {
-        Debug.Log(JsonConvert.SerializeObject(clientInterface.queuedActions));
-        //clientInterface.SubmitQueuedActions();
+        clientInterface.SubmitQueuedActions();
     }
 }

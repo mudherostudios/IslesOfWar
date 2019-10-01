@@ -67,10 +67,13 @@ public class ClientInterface : MonoBehaviour
     //------------------------------------------------------------------
     //Xaya Name Updates and Action Queueing
     //------------------------------------------------------------------
-    public void ChangeNation(string nationCode)
+    public void ChangeNation(string nationCode, bool immediately)
     {
         if (Validity.Nation(nationCode))
             queuedActions.nat = nationCode;
+
+        if (immediately)
+            SubmitQueuedActions();
     }
     
     public bool PurchaseIslandCollector(StructureCost cost)
@@ -316,6 +319,9 @@ public class ClientInterface : MonoBehaviour
 
     public void SubmitQueuedActions()
     {
+        //Make sure this stays above QueueIsValid. Needs to clean the plans before it checks if they are valid.
+        CleanEmptyPlans();
+
         JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
         string command = JsonConvert.SerializeObject(queuedActions, Formatting.None, settings);
         command = string.Format("{{\"g\":{{\"iow\":{0}}}}}", command);
@@ -328,10 +334,55 @@ public class ClientInterface : MonoBehaviour
             isValid = isValid && validities[b];
         }
 
-        if (isValid)
+        if (isValid && !QueuedAreNull())
         {
             communication.SendCommand(command);
             queuedActions = new PlayerActions();
+        }
+    }
+
+    void CleanEmptyPlans()
+    {
+        if (queuedActions.dfnd != null)
+        {
+            List<List<int>> cleanedPlans = new List<List<int>>();
+
+            for (int p = 0; p < queuedActions.dfnd.pln.Count; p++)
+            {
+                if (queuedActions.dfnd.pln[p].Count > 0)
+                    cleanedPlans.Add(queuedActions.dfnd.pln[p].ToArray().ToList());
+            }
+
+            if (cleanedPlans.Count > 0)
+            {
+                queuedActions.dfnd.pln.Clear();
+                queuedActions.dfnd.pln = cleanedPlans;
+            }
+            else
+                queuedActions.dfnd = null;
+
+        }
+
+        if (queuedActions.attk != null)
+        {
+            List<List<int>> cleanedPlans = new List<List<int>>();
+
+            for (int p = 0; p < queuedActions.attk.pln.Count; p++)
+            {
+                if (queuedActions.attk.pln[p].Count > 0)
+                    cleanedPlans.Add(queuedActions.attk.pln[p].ToArray().ToList());
+            }
+
+            queuedActions.attk.pln.Clear();
+            queuedActions.attk.pln = cleanedPlans;
+
+            if (cleanedPlans.Count > 0)
+            {
+                queuedActions.attk.pln.Clear();
+                queuedActions.attk.pln = cleanedPlans;
+            }
+            else
+                queuedActions.attk = null;
         }
     }
 
@@ -621,6 +672,13 @@ public class ClientInterface : MonoBehaviour
         size = Validity.UpdateSize(queuedActions);
 
         return new bool[] { nation, build, units, search, resource, depleted, attack, defend, size };
+    }
+
+    bool QueuedAreNull()
+    {
+        bool isNull = queuedActions.attk == null && queuedActions.bld == null && queuedActions.buy == null && queuedActions.dep == null
+        && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null;
+        return isNull;
     }
 
     //Made this function to not confuse the use of index 1,2,3 instead of 0,1,2 in the SendPoolContributions Function

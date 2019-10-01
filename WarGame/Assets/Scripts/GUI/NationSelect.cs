@@ -20,6 +20,12 @@ public class NationSelect : MonoBehaviour
         ChangeFlag();
     }
 
+    public void Update()
+    {
+        if (commandScript.isPlaying)
+            gameObject.SetActive(false);
+    }
+
     public void ChangeFlag()
     {
         int index = countryList.value;
@@ -70,6 +76,7 @@ public class NationSelect : MonoBehaviour
     {
         int index = countryList.value;
         string countryCode = keys[index];
-        commandScript.ChangeNation(countryCode);
+        commandScript.ChangeNation(countryCode, !commandScript.isPlaying);
+        gameObject.SetActive(false);
     }
 }

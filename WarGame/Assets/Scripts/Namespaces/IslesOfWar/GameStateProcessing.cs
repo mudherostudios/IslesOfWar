@@ -12,44 +12,28 @@ namespace IslesOfWar
     {
         public static class IslandDiscovery
         {
-            public static float[] probabilities;
-            public static float[] relativeLikelihoods = new float[] { 0.4f, 0.6f };//0 - Undiscovered; 1 - Player Owned;
+            public static double[] probabilities;
 
-            static void CalculateProbabilities(double possibleUndiscoveredIslands, double totalIslands)
+            static void CalculateProbabilities(double playerIslands)
             {
-                double undiscoveredProb = 0.0;
-                double existingProb = 0.0;
-                double totalProbs = 0.0;
-                probabilities = new float[relativeLikelihoods.Length];
+                probabilities = new double[2];
 
-                undiscoveredProb = relativeLikelihoods[0] * possibleUndiscoveredIslands;
-                existingProb = relativeLikelihoods[1] * totalIslands;
-                totalProbs = existingProb + undiscoveredProb;
-
-                probabilities[0] = (float)(undiscoveredProb / totalProbs);
-                probabilities[1] = (float)(existingProb / totalProbs);
-            }
-
-            //Just gets an average right now, but should change to something more sophisticated to avoid island explosion.
-            public static double GetPossibleUndiscoveredIslands(Dictionary<string, PlayerState> players)
-            {
-                double total = 0.0;
-
-                foreach (KeyValuePair<string, PlayerState> pair in players)
+                if (playerIslands < Constants.islandUndiscoveredMinimum + 1)
                 {
-                    total += pair.Value.islands.Count;
+                    probabilities[0] = 1.0f;
+                    probabilities[1] = 0.0f;
+                }
+                else
+                {
+                    probabilities[0] = 1.0 / Math.Pow(playerIslands - Constants.islandUndiscoveredMinimum, Constants.undiscoveredFalloffRate);
+                    probabilities[1] = 1.0 - probabilities[0];
                 }
 
-                if (total < players.Count)
-                    total = players.Count;
-
-                return total / players.Count;
             }
 
-            public static string GetIsland(Dictionary<string, PlayerState> players, string[] islands, string txid, ref MudHeroRandom random)
+            public static string GetIsland(double playerIslandCount, string[] islands, string txid, ref MudHeroRandom random)
             {
-                double possibleIslands = GetPossibleUndiscoveredIslands(players);
-                CalculateProbabilities(possibleIslands, islands.Length);
+                CalculateProbabilities(playerIslandCount);
                 float choice = random.Value();
 
                 if (choice > probabilities[1])
