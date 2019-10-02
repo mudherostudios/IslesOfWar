@@ -12,7 +12,8 @@ public class NationSelect : MonoBehaviour
     public Image flag;
     public float maxSize;
     public Dropdown countryList;
-    public string pathToFlags;
+    public string resourcePathToFlags;
+    public string fullPathToFlags;
     List<string> keys;
 
     public void Start()
@@ -30,11 +31,12 @@ public class NationSelect : MonoBehaviour
     {
         int index = countryList.value;
         string countryCode = keys[index];
-        string filePath = string.Format("{0}/{1}.png", pathToFlags, countryCode);
+        string filePath = string.Format("{0}/{1}.png", fullPathToFlags, countryCode.ToLower());
+        string resourcePath = string.Format("{0}/{1}", resourcePathToFlags, countryCode.ToLower());
 
         if (File.Exists(filePath))
         {
-            Texture flagTexture = (Texture)Resources.Load(filePath);
+            Texture flagTexture = (Texture)Resources.Load(resourcePath);
             flag.material.SetTexture("_MainTex", flagTexture);
 
             int height = flagTexture.height;
@@ -55,7 +57,7 @@ public class NationSelect : MonoBehaviour
             flag.gameObject.SetActive(true);
         }
         else
-            Debug.Log(string.Format("Flag File {0} Does Not Exist!", countryCode));
+            Debug.Log(string.Format("Flag File {0} Does Not Exist!", filePath));
     }
 
     public void SetList()

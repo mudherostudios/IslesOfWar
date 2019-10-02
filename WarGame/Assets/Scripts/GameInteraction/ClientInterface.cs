@@ -325,9 +325,10 @@ public class ClientInterface : MonoBehaviour
         JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
         string command = JsonConvert.SerializeObject(queuedActions, Formatting.None, settings);
         command = string.Format("{{\"g\":{{\"iow\":{0}}}}}", command);
-        Debug.Log(command);
         bool isValid = true;
         bool[] validities = QueueIsValid();
+
+        Debug.Log("isValid is " + isValid + " with command " + command);
 
         for (int b = 0; b < validities.Length; b++)
         {
@@ -336,6 +337,7 @@ public class ClientInterface : MonoBehaviour
 
         if (isValid && !QueuedAreNull())
         {
+            Debug.Log("Sending");
             communication.SendCommand(command);
             queuedActions = new PlayerActions();
         }
