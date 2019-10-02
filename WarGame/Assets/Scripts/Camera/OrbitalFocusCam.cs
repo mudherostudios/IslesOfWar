@@ -23,7 +23,7 @@ public class OrbitalFocusCam : MonoBehaviour
     {
         ppVolume = cam.GetComponent<PostProcessVolume>();
         ppVolume.profile.TryGetSettings(out dof);
-        dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
+        Focus();
         hasMoved = false;
         tracking = false;
         centered = true;
@@ -73,7 +73,7 @@ public class OrbitalFocusCam : MonoBehaviour
 
         if (!centered)
         {
-            dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
+            Focus();
             float timeTraversed = (Time.time - startTime);
             float fracJourney = 0;
             
@@ -145,6 +145,11 @@ public class OrbitalFocusCam : MonoBehaviour
     public void Defocus()
     {
         dof.focusDistance.value = 0.0f;
+    }
+
+    public void Focus()
+    {
+        dof.focusDistance.value = Vector3.Distance(focalTarget.position, cam.transform.position);
     }
 
     public void SetNewObservePoint(Transform newObservePoint, Transform newFocalTarget)

@@ -40,6 +40,7 @@ public class SearchIslands : MonoBehaviour
     public void SearchForIslands()
     {
         commandScript.SearchForIslands();
+        gameObject.SetActive(false);
     }
 
     public void Show()

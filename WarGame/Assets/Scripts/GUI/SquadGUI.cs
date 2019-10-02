@@ -12,7 +12,37 @@ public class SquadGUI : MonoBehaviour
     public Dropdown squadList;
     public GameObject removeMenu;
     public CommandIslandInteraction commandScript;
-    private int[] totalUnitsInSquads;
+    private int[] totalUnitsInSquads = new int[9];
+
+    public void Update()
+    {
+    }
+
+    int CorrectedValue(int type)
+    {
+        if (commandScript == null)
+            commandScript = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<CommandIslandInteraction>();
+
+        if (commandScript != null)
+        {
+            totalUnitsInSquads = GetTotalUnitsInSquads();
+            int parsedValue = 0;
+            int.TryParse(unitInputs[type].text, out parsedValue);
+            double unitCount = commandScript.GetUnitCount(type) - totalUnitsInSquads[type];
+
+            if (parsedValue > unitCount)
+            {
+                if (unitCount <= int.MaxValue)
+                    parsedValue = (int)unitCount;
+                else
+                    parsedValue = int.MaxValue;
+            }
+
+            return parsedValue;
+        }
+
+        return type;
+    }
 
     public void CheckMax(int type)
     {
@@ -121,23 +151,7 @@ public class SquadGUI : MonoBehaviour
             return new List<string>();
     }
 
-    int CorrectedValue(int type)
-    {
-        totalUnitsInSquads = GetTotalUnitsInSquads();
-        int parsedValue = 0;
-        int.TryParse(unitInputs[type].text, out parsedValue);
-        double unitCount = commandScript.GetUnitCount(type) - totalUnitsInSquads[type];
-
-        if (parsedValue > unitCount)
-        {
-            if (unitCount <= int.MaxValue)
-                parsedValue = (int)unitCount;
-            else
-                parsedValue = int.MaxValue;
-        }
-
-        return parsedValue;
-    }
+    
 
     void SetAllFieldsToZero()
     {

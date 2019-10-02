@@ -82,7 +82,7 @@ public class WorldNavigator : MonoBehaviour
     public float managementCleanTimer;
     public float battleCleanTimer;
     
-    enum Mode
+    public enum Mode
     {
         COMMAND,
         MANAGEMENT,
@@ -90,7 +90,7 @@ public class WorldNavigator : MonoBehaviour
         NONE
     }
 
-    private Mode mode = Mode.NONE;
+    public Mode mode = Mode.NONE;
     private Mode cleanMode = Mode.NONE;
     private float sceneCleanTimer = 0;
     private bool traversing = false;
@@ -119,12 +119,6 @@ public class WorldNavigator : MonoBehaviour
         commandScript.enabled = true;
         managementScript.enabled = false;
         battleScript.enabled = false;
-
-        /*if (clientInterface.isPlaying)
-        { 
-            orbital.ExploreMode(commandIsland, false);
-            orbital.SetNewObservePoint(commandObservationPoint, commandFocusPoint);
-        }*/
 
         //Command Variables
         commandScript.unitPurchase = unitPurchase;
