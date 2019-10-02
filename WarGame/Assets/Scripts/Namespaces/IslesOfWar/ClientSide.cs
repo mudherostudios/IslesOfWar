@@ -586,6 +586,8 @@ namespace IslesOfWar
 
                     return canBuild;
                 }
+                else if (orderedType == 0)
+                    return true;
 
                 return false;
             }
