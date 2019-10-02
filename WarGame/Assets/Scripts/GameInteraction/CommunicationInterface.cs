@@ -103,6 +103,13 @@ public class CommunicationInterface : MonoBehaviour
     {
         ConnectionLog log = new ConnectionLog();
 
+        if (xayaCommands != null || stateRetriever != null)
+        {
+            stateRetriever.Disconnect();
+            xayaCommands = null;
+            stateRetriever = null;
+        }
+
         if (useCookies)
             Debug.Log("Use Cookies Somehow Here. Don't forget to put this option in.");
         

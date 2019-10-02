@@ -27,6 +27,7 @@ namespace MudHero
 
                 if (xayaService == null)
                 {
+
                     xayaService = new XAYAService(cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword, cInfo.walletPassword);
 
                     if (xayaService.GetBlockCount() > 0)
@@ -35,16 +36,16 @@ namespace MudHero
                         connected = false;
 
                     if (connected)
-                        log.message = string.Format("Connected to XayaServices with {0}.",cInfo.GetHTTPCompatibleURL(true));
+                        log.message = string.Format("Connected to XayaServices with {0}.", cInfo.GetHTTPCompatibleURL(true));
                     else if (!connected)
                         log.message = string.Format("Could not make connection to {0} with {1} & {2}.", cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword);
-                }
-                else 
-                {
-                    log.message = "Xaya Service Already Exists! You are trying to recreate it.";
+
+
+                    log.success = connected;
+                    return log;
                 }
 
-                log.success = connected;
+                log.message = "Xaya Service Already Exists.";
                 return log;
             }
 
