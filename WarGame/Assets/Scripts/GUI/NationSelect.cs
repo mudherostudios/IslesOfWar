@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using IslesOfWar;
@@ -22,8 +23,7 @@ public class NationSelect : MonoBehaviour
 
     public void Update()
     {
-        if (commandScript.isPlaying)
-            gameObject.SetActive(false);
+
     }
 
     public void ChangeFlag()
@@ -34,7 +34,7 @@ public class NationSelect : MonoBehaviour
 
         if (File.Exists(filePath))
         {
-            Texture flagTexture = UnityEditor.AssetDatabase.LoadAssetAtPath(filePath, typeof(Texture)) as Texture;
+            Texture flagTexture = (Texture)Resources.Load(filePath);
             flag.material.SetTexture("_MainTex", flagTexture);
 
             int height = flagTexture.height;

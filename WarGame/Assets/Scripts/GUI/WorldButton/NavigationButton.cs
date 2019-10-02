@@ -5,9 +5,4 @@ using UnityEngine;
 public class NavigationButton : WorldButton
 {
     public Transform navigationDestination;
-
-    public void Start()
-    {
-        UnityEditorInternal.ComponentUtility.MoveComponentUp(this);
-    }
 }
