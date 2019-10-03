@@ -6,7 +6,8 @@ using UnityEngine.Rendering.PostProcessing;
 public class OrbitalFocusCam : MonoBehaviour
 {
     public Transform focalTarget, observePoint;
-    public Vector3 exploreOffset;
+    public Vector3 exploreOffset, islandManageOffset;
+    private Vector3 currentOffset;
     public float exploreAngle;
     public Camera cam;
     public float rotationSpeed, camDistance, lerpSpeed, observeLerpSpeed, deltaSensitivity;
@@ -96,7 +97,7 @@ public class OrbitalFocusCam : MonoBehaviour
 
                 if (!offset)
                 {
-                    cam.transform.localPosition = Vector3.Lerp(lastCamPos, exploreOffset, fracJourney);
+                    cam.transform.localPosition = Vector3.Lerp(lastCamPos, currentOffset, fracJourney);
                     cam.transform.localRotation = Quaternion.Lerp(lastCamRot, Quaternion.Euler(25, 0, 0), fracJourney);
                 }
             }
@@ -132,6 +133,11 @@ public class OrbitalFocusCam : MonoBehaviour
 
     public void ExploreMode(Transform explorationPoint, bool explore)
     {
+        ExploreMode(explorationPoint, explore, false);
+    }
+
+    public void ExploreMode(Transform explorationPoint, bool explore, bool islandManaging)
+    {
         focalTarget = explorationPoint;
         ResetState();
         exploring = explore;
@@ -139,7 +145,18 @@ public class OrbitalFocusCam : MonoBehaviour
         if (!explore)
             camTargetPos = Vector3.zero;
         else
-            camTargetPos = exploreOffset;
+        {
+            if (!islandManaging)
+            {
+                camTargetPos = exploreOffset;
+                currentOffset = exploreOffset;
+            }
+            else
+            {
+                camTargetPos = islandManageOffset;
+                currentOffset = islandManageOffset;
+            }
+        }
     }
 
     public void Defocus()

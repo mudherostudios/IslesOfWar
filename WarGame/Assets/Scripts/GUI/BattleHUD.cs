@@ -77,4 +77,22 @@ public class BattleHUD : MonoBehaviour
             return new List<string>();
     }
 
+    public void ClearDeployedSquads()
+    {
+        if (PlayerPrefs.HasKey("keys") && deployedSquads != null)
+        {
+            if (deployedSquads.Count > 0)
+            {
+                List<string> keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
+
+                foreach (string squad in deployedSquads)
+                {
+                    keys.Remove(squad);
+                }
+
+                PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+            }
+        }
+    }
+
 }

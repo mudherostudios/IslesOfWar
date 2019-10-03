@@ -20,6 +20,7 @@ public class IslandManagementInteraction : Interaction
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
     public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton;
+    public Vector3 islandTileZoom;
 
     [Header("Prefabs")]
     public GameObject[] tilePrefabs;
@@ -216,7 +217,7 @@ public class IslandManagementInteraction : Interaction
     public void GotoObservationPoint()
     {
         SetDefaultGUIStates();
-        orbital.ExploreMode(defaultObservePoint, false);
+        orbital.ExploreMode(defaultObservePoint, false, true);
         orbital.SetNewObservePoint(defaultObservePoint, defaultObservationFocus);
     }
 
@@ -289,6 +290,12 @@ public class IslandManagementInteraction : Interaction
             enableBuildCollectorsButton.Show(true);
             enableBuildBunkersButton.Show(true);
             enableBuildBlockersButton.Show(true);
+        }
+        else
+        {
+            enableBuildCollectorsButton.Show(false);
+            enableBuildBunkersButton.Show(false);
+            enableBuildBlockersButton.Show(false);
         }
     }
 
@@ -522,6 +529,7 @@ public class IslandManagementInteraction : Interaction
 
     public void Initialize()
     {
+        isIslandManaging = true;
         islands = clientInterface.playerIslandIDs.ToArray();
         islandIndex = 0;
         islandCount = islands.Length;

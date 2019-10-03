@@ -28,6 +28,7 @@ public class Interaction : MonoBehaviour
     protected bool isAtTarget;
     protected int indexLocation = 4;
     protected int lastIndexLocation = 11;
+    protected bool isIslandManaging = false;
 
     protected void WorldButtonCheck(bool didClick)
     {
@@ -85,7 +86,7 @@ public class Interaction : MonoBehaviour
 
         if (destination != null)
         {
-            orbital.ExploreMode(destination, true);
+            orbital.ExploreMode(destination, true, isIslandManaging);
             selectedWorldUI = null;
         }
     }

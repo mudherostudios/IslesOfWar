@@ -174,10 +174,9 @@ public class WorldNavigator : MonoBehaviour
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
         battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefab, planMarkerPrefab);
         
-        
         SetCommandMode();
     }
-
+    
     void SetState()
     {
         clientInterface = new ClientInterface(communicationScript);
@@ -331,5 +330,6 @@ public class WorldNavigator : MonoBehaviour
     public void SubmitQueuedActions()
     {
         clientInterface.SubmitQueuedActions();
+        battleIslandsGUI.hud.ClearDeployedSquads();
     }
 }
