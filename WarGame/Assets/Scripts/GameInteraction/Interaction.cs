@@ -43,7 +43,9 @@ public class Interaction : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit) && !EventSystem.current.IsPointerOverGameObject())
             {
-                if (hit.transform.tag == "WorldButton")
+                bool isConstructing = hit.transform.tag == "UnderConstruction";
+
+                if (hit.transform.tag == "WorldButton" || isConstructing)
                 {
                     selectedButton = hit.transform.GetComponent<WorldButton>();
                     selectedWorldUIObject = hit.transform;
@@ -64,7 +66,11 @@ public class Interaction : MonoBehaviour
                     {
                         RevealObject();
                     }
+
+                    if(isConstructing)
+                        RevealObject();
                 }
+
             }
         }
         else

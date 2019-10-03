@@ -24,7 +24,7 @@ public class CommandIslandInteraction : Interaction
     public Transform focalPoint;
     
     private string[] commandButtonTypes = new string[] 
-    { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter", "CommandPrompter" };
+    { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter", "CommandPrompter", "ConstructionPrompter" };
     private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter, hasCommandPromtper;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
@@ -34,6 +34,13 @@ public class CommandIslandInteraction : Interaction
     private void Update()
     {
         bool clicked = Input.GetButtonDown("Fire1");
+
+        if (selectedWorldUIObject != null)
+        {
+            if (selectedWorldUIObject.tag == "UnderConstruction" && clicked)
+                selectedWorldUIObject.GetComponent<ObjectRevealer>().hiddenObject.SetActive(false);
+        }
+
         WorldButtonCheck(clicked, new List<string> { commandButtonTypes[0] });
 
         if (resourcePool.gameObject.activeSelf)
@@ -47,7 +54,7 @@ public class CommandIslandInteraction : Interaction
             unitPrompter = selectedWorldUIObject.GetComponent<UnitPurchasePrompter>();
             poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
             genericPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
-
+            
             hasUnitPurchasePrompter = unitPrompter != null;
             hasPoolPrompter = poolPrompter != null;
             hasWarbuxPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[2];
@@ -88,6 +95,11 @@ public class CommandIslandInteraction : Interaction
             commandCenterMenu.SetActive(true);
         
         orbital.Defocus();
+    }
+
+    public void ShowConstructionTape()
+    {
+        
     }
 
     public void SetCommandVariables(Transform _commandCenter, string[] buttons, GameObject _showMenuButton)

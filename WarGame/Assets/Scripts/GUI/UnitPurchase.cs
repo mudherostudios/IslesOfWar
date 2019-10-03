@@ -7,6 +7,8 @@ using IslesOfWar;
 public class UnitPurchase: MonoBehaviour
 {
     public Text[] resourceCosts;
+    public Image[] unitImages;
+    public Text[] unitButtonTexts;
     public InputField purchaseAmount;
     public CommandIslandInteraction commandScript;
     public int type = 0;
@@ -17,7 +19,6 @@ public class UnitPurchase: MonoBehaviour
     public void UpdateAllStats(int _type)
     {
         type = _type;
-        SetTitle();
         string formatW = "";
         string formatO = "";
         string formatM = "";
@@ -44,7 +45,9 @@ public class UnitPurchase: MonoBehaviour
 
     public void ShowMenu(int unitType)
     {
+        unitImages[type].gameObject.SetActive(false);
         type = relativeTypes[unitType];
+        unitImages[type].gameObject.SetActive(true);
         gameObject.SetActive(true);
         UpdateAllStats();
     }
@@ -52,41 +55,36 @@ public class UnitPurchase: MonoBehaviour
     public void SetMenu(int[] possibleTypes)
     {
         relativeTypes = possibleTypes;
+
+        if (possibleTypes[0] == 3)
+            SetButtonTexts(1);
+        else if (possibleTypes[0] == 6)
+            SetButtonTexts(2);
+        else
+            SetButtonTexts(0);
+        
+
         ShowMenu(0);
     }
 
-    void SetTitle()
+    void SetButtonTexts(int category)
     {
-        string title = "";
-
-        switch (type)
+        switch (category)
         {
             case 0:
-                title = "Riflemen";
+                unitButtonTexts[0].text = "Riflemen";
+                unitButtonTexts[1].text = "Machine Gunners";
+                unitButtonTexts[2].text = "Bazookamen";
                 break;
             case 1:
-                title = "Machine Gunners";
+                unitButtonTexts[0].text = "Light Tanks";
+                unitButtonTexts[1].text = "Medium Tanks";
+                unitButtonTexts[2].text = "Heavy Tanks";
                 break;
             case 2:
-                title = "Bazookamen";
-                break;
-            case 3:
-                title = "Light Tank";
-                break;
-            case 4:
-                title = "Medium Tank";
-                break;
-            case 5:
-                title = "Heavy Tank";
-                break;
-            case 6:
-                title = "Light Fighter";
-                break;
-            case 7:
-                title = "Medium Fighter";
-                break;
-            case 8:
-                title = "Bomber";
+                unitButtonTexts[0].text = "Light Fighters";
+                unitButtonTexts[1].text = "Medium Fighters";
+                unitButtonTexts[2].text = "Bombers";
                 break;
             default:
                 break;
