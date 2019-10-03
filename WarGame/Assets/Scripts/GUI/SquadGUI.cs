@@ -20,6 +20,7 @@ public class SquadGUI : MonoBehaviour
 
     int CorrectedValue(int type)
     {
+        //Figure out eventually why this commandScript keeps saying it is null even though we set it in WorldNavigator
         if (commandScript == null)
             commandScript = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<CommandIslandInteraction>();
 

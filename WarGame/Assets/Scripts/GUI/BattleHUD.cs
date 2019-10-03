@@ -95,4 +95,9 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
+    public void SetDeployedSquads(List<string> deployed)
+    {
+        deployedSquads = new List<string>(deployed);
+    }
+
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using MudHero.XayaCommunication;
+using Newtonsoft.Json;
 
 public class ConnectGUI : MonoBehaviour
 {
@@ -107,7 +108,12 @@ public class ConnectGUI : MonoBehaviour
     public void Connect()
     {
         ConnectionLog log = new ConnectionLog(false, "Could not even attempt to connect.");
+        int user = 0;
+        if (PlayerPrefs.HasKey("User"))
+            user = PlayerPrefs.GetInt("User");
 
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.SetInt("User", user);
         if (!useCookies.isOn)
         {
             log = comms.Connect(username.text, password.text, wallet.text);
@@ -122,7 +128,6 @@ public class ConnectGUI : MonoBehaviour
         PlayerPrefs.SetString("username", username.text);
         PlayerPrefs.SetString("userpassword", password.text);
         PlayerPrefs.SetString("walletpassword", wallet.text);
-
 
         if (log.success)
         {

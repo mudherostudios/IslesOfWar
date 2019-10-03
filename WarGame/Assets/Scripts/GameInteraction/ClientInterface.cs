@@ -315,6 +315,14 @@ public class ClientInterface : MonoBehaviour
             queuedActions.dfnd.pln.Add(new List<int>());
         }
     }
+
+    public void SetFullBattlePlan(bool isAttack, string island, List<List<int>> counts, List<List<int>> plans)
+    {
+        if (isAttack)
+            queuedActions.attk = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
+        else
+            queuedActions.dfnd = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
+    }
     //Battle Planning - End
 
     public void SubmitQueuedActions()
@@ -386,6 +394,14 @@ public class ClientInterface : MonoBehaviour
             else
                 queuedActions.attk = null;
         }
+    }
+
+    //----------------------------------------------------------------------------------------------------
+    //Cancel Functions
+    //----------------------------------------------------------------------------------------------------
+    public void CancelDefensePlan()
+    {
+        queuedActions.dfnd = null;
     }
 
     //**************************************************************************************************
@@ -497,7 +513,12 @@ public class ClientInterface : MonoBehaviour
         bool hasDefenders = false;
 
         if (IslandExists(islandID))
+        {
+            if (chainState.islands[islandID].squadCounts == null)
+                return false;
+
             hasDefenders = chainState.islands[islandID].squadCounts.Count > 0;
+        }
 
         return hasDefenders;
     }
@@ -513,6 +534,17 @@ public class ClientInterface : MonoBehaviour
         List<List<int>> squadPlans = chainState.islands[_islandID].squadPlans;
         return squadPlans;
     }
+
+    public bool hasDefendPlanInQueue { get { return queuedActions.dfnd != null; } }
+    public bool IslandIsBeingDefended(string _islandID)
+    {
+        if (queuedActions.dfnd == null)
+            return false;
+        else if (queuedActions.dfnd.id == _islandID)
+            return true;
+        else
+            return false;
+    } 
 
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
     public string islandInDevelopment { get { return queuedActions.bld.id; } }

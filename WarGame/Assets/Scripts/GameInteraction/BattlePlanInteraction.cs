@@ -20,6 +20,7 @@ public class BattlePlanInteraction : Interaction
     public Mode mode = Mode.NONE;
     public GameObject squadMarkerPrefab;
     public GameObject planMarkerPrefab;
+    public BattleHUD hud;
 
     [Header("Marker Generation Variables")]
     public Transform[] squadMarkerWaitPositions;
@@ -135,10 +136,31 @@ public class BattlePlanInteraction : Interaction
 
     public void StartWithDefenders(string _islandID)
     {
+        squadNames = new List<string>();
+        List<string> deployedSquads = new List<string>();
+        List<string> keys = new List<string>();
+
+        if (PlayerPrefs.HasKey("keys"))
+            keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
+
         islandID = _islandID;
         squadCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
+        clientInterface.SetFullBattlePlan(mode == Mode.ATTACK, islandID, squadCounts, squadPlans);
 
+        for (int s = 0; s < squadCounts.Count; s++)
+        {
+            string defenderName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0, 8));
+            if (!PlayerPrefs.HasKey(defenderName)) 
+                squadNames.Add(defenderName);
+            deployedSquads.Add(defenderName);
+            PlayerPrefs.SetString(defenderName, JsonConvert.SerializeObject(squadCounts[s]));
+        }
+
+        keys.AddRange(squadNames);
+        PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+
+        hud.SetDeployedSquads(deployedSquads);
         InstantiateAllSquads();
     }
 

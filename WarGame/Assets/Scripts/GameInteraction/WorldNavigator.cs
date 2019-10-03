@@ -155,6 +155,7 @@ public class WorldNavigator : MonoBehaviour
         enableBuildBlockersButton.managementScript = managementScript;
 
         //Battle Variables
+        battleScript.hud = battleIslandsGUI.hud;
         List<GameObject> battleIslandGenerationPrefabs = new List<GameObject>();
         battleIslandGenerationPrefabs.AddRange(tilePrefabs);
         battleIslandGenerationPrefabs.Add(battleIsland);
@@ -279,24 +280,27 @@ public class WorldNavigator : MonoBehaviour
 
     public void SetBattleMode(string islandID)
     {
-        traversing = true;
+        if (!clientInterface.hasDefendPlanInQueue || clientInterface.IslandIsBeingDefended(islandID))
+        {
+            traversing = true;
 
-        if (mode != cleanMode)
-            cleanMode = mode;
-        else
-            cleanMode = Mode.NONE;
+            if (mode != cleanMode)
+                cleanMode = mode;
+            else
+                cleanMode = Mode.NONE;
 
-        if (mode == Mode.COMMAND)
-            commandScript.enabled = false;
-        else if (mode == Mode.MANAGEMENT)
-            managementScript.enabled = false;
+            if (mode == Mode.COMMAND)
+                commandScript.enabled = false;
+            else if (mode == Mode.MANAGEMENT)
+                managementScript.enabled = false;
 
-        mode = Mode.BATTLE;
+            mode = Mode.BATTLE;
 
-        battleScript.enabled = true;
-        battleScript.TurnOnIsland(islandID);
-        battleScript.GotToObservePoint();
-        sceneCleanTimer = battleCleanTimer;
+            battleScript.enabled = true;
+            battleScript.TurnOnIsland(islandID);
+            battleScript.GotToObservePoint();
+            sceneCleanTimer = battleCleanTimer;
+        }
     }
 
     bool isClean()
@@ -331,5 +335,38 @@ public class WorldNavigator : MonoBehaviour
     {
         clientInterface.SubmitQueuedActions();
         battleIslandsGUI.hud.ClearDeployedSquads();
+    }
+
+    //--------------------------------------------------
+    //Cancel Orders
+    //--------------------------------------------------
+    public void CancelDefensePlan()
+    {
+        clientInterface.CancelDefensePlan();
+        SetCommandMode();
+
+        List<string> keys = new List<string>();
+
+        if (PlayerPrefs.HasKey("keys"))
+        {
+            keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
+            List<string> remove = new List<string>();
+
+            for (int k = 0; k < keys.Count; k++)
+            {
+                if (keys[k].Contains("Defender"))
+                {
+                    PlayerPrefs.DeleteKey(keys[k]);
+                    remove.Add(keys[k]);
+                }
+            }
+
+            foreach(string name in remove)
+            {
+                keys.Remove(name);
+            }
+
+            PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+        }
     }
 }
