@@ -35,9 +35,13 @@ public class BattleIslandsGUI : MonoBehaviour
     public void AttackIsland()
     {
         hud.battleScript = battleScript;
-        navigator.SetBattleMode(battleScript.GetAttackableIsland());
-        attackMenu.SetActive(false);
-        hud.Show();
+
+        if (battleScript.GetAttackableIsland() != "")
+        {
+            navigator.SetBattleMode(battleScript.GetAttackableIsland());
+            attackMenu.SetActive(false);
+            hud.Show();
+        }
     }
 
     public void ShowDefendMenu()

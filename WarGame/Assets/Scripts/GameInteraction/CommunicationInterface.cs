@@ -43,7 +43,13 @@ public class CommunicationInterface : MonoBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
     }
-    
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+    }
+
     public State state { get { return JsonConvert.DeserializeObject<State>(gameState); } }
     public string player { get { return selectedUser.Substring(2); } }
     public bool isConnectedToXayaDaemon
