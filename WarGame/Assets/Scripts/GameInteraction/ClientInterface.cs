@@ -492,6 +492,28 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
+    public bool IslandHasDefenders(string islandID)
+    {
+        bool hasDefenders = false;
+
+        if (IslandExists(islandID))
+            hasDefenders = chainState.islands[islandID].squadCounts.Count > 0;
+
+        return hasDefenders;
+    }
+
+    public List<List<int>> GetDefenderCountsFromIsland(string _islandID)
+    {
+        List<List<int>> squadCounts = chainState.islands[_islandID].squadCounts;
+        return squadCounts;
+    }
+
+    public List<List<int>> GetDefenderPlansFromIsland(string _islandID)
+    {
+        List<List<int>> squadPlans = chainState.islands[_islandID].squadPlans;
+        return squadPlans;
+    }
+
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
     public string islandInDevelopment { get { return queuedActions.bld.id; } }
 

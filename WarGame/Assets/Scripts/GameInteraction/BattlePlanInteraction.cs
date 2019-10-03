@@ -118,7 +118,7 @@ public class BattlePlanInteraction : Interaction
         squadPlans.Clear();
     }
 
-    public void StartWithOldPlan()
+    public void StartWithQueuedPlan()
     {
         BattleCommand command = new BattleCommand();
         if (mode == Mode.ATTACK)
@@ -130,10 +130,28 @@ public class BattlePlanInteraction : Interaction
         squadCounts = new List<List<int>>(command.sqd);
         squadPlans = new List<List<int>>(command.pln);
 
+        InstantiateAllSquads();
+    }
+
+    public void StartWithDefenders(string _islandID)
+    {
+        islandID = _islandID;
+        squadCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
+        squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
+
+        InstantiateAllSquads();
+    }
+
+    void InstantiateAllSquads()
+    {
         for (int s = 0; s < squadCounts.Count; s++)
         {
             squadMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[s].position, Quaternion.identity));
             squadMarkers[s].GetComponent<SquadMarker>().squad = s;
+            currentSquad = s;
+            selectedSquad = squadMarkers[s].GetComponent<SquadMarker>();
+            ViewCurrentSquad();
+            CloseCurrentSquad();
         }
     }
 
@@ -459,10 +477,12 @@ public class BattlePlanInteraction : Interaction
 
             if (mode != Mode.NONE)
             {
-                if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
+                if (clientInterface.IslandHasDefenders(_islandID))
+                    StartWithDefenders(_islandID);
+                else if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
                     clientInterface.InitBattleSquads(mode == Mode.ATTACK, _islandID);
-                else
-                    StartWithOldPlan();
+                else if (clientInterface.queuedActions.dfnd != null || clientInterface.queuedActions.attk != null)
+                    StartWithQueuedPlan();
 
                 islandID = _islandID;
                 Island island = clientInterface.GetIsland(islandID);
