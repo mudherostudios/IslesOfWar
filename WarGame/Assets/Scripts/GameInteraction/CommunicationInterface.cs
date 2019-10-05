@@ -28,13 +28,14 @@ public class CommunicationInterface : MonoBehaviour
     public string databasePath;
     public string databaseName;
 
+    public int blockProgress = 0;
+    public int blockCount = 0;
+    public string progressMessage;
     private ConnectionInfo daemonInfo;
     private ConnectionInfo gsrInfo;
     private StateProcessorPathInfo pathInfo;
     private XayaCommander xayaCommands;
     private GameStateRetriever stateRetriever;
-    public int blockProgress = 0;
-    private int blockCount = 0;
     private string selectedUser = "";
     private bool checkedScene = true;
     private string gameState = "";
@@ -69,7 +70,7 @@ public class CommunicationInterface : MonoBehaviour
         {
             string[] names = xayaCommands.names;
             List<string> validNames = new List<string>();
-
+            
             for (int n = 0; n < names.Length; n++)
             {
                 if (names[n][0] == 'p')
@@ -92,22 +93,13 @@ public class CommunicationInterface : MonoBehaviour
         gameState = _gameState;
     }
 
-    public ConnectionLog Connect(string user, string password, string wallet)
+    public ConnectionLog Connect(string user, string password, string _walletPassword)
     {
         ConnectionLog log = new ConnectionLog();
 
         username = user;
         userpassword = password;
-        walletPassword = wallet;
-
-        log = Connect(false);
-
-        return log;
-    }
-
-    public ConnectionLog Connect(bool useCookies)
-    {
-        ConnectionLog log = new ConnectionLog();
+        walletPassword = _walletPassword;
 
         if (xayaCommands != null || stateRetriever != null)
         {
@@ -115,16 +107,22 @@ public class CommunicationInterface : MonoBehaviour
             xayaCommands = null;
             stateRetriever = null;
         }
-
-        if (useCookies)
-            Debug.Log("Use Cookies Somehow Here. Don't forget to put this option in.");
         
         SetConnectionInfo();
         SetupConnectionObjects();
         LaunchGameStateRetriever();
         log = ConnectToXayaDaemon();
-
+        progressMessage = log.message;
         return log;
+    }
+
+    public void SetAdvancedOptions(string dPort, string gPort, string wallet)
+    {
+        xayaDaemonPort = dPort;
+        gsrPort = gPort;
+
+        if(wallet != "" && wallet != " ")
+            xayaDaemonWalletPath = wallet;
     }
 
     private void SetConnectionInfo()
@@ -154,6 +152,8 @@ public class CommunicationInterface : MonoBehaviour
     {
         if (xayaCommands != null && stateRetriever != null)
             stateRetriever.LaunchGSR();
+
+        progressMessage = "Launched Game State Retriever.";
     }
 
     private ConnectionLog ConnectToXayaDaemon()
@@ -186,7 +186,14 @@ public class CommunicationInterface : MonoBehaviour
 
     public void SendCommand(string command)
     {
-        Debug.Log(xayaCommands.ExecutePlayerCommand(selectedUser, command).message);
+        progressMessage = xayaCommands.ExecutePlayerCommand(selectedUser, command).message;
+        Debug.Log(progressMessage);
+    }
+
+    public void CreateName(string name)
+    {
+        progressMessage = xayaCommands.CreateName(name).message;
+        Debug.Log(progressMessage);
     }
 
     public void Disconnect()
@@ -194,9 +201,16 @@ public class CommunicationInterface : MonoBehaviour
         if (stateRetriever != null)
             stateRetriever.Disconnect();
         else
-            Debug.Log("There is no State Retriever to Disconnect.");
+            progressMessage = "There is no State Retriever to Disconnect.";
+
+        Debug.Log(progressMessage);
 
         CleanConnections();
+    }
+
+    public void UpdateProgressMessage(string message)
+    {
+        progressMessage = message;
     }
 
     private void CleanConnections()

@@ -44,7 +44,7 @@ namespace MudHero
                 yield return StartCoroutine(task.Wait());
 
                 if (task.State == TaskState.Error)
-                    Debug.LogError(task.Exception.ToString());
+                    MessageCommunicator(task.Exception.ToString(), 3);
             }
 
             IEnumerator GSRAsync()
@@ -54,7 +54,7 @@ namespace MudHero
                 result += "\n" + wrapper.SetConnectInfo(daemonInfo.ip, daemonInfo.port, gsrInfo.ip, gsrInfo.port, daemonInfo.username, daemonInfo.userpassword);
 
                 yield return Ninja.JumpToUnity;
-                Debug.Log(result);
+                MessageCommunicator(result, 0);
                 yield return Ninja.JumpBack;
 
                 connected = true;
@@ -64,13 +64,13 @@ namespace MudHero
                 connected = false;
 
                 yield return Ninja.JumpToUnity;
-                Debug.Log(result);
+                MessageCommunicator(result, 0);
                 yield return Ninja.JumpBack;
             }
 
             public void SubscribeForBlockUpdates()
             {
-                Debug.Log("Subscribed.");
+                MessageCommunicator("Subscribed for block updates.", 0);
                 StartCoroutine(WaitForChanges());
             }
 
@@ -95,7 +95,9 @@ namespace MudHero
                         }
                         else
                         {
-                            Debug.LogError("actualState is null");
+                            yield return Ninja.JumpToUnity;
+                            MessageCommunicator("actualState is null.",3);
+                            yield return Ninja.JumpBack;
                         }
 
                     }
@@ -149,6 +151,31 @@ namespace MudHero
             public bool isConnected
             {
                 get { return connected; }
+            }
+
+
+            public void MessageCommunicator(string message, int type)
+            {
+                communicator.progressMessage = message;
+
+                switch (type)
+                {
+                    case 0:
+                        Debug.Log(message);
+                        break;
+                    case 1:
+                        Debug.LogWarning(message);
+                        break;
+                    case 2:
+                        Debug.LogAssertion(message);
+                        break;
+                    case 3:
+                        Debug.LogError(message);
+                        break;
+                    default:
+                        Debug.Log(message);
+                        break;
+                }
             }
         }
     }

@@ -67,7 +67,7 @@ namespace MudHero
                 if (xayaService == null || networkBlockCount == 0)
                 {
                     log.success = false;
-                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya daemon";
+                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya Daemon";
                     return log;
                 }
                 else
@@ -76,6 +76,24 @@ namespace MudHero
                     log.success = true;
                     return log;
                 }
+            }
+
+            public ConnectionLog CreateName(string name)
+            {
+                ConnectionLog log = new ConnectionLog();
+                if (xayaService == null || networkBlockCount == 0)
+                {
+                    log.success = false;
+                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya Daemon";
+                    return log;
+                }
+                else
+                {
+                    log.success = true;
+                    log.message = string.Format("Pretending to create p/{0}...", name);
+                }
+
+                return log;
             }
 
             public int GetBlockHeight(string hash)
@@ -100,7 +118,7 @@ namespace MudHero
                 {
                     List<string> nameList = new List<string>();
                     List<GetNameListResponse> responses = xayaService.GetNameList();
-
+                    
                     if (responses == null || xayaService == null)
                         return new string[0];
 
@@ -109,7 +127,7 @@ namespace MudHero
                         if (response.ismine)
                             nameList.Add(response.name);
                     }
-
+                   
                     return nameList.ToArray();
                 }
             }

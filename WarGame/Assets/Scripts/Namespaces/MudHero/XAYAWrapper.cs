@@ -125,7 +125,7 @@ namespace MudHero
 
                 xayaGameService = new XAYAService("http://" + gameIP + ":" + gamePort, username, password, "");
 
-                return "Connection information set. \n Connection made with " + "http://" + gameIP + ":" + gamePort + ".";
+                return "Connection information set. \nConnection made with " + "http://" + gameIP + ":" + gamePort + ".";
             }
 
             public string Connect(string chain_s, string storage_s, string gamenamespace, string databasePath, string glogsPath)
