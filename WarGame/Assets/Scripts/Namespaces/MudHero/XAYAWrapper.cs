@@ -160,7 +160,7 @@ namespace MudHero
 
                 //This will be blocked by dll until "stop" command is issued
                 ShutdownDaemon();
-                return "Done";
+                return "Shutting Down.";
             }
 
 
