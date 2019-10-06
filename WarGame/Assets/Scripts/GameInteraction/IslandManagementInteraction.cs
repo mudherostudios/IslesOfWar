@@ -196,7 +196,7 @@ public class IslandManagementInteraction : Interaction
 
                 if (lastPeekedButton != button.buttonType || lastPeekedName != button.name)
                 {
-                    costSlider.SetCost(cost);
+                    costSlider.SetCost(GetCollectorName(type),cost);
                     costSlider.TurnOn(true);
                     lastPeekedButton = button.buttonType;
                     lastPeekedName = button.name;
@@ -211,6 +211,21 @@ public class IslandManagementInteraction : Interaction
                     lastPeekedName = "None";
                 }
             }
+        }
+    }
+
+    string GetCollectorName(int type)
+    {
+        switch(type)
+        {
+            case 1:
+                return "Oil Well";
+            case 2:
+                return "Metal Mine";
+            case 3:
+                return "Lime Processor";
+            default:
+                return "Unknown Collector";
         }
     }
 

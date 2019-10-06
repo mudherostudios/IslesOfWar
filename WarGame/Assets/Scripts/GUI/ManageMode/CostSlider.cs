@@ -10,6 +10,7 @@ public class CostSlider : MonoBehaviour
     public float speed;
 
     public Text[] costTexts;
+    public Text title;
     public double[] cost;
   
     //Not working right now but would be nice to have a slide effect.
@@ -48,8 +49,9 @@ public class CostSlider : MonoBehaviour
             transform.position = offPosition;
     }
 
-    public void SetCost(double[] _cost)
+    public void SetCost(string name, double[] _cost)
     {
+        title.text = name;
         cost = _cost;
         costTexts[0].text = string.Format("-{0}", cost[0]);
         costTexts[1].text = string.Format("-{0}", cost[1]);

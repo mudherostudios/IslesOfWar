@@ -57,7 +57,7 @@ public class Notifications : MonoBehaviour
         if (notifications.Count * 32 >= contentParent.GetComponent<RectTransform>().rect.height)
         {
             Rect oldRect = contentParent.GetComponent<RectTransform>().rect;
-            contentParent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, notifications.Count*32);
+            contentParent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, notifications.Count*32+24);
         }
 
         BuildList();
@@ -82,7 +82,7 @@ public class Notifications : MonoBehaviour
     {
         for (int n = 0; n < notifications.Count; n++)
         {
-            notifications[n].transform.localPosition = new Vector3(0, (n * -32) - 16, 0);
+            notifications[n].transform.localPosition = new Vector3(136, (n * -32) - 24, 0);
         }
     }
 

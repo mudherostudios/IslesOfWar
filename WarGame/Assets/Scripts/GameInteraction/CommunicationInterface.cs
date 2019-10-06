@@ -37,7 +37,6 @@ public class CommunicationInterface : MonoBehaviour
     private XayaCommander xayaCommands;
     private GameStateRetriever stateRetriever;
     private string selectedUser = "";
-    private bool checkedScene = true;
     private string gameState = "";
 
     private void Awake()
@@ -181,7 +180,6 @@ public class CommunicationInterface : MonoBehaviour
     public void SelectUser(string name)
     {
         selectedUser = name;
-        checkedScene = false;
     }
 
     public ConnectionLog SendCommand(string command)

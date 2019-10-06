@@ -97,10 +97,6 @@ public class CommandIslandInteraction : Interaction
         orbital.Defocus();
     }
 
-    public void ShowConstructionTape()
-    {
-        
-    }
 
     public void SetCommandVariables(Transform _commandCenter, string[] buttons, GameObject _showMenuButton)
     {

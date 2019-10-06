@@ -22,13 +22,15 @@ public class ClientInterface : MonoBehaviour
 
     public ClientInterface(){ queuedActions = new PlayerActions(); }
 
-    public ClientInterface(CommunicationInterface comms)
+    public ClientInterface(CommunicationInterface comms, Notifications _notificationSystem)
     {
         communication = comms;
         InitStates(communication.state);
         player = comms.player;
         queuedActions = new PlayerActions();
+        notificationSystem = _notificationSystem;
     }
+
 
     void InitStates(State state)
     {
@@ -76,6 +78,8 @@ public class ClientInterface : MonoBehaviour
 
         if (immediately)
             SubmitQueuedActions();
+        
+        notificationSystem.PushNotification(1, string.Format("We have submitted a proposal to join {0}.", Constants.countryCodes[nationCode]));
     }
     
     public bool PurchaseIslandCollector(StructureCost cost)
@@ -203,7 +207,36 @@ public class ClientInterface : MonoBehaviour
             if(queuedActions.buy == null)
                 queuedActions.buy = new List<int>(new int[9]);
 
-            queuedActions.buy[type] += amount;
+            queuedActions.buy[type] += amount; 
+            string message = string.Format("{0} total {1} will be ordered after submission.", queuedActions.buy[type], GetUnitName(type));
+            notificationSystem.PushNotification(1, message);
+        }
+    }
+
+    string GetUnitName(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return "Riflemen";
+            case 1:
+                return "Machine Gunners";
+            case 2:
+                return "Bazookamen";
+            case 3:
+                return "Light Tanks";
+            case 4:
+                return "Medium Tanks";
+            case 5:
+                return "Heavy Tanks";
+            case 6:
+                return "Light Fighters";
+            case 7:
+                return "Medium Fighters";
+            case 8:
+                return "Bombers";
+            default:
+                return "Invalid Type";
         }
     }
     
@@ -216,6 +249,7 @@ public class ClientInterface : MonoBehaviour
         {
             SpendResources(cost);
             queuedActions.srch = Constants.islandSearchOptions[0];
+            notificationSystem.PushNotification(1, "An expeditionary force will depart on your command.");
         }
     }
     
@@ -244,6 +278,23 @@ public class ClientInterface : MonoBehaviour
 
             SpendResources(fullResources);
             queuedActions.pot = new ResourceOrder(type, new List<double>(resources));
+            string message = string.Format("Adding resources to the {0} Market.",  GetPoolName(type));
+            notificationSystem.PushNotification(1, message);
+        }
+    }
+
+    string GetPoolName(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return "Oil";
+            case 1:
+                return "Metal";
+            case 2:
+                return "Concrete";
+            default:
+                return "Unkown";
         }
     }
     
@@ -255,6 +306,8 @@ public class ClientInterface : MonoBehaviour
             clientState.islands.Remove(island);
             clientState.depletedContributions[player].Add(island);
             queuedActions.dep = new List<string>() { island };
+            string message = string.Format("Depleted Island {0}... has been queued for reclaimation.", island.Substring(0,10));
+            notificationSystem.PushNotification(1, message);
         }
     }
 
@@ -347,12 +400,6 @@ public class ClientInterface : MonoBehaviour
         {
             ConnectionLog log = communication.SendCommand(command);
 
-            if (notificationSystem == null)
-            {
-                Debug.Log("DAFUQ");
-                notificationSystem = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<WorldNavigator>().notificationSystem;
-            }
-
             if (log.success)
             {
                 notificationSystem.PushNotification(2, "Actions successfully submitted to the network.");
@@ -418,6 +465,7 @@ public class ClientInterface : MonoBehaviour
     //----------------------------------------------------------------------------------------------------
     public void CancelDefensePlan()
     {
+        notificationSystem.PushNotification(1, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)));
         queuedActions.dfnd = null;
     }
 

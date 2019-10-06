@@ -10,7 +10,6 @@ public class NotificationObject : MonoBehaviour
 
     public void SetMessage(Sprite icon, string _message)
     {
-        Debug.Log("Setting Message");
         if(icon != null)
             typeIcon.sprite = icon;
 

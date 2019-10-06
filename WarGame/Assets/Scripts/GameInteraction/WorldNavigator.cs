@@ -107,8 +107,6 @@ public class WorldNavigator : MonoBehaviour
 
     private void Start()
     {
-        clientInterface = new ClientInterface();
-        clientInterface.notificationSystem = notificationSystem;
         GameObject commObject = GameObject.FindGameObjectWithTag("CommunicationInterface");
         communicationScript = commObject.GetComponent<CommunicationInterface>();
         SetState();
@@ -182,7 +180,7 @@ public class WorldNavigator : MonoBehaviour
     
     void SetState()
     {
-        clientInterface = new ClientInterface(communicationScript);
+        clientInterface = new ClientInterface(communicationScript, notificationSystem);
     }
 
     private void Update()
