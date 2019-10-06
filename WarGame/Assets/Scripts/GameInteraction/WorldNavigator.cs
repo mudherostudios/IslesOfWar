@@ -12,6 +12,7 @@ public class WorldNavigator : MonoBehaviour
     public CommunicationInterface communicationScript;
 
     [Header("Common Variables")]
+    public Notifications notificationSystem;
     public ClientInterface clientInterface;
     public Camera cam;
     public OrbitalFocusCam orbital;
@@ -107,6 +108,7 @@ public class WorldNavigator : MonoBehaviour
     private void Start()
     {
         clientInterface = new ClientInterface();
+        clientInterface.notificationSystem = notificationSystem;
         GameObject commObject = GameObject.FindGameObjectWithTag("CommunicationInterface");
         communicationScript = commObject.GetComponent<CommunicationInterface>();
         SetState();

@@ -8,6 +8,7 @@ using IslesOfWar.ClientSide;
 using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 using MudHero;
+using MudHero.XayaCommunication;
 using Newtonsoft.Json;
 
 public class ClientInterface : MonoBehaviour
@@ -15,6 +16,7 @@ public class ClientInterface : MonoBehaviour
     public State chainState;
     public State clientState;
     public CommunicationInterface communication;
+    public Notifications notificationSystem;
     public PlayerActions queuedActions;
     public string player;
 
@@ -336,8 +338,6 @@ public class ClientInterface : MonoBehaviour
         bool isValid = true;
         bool[] validities = QueueIsValid();
 
-        Debug.Log("isValid is " + isValid + " with command " + command);
-
         for (int b = 0; b < validities.Length; b++)
         {
             isValid = isValid && validities[b];
@@ -345,8 +345,25 @@ public class ClientInterface : MonoBehaviour
 
         if (isValid && !QueuedAreNull())
         {
-            Debug.Log("Sending");
-            communication.SendCommand(command);
+            ConnectionLog log = communication.SendCommand(command);
+
+            if (notificationSystem == null)
+            {
+                Debug.Log("DAFUQ");
+                notificationSystem = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<WorldNavigator>().notificationSystem;
+            }
+
+            if (log.success)
+            {
+                notificationSystem.PushNotification(2, "Actions successfully submitted to the network.");
+                notificationSystem.PushNotification(2, string.Format("Succesful TxID is {0}...", log.message.Substring(0, 10)));
+            }
+            else
+            {
+                notificationSystem.PushNotification(3, "Action submission to the network has failed.");
+                notificationSystem.PushNotification(3, log.message);
+            }
+
             queuedActions = new PlayerActions();
         }
     }

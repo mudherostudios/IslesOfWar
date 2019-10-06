@@ -184,10 +184,11 @@ public class CommunicationInterface : MonoBehaviour
         checkedScene = false;
     }
 
-    public void SendCommand(string command)
+    public ConnectionLog SendCommand(string command)
     {
-        progressMessage = xayaCommands.ExecutePlayerCommand(selectedUser, command).message;
-        Debug.Log(progressMessage);
+        ConnectionLog log = xayaCommands.ExecutePlayerCommand(selectedUser, command);
+        progressMessage = log.message;
+        return log;
     }
 
     public void CreateName(string name)
