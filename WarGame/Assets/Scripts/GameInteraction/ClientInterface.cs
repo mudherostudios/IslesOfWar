@@ -24,22 +24,16 @@ public class ClientInterface : MonoBehaviour
     public List<List<double>> queuedContributions;
     public List<string> queuedDepletedSubmissions;
 
-    public ClientInterface(){ queuedActions = new PlayerActions(); }
-
-    public ClientInterface(CommunicationInterface comms, Notifications _notificationSystem)
+    public void InitStates(CommunicationInterface comms, Notifications _notificationSystem)
     {
         communication = comms;
-        InitStates(communication.state);
         player = comms.player;
         queuedActions = new PlayerActions();
         notificationSystem = _notificationSystem;
-    }
-
-
-    void InitStates(State state)
-    {
-        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
         queuedExpenditures = new double[4];
+        queuedContributions = new List<List<double>>();
+        queuedDepletedSubmissions = new List<string>();
+        UpdateState();
     }
 
     //Also eventually check to see if queued actions are still valid.
@@ -289,7 +283,7 @@ public class ClientInterface : MonoBehaviour
 
         if (canSend)
         {
-            if (queuedContributions == null)
+            if (queuedContributions == null || queuedContributions.Count == 0)
             {
                 queuedContributions = new List<List<double>>
                 {
@@ -668,7 +662,7 @@ public class ClientInterface : MonoBehaviour
         return new double[] { GetContributionSize(0), GetContributionSize(1), GetContributionSize(2) };
     }
 
-    public double[] GetPlayerContributedResources(int type, double[] modifiers)
+    public double[] GetPlayerContributedResources(double[] modifiers)
     {
         if (chainState.resourceContributions.ContainsKey(player))
             return PoolUtility.GetPlayerContributedResources(chainState.resourceContributions[player], modifiers);
@@ -681,15 +675,6 @@ public class ClientInterface : MonoBehaviour
         return PoolUtility.GetTotalContributedResources(chainState.resourceContributions, modifiers);
     }
 
-    public double[] GetResourceModifiers(double[] queuedAmounts)
-    {
-        double[] potentialPoolSizes = GetAllPoolSizes();
-        potentialPoolSizes[0] += queuedAmounts[0] + chainState.resourcePools[0];
-        potentialPoolSizes[1] += queuedAmounts[1] + chainState.resourcePools[1];
-        potentialPoolSizes[2] += queuedAmounts[2] + chainState.resourcePools[2];
-
-        return PoolUtility.CalculateResourcePoolModifiers(potentialPoolSizes);
-    }
 
     //Just in case I want to do it this way rather than contributions then total.
     public double GetOwnership(double[] modifiers, int type)

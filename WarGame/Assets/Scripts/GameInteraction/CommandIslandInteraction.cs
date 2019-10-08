@@ -81,7 +81,7 @@ public class CommandIslandInteraction : Interaction
     {
         if (hasWarbuxPrompter)
             warbucksPool.Show();
-        else if (hasPoolPrompter)
+        else if (hasPoolPrompter && clientInterface.queuedContributions.Count == 0)
             resourcePool.ShowMenu(poolPrompter.poolType);
         else if (hasUnitPurchasePrompter)
             unitPurchase.SetMenu(unitPrompter.possiblePurchaseTypes);
@@ -165,8 +165,7 @@ public class CommandIslandInteraction : Interaction
     //----------------------------------------------------------------------
     public double GetPoolSize(int poolType) { return clientInterface.GetContributionSize(poolType); }
     public double[] GetAllPoolSizes() { return clientInterface.GetAllPoolSizes(); }
-    public double[] GetResourceModifiers(double[] queuedAmounts) { return clientInterface.GetResourceModifiers(queuedAmounts); }
-    public double[] GetPlayerContributedResources(int poolType, double[] modifiers) { return clientInterface.GetPlayerContributedResources(poolType, modifiers); }
+    public double[] GetPlayerContributedResources(double[] modifiers) { return clientInterface.GetPlayerContributedResources(modifiers); }
     public double[] GetTotalContributedResources(double[] modifiers) { return clientInterface.GetTotalContributedResources(modifiers); }
 
     public List<string> GetDepletedIslands() { return clientInterface.depletedIslands; }

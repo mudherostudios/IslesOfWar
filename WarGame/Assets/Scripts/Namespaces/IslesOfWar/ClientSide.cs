@@ -35,16 +35,16 @@ namespace IslesOfWar
                 double[] playersContribution = new double[3];
 
                 //Oil
-                playersContribution[0] += contribution[0][1] * modifiers[1]; //Metal
-                playersContribution[0] += contribution[0][2] * modifiers[2]; //Concrete
+                playersContribution[0] += contribution[0][1] * modifiers[0]; //Metal
+                playersContribution[0] += contribution[0][2] * modifiers[1]; //Concrete
 
                 //Metal
-                playersContribution[1] += contribution[1][0] * modifiers[0]; //Oil
-                playersContribution[1] += contribution[1][2] * modifiers[2]; //Concrete
+                playersContribution[1] += contribution[1][0] * modifiers[2]; //Oil
+                playersContribution[1] += contribution[1][2] * modifiers[3]; //Concrete
 
                 //Concrete
-                playersContribution[2] += contribution[2][0] * modifiers[0]; //Oil
-                playersContribution[2] += contribution[2][1] * modifiers[1]; //Metal
+                playersContribution[2] += contribution[2][0] * modifiers[4]; //Oil
+                playersContribution[2] += contribution[2][1] * modifiers[5]; //Metal
 
                 return playersContribution;
             }

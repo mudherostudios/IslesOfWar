@@ -8,6 +8,9 @@ using IslesOfWar.ClientSide;
 public class PoolContribute: MonoBehaviour
 {
     public int poolType;
+    public Image poolTypeIcon;
+    public Image[] tradeIcons;
+    public Sprite[] resourceSprites;
     public Text[] resourceModifiers;
     public InputField[] tradeAmounts;
     public Text poolAmount;
@@ -21,7 +24,7 @@ public class PoolContribute: MonoBehaviour
     private double[] modifiers;
     private string[] strModifiers;
     private double pool, ownership;
-    public double[] poolContributions, poolContributed;
+    public double[] playerContributions, totalContributed;
     private Dictionary<string, List<List<double>>> resources;
 
     public void Initialize(string _player, Dictionary<string, List<List<double>>> _resources, int currentXayaBlock)
@@ -71,12 +74,21 @@ public class PoolContribute: MonoBehaviour
         {
             case 0:
                 poolTitle.text = "Oil Pool";
+                poolTypeIcon.sprite = resourceSprites[0];
+                tradeIcons[0].sprite = resourceSprites[1];
+                tradeIcons[1].sprite = resourceSprites[2];
                 break;
             case 1:
                 poolTitle.text = "Metal Pool";
+                poolTypeIcon.sprite = resourceSprites[1];
+                tradeIcons[0].sprite = resourceSprites[0];
+                tradeIcons[1].sprite = resourceSprites[2];
                 break;
             case 2:
                 poolTitle.text = "Concrete Pool";
+                poolTypeIcon.sprite = resourceSprites[2];
+                tradeIcons[0].sprite = resourceSprites[0];
+                tradeIcons[1].sprite = resourceSprites[1];
                 break;
             default:
                 poolTitle.text = "Error - Do Not Submit!";
@@ -103,40 +115,50 @@ public class PoolContribute: MonoBehaviour
 
     void CalculatePoolStates()
     {
-        modifiers = new double[3];
         strModifiers = new string[3];
         double[] tempPools = commandScript.GetAllPoolSizes();
-        modifiers = commandScript.GetResourceModifiers(tempPools);
+        modifiers = new double[]
+        {
+            tempPools[1]/tempPools[2], tempPools[2]/tempPools[1],
+            tempPools[0]/tempPools[2], tempPools[2]/tempPools[0],
+            tempPools[0]/tempPools[1], tempPools[1]/tempPools[0]
+        };
+
+        for (int m = 0; m < modifiers.Length; m++)
+        {
+            if (modifiers[m] == double.NaN || modifiers[m] == 0)
+                modifiers[m] = 1.0;
+        }
 
         int tempTypeA = 0;
         int tempTypeB = 0;
 
-        if (pool == 0)
-        {
-            tempTypeA = 1;
-            tempTypeB = 2;
-        }
-        else if (pool == 1)
-        {
-            tempTypeA = 0;
-            tempTypeB = 2;
-        }
-        else if (pool == 2)
+        if (poolType == 0)
         {
             tempTypeA = 0;
             tempTypeB = 1;
         }
+        else if (poolType == 1)
+        {
+            tempTypeA = 2;
+            tempTypeB = 3;
+        }
+        else if (poolType == 2)
+        {
+            tempTypeA = 4;
+            tempTypeB = 5;
+        }
 
-        strModifiers[0] = string.Format("x {0:0.00} Broken", modifiers[tempTypeA]);
-        strModifiers[1] = string.Format("x {0:0.00} Broken", modifiers[tempTypeB]);
+        strModifiers[0] = string.Format("x {0:0.00}", modifiers[tempTypeA]);
+        strModifiers[1] = string.Format("x {0:0.00}", modifiers[tempTypeB]);
 
         pool = commandScript.GetPoolSize(poolType);
-        poolContributions = commandScript.GetPlayerContributedResources(poolType, modifiers);
-        poolContributed = commandScript.GetTotalContributedResources(modifiers);
+        playerContributions = commandScript.GetPlayerContributedResources(modifiers);
+        totalContributed = commandScript.GetTotalContributedResources(modifiers);
 
-        if (poolContributions[poolType] == 0)
+        if (playerContributions[poolType] == 0)
             ownership = 0;
         else
-            ownership = poolContributions[poolType] / poolContributed[poolType] * 100;
+            ownership = playerContributions[poolType] / totalContributed[poolType] * 100;
     }
 }

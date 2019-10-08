@@ -180,7 +180,7 @@ public class WorldNavigator : MonoBehaviour
     
     void SetState()
     {
-        clientInterface = new ClientInterface(communicationScript, notificationSystem);
+        clientInterface.InitStates(communicationScript, notificationSystem);
     }
 
     private void Update()

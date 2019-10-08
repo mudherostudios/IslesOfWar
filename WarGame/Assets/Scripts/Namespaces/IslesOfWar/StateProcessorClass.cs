@@ -341,8 +341,8 @@ namespace IslesOfWar
                 {
                     for (int r = 0; r < order.amnt.Count && canSubmit; r++)
                     {
-                        updatedResources.Add(state.players[player].resources[r] - order.amnt[r]);
-                        canSubmit = updatedResources[r] >= 0 && order.amnt[r] >= 0;
+                        updatedResources.Add(state.players[player].resources[r + 1] - order.amnt[r]);
+                        canSubmit = updatedResources[r + 1] >= 0 && order.amnt[r] >= 0;
                     }
                 }
 

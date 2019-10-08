@@ -2282,7 +2282,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00001237162}
+  m_AnchoredPosition: {x: 0, y: -0.000019681229}
   m_SizeDelta: {x: 16.2, y: 200}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &394961371569592393
@@ -8222,6 +8222,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolType: 0
+  poolTypeIcon: {fileID: 7211840473424039655}
+  tradeIcons:
+  - {fileID: 1204161893706797514}
+  - {fileID: 4975789168032326518}
+  resourceSprites:
+  - {fileID: 21300000, guid: b2ace050ffd4ffc4db07789a0ad00a24, type: 3}
+  - {fileID: 21300000, guid: d3aae7045af812c41b3638f684cf9dfb, type: 3}
+  - {fileID: 21300000, guid: 794a4d22f07162d4a8ad0365c5949331, type: 3}
   resourceModifiers:
   - {fileID: 6082485735498070296}
   - {fileID: 4569359182970660185}
@@ -10748,7 +10756,7 @@ GameObject:
   - component: {fileID: 8519302341579253645}
   - component: {fileID: 4975789168032326518}
   m_Layer: 5
-  m_Name: ResourceType2
+  m_Name: ResourceType1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22842,7 +22850,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3844879122381668792
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27508,7 +27516,7 @@ GameObject:
   - component: {fileID: 413736562884389286}
   - component: {fileID: 1204161893706797514}
   m_Layer: 5
-  m_Name: ResourceType1
+  m_Name: ResourceType0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
