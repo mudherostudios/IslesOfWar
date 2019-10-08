@@ -181,22 +181,31 @@ public class IslandManagementInteraction : Interaction
             {
                 double[] cost = new double[4];
                 int type = 0;
-
+                int category = 0;
                 type = prompter.purchaseType;
 
-                if(isCollector)
+                if (isCollector)
+                {
                     cost = new double[] {Constants.collectorCosts[type-1, 0], Constants.collectorCosts[type-1, 1],
                     Constants.collectorCosts[type-1, 2] , Constants.collectorCosts[type-1, 3] };
-                else if(isBunker)
+                    category = 0;
+                }
+                else if (isBunker)
+                {
                     cost = new double[] {Constants.bunkerCosts[type-1, 0], Constants.bunkerCosts[type-1, 1],
                     Constants.bunkerCosts[type-1, 2] , Constants.bunkerCosts[type-1, 3] };
+                    category = 1;
+                }
                 else if (isBlocker)
+                {
                     cost = new double[] {Constants.blockerCosts[type-1, 0], Constants.blockerCosts[type-1, 1],
                     Constants.blockerCosts[type-1, 2] , Constants.blockerCosts[type-1, 3] };
+                    category = 2;
+                }
 
                 if (lastPeekedButton != button.buttonType || lastPeekedName != button.name)
                 {
-                    costSlider.SetCost(GetCollectorName(type),cost);
+                    costSlider.SetCost(GetName(category, type),cost);
                     costSlider.TurnOn(true);
                     lastPeekedButton = button.buttonType;
                     lastPeekedName = button.name;
@@ -214,6 +223,21 @@ public class IslandManagementInteraction : Interaction
         }
     }
 
+    string GetName(int category, int type)
+    {
+        switch (category)
+        {
+            case 0:
+                return GetCollectorName(type);
+            case 1:
+                return GetBunkerName(type);
+            case 2:
+                return GetBlockerName(type);
+            default:
+                return "Unknown Structure";
+        }
+    }
+
     string GetCollectorName(int type)
     {
         switch(type)
@@ -226,6 +250,36 @@ public class IslandManagementInteraction : Interaction
                 return "Lime Processor";
             default:
                 return "Unknown Collector";
+        }
+    }
+
+    string GetBunkerName(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return "Anti Troop Bunker";
+            case 2:
+                return "Anti Tank Bunker";
+            case 3:
+                return "Anti Air Bunker";
+            default:
+                return "Unknown Bunker";
+        }
+    }
+
+    string GetBlockerName(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return "Troop Blocker";
+            case 2:
+                return "Tank Blocker";
+            case 3:
+                return "Air Blocker";
+            default:
+                return "Unknown Blocker";
         }
     }
 
@@ -331,13 +385,13 @@ public class IslandManagementInteraction : Interaction
 
     public void TurnOnIsland()
     {
-        islands = clientInterface.clientState.players[clientInterface.player].islands.ToArray();
+        islands = clientInterface.chainState.players[clientInterface.player].islands.ToArray();
         islandIndex = 0;
         islandID = islands[islandIndex];
         islandCount = islands.Length;
         currentIsland = Instantiate(tileHolderPrefab, generateCenter, Quaternion.Euler(genereateRotation));
         currentStats = currentIsland.GetComponent<IslandStats>();
-        PlaceTiles(clientInterface.clientState.islands[islandID], currentStats, currentIsland.transform);
+        PlaceTiles(clientInterface.chainState.islands[islandID], currentStats, currentIsland.transform);
     }
 
     public void TurnOffIsland()
@@ -386,7 +440,7 @@ public class IslandManagementInteraction : Interaction
 
             int possibleIndexes = islandCount;
 
-            if (clientInterface.clientState.players[clientInterface.player].attackableIsland != "")
+            if (clientInterface.chainState.players[clientInterface.player].attackableIsland != "")
                 possibleIndexes += 1;
 
             if (islandIndex + increment >= possibleIndexes)
@@ -397,12 +451,12 @@ public class IslandManagementInteraction : Interaction
                 islandIndex += increment;
 
             Island island = new Island();
-            islandID = clientInterface.clientState.players[clientInterface.player].allIslands[islandIndex];
+            islandID = clientInterface.chainState.players[clientInterface.player].allIslands[islandIndex];
 
             if (islandIndex < islandCount)
-                island = clientInterface.clientState.islands[islandID];
+                island = clientInterface.chainState.islands[islandID];
             else
-                island = clientInterface.clientState.islands[clientInterface.clientState.players[clientInterface.player].attackableIsland];
+                island = clientInterface.chainState.islands[clientInterface.chainState.players[clientInterface.player].attackableIsland];
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
             SetEditButtons();
@@ -461,8 +515,8 @@ public class IslandManagementInteraction : Interaction
         {
             if (on)
             {
-                string feature = clientInterface.clientState.islands[islandID].features[t].ToString();
-                string collector = clientInterface.clientState.islands[islandID].collectors[t].ToString();
+                string feature = clientInterface.chainState.islands[islandID].features[t].ToString();
+                string collector = clientInterface.chainState.islands[islandID].collectors[t].ToString();
                 TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents, feature, collector);
             }
             else

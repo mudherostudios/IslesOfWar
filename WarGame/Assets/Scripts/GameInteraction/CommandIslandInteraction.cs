@@ -149,15 +149,16 @@ public class CommandIslandInteraction : Interaction
         if (amount > 0)
         {
             clientInterface.PurchaseUnits(type, amount);
+            SetGUIContents();
             orbital.Focus();
         }
     }
 
-    public void AddIslandToPool(string island) { clientInterface.AddIslandToPool(island); orbital.Focus(); }
-    public void SendToPool(int type, double[] resources) { clientInterface.SendResourcePoolContributions(type, resources); orbital.Focus(); }
-    public void SearchForIslands() { clientInterface.SearchForIslands(); orbital.Focus(); }
+    public void AddIslandToPool(string island) { clientInterface.AddIslandToPool(island); orbital.Focus(); SetGUIContents(); }
+    public void SendToPool(int type, double[] resources) { clientInterface.SendResourcePoolContributions(type, resources); orbital.Focus(); SetGUIContents(); }
+    public void SearchForIslands() { clientInterface.SearchForIslands(); orbital.Focus(); SetGUIContents(); }
     public void ChangeNation(string nationCode, bool immediately) { clientInterface.ChangeNation(nationCode, immediately); orbital.Focus(); }
-    public void SubmitAllActions() { clientInterface.SubmitQueuedActions(); orbital.Focus(); }
+    public void SubmitAllActions() { clientInterface.SubmitQueuedActions(); orbital.Focus();}
     public int GetCurrentXayaBlock() { return clientInterface.currentBlock; }
     //----------------------------------------------------------------------
     //Gamestate Variables

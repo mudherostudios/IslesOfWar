@@ -54,7 +54,7 @@ public class ScreenGUI : MonoBehaviour
 
     public void SetGUIContents()
     {
-        double[] playerResources = client.playerResources;
+        double[] playerResources = client.GetSubtractedResources();
         resourceContent[0].text = GetOrderOfMagnitudeString(playerResources[0]);
         resourceContent[1].text = GetOrderOfMagnitudeString(playerResources[1]);
         resourceContent[2].text = GetOrderOfMagnitudeString(playerResources[2]);

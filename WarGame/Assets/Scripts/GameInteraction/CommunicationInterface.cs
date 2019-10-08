@@ -170,7 +170,7 @@ public class CommunicationInterface : MonoBehaviour
             else if (stateRetriever == null)
             {
                 log.success = false;
-                log.message = string.Format("{0} \n No State Retriever Found.",log.message);
+                log.message = string.Format("{0} \nNo State Retriever Found.",log.message);
             }
         }
 

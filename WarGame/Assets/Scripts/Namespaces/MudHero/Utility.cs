@@ -17,9 +17,14 @@ namespace MudHero
 
     public static class Deep
     {
-        public static int[] Copy(int[] original)
+        public static T[] Copy<T>(List<T> original)
         {
-            int[] copy = new int[original.Length];
+            return Copy(original.ToArray());
+        }
+
+        public static T[] Copy<T>(T[] original)
+        {
+            T[] copy = new T[original.Length];
 
             for (int i = 0; i < copy.Length; i++)
             {
@@ -29,9 +34,9 @@ namespace MudHero
             return copy;
         }
 
-        public static int[][] Convert(List<List<int>> original)
+        public static T[][] Convert<T>(List<List<T>> original)
         {
-            int[][] converted = new int[original.Count][];
+            T[][] converted = new T[original.Count][];
 
             for (int c = 0; c < converted.Length; c++)
             {

@@ -14,11 +14,15 @@ using Newtonsoft.Json;
 public class ClientInterface : MonoBehaviour
 {
     public State chainState;
-    public State clientState;
     public CommunicationInterface communication;
     public Notifications notificationSystem;
     public PlayerActions queuedActions;
     public string player;
+
+    public double[] queuedExpenditures;
+    public Island queuedIslandDevelopment;
+    public List<List<double>> queuedContributions;
+    public List<string> queuedDepletedSubmissions;
 
     public ClientInterface(){ queuedActions = new PlayerActions(); }
 
@@ -35,37 +39,48 @@ public class ClientInterface : MonoBehaviour
     void InitStates(State state)
     {
         chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
-        clientState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(state));
+        queuedExpenditures = new double[4];
     }
 
     //Also eventually check to see if queued actions are still valid.
     public void UpdateState()
     {
         chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
-        clientState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
     }
 
     void SpendResources(double[] resources)
     {
-        clientState.players[player].resources[0] -= resources[0];
-        clientState.players[player].resources[1] -= resources[1];
-        clientState.players[player].resources[2] -= resources[2];
-        clientState.players[player].resources[3] -= resources[3];
+        queuedExpenditures[0] += resources[0];
+        queuedExpenditures[1] += resources[1];
+        queuedExpenditures[2] += resources[2];
+        queuedExpenditures[3] += resources[3];
     }
 
     void UpdateCollectors(string islandID, int tileIndex, int[] updatedCollectorTypes)
     {
+        DevelopIsland(islandID);
         int collectorType = EncodeUtility.GetDecodeIndex(updatedCollectorTypes);
-        clientState.islands[islandID].SetCollectors(tileIndex, collectorType.ToString()[0]);
+        queuedIslandDevelopment.SetCollectors(tileIndex, collectorType.ToString()[0]);
     }
 
     void UpdateDefenses(string islandID, int tileIndex, int orderedBunkerType, int orderedBlockerType)
     {
+        DevelopIsland(islandID);
         char[] fullOrder = "))))))))))))".ToCharArray();
         char ordered = EncodeUtility.GetDefenseCode(orderedBlockerType, orderedBunkerType);
         fullOrder[tileIndex] = ordered;
+        queuedIslandDevelopment.SetDefenses(new string(fullOrder));
+    }
 
-        clientState.islands[islandID].SetDefenses(new string(fullOrder));
+    public void DevelopIsland(string islandID)
+    {
+        if (queuedIslandDevelopment == null)
+        {
+            string features = chainState.islands[islandID].features;
+            string collectors = chainState.islands[islandID].collectors;
+            string defenses = chainState.islands[islandID].defenses;
+            queuedIslandDevelopment = new Island(player, features, collectors, defenses);
+        }
     }
 
     //------------------------------------------------------------------
@@ -84,12 +99,13 @@ public class ClientInterface : MonoBehaviour
     
     public bool PurchaseIslandCollector(StructureCost cost)
     {
+        DevelopIsland(cost.islandID);
         bool successfulPurchase = false;
 
-        if (clientState.islands[cost.islandID].owner == player)
+        if (chainState.islands[cost.islandID].owner == player)
         {
-            string tileResources = clientState.islands[cost.islandID].features[cost.tileIndex].ToString();
-            string tileCollectors = clientState.islands[cost.islandID].collectors[cost.tileIndex].ToString();
+            string tileResources = queuedIslandDevelopment.features[cost.tileIndex].ToString();
+            string tileCollectors = queuedIslandDevelopment.collectors[cost.tileIndex].ToString();
 
             int resourceType = EncodeUtility.GetXType(tileResources);
             int collectorType = EncodeUtility.GetXType(tileCollectors);
@@ -97,7 +113,7 @@ public class ClientInterface : MonoBehaviour
             int[] resources = EncodeUtility.GetBaseTypes(resourceType);
             int[] collectors = EncodeUtility.GetBaseTypes(collectorType);
 
-            successfulPurchase = Validity.HasEnoughResources(cost.resources, clientState.players[player].allResources);
+            successfulPurchase = Validity.HasEnoughResources(cost.resources, GetSubtractedResources());
 
             for (int r = 0; r < resources.Length && successfulPurchase; r++)
             {
@@ -121,26 +137,31 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.bld.col = UpdateCollectorOrder(cost.tileIndex, EncodeUtility.GetBaseTypes(cost.purchaseType), queuedActions.bld.col);
             }
         }
+        else
+        {
+            notificationSystem.PushNotification(3, "You are no longer the owner of this island.");
+        }
 
         return successfulPurchase;
     }
     
     public bool PurchaseIslandBunker(string islandID, int tileIndex, int purchaseType)
     {
+        DevelopIsland(islandID);
         bool successfulPurchase = false;
 
-        if (clientState.islands[islandID].owner == player)
+        if (chainState.islands[islandID].owner == player)
         {
-            char existingDefense = clientState.islands[islandID].defenses[tileIndex];
+            char existingDefense = queuedIslandDevelopment.defenses[tileIndex];
             char orderedDefense = EncodeUtility.GetDefenseCode(0, purchaseType);
             successfulPurchase = IslandBuildUtility.CanBuildDefenses(existingDefense, orderedDefense);
             double[] cost = new double[4];
 
-            if(successfulPurchase)
+            if (successfulPurchase)
                 cost = new double[] {Constants.bunkerCosts[purchaseType-1 ,0], Constants.bunkerCosts[purchaseType - 1, 1],
                 Constants.bunkerCosts[purchaseType-1 ,2], Constants.bunkerCosts[purchaseType-1 ,3]};
 
-            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, clientState.players[player].allResources);
+            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, GetSubtractedResources());
 
             if (successfulPurchase)
             {
@@ -153,17 +174,22 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.bld.def = UpdateDefenseOrder(tileIndex, 0, purchaseType, queuedActions.bld.def);
             }
         }
+        else
+        {
+            notificationSystem.PushNotification(3, "You are no longer owner of this island.");
+        }
 
         return successfulPurchase;
     }
     
     public bool PurchaseIslandBlocker(string islandID, int tileIndex, int purchaseType)
     {
+        DevelopIsland(islandID);
         bool successfulPurchase = false;
 
-        if (clientState.islands[islandID].owner == player)
+        if (chainState.islands[islandID].owner == player)
         {
-            char existingDefense = clientState.islands[islandID].defenses[tileIndex];
+            char existingDefense = queuedIslandDevelopment.defenses[tileIndex];
             char orderedDefense = EncodeUtility.GetDefenseCode(purchaseType, 0);
             successfulPurchase = IslandBuildUtility.CanBuildDefenses(existingDefense, orderedDefense);
             double[] cost = new double[4];
@@ -172,7 +198,7 @@ public class ClientInterface : MonoBehaviour
                 cost = new double[] {Constants.blockerCosts[purchaseType-1 ,0], Constants.blockerCosts[purchaseType - 1, 1],
                 Constants.blockerCosts[purchaseType-1 ,2], Constants.blockerCosts[purchaseType-1 ,3]};
 
-            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, clientState.players[player].allResources);
+            successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, GetSubtractedResources());
 
             if (successfulPurchase)
             {
@@ -184,6 +210,10 @@ public class ClientInterface : MonoBehaviour
 
                 queuedActions.bld.def = UpdateDefenseOrder(tileIndex, purchaseType, 0, queuedActions.bld.def);
             }
+        }
+        else
+        {
+            notificationSystem.PushNotification(3, "You are no longer owner of this island.");
         }
 
         return successfulPurchase;
@@ -197,12 +227,11 @@ public class ClientInterface : MonoBehaviour
         spend[2] = Constants.unitCosts[type, 2] * amount;
         spend[3] = Constants.unitCosts[type, 3] * amount;
 
-        bool canSpend = Validity.HasEnoughResources(spend, clientState.players[player].allResources);
+        bool canSpend = Validity.HasEnoughResources(spend, GetSubtractedResources());
 
         if (canSpend)
         {
             SpendResources(spend);
-            clientState.players[player].units[type] += amount;
 
             if(queuedActions.buy == null)
                 queuedActions.buy = new List<int>(new int[9]);
@@ -242,8 +271,8 @@ public class ClientInterface : MonoBehaviour
     
     public void SearchForIslands()
     {
-        double[] cost = IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
-        bool canSearch = Validity.HasEnoughResources(cost, clientState.players[player].allResources);
+        double[] cost = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
+        bool canSearch = Validity.HasEnoughResources(cost, GetSubtractedResources());
 
         if (canSearch)
         {
@@ -256,25 +285,23 @@ public class ClientInterface : MonoBehaviour
     public void SendResourcePoolContributions(int type, double[] resources)
     {
         double[] fullResources = GetFullResources(resources);
-        bool canSend = Validity.HasEnoughResources(fullResources, clientState.players[player].allResources);
+        bool canSend = Validity.HasEnoughResources(fullResources, GetSubtractedResources());
 
         if (canSend)
         {
-            if (!clientState.resourceContributions.ContainsKey(player))
+            if (queuedContributions == null)
             {
-                List<List<double>> contributions = new List<List<double>>
+                queuedContributions = new List<List<double>>
                 {
                     new List<double>{ 0.0, 0.0, 0.0 },
                     new List<double>{ 0.0, 0.0, 0.0 },
                     new List<double>{ 0.0, 0.0, 0.0 }
                 };
-
-                clientState.resourceContributions.Add(player, contributions);
             }
 
-            clientState.resourceContributions[player][type][0] += resources[0];
-            clientState.resourceContributions[player][type][1] += resources[1];
-            clientState.resourceContributions[player][type][2] += resources[2];
+            queuedContributions[type][0] += resources[0];
+            queuedContributions[type][1] += resources[1];
+            queuedContributions[type][2] += resources[2];
 
             SpendResources(fullResources);
             queuedActions.pot = new ResourceOrder(type, new List<double>(resources));
@@ -300,11 +327,9 @@ public class ClientInterface : MonoBehaviour
     
     public void AddIslandToPool(string island)
     {
-        if (Validity.DepletedSubmissions(new List<string> { island }, clientState, player))
+        if (Validity.DepletedSubmissions(new List<string> { island }, chainState, player))
         {
-            clientState.players[player].islands.Remove(island);
-            clientState.islands.Remove(island);
-            clientState.depletedContributions[player].Add(island);
+            queuedDepletedSubmissions.Add(island);
             queuedActions.dep = new List<string>() { island };
             string message = string.Format("Depleted Island {0}... has been queued for reclaimation.", island.Substring(0,10));
             notificationSystem.PushNotification(1, message);
@@ -404,14 +429,17 @@ public class ClientInterface : MonoBehaviour
             {
                 notificationSystem.PushNotification(2, "Actions successfully submitted to the network.");
                 notificationSystem.PushNotification(2, string.Format("Succesful TxID is {0}...", log.message.Substring(0, 10)));
+                queuedActions = new PlayerActions();
+                queuedContributions.Clear();
+                queuedDepletedSubmissions.Clear();
+                queuedExpenditures = new double[4];
+                queuedIslandDevelopment = null;
             }
             else
             {
                 notificationSystem.PushNotification(3, "Action submission to the network has failed.");
                 notificationSystem.PushNotification(3, log.message);
             }
-
-            queuedActions = new PlayerActions();
         }
     }
 
@@ -469,9 +497,9 @@ public class ClientInterface : MonoBehaviour
         queuedActions.dfnd = null;
     }
 
-    //**************************************************************************************************
-    //Variables from the processed gamestate - Also Make sure you decide to use chain or client state.
-    //**************************************************************************************************
+    //--------------------------------------------------------------
+    //Variables from the processed gamestate 
+    //--------------------------------------------------------------
     public bool isPlaying { get { return chainState.players.Keys.Contains(player); } }
     public int currentBlock { get { return communication.blockProgress; } }
     public Island[] playerIslands
@@ -480,12 +508,12 @@ public class ClientInterface : MonoBehaviour
         {
             if (isPlaying)
             {
-                List<string> playerIslandIDs = clientState.players[player].islands;
+                List<string> playerIslandIDs = chainState.players[player].islands;
                 Island[] islands = new Island[playerIslandIDs.Count];
 
                 for (int i = 0; i < islands.Length; i++)
                 {
-                    islands[i] = clientState.islands[playerIslandIDs[i]];
+                    islands[i] = chainState.islands[playerIslandIDs[i]];
                 }
 
                 return islands;
@@ -501,8 +529,8 @@ public class ClientInterface : MonoBehaviour
         {
             if (isPlaying)
             {
-                string attackableID = clientState.players[player].attackableIsland;
-                return clientState.islands[attackableID];
+                string attackableID = chainState.players[player].attackableIsland;
+                return chainState.islands[attackableID];
             }
             else
                 return new Island();
@@ -514,7 +542,7 @@ public class ClientInterface : MonoBehaviour
         get
         {
             if (isPlaying)
-                return clientState.players[player].islands;
+                return chainState.players[player].islands;
             else
                 return new List<string>();
         }
@@ -524,7 +552,7 @@ public class ClientInterface : MonoBehaviour
         get
         {
             if (isPlaying)
-                return clientState.players[player].attackableIsland;
+                return chainState.players[player].attackableIsland;
             else
                 return "";
         }
@@ -538,11 +566,11 @@ public class ClientInterface : MonoBehaviour
 
             if (isPlaying)
             {
-                List<string> islands = clientState.players[player].islands;
+                List<string> islands = chainState.players[player].islands;
 
                 foreach (string island in islands)
                 {
-                    if (clientState.islands[island].IsDepleted())
+                    if (chainState.islands[island].IsDepleted())
                         depleted.Add(island);
                 }
             }
@@ -617,7 +645,7 @@ public class ClientInterface : MonoBehaviour
     public bool IslandExists(string islandID)
     {
         if (isPlaying)
-            return clientState.islands.ContainsKey(islandID);
+            return chainState.islands.ContainsKey(islandID);
         else
             return false;
     }
@@ -625,14 +653,14 @@ public class ClientInterface : MonoBehaviour
     public Island GetIsland(string islandID)
     {
         if (isPlaying)
-            return clientState.islands[islandID];
+            return chainState.islands[islandID];
         else
             return new Island();
     }
 
     public double GetContributionSize(int type)
     {
-       return PoolUtility.GetPoolSize(clientState.resourceContributions, type);
+       return PoolUtility.GetPoolSize(chainState.resourceContributions, type);
     }
 
     public double[] GetAllPoolSizes()
@@ -642,23 +670,23 @@ public class ClientInterface : MonoBehaviour
 
     public double[] GetPlayerContributedResources(int type, double[] modifiers)
     {
-        if (clientState.resourceContributions.ContainsKey(player))
-            return PoolUtility.GetPlayerContributedResources(clientState.resourceContributions[player], modifiers);
+        if (chainState.resourceContributions.ContainsKey(player))
+            return PoolUtility.GetPlayerContributedResources(chainState.resourceContributions[player], modifiers);
         else
             return new double[3];
     }
 
     public double[] GetTotalContributedResources(double[] modifiers)
     {
-        return PoolUtility.GetTotalContributedResources(clientState.resourceContributions, modifiers);
+        return PoolUtility.GetTotalContributedResources(chainState.resourceContributions, modifiers);
     }
 
     public double[] GetResourceModifiers(double[] queuedAmounts)
     {
         double[] potentialPoolSizes = GetAllPoolSizes();
-        potentialPoolSizes[0] += queuedAmounts[0] + clientState.resourcePools[0];
-        potentialPoolSizes[1] += queuedAmounts[1] + clientState.resourcePools[1];
-        potentialPoolSizes[2] += queuedAmounts[2] + clientState.resourcePools[2];
+        potentialPoolSizes[0] += queuedAmounts[0] + chainState.resourcePools[0];
+        potentialPoolSizes[1] += queuedAmounts[1] + chainState.resourcePools[1];
+        potentialPoolSizes[2] += queuedAmounts[2] + chainState.resourcePools[2];
 
         return PoolUtility.CalculateResourcePoolModifiers(potentialPoolSizes);
     }
@@ -667,10 +695,10 @@ public class ClientInterface : MonoBehaviour
     public double GetOwnership(double[] modifiers, int type)
     {
         double[] totalPoints;
-        double[][] ownerships = PoolUtility.CalculateOwnershipOfPools(clientState.resourceContributions, modifiers, out totalPoints);
+        double[][] ownerships = PoolUtility.CalculateOwnershipOfPools(chainState.resourceContributions, modifiers, out totalPoints);
         int counter = 0;
 
-        foreach (KeyValuePair<string, List<List<double>>> pair in clientState.resourceContributions)
+        foreach (KeyValuePair<string, List<List<double>>> pair in chainState.resourceContributions)
         {
             if (pair.Key != player)
                 counter++;
@@ -686,10 +714,10 @@ public class ClientInterface : MonoBehaviour
         double total = 0;
         double playerAmount = 0;
 
-        if (clientState.depletedContributions.ContainsKey(player))
-            playerAmount = clientState.depletedContributions[player].Count;
+        if (chainState.depletedContributions.ContainsKey(player))
+            playerAmount = chainState.depletedContributions[player].Count + queuedDepletedSubmissions.Count;
 
-        foreach (KeyValuePair<string, List<string>> pair in clientState.depletedContributions)
+        foreach (KeyValuePair<string, List<string>> pair in chainState.depletedContributions)
         {
             total += pair.Value.Count;
         }
@@ -706,13 +734,13 @@ public class ClientInterface : MonoBehaviour
 
     public double GetWarbucksPoolSize()
     {
-        return clientState.warbucksPool;
+        return chainState.warbucksPool;
     }
 
     public double[] GetIslandSearchCost()
     {
         if (isPlaying)
-            return IslandSearchCostUtility.GetCost(clientState.players[player].islands.Count);
+            return IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
         else
             return new double[4];
     }
@@ -828,5 +856,20 @@ public class ClientInterface : MonoBehaviour
         char updatedDefense = EncodeUtility.GetDefenseCode(updatedBlocker, updatedBunkerComboType);
         defenseArray[tileIndex] = updatedDefense;
         return new string(defenseArray);
+    }
+
+    public double[] GetSubtractedResources()
+    {
+        double[] subtracted = new double[4];
+
+        if (chainState.players.Keys.Contains(player))
+        {
+            subtracted[0] = chainState.players[player].resources[0] - queuedExpenditures[0];
+            subtracted[1] = chainState.players[player].resources[1] - queuedExpenditures[1];
+            subtracted[2] = chainState.players[player].resources[2] - queuedExpenditures[2];
+            subtracted[3] = chainState.players[player].resources[3] - queuedExpenditures[3];
+        }
+
+        return subtracted;
     }
 }
