@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using IslesOfWar;
+using IslesOfWar.Communication;
 using IslesOfWar.GameStateProcessing;
 using MudHero;
 using MudHero.XayaCommunication;
@@ -32,6 +32,13 @@ public class PlayStateTesting : MonoBehaviour
             GetMoveData();
         if (Input.GetKeyDown(KeyCode.G))
             Debug.Log(GenerateBlocks()[0]);
+        if (Input.GetKeyDown(KeyCode.J))
+            CheckJson();
+    }
+
+    void CheckJson()
+    {
+        Debug.Log(Validity.JSON("{\"message\"}"));
     }
 
     void GetTestData()

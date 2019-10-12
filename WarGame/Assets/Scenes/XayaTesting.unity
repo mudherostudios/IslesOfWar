@@ -123,7 +123,6 @@ GameObject:
   - component: {fileID: 976587963}
   - component: {fileID: 976587962}
   - component: {fileID: 976587961}
-  - component: {fileID: 976587965}
   - component: {fileID: 976587966}
   - component: {fileID: 976587967}
   m_Layer: 0
@@ -197,25 +196,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &976587965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 976587960}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 021c31cec1a53ea4580bb94f9c52146c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blockData: '{"rngseed":"5b43162a0b7253fb5dd9e08c78d040b606df69bdf7c8abeca334aed92d99df4b","moves":[{"inputs":[{"txid":"79e6fa02b7cbf0017135d62101682254b822cc1476b5990008e5ed3311168399","vout":0},{"txid":"88b56e9af63ad53822f6af9f80985b5d3a1d9cc67f6f8b237bd843deea4cb7ed","vout":0}],"move":{"nat":"OR","bld":{"id":"1234567890","col":"0987654321","def":"qwer5t6y7u"},"buy":[1,2,3,4,5,6,7,8,9],"srch":0,"pot":{"rsrc":0,"amnt":[0,100,200]},"dep":["1234567890","qwertyuio","asdfghjk"],"attk":{"id":"123456789","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]]},"dfnd":{"id":"qwertyuio","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]],"flw":[1,1]}},"name":"cairo","out":{"CeYndM81TFtbKAhEXQo2vPzym8cWhwmZjH":59.97631241},"txid":"4bd12e513d777d628aaae1f3fd1d3a583c0f495806d9cdcd40841d47795018ea"}]}'
-  validBlockData: '{"rngseed":"5b43162a0b7253fb5dd9e08c78d040b606df69bdf7c8abeca334aed92d99df4b","moves":[{"inputs":[{"txid":"79e6fa02b7cbf0017135d62101682254b822cc1476b5990008e5ed3311168399","vout":0},{"txid":"88b56e9af63ad53822f6af9f80985b5d3a1d9cc67f6f8b237bd843deea4cb7ed","vout":0}],"move":{"nat":"OR","bld":{"id":"1234567890","col":"0987654321","def":"qwer5t6y7u"},"buy":[1,2,3,4,5,6,7,8,9],"srch":0,"pot":{"rsrc":0,"amnt":[0,100,200]},"dep":["1234567890","qwertyuio","asdfghjk"],"attk":{"id":"123456789","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]]},"dfnd":{"id":"qwertyuio","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]],"flw":[1,1]}},"name":"cairo","out":{"CeYndM81TFtbKAhEXQo2vPzym8cWhwmZjH":59.97631241},"txid":"4bd12e513d777d628aaae1f3fd1d3a583c0f495806d9cdcd40841d47795018ea"}]}'
-  invalidGameMoves: '{"punkbutter":[{"farts":"stinky"},{"clowns":"scary"}],"weapons":10,"telekenis":true}'
-  validGameMoves: '{"nat":"OR","bld":{"id":"1234567890","col":"0987654321","def":"qwer5t6y7u"},"buy":[1,2,3,4,5,6,7,8,9],"srch":0,"pot":{"rsrc":0,"amnt":[0,100,200]},"dep":["1234567890","qwertyuio","asdfghjk"],"attk":{"id":"123456789","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]]},"dfnd":{"id":"qwertyuio","pln":[[0,1,2,3,4,5],[2,4,6,8,10,11]],"sqd":[[100,0,0,10,0,0,1,0,0],[100,0,0,10,0,0,1,0,0]],"flw":[1,1]}}'
-  databasePath: /database/
-  dbName: IslesOfWar.db
-  DEBUG: 1
 --- !u!114 &976587966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,7 +215,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976587960}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 238057da085fad74da0b2c396fe4aa67, type: 3}
   m_Name: 

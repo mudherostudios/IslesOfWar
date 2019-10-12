@@ -90,14 +90,14 @@ namespace IslesOfWar
             "Weasel", "Whale", "Whitefish", "Wildcat", "Wildebeest", "Wolf", "Wolverine", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra"
         };
 
-        public static double[] islandSearchCost = new double[] { 1000, 0, 0, 0 };
+        public static float[] islandSearchCost = new float[] { 1000, 0, 0, 0 };
         public static int islandUndiscoveredMinimum = 10;
-        public static double undiscoveredFalloffRate = 0.3;
-        public static double islandSearchReplenishTime = 150.0; //Estimated time in blocks it should take to get enough resources to search again.
+        public static float undiscoveredFalloffRate = 0.3f;
+        public static float islandSearchReplenishTime = 150.0f; //Estimated time in blocks it should take to get enough resources to search again.
         public static string[] islandSearchOptions = new string[] { "norm" };
         
         //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
-        public static double[,] unitCosts = new double[,]
+        public static float[,] unitCosts = new float[,]
         {
             {10,    0,      10,     0},
             {50,    0,      20,     0},
@@ -110,21 +110,21 @@ namespace IslesOfWar
             {1000,  500,    200,    0}
         };
 
-        public static double[,] blockerCosts = new double[,]
+        public static float[,] blockerCosts = new float[,]
         {
             {1500, 100, 1000, 100 },
             {1500, 1000, 500, 500 },
             {1500, 500, 1000, 1000}
         };
 
-        public static double[,] bunkerCosts = new double[,]
+        public static float[,] bunkerCosts = new float[,]
         {
             {1500, 100, 1000, 100 },
             {1500, 1000, 500, 500 },
             {1500, 500, 1000, 1000}
         };
 
-        public static double[,] collectorCosts = new double[,]
+        public static float[,] collectorCosts = new float[,]
         {
             {1500, 500, 1000, 1000 },
             {1500, 1000, 500, 1000 },
@@ -172,7 +172,7 @@ namespace IslesOfWar
             {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
         };
 
-        public static float[,] minMaxResources = new float[,]
+        public static int[,] minMaxResources = new int[,]
         {
             {28750, 80500},
             {28750, 80500},
@@ -187,12 +187,12 @@ namespace IslesOfWar
 
         //X = Warbucks Oil Metal Lime 
         //Y = Units Collectors Defenses Search
-        public static double[,] purchaseToPoolPercents = new double[,]
+        public static float[,] purchaseToPoolPercents = new float[,]
         {
-            {0.15, 0.05, 0.05, 0.05},
-            {0.15, 0.05, 0.05, 0.05},
-            {0.15, 0.05, 0.05, 0.05},
-            {0.15, 0.05, 0.05, 0.05}
+            {0.15f, 0.05f, 0.05f, 0.05f},
+            {0.15f, 0.05f, 0.05f, 0.05f},
+            {0.15f, 0.05f, 0.05f, 0.05f},
+            {0.15f, 0.05f, 0.05f, 0.05f}
         };
 
         public static int poolRewardBlocks = 7000;

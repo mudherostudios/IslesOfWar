@@ -50,8 +50,6 @@ namespace IslesOfWar
                     int seed = HexToInt.Get(rng.Substring(0,8));
                     MudHeroRandom random = new MudHeroRandom(seed);
 
-                    //Admin commands would be processed here first.
-
                     if (currentState.Length > 2)
                         processor = new StateProcessor(JsonConvert.DeserializeObject<State>(currentState));
                     else
@@ -60,6 +58,20 @@ namespace IslesOfWar
                         processor.state.Init();
                     }
 
+                    //Admin commands would be processed here first.
+                    string adminCommands = JsonConvert.SerializeObject(admin);
+                    if (adminCommands.Length > 2)
+                    {
+                        adminCommands = JsonConvert.SerializeObject(admin[0]["cmd"]);
+
+                        if (Validity.JSON(adminCommands))
+                        {
+                            AdminCommands commands = JsonConvert.DeserializeObject<AdminCommands>(adminCommands);
+                            processor.ApplyAdminCommands(commands);
+                        }
+                        
+                    }
+                    
                     //Resource Loop
                     processor.UpdateIslandAndPlayerResources();
 
@@ -99,7 +111,6 @@ namespace IslesOfWar
 
                                 if (actions.pot != null)
                                     processor.SubmitResourcesToPool(player, actions.pot);
-
                             }
                         }
 

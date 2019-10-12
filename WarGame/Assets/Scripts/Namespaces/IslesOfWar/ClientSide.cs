@@ -132,10 +132,8 @@ namespace IslesOfWar
                         totalPoints[p] += ownership[o][p];
                     }
                 }
-
                 return ownership;
             }
-
         }
 
         public class State
@@ -146,6 +144,7 @@ namespace IslesOfWar
             public Dictionary<string, List<string>> depletedContributions;
             public List<double> resourcePools;
             public double warbucksPool;
+            public string debugBlockData = "";
 
             public State() { }
             
@@ -233,7 +232,7 @@ namespace IslesOfWar
             }
 
             //Think of resources as how many times extraction can be made rather than an actual amount.
-            public void SetResources()
+            public void SetResources(ref MudHeroRandom random)
             {
                 if (resources == null && features != null)
                 {
@@ -248,8 +247,8 @@ namespace IslesOfWar
                         {
                             if (tileTypes[r] > 0)
                             {
-                                float rand = Random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]);
-                                rand = Mathf.Round(rand);
+                                float rand = random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]);
+                                rand = Mathf.CeilToInt(rand);
                                 resources[t].Add(rand);
                             }
                             else

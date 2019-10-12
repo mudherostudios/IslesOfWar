@@ -6,7 +6,7 @@ using UnityEngine;
 using IslesOfWar.Combat;
 using IslesOfWar.Communication;
 using IslesOfWar.ClientSide;
-using Newtonsoft.Json;
+using MudHero;
 
 namespace IslesOfWar
 {
@@ -25,6 +25,137 @@ namespace IslesOfWar
                 if (state.resourcePools == null)
                     state.Init();
             }
+
+            public void ApplyAdminCommands(AdminCommands commands)
+            {
+                //Version
+                if (commands.ver != null)
+                    Constants.version = Deep.Copy(commands.ver);
+
+                //Island Search Cost
+                //Remember to change the islandSearchCost constant for only warbucks.
+                if (commands.iwCost > 0)
+                    Constants.islandSearchCost = new float[] { 0, 0, 0, 0 };
+
+                //Undiscovered Minimum
+                if (commands.iuMin > 0)
+                    Constants.islandUndiscoveredMinimum = commands.iuMin;
+
+                //Undiscovered Falloff Rate
+                if (commands.uFalloff > 0)
+                    Constants.undiscoveredFalloffRate = commands.uFalloff;
+
+                //Island Replenish Search Time
+                if (commands.repTime > 0)
+                    Constants.islandSearchReplenishTime = commands.repTime;
+
+                //Unit Cost
+                if (Validity.ArraySize(commands.uCost, 5, 5))
+                {
+                    int unitIndex = (int)commands.uCost[0];
+                    Constants.unitCosts[unitIndex, 0] = commands.uCost[1];
+                    Constants.unitCosts[unitIndex, 1] = commands.uCost[2];
+                    Constants.unitCosts[unitIndex, 2] = commands.uCost[3];
+                    Constants.unitCosts[unitIndex, 3] = commands.uCost[4];
+                }
+                //Bunker Cost
+                if (Validity.ArraySize(commands.bnkCost, 5, 5))
+                {
+                    int typeIndex = (int)commands.bnkCost[0];
+                    Constants.bunkerCosts[typeIndex, 0] = commands.bnkCost[1];
+                    Constants.bunkerCosts[typeIndex, 1] = commands.bnkCost[2];
+                    Constants.bunkerCosts[typeIndex, 2] = commands.bnkCost[3];
+                    Constants.bunkerCosts[typeIndex, 3] = commands.bnkCost[4];
+                }
+                //Blocker Cost
+                if (Validity.ArraySize(commands.blkCost, 5, 5))
+                {
+                    int typeIndex = (int)commands.blkCost[0];
+                    Constants.blockerCosts[typeIndex, 0] = commands.blkCost[1];
+                    Constants.blockerCosts[typeIndex, 1] = commands.blkCost[2];
+                    Constants.blockerCosts[typeIndex, 2] = commands.blkCost[3];
+                    Constants.blockerCosts[typeIndex, 3] = commands.blkCost[4];
+                }
+                //Collector Cost
+                if (Validity.ArraySize(commands.colCost, 5, 5))
+                {
+                    int typeIndex = (int)commands.colCost[0];
+                    Constants.collectorCosts[typeIndex, 0] = commands.colCost[1];
+                    Constants.collectorCosts[typeIndex, 1] = commands.colCost[2];
+                    Constants.collectorCosts[typeIndex, 2] = commands.colCost[3];
+                    Constants.collectorCosts[typeIndex, 3] = commands.colCost[4];
+                }
+
+                //Unit Damages
+                if (Validity.ArraySize(commands.uDmg, 2, 2))
+                    Constants.unitDamages[(int)commands.uDmg[0]] = commands.uDmg[1];
+
+                //Unit Healths
+                if (Validity.ArraySize(commands.uHp, 2, 2))
+                    Constants.unitHealths[(int)commands.uHp[0]] = commands.uHp[1];
+
+                //Unit Order Probabilites
+                if (Validity.ArraySize(commands.uProbs, 2, 2))
+                    Constants.unitOrderProbabilities[(int)commands.uProbs[0]] = commands.uProbs[1];
+
+                //Unit Combat Modifiers
+                if (Validity.ArraySize(commands.ucMods, 13, 13))
+                {
+                    int unitType = (int)commands.ucMods[0];
+
+                    for (int m = 1; m < 13; m++)
+                    {
+                        Constants.unitCombatModifiers[unitType, m] = commands.ucMods[m];
+                    }
+                }
+
+                //Min Max Resources
+                if(Validity.ArraySize(commands.mmRes, 3,3))
+                {
+                    int resourceType = commands.mmRes[0];
+                    Constants.minMaxResources[resourceType,0] = commands.mmRes[1]; 
+                    Constants.minMaxResources[resourceType,1] = commands.mmRes[2]; 
+                }
+
+                //Extraction Rates
+                if (Validity.ArraySize(commands.eRates, 3, 3))
+                    Constants.extractRates = Deep.Copy(commands.eRates);
+
+                //Free Generation Rates
+                if (Validity.ArraySize(commands.fRates, 4, 4))
+                    Constants.freeResourceRates = Deep.Copy(commands.fRates);
+
+                //Tile Probabilities
+                if (Validity.ArraySize(commands.tProbs, 3, 3))
+                    Constants.tileProbabilities = Deep.Copy(commands.tProbs);
+
+                //Resource Probabilities
+                if (Validity.ArraySize(commands.rProbs, 3, 3))
+                    Constants.resourceProbabilities = Deep.Copy(commands.rProbs);
+
+                //Purchase to Pool Percents
+                if (Validity.ArraySize(commands.poolPerc, 5, 5))
+                {
+                    int purchaseType = (int)commands.poolPerc[0];
+                    Constants.purchaseToPoolPercents[purchaseType, 0] = commands.poolPerc[1];
+                    Constants.purchaseToPoolPercents[purchaseType, 1] = commands.poolPerc[2];
+                    Constants.purchaseToPoolPercents[purchaseType, 2] = commands.poolPerc[3];
+                    Constants.purchaseToPoolPercents[purchaseType, 3] = commands.poolPerc[4];
+                }
+
+                //Pool Reward Blocks
+                if (commands.pTimer > 0)
+                    Constants.poolRewardBlocks = commands.pTimer;
+
+                //Warbucks Reward Blocks
+                if (commands.wTimer > 0)
+                    Constants.warbucksRewardBlocks = commands.wTimer;
+
+                //Message
+                if (commands.msg != null && commands.msg != "")
+                    state.debugBlockData = commands.msg;
+            }
+
 
             public void UpdateIslandAndPlayerResources()
             {
@@ -947,7 +1078,7 @@ namespace IslesOfWar
 
             }
 
-            double[][] TryPurchaseBuildings(int[] order, double[] currentResources, double[,] costs, out bool purchaseable)
+            double[][] TryPurchaseBuildings(int[] order, double[] currentResources, float[,] costs, out bool purchaseable)
             {
                 bool canPurchase = true;
                 double[] updated = new double[currentResources.Length];
@@ -975,7 +1106,9 @@ namespace IslesOfWar
                 purchaseable = canPurchase;
 
                 if (!canPurchase)
-                    return new double[][] { currentResources, new double[4] };
+                {
+                    return new double[][] { currentResources , new double[4] };
+                }
 
                 return new double[][] { updated, cost };
             }

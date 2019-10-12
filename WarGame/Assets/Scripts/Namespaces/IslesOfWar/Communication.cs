@@ -86,12 +86,45 @@ namespace IslesOfWar
             public BattleCommand dfnd;  //Defend Orders
         }
 
+        public class AdminCommands
+        {
+            public int[] ver;          //Set Version, sets all - 3
+            public float iwCost;       //Set IslandSearchCost ********* Need to change the cost method first. *********
+            public int iuMin;          //Set IslandUndiscoveredMinimum
+            public float uFalloff;     //Set UndiscoveredFalloffRate
+            public float repTime;      //Set IslandReplenishTime
+            public float[] uCost;      //Set UnitCost first is unitType, next 4 are prices - 5
+            public float[] bnkCost;    //Set BunkerCost, same as uCost
+            public float[] blkCost;    //Set BlockerCost, same as uCost
+            public float[] colCost;    //Set CollectorCost, same as uCost
+            public float[] uDmg;       //Set UnitDamages, first is type/index, next is damage - 2
+            public float[] uHp;        //Set UnitHealths, same as uDmg
+            public float[] uProbs;     //Set UnitOrderProbabilities, same as uDmg
+            public float[] ucMods;     //Set UnitCombatModifiers, first is unitType, next 12 is modifiers - 13
+            public int[] mmRes;        //Set MinMaxResoruces, first is resourceType, next 2 are min and max respectively - 3
+            public float[] eRates;     //Set ExtractRates, sets all - 3
+            public float[] fRates;     //Set FreeResourceRates, sets all - 4
+            public float[] tProbs;     //Set TileProbabilities, sets all - 3
+            public float[] rProbs;     //Set ResourceProbabilities, set all - 3
+            public float[] poolPerc;   //Set PurchaseToPoolPercents, first is YType, next 4 are percents per resource - 5
+            public int pTimer;         //Set PoolRewardBlocks
+            public int wTimer;         //Set WarbucksRewardBlocks
+            public string msg;         //Set a message that can be displayed to everyone. Use special characters at start for message types.
+            public string txid;        //Transaction ID of the command. Xaya Given Info.
+        }
+
         public static class CommandUtility
         {
-            public static string GetSerializedCommand(PlayerActions actions)
+            public static string GetSerializedPlayerCommand(PlayerActions actions)
             {
                 JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
                 return JsonConvert.SerializeObject(actions, Formatting.None, settings);
+            }
+
+            public static string GetSerializedAdminCommand(AdminCommands commands)
+            {
+                JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+                return JsonConvert.SerializeObject(commands, Formatting.None, settings);
             }
         }
 
@@ -102,7 +135,10 @@ namespace IslesOfWar
                 try
                 {
                     object obj = JToken.Parse(stringToValidate);
-                    return true;
+                    if (stringToValidate[0] == '{' && stringToValidate[stringToValidate.Length - 1] == '}')
+                        return true;
+                    else
+                        return false;
                 }
                 catch
                 {
@@ -359,6 +395,22 @@ namespace IslesOfWar
                 isLessThanOrEqualTo2048 = json.Length <= 2048;
 
                 return isLessThanOrEqualTo2048;
+            }
+
+            public static bool ArraySize<T>(T[] array, int minSize, int maxSize)
+            {
+                bool isValid = false;
+
+                if (array != null)
+                {
+                    if (maxSize == 0)
+                        maxSize = minSize;
+
+                    if (array.Length >= minSize && array.Length <= maxSize)
+                        isValid = true;
+                }
+
+                return isValid;
             }
         }
     }

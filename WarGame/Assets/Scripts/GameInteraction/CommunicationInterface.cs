@@ -91,6 +91,7 @@ public class CommunicationInterface : MonoBehaviour
         blockCount = xayaCommands.networkBlockCount;
         gameState = _gameState;
     }
+    
 
     public ConnectionLog Connect(string user, string password, string _walletPassword)
     {

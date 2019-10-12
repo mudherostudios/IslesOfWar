@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 public class GSPTesting : MonoBehaviour
 {
     StateProcessor processor;
-
+    MudHeroRandom random;
     Dictionary<string, PlayerState> players;
     Dictionary<string, Island> islands;
     string[] IIDs = new string[] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o" };
@@ -39,7 +39,7 @@ public class GSPTesting : MonoBehaviour
     string terrainTestingResults = "";
     string[] label;
     string[] results;
-    double[,] colCost = Constants.collectorCosts;
+    float[,] colCost = Constants.collectorCosts;
     int passCount;
     int failCount;
 
@@ -1302,7 +1302,7 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         resourceUpdateResults = "";
-        SetIslandResources();
+        SetIslandResources(ref random);
         Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
         Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
 
@@ -1566,7 +1566,7 @@ public class GSPTesting : MonoBehaviour
     {
         ResetTestData();
         depletedIslandResults = "";
-        SetIslandResources();
+        SetIslandResources(ref random);
         Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
         Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
 
@@ -1588,7 +1588,7 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed with multiple depeleted island.
         ResetTestData();
-        SetIslandResources();
+        SetIslandResources(ref random);
         ClearResources(processor.state.islands["a"].resources);
         ClearResources(processor.state.islands["b"].resources);
         ClearResources(processor.state.islands["c"].resources);
@@ -1605,7 +1605,7 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed with updating to already existing contributions
         ResetTestData();
-        SetIslandResources();
+        SetIslandResources(ref random);
         alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(savedIslands));
         processor.state.islands.Remove("a");
         ClearResources(processor.state.islands["b"].resources);
@@ -1621,7 +1621,7 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed with 1 depleted island from multiple users.
         ResetTestData();
-        SetIslandResources();
+        SetIslandResources(ref random);
         alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(savedIslands));
         ClearResources(processor.state.islands["a"].resources);
         ClearResources(processor.state.islands["e"].resources);
@@ -1648,7 +1648,7 @@ public class GSPTesting : MonoBehaviour
 
         //Fail multi island because one island is not depleted.
         ResetTestData();
-        SetIslandResources();
+        SetIslandResources(ref random);
         ClearResources(processor.state.islands["b"].resources);
         ClearResources(processor.state.islands["c"].resources);
         ClearResources(processor.state.islands["d"].resources);
@@ -1659,7 +1659,7 @@ public class GSPTesting : MonoBehaviour
 
         //Fail multi island because one island is not owned by player.
         ResetTestData();
-        SetIslandResources();
+        SetIslandResources(ref random);
         ClearResources(processor.state.islands["a"].resources);
         ClearResources(processor.state.islands["b"].resources);
         ClearResources(processor.state.islands["c"].resources);
@@ -2293,11 +2293,11 @@ public class GSPTesting : MonoBehaviour
     }
 
 
-    void SetIslandResources()
+    void SetIslandResources(ref MudHeroRandom random)
     {
         foreach (KeyValuePair<string, Island> pair in processor.state.islands)
         {
-            pair.Value.SetResources();
+            pair.Value.SetResources(ref random);
         }
     }
 
@@ -2356,7 +2356,7 @@ public class GSPTesting : MonoBehaviour
     {
         //Initialize Random Seed to get the same islands everytime.
         //Changing this seed will break a lot of the tests.
-        MudHeroRandom random = new MudHeroRandom(1337);
+        random = new MudHeroRandom(1337);
         processor = new StateProcessor();
         processor.state = new State();
         processor.state.Init();

@@ -88,7 +88,7 @@ namespace MudHero
                         if (actualState != null)
                         {
                             yield return Ninja.JumpToUnity;
-                            communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate); 
+                            communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate);
                             yield return Ninja.JumpBack;
 
                             yield return null;
