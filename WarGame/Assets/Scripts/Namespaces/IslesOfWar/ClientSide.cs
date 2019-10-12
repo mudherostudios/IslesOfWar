@@ -11,11 +11,6 @@ namespace IslesOfWar
     {
         public static class PoolUtility
         {
-            public static ulong MapLongToUlong(long longValue)
-            {
-                return unchecked((ulong)(longValue - long.MinValue));
-            }
-            
             public static double GetPoolSize(Dictionary<string, List<List<double>>> contributions, int type)
             {
                 double poolSize = 0;
@@ -205,16 +200,6 @@ namespace IslesOfWar
                 depletedContributions = depContributions;
                 resourcePools = resPools;
                 warbucksPool = warPool;
-            }
-
-            public Island[] allIslands
-            {
-                get { return islands.Values.ToArray(); }
-            }
-
-            public string[] allIslandIDs
-            {
-                get { return islands.Keys.ToArray(); }
             }
         }
 
@@ -635,10 +620,6 @@ namespace IslesOfWar
             public List<double> resources;
             public List<string> islands;
             public string attackableIsland;
-
-            public double[] allUnits { get { return units.ToArray(); } }
-            public double[] allResources { get { return resources.ToArray(); } }
-            public string[] allIslands { get { return islands.ToArray(); } }
 
             public PlayerState() { }
 

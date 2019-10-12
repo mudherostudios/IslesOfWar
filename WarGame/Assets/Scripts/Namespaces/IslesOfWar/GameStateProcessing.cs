@@ -192,7 +192,7 @@ namespace IslesOfWar
                 if (!state.resourceContributions.ContainsKey(playerName))
                     state.resourceContributions.Add(playerName, new List<List<double>> { new List<double>(), new List<double>(), new List<double>() } );
 
-                if (Validity.HasEnoughResources(resources.costs, state.players[playerName].allResources))
+                if (Validity.HasEnoughResources(resources.costs, state.players[playerName].resources.ToArray()))
                 {
                     SpendResources(playerName, resources, true);
 
@@ -234,7 +234,7 @@ namespace IslesOfWar
                     int[] resources = EncodeUtility.GetBaseTypes(resourceType);
                     int[] collectors = EncodeUtility.GetBaseTypes(collectorType);
 
-                    successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].allResources);
+                    successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].resources.ToArray());
 
                     for (int r = 0; r < resources.Length; r++)
                     {
@@ -270,7 +270,7 @@ namespace IslesOfWar
 
                     if (cost.purchaseType > 0 && cost.purchaseType <= tileDefenses.Length)
                     {
-                       successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].allResources);
+                       successfulPurchase = Validity.HasEnoughResources(cost.resources, state.players[playerName].resources.ToArray());
 
                         if (blockerType != 0 && cost.purchaseType <= 3)
                             successfulPurchase = false;
@@ -337,7 +337,7 @@ namespace IslesOfWar
             //Phase Out After Changed in Client
             public State PurchaseUnits(string playerName, Cost cost)
             {
-                if (Validity.HasEnoughResources(cost.costs, state.players[playerName].allResources))
+                if (Validity.HasEnoughResources(cost.costs, state.players[playerName].resources.ToArray()))
                 {
                     SpendResources(playerName, cost, false);
                     //Deleted name type costs

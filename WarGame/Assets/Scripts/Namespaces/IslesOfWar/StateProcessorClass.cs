@@ -94,7 +94,7 @@ namespace IslesOfWar
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
-                    string discovered = IslandDiscovery.GetIsland(state.players[player].islands.Count, state.allIslandIDs, txid, ref random);
+                    string discovered = IslandDiscovery.GetIsland(state.players[player].islands.Count, state.islands.Keys.ToArray(), txid, ref random);
                     double[] resources = Subtract(state.players[player].resources.ToArray(), cost);
                     state.players[player].resources.Clear();
                     state.players[player].resources.AddRange(resources);
@@ -115,8 +115,8 @@ namespace IslesOfWar
 
             public void PurchaseUnits(string player, List<int> order)
             {
-                double[] resources = state.players[player].allResources;
-                double[] units = state.players[player].allUnits;
+                double[] resources = state.players[player].resources.ToArray();
+                double[] units = state.players[player].units.ToArray();
                 double[][] result = TryPurchaseUnits(order, resources, units);
                 state.players[player].resources.Clear();
                 state.players[player].resources.AddRange(result[0]);
@@ -142,7 +142,7 @@ namespace IslesOfWar
                             defensesOrdered = order.def != "))))))))))))" && order.def.Length == 12;
 
                         double[] resources = new double[4];
-                        Array.Copy(state.players[player].allResources, resources, 4);
+                        Array.Copy(state.players[player].resources.ToArray(), resources, 4);
 
                         if(collectorsOrdered)
                             resources = DevelopCollectors(order.col, island, resources, out collectorsOrdered);
@@ -246,7 +246,7 @@ namespace IslesOfWar
 
                     if (canUpdate)
                     {
-                        double[] totalUnits = state.players[player].allUnits;
+                        double[] totalUnits = state.players[player].units.ToArray();
                         totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
 
                         canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
@@ -330,7 +330,7 @@ namespace IslesOfWar
                 bool canSubmit = order.amnt != null;
 
                 if (canSubmit)
-                    canSubmit = Validity.ResourceSubmissions(order, state.players[player].allResources);
+                    canSubmit = Validity.ResourceSubmissions(order, state.players[player].resources.ToArray());
                 
                 //This section is both creating an updated resources array and checking if its valid
                 //I would like if it were cleaner.
@@ -435,7 +435,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                     canAttack = canAttack && state.islands.ContainsKey(attackPlan.id) && attackPlan.pln.Count == attackPlan.sqd.Count
-                    && Validity.AttackPlan(attackPlan.pln) && Validity.AttackSquad(attackPlan.sqd, state.players[player].allUnits)
+                    && Validity.AttackPlan(attackPlan.pln) && Validity.AttackSquad(attackPlan.sqd, state.players[player].units.ToArray())
                     && !state.players[player].islands.Contains(attackPlan.id);
 
                 bool capturedIsland = false;
@@ -830,7 +830,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                 {
-                    double[] units = state.players[player].allUnits;
+                    double[] units = state.players[player].units.ToArray();
                     canAttack = HasEnoughUnits(units, actions.attk.sqd) && AttackPlansAreAdjacent(actions.attk.pln);
                 }
 

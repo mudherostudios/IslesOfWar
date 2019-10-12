@@ -578,7 +578,7 @@ public class ClientInterface : MonoBehaviour
         get
         {
             if (isPlaying)
-                return chainState.players[player].allResources;
+                return chainState.players[player].resources.ToArray();
             else
                 return new double[4];
         }
@@ -589,7 +589,7 @@ public class ClientInterface : MonoBehaviour
         get
         {
             if (isPlaying)
-                return chainState.players[player].allUnits;
+                return chainState.players[player].units.ToArray();
             else
                 return new double[9];
         }
@@ -755,7 +755,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.buy != null)
         {
-            units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].allResources);
+            units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].resources.ToArray());
 
             if (!units)
                 queuedActions.buy = null;
@@ -771,7 +771,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.pot != null)
         {
-            resource = Validity.ResourceSubmissions(queuedActions.pot, chainState.players[player].allResources);
+            resource = Validity.ResourceSubmissions(queuedActions.pot, chainState.players[player].resources.ToArray());
 
             if (!resource)
                 queuedActions.pot = null;
@@ -787,7 +787,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.attk != null)
         {
-            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].allUnits)
+            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].units.ToArray())
             && chainState.players[player].attackableIsland == queuedActions.attk.id;
 
             if (!attack)
@@ -796,7 +796,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.dfnd != null)
         {
-            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].allUnits)
+            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].units.ToArray())
             && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
 
             if (!defend)

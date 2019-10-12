@@ -6,10 +6,11 @@ using UnityEngine.UI;
 public class Notifications : MonoBehaviour
 {
     public Transform contentParent;
+    public GameObject simpleMessage;
     public GameObject notificationPrefab;
     public Sprite infoIcon, queueIcon, submitIcon;
     public float stayTimer = 2.5f;
-    public Vector3 onPosition, offPosition;
+    public Vector3 onPosition, offPosition, simpleOnPosition;
     public GameObject onButton, offButton;
     private List<GameObject> notifications = new List<GameObject>();
     private float lastTime = 0.0f;
@@ -23,22 +24,32 @@ public class Notifications : MonoBehaviour
         }
     }
 
-    public void Open(bool timed)
+    public void Open(bool simple)
     {
-        if (timed)
+        if (simple)
         {
             lastTime = Time.time;
             doneTiming = false;
-        }
+            simpleMessage.transform.position = new Vector3(simpleOnPosition.x, simpleOnPosition.y, 0);
 
-        transform.position = new Vector3(onPosition.x, transform.position.y, 0);
-        onButton.SetActive(false);
-        offButton.SetActive(true);
+            //Off
+            transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+        }
+        else
+        {
+            transform.position = new Vector3(onPosition.x, transform.position.y, 0);
+            onButton.SetActive(false);
+            offButton.SetActive(true);
+
+            //Off
+            simpleMessage.transform.position = new Vector3(offPosition.x, simpleMessage.transform.position.y, 0);
+        }
     }
 
     public void Close()
     {
         transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+        simpleMessage.transform.position = new Vector3(offPosition.x, transform.position.y, 0);
         doneTiming = true;
         offButton.SetActive(false);
         onButton.SetActive(true);
@@ -53,6 +64,7 @@ public class Notifications : MonoBehaviour
         
         Sprite typeIcon = GetTypeIcon(type);
         notification.GetComponent<NotificationObject>().SetMessage(typeIcon, message);
+        simpleMessage.GetComponent<NotificationObject>().SetMessage(typeIcon, message);
 
         if (notifications.Count * 32 >= contentParent.GetComponent<RectTransform>().rect.height)
         {

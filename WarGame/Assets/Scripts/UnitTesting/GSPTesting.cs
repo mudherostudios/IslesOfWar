@@ -235,71 +235,71 @@ public class GSPTesting : MonoBehaviour
         ResetTestData();
         purchaseUnitResults = "";
         double[][] playerResources = new double[][] { new double[4], new double[4], new double[4] };
-        Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
-        Array.Copy(processor.state.players["pimpMacD"].allResources, playerResources[1], 4);
-        Array.Copy(processor.state.players["nox"].allResources, playerResources[2], 4);
+        Array.Copy(processor.state.players["cairo"].resources.ToArray(), playerResources[0], 4);
+        Array.Copy(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1], 4);
+        Array.Copy(processor.state.players["nox"].resources.ToArray(), playerResources[2], 4);
         double[][] playerUnits = new double[][] { new double[9], new double[9], new double[9] };
-        Array.Copy(processor.state.players["cairo"].allUnits, playerUnits[0], 9);
-        Array.Copy(processor.state.players["pimpMacD"].allUnits, playerUnits[1], 9);
-        Array.Copy(processor.state.players["nox"].allUnits, playerUnits[2], 9);
+        Array.Copy(processor.state.players["cairo"].units.ToArray(), playerUnits[0], 9);
+        Array.Copy(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1], 9);
+        Array.Copy(processor.state.players["nox"].units.ToArray(), playerUnits[2], 9);
 
         //Fail to purchase because array size.
         processor.PurchaseUnits("cairo", new List<int>() { 1, 1, 1 });
-        bool passedFirst = IsEqual(processor.state.players["cairo"].allUnits, playerUnits[0])
-        && IsEqual(processor.state.players["pimpMacD"].allUnits, playerUnits[1])
-        && IsEqual(processor.state.players["nox"].allUnits, playerUnits[2])
-        && IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
-        && IsEqual(processor.state.players["pimpMacD"].allResources, playerResources[1])
-        && IsEqual(processor.state.players["nox"].allResources, playerResources[2]);
+        bool passedFirst = IsEqual(processor.state.players["cairo"].units.ToArray(), playerUnits[0])
+        && IsEqual(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1])
+        && IsEqual(processor.state.players["nox"].units.ToArray(), playerUnits[2])
+        && IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1])
+        && IsEqual(processor.state.players["nox"].resources.ToArray(), playerResources[2]);
         purchaseUnitResults += GetPassOrFail(passedFirst);
 
         //Fail to purchase because not enough of each resource.
         processor.PurchaseUnits("nox", new List<int>() { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-        bool passedSecond = IsEqual(processor.state.players["cairo"].allUnits, playerUnits[0])
-        && IsEqual(processor.state.players["pimpMacD"].allUnits, playerUnits[1])
-        && IsEqual(processor.state.players["nox"].allUnits, playerUnits[2])
-        && IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
-        && IsEqual(processor.state.players["pimpMacD"].allResources, playerResources[1])
-        && IsEqual(processor.state.players["nox"].allResources, playerResources[2]);
+        bool passedSecond = IsEqual(processor.state.players["cairo"].units.ToArray(), playerUnits[0])
+        && IsEqual(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1])
+        && IsEqual(processor.state.players["nox"].units.ToArray(), playerUnits[2])
+        && IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1])
+        && IsEqual(processor.state.players["nox"].resources.ToArray(), playerResources[2]);
         purchaseUnitResults += GetPassOrFail(passedSecond);
 
         //Fail to purchase because not enough of one resource.
         processor.PurchaseUnits("pimpMacD", new List<int>() { 101, 0, 0, 0, 0, 0, 0, 0, 0 });
-        bool passedThird = IsEqual(processor.state.players["cairo"].allUnits, playerUnits[0])
-        && IsEqual(processor.state.players["pimpMacD"].allUnits, playerUnits[1])
-        && IsEqual(processor.state.players["nox"].allUnits, playerUnits[2])
-        && IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
-        && IsEqual(processor.state.players["pimpMacD"].allResources, playerResources[1])
-        && IsEqual(processor.state.players["nox"].allResources, playerResources[2]);
+        bool passedThird = IsEqual(processor.state.players["cairo"].units.ToArray(), playerUnits[0])
+        && IsEqual(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1])
+        && IsEqual(processor.state.players["nox"].units.ToArray(), playerUnits[2])
+        && IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1])
+        && IsEqual(processor.state.players["nox"].resources.ToArray(), playerResources[2]);
         purchaseUnitResults += GetPassOrFail(passedThird);
 
         //Successful purchase of one unit type.
         processor.PurchaseUnits("pimpMacD", new List<int>() { 100, 0, 0, 0, 0, 0, 0, 0, 0 });
-        bool passedFourth = IsEqual(processor.state.players["cairo"].allUnits, playerUnits[0])
-        && IsEqual(processor.state.players["pimpMacD"].allUnits, new double[] { 150, 25, 12, 5, 2, 1, 5, 2, 1 })
-        && IsEqual(processor.state.players["nox"].allUnits, playerUnits[2])
-        && IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
-        && IsEqual(processor.state.players["pimpMacD"].allResources, new double[] { 0, 2500, 1000, 500 })
-        && IsEqual(processor.state.players["nox"].allResources, playerResources[2]);
+        bool passedFourth = IsEqual(processor.state.players["cairo"].units.ToArray(), playerUnits[0])
+        && IsEqual(processor.state.players["pimpMacD"].units.ToArray(), new double[] { 150, 25, 12, 5, 2, 1, 5, 2, 1 })
+        && IsEqual(processor.state.players["nox"].units.ToArray(), playerUnits[2])
+        && IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), new double[] { 0, 2500, 1000, 500 })
+        && IsEqual(processor.state.players["nox"].resources.ToArray(), playerResources[2]);
         purchaseUnitResults += GetPassOrFail(passedFourth);
 
         //Save state again
-        Array.Copy(processor.state.players["cairo"].allUnits, playerUnits[0], 9);
-        Array.Copy(processor.state.players["pimpMacD"].allUnits, playerUnits[1], 9);
-        Array.Copy(processor.state.players["nox"].allUnits, playerUnits[2], 9);
-        Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
-        Array.Copy(processor.state.players["pimpMacD"].allResources, playerResources[1], 4);
-        Array.Copy(processor.state.players["nox"].allResources, playerResources[2], 4);
+        Array.Copy(processor.state.players["cairo"].units.ToArray(), playerUnits[0], 9);
+        Array.Copy(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1], 9);
+        Array.Copy(processor.state.players["nox"].units.ToArray(), playerUnits[2], 9);
+        Array.Copy(processor.state.players["cairo"].resources.ToArray(), playerResources[0], 4);
+        Array.Copy(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1], 4);
+        Array.Copy(processor.state.players["nox"].resources.ToArray(), playerResources[2], 4);
 
         //Successful purchase of multiple units
         //Total purchase based on current unit price should be 2710, 1035, 1175, 0
         processor.PurchaseUnits("cairo", new List<int>() { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-        bool passedFifth = IsEqual(processor.state.players["cairo"].allUnits, new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 })
-        && IsEqual(processor.state.players["pimpMacD"].allUnits, playerUnits[1])
-        && IsEqual(processor.state.players["nox"].allUnits, playerUnits[2])
-        && IsEqual(processor.state.players["cairo"].allResources, new double[] { 290, 6465, 4825, 1500 })
-        && IsEqual(processor.state.players["pimpMacD"].allResources, playerResources[1])
-        && IsEqual(processor.state.players["nox"].allResources, playerResources[2]);
+        bool passedFifth = IsEqual(processor.state.players["cairo"].units.ToArray(), new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 })
+        && IsEqual(processor.state.players["pimpMacD"].units.ToArray(), playerUnits[1])
+        && IsEqual(processor.state.players["nox"].units.ToArray(), playerUnits[2])
+        && IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 290, 6465, 4825, 1500 })
+        && IsEqual(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1])
+        && IsEqual(processor.state.players["nox"].resources.ToArray(), playerResources[2]);
         purchaseUnitResults += GetPassOrFail(passedFifth);
 
     }
@@ -313,44 +313,44 @@ public class GSPTesting : MonoBehaviour
         purchaseCollectorsResults = "";
 
         double[][] playerResources = new double[][] { new double[4], new double[4], new double[4] };
-        Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
-        Array.Copy(processor.state.players["pimpMacD"].allResources, playerResources[1], 4);
-        Array.Copy(processor.state.players["nox"].allResources, playerResources[2], 4);
+        Array.Copy(processor.state.players["cairo"].resources.ToArray(), playerResources[0], 4);
+        Array.Copy(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1], 4);
+        Array.Copy(processor.state.players["nox"].resources.ToArray(), playerResources[2], 4);
         Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
 
         //No need to test if IslandBuildOrder is null or player exists
         //because the callback checks that before it pushes data to this function.
         //Fail because no ID.
         processor.DevelopIsland("cairo", new IslandBuildOrder(null, "100000000000", "))))))))))))"));
-        bool passedFirst = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedFirst = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedFirst);
 
         //Fail because non-existent ID
         processor.DevelopIsland("cairo", new IslandBuildOrder("z", "100000000000", "))))))))))))"));
-        bool passedSecond = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedSecond = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedSecond);
 
         //Fail because defenses and collectors are null
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, null));
-        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedThird);
 
         //Fail because island is not owned by player
         processor.DevelopIsland("cairo", new IslandBuildOrder("o", "100000000000", null));
-        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedFourth);
 
         //Fail because collectors are not long enough. #1
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "10", null));
-        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedFifth);
@@ -359,7 +359,7 @@ public class GSPTesting : MonoBehaviour
 
         //Fail because collectors are not long enough. #2
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "10", "))))))))))))"));
-        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedSeventh);
@@ -372,7 +372,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         alteredIslands["a"].collectors = "100000000000";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000000", null));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedNinth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedNinth);
@@ -383,7 +383,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "200000000000", null));
         alteredIslands["a"].collectors = "200000000000";
-        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedTenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands);
         purchaseCollectorsResults += GetPassOrFail(passedTenth);
 
@@ -393,7 +393,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 0, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "300000000000", null));
         alteredIslands["a"].collectors = "300000000000";
-        bool passedEleventh = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedEleventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedEleventh);
@@ -404,7 +404,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 1, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "400000000000", null));
         alteredIslands["a"].collectors = "400000000000";
-        bool passedTwelfth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedTwelfth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwelfth);
@@ -415,7 +415,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "500000000000", null));
         alteredIslands["a"].collectors = "500000000000";
-        bool passedThirteenth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedThirteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedThirteenth);
@@ -426,7 +426,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 0, 1, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "600000000000", null));
         alteredIslands["a"].collectors = "600000000000";
-        bool passedFourteenth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedFourteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedFourteenth);
@@ -437,7 +437,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 1, 1 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "700000000000", null));
         alteredIslands["a"].collectors = "700000000000";
-        bool passedFifteenth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedFifteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedFifteenth);
@@ -448,7 +448,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] {2,1,0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000012", null));
         alteredIslands["a"].collectors = "100000000012";
-        bool passedSixteenth = IsEqual(processor.state.players["cairo"].allResources, new double[] { 0, 0, 0, 0 })
+        bool passedSixteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedSixteenth);
@@ -458,7 +458,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 2, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000022", null));
-        bool passedSeventeenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 2, 0 }))
+        bool passedSeventeenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfCollectors(new int[] { 1, 2, 0 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedSeventeenth);
@@ -470,7 +470,7 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("cairo", new IslandBuildOrder("d", "000000000060", null));
         alteredIslands["a"].collectors = "000000000000";
         alteredIslands["d"].collectors = "000000000060";
-        bool passedEighteenth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedEighteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedEighteenth);
@@ -480,7 +480,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 2, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000042", null));
-        bool passedNineteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 2, 0 }))
+        bool passedNineteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfCollectors(new int[] { 1, 2, 0 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedNineteenth);
@@ -493,7 +493,7 @@ public class GSPTesting : MonoBehaviour
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "200000000000", null));
         alteredIslands["a"].collectors = "400000000000";
         alteredIslands["d"].collectors = "000000000000";
-        bool passedTwentieth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedTwentieth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentieth);
@@ -505,7 +505,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].collectors = "100000000000";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000000", null));
         alteredIslands["a"].collectors = "100000000000";
-        bool passedTwentyFirst = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 0, 0 }))
+        bool passedTwentyFirst = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfCollectors(new int[] { 1, 0, 0 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentyFirst);
@@ -516,7 +516,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         processor.state.islands["a"].collectors = "100000000000";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "400000000000", null));
-        bool passedTwentySecond = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 0, 0 }))
+        bool passedTwentySecond = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfCollectors(new int[] { 1, 0, 0 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentySecond);
@@ -524,7 +524,7 @@ public class GSPTesting : MonoBehaviour
         //Fail because malformed data
         ResetTestData();
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "0000000|0000", null));
-        bool passedTwentyThird = IsEqual(processor.state.players["cairo"].allResources, playerResources[0])
+        bool passedTwentyThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentyThird);
@@ -534,7 +534,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "1000000|0000", null));
-        bool passedTwentyFourth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfCollectors(new int[] { 1, 0, 0 }))
+        bool passedTwentyFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfCollectors(new int[] { 1, 0, 0 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseCollectorsResults += GetPassOrFail(passedTwentyFourth);
@@ -546,9 +546,9 @@ public class GSPTesting : MonoBehaviour
         purchaseBunkerResults = "";
 
         double[][] playerResources = new double[][] { new double[4], new double[4], new double[4] };
-        Array.Copy(processor.state.players["cairo"].allResources, playerResources[0], 4);
-        Array.Copy(processor.state.players["pimpMacD"].allResources, playerResources[1], 4);
-        Array.Copy(processor.state.players["nox"].allResources, playerResources[2], 4);
+        Array.Copy(processor.state.players["cairo"].resources.ToArray(), playerResources[0], 4);
+        Array.Copy(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1], 4);
+        Array.Copy(processor.state.players["nox"].resources.ToArray(), playerResources[2], 4);
         Dictionary<string, Island> savedIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
         Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(processor.state.islands));
 
@@ -570,7 +570,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 0, 0 }));
         alteredIslands["a"].defenses = "!)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!)))))))))))"));
-        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedThird);
@@ -581,7 +581,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 1, 0 }));
         alteredIslands["a"].defenses = "@)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "@)))))))))))"));
-        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedThird);
@@ -592,7 +592,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 0, 1 }));
         alteredIslands["a"].defenses = "#)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "#)))))))))))"));
-        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedFifth);
@@ -603,7 +603,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 0 }));
         alteredIslands["a"].defenses = "$)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "$)))))))))))"));
-        bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSixth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedSixth);
@@ -614,7 +614,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers( new int[] { 1, 0, 1 }));
         alteredIslands["a"].defenses = "%)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "%)))))))))))"));
-        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedSeventh);
@@ -625,7 +625,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 0, 1, 1 }));
         alteredIslands["a"].defenses = "^)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "^)))))))))))"));
-        bool passedEigth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedEigth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedEigth);
@@ -636,7 +636,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers( new int[] { 1, 1, 1 }));
         alteredIslands["a"].defenses = "))))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "&)))))))))))"));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 1 }))
+        bool passedNinth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBunkers(new int[] { 1, 1, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedNinth);
@@ -647,7 +647,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 1, 1, 1 }));
         alteredIslands["a"].defenses = "!))))@))))#)";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@))))#)"));
-        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedTenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedTenth);
@@ -658,7 +658,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBunkers(new int[] { 3, 1, 1 }));
         alteredIslands["a"].defenses = "!))))$))))%)";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))$))))%)"));
-        bool passedEleventh = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedEleventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedEleventh);
@@ -670,7 +670,7 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["a"].defenses = ")))))!))))))";
         processor.state.islands["a"].defenses = ")))))!))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))!))))#)"));
-        bool passedTwelfth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 2, 0, 1 }))
+        bool passedTwelfth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBunkers(new int[] { 2, 0, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedTwelfth);
@@ -682,7 +682,7 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["a"].defenses = ")))))!))))))";
         processor.state.islands["a"].defenses = ")))))!))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))$))))%)"));
-        bool passedThirteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 3, 1, 1 }))
+        bool passedThirteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBunkers(new int[] { 3, 1, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBunkerResults += GetPassOrFail(passedThirteenth);
@@ -715,7 +715,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 0, 0 }));
         alteredIslands["a"].defenses = "0)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0)))))))))))"));
-        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedThird);
@@ -726,7 +726,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 1, 0 }));
         alteredIslands["a"].defenses = "a)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "a)))))))))))"));
-        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedFourth);
@@ -737,7 +737,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers( new int[] { 0, 0, 1 }));
         alteredIslands["a"].defenses = "A)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))))))))))"));
-        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedFifth);
@@ -748,7 +748,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 1, 2 }));
         alteredIslands["a"].defenses = "A)))0)))a))A";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))0)))a))A"));
-        bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSixth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedSixth);
@@ -759,7 +759,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 0, 0, 1 }));
         alteredIslands["a"].defenses = "))))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A))))))))0aA"));
-        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 0, 1 }))
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 0, 0, 1 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedSeventh);
@@ -771,7 +771,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "0)))))))))))";
         alteredIslands["a"].defenses = "0)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "a)))))))))))"));
-        bool passedEighth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 1, 0 }))
+        bool passedEighth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 0, 1, 0 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedEighth);
@@ -783,7 +783,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "0)))))))))))";
         alteredIslands["a"].defenses = "0)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "A)))))))))))"));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 0, 0, 1 }))
+        bool passedNinth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 0, 0, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedNinth);
@@ -795,7 +795,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "A)))))))))))";
         alteredIslands["a"].defenses = "A)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0)))))))))))"));
-        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 0, 0}))
+        bool passedTenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 1, 0, 0}))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerResults += GetPassOrFail(passedTenth);
@@ -814,7 +814,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })));
         alteredIslands["a"].defenses = "1)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "1)))))))))))"));
-        bool passedFirst = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFirst = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedFirst);
@@ -825,7 +825,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 1, 0 })));
         alteredIslands["a"].defenses = "2)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "2)))))))))))"));
-        bool passedSecond = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSecond = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSecond);
@@ -836,7 +836,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 0, 1 })));
         alteredIslands["a"].defenses = "3)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "3)))))))))))"));
-        bool passedThird = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedThird = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedThird);
@@ -847,7 +847,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 1, 0 })));
         alteredIslands["a"].defenses = "4)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "4)))))))))))"));
-        bool passedFourth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFourth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedFourth);
@@ -858,7 +858,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 1 })));
         alteredIslands["a"].defenses = "5)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "5)))))))))))"));
-        bool passedFifth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedFifth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedFifth);
@@ -869,7 +869,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 1, 0, 0 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
         alteredIslands["a"].defenses = "6)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "6)))))))))))"));
-        bool passedSixth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSixth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSixth);
@@ -880,7 +880,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 0, 1, 0 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
         alteredIslands["a"].defenses = "g)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "g)))))))))))"));
-        bool passedSeventh = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedSeventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSeventh);
@@ -891,7 +891,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 0, 0, 1 }), GetCostOfBunkers(new int[] { 0, 1, 1 })));
         alteredIslands["a"].defenses = "G)))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "G)))))))))))"));
-        bool passedEigth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedEigth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedEigth);
@@ -902,7 +902,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 3, 3, 3 }), GetCostOfBunkers(new int[] { 4, 4, 4 })));
         alteredIslands["a"].defenses = ")01bcDE5gG))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, ")01bcDE5gG))"));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedNinth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedNinth);
@@ -913,7 +913,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.AddRange(GetCostOfBlockers(new int[] { 1, 0, 0 }));
         alteredIslands["a"].defenses = "))))))))))))";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))@))))))"));
-        bool passedTenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 0, 0 }))
+        bool passedTenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 1, 0, 0 }))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedTenth);
@@ -923,7 +923,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(Add(GetCostOfBlockers(new int[] { 2, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })));
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))@))7)))"));
-        bool passedEleventh = IsEqual(processor.state.players["cairo"].allResources, Add(GetCostOfBlockers(new int[] { 2, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })))
+        bool passedEleventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), Add(GetCostOfBlockers(new int[] { 2, 0, 0 }), GetCostOfBunkers(new int[] { 1, 0, 0 })))
         && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedEleventh);
@@ -935,7 +935,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "0))))A)))))a";
         alteredIslands["a"].defenses = "1))))C)))))d";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
-        bool passedTwelfth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedTwelfth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedTwelfth);
@@ -947,7 +947,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "!))))@)))))#";
         alteredIslands["a"].defenses = "1))))C)))))d";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
-        bool passedThriteenth = IsEqual(processor.state.players["cairo"].allResources, new double[4])
+        bool passedThriteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[4])
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedThriteenth);
@@ -959,7 +959,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "0))))A)))))a";
         alteredIslands["a"].defenses = "0))))A)))))a";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
-        bool passedFourteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 0 }))
+        bool passedFourteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBunkers(new int[] { 1, 1, 0 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedFourteenth);
@@ -971,7 +971,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "1))))A)))))a";
         alteredIslands["a"].defenses = "1))))A)))))a";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "!))))@)))))#"));
-        bool passedFifteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBunkers(new int[] { 1, 1, 1 }))
+        bool passedFifteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBunkers(new int[] { 1, 1, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedFifteenth);
@@ -983,7 +983,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "!))))@)))))#";
         alteredIslands["a"].defenses = "!))))@)))))#";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
-        bool passedSixteenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 1, 0 }))
+        bool passedSixteenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 1, 1, 0 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSixteenth);
@@ -995,7 +995,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].defenses = "0))))@)))))#";
         alteredIslands["a"].defenses = "0))))@)))))#";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", null, "0))))A)))))a"));
-        bool passedSeventeenth = IsEqual(processor.state.players["cairo"].allResources, GetCostOfBlockers(new int[] { 1, 1, 1 }))
+        bool passedSeventeenth = IsEqual(processor.state.players["cairo"].resources.ToArray(), GetCostOfBlockers(new int[] { 1, 1, 1 }))
         && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(alteredIslands, processor.state.islands)
         && PlayersAreEqualExcept("cairo", players, processor.state.players);
         purchaseBlockerAndBunkerResults += GetPassOrFail(passedSeventeenth);
@@ -2558,9 +2558,9 @@ public class GSPTesting : MonoBehaviour
         {
             if (pair.Key != player)
             {
-                areEqual = areEqual && IsEqual(pair.Value.allResources, saved[pair.Key].allResources);
-                areEqual = areEqual && IsEqual(pair.Value.allUnits, saved[pair.Key].allUnits);
-                areEqual = areEqual && IsEqual(pair.Value.allIslands, saved[pair.Key].allIslands);
+                areEqual = areEqual && IsEqual(pair.Value.resources.ToArray(), saved[pair.Key].resources.ToArray());
+                areEqual = areEqual && IsEqual(pair.Value.units.ToArray(), saved[pair.Key].units.ToArray());
+                areEqual = areEqual && IsEqual(pair.Value.islands.ToArray(), saved[pair.Key].islands.ToArray());
             }
         }
 

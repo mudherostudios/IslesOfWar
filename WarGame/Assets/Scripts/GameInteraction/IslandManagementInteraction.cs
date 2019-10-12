@@ -451,7 +451,7 @@ public class IslandManagementInteraction : Interaction
                 islandIndex += increment;
 
             Island island = new Island();
-            islandID = clientInterface.chainState.players[clientInterface.player].allIslands[islandIndex];
+            islandID = clientInterface.chainState.players[clientInterface.player].islands[islandIndex];
 
             if (islandIndex < islandCount)
                 island = clientInterface.chainState.islands[islandID];
