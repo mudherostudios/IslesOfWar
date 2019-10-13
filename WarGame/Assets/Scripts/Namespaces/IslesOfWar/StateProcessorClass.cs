@@ -15,7 +15,7 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-
+            public readonly int[] version = { 0, 0, 0 };
             public StateProcessor() { }
 
             public StateProcessor(State _state)

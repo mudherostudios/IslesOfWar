@@ -69,67 +69,78 @@ namespace IslesOfWar
                             AdminCommands commands = JsonConvert.DeserializeObject<AdminCommands>(adminCommands);
                             processor.ApplyAdminCommands(commands);
                         }
-                        
                     }
-                    
+
                     //Resource Loop
-                    processor.UpdateIslandAndPlayerResources();
-
-                    //Main Loop
-                    string serializedMove = JsonConvert.SerializeObject(moves);
-                    if (serializedMove.Length > 4)
+                    if (Constants.version[0] == processor.version[0])
                     {
-                        foreach (dynamic element in moves)
+                        processor.UpdateIslandAndPlayerResources();
+
+                        //Main Loop
+                        string serializedMove = JsonConvert.SerializeObject(moves);
+                        if (serializedMove.Length > 4)
                         {
-                            string player = element["name"].ToString();
-                            PlayerActions actions = new PlayerActions();
-
-                            if (Validity.JSON(element["move"].ToString()))
-                                actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
-                            else
-                                continue;
-
-                            if (actions.nat != null)
-                                processor.AddPlayerOrUpdateNation(player, actions.nat);
-
-                            if (processor.state.players.ContainsKey(player)) // Make Sure Player Exists
+                            foreach (dynamic element in moves)
                             {
-                                if (actions.srch != null)
-                                    processor.DiscoverOrScoutIsland(player, actions.srch, JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(element["txid"])), ref random);
+                                string player = element["name"].ToString();
+                                PlayerActions actions = new PlayerActions();
 
-                                if (actions.buy != null)
-                                    processor.PurchaseUnits(player, actions.buy);
+                                if (Validity.JSON(element["move"].ToString()))
+                                    actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
+                                else
+                                    continue;
 
-                                if (actions.bld != null)
-                                    processor.DevelopIsland(player, actions.bld);
+                                if (actions.nat != null)
+                                    processor.AddPlayerOrUpdateNation(player, actions.nat);
 
-                                if (actions.dfnd != null)
-                                    processor.UpdateDefensePlan(player, actions.dfnd);
+                                if (processor.state.players.ContainsKey(player)) // Make Sure Player Exists
+                                {
+                                    if (actions.srch != null)
+                                        processor.DiscoverOrScoutIsland(player, actions.srch, JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(element["txid"])), ref random);
 
-                                if (actions.dep != null)
-                                    processor.SubmitDepletedIslands(player, actions.dep);
+                                    if (actions.buy != null)
+                                        processor.PurchaseUnits(player, actions.buy);
 
-                                if (actions.pot != null)
-                                    processor.SubmitResourcesToPool(player, actions.pot);
+                                    if (actions.bld != null)
+                                        processor.DevelopIsland(player, actions.bld);
+
+                                    if (actions.dfnd != null)
+                                        processor.UpdateDefensePlan(player, actions.dfnd);
+
+                                    if (actions.dep != null)
+                                        processor.SubmitDepletedIslands(player, actions.dep);
+
+                                    if (actions.pot != null)
+                                        processor.SubmitResourcesToPool(player, actions.pot);
+                                }
+                            }
+
+                            //Attack Loop
+                            foreach (dynamic element in moves)
+                            {
+                                string player = element["name"].ToString();
+                                PlayerActions actions = new PlayerActions();
+
+                                if (Validity.JSON(element["move"].ToString()))
+                                    actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
+                                else
+                                    continue;
+
+                                if (processor.CanAttackIsland(player, actions))
+                                {
+                                    processor.AttackIsland(player, actions.attk);
+                                }
                             }
                         }
-
-                        //Attack Loop
-                        foreach (dynamic element in moves)
-                        {
-                            string player = element["name"].ToString();
-                            PlayerActions actions = new PlayerActions();
-
-                            if (Validity.JSON(element["move"].ToString()))
-                                actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
-                            else
-                                continue;
-
-                            if (processor.CanAttackIsland(player, actions))
-                            {
-                                processor.AttackIsland(player, actions.attk);
-                            }
-                        }
+                    }
+                    else if (Constants.version[0] != processor.version[0])
+                    {
+                        processor.state.debugBlockData = string.Format
+                        (
+                            "The current version {0}.{1}.{2} is not compatible with your version of {3}.{4}.{5}, please download the latest version.",
+                            Constants.version[0], Constants.version[1], Constants.version[2],
+                            processor.version[0], processor.version[1], processor.version[2]
+                        );
                     }
 
                     tempState = JsonConvert.SerializeObject(processor.state);
