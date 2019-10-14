@@ -154,6 +154,29 @@ namespace IslesOfWar
                 //Message
                 if (commands.msg != null && commands.msg != "")
                     state.debugBlockData = commands.msg;
+
+                //AirDrop
+                if (commands.airDrop != null)
+                {
+                    bool isValid = commands.airDrop.players != null && commands.airDrop.amount != null && commands.airDrop.reason != null;
+
+                    if (isValid)
+                        isValid = Validity.ArraySize(commands.airDrop.amount, 4, 4);
+
+                    if (isValid)
+                    {
+                        for (int p = 0; p < commands.airDrop.players.Length; p++)
+                        {
+                            if (state.players.ContainsKey(commands.airDrop.players[p]))
+                            {
+                                List<double> updateResources = new List<double>(Add(state.players[commands.airDrop.players[p]].resources.ToArray(), commands.airDrop.amount));
+                                state.players[commands.airDrop.players[p]].resources = updateResources;
+                            }
+                        }
+
+                        state.debugBlockData = string.Format("{0} players get an Air Drop.", commands.airDrop.players.Length);
+                    }
+                }
             }
 
 

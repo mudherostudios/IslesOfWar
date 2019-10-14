@@ -110,21 +110,24 @@ namespace IslesOfWar
             public int pTimer;         //Set PoolRewardBlocks
             public int wTimer;         //Set WarbucksRewardBlocks
             public string msg;         //Set a message that can be displayed to everyone. Use special characters at start for message types.
+            public AirDrop airDrop;    //Add Money to a player's resources.
             public string txid;        //Transaction ID of the command. Xaya Given Info.
+        }
+
+        public class AirDrop
+        {
+            public string[] players; //Name as it is in the state dictionaries as keys or values.
+            public double[] amount;  //Add to state.players[player].resources - 4
+            public string reason; //Just a reason that can be displayed but also doubles as transparency for community.
         }
 
         public static class CommandUtility
         {
-            public static string GetSerializedPlayerCommand(PlayerActions actions)
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-                return JsonConvert.SerializeObject(actions, Formatting.None, settings);
-            }
+            static JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 
-            public static string GetSerializedAdminCommand(AdminCommands commands)
+            public static string GetSerializedCommand<T>(T actions)
             {
-                JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-                return JsonConvert.SerializeObject(commands, Formatting.None, settings);
+                return JsonConvert.SerializeObject(actions, Formatting.None, settings);
             }
         }
 
@@ -200,6 +203,14 @@ namespace IslesOfWar
 
                     double[] resources = new double[4];
 
+                    if (defenses[0][0] > 0)
+                    {
+                        resources[0] += Constants.blockerCosts[defenses[0][0], 0];
+                        resources[1] += Constants.blockerCosts[defenses[0][0], 1];
+                        resources[2] += Constants.blockerCosts[defenses[0][0], 2];
+                        resources[3] += Constants.blockerCosts[defenses[0][0], 3];
+                    }
+
                     for (int type = 0; type < 3; type++)
                     {
                         if (collectors[type] > 0)
@@ -209,16 +220,8 @@ namespace IslesOfWar
                             resources[2] += Constants.collectorCosts[type, 2];
                             resources[3] += Constants.collectorCosts[type, 3];
                         }
-
-                        if (defenses[0][type] > 0)
-                        {
-                            resources[0] += Constants.blockerCosts[type, 0];
-                            resources[1] += Constants.blockerCosts[type, 1];
-                            resources[2] += Constants.blockerCosts[type, 2];
-                            resources[3] += Constants.blockerCosts[type, 3];
-                        }
-
-                        if (defenses[0][type] > 0)
+                        
+                        if (defenses[1][type] > 0)
                         {
                             resources[0] += Constants.bunkerCosts[type, 0];
                             resources[1] += Constants.bunkerCosts[type, 1];
