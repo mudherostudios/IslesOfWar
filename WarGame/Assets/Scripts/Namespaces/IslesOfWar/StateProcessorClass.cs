@@ -37,6 +37,10 @@ namespace IslesOfWar
                 if (commands.iwCost > 0)
                     Constants.islandSearchCost = new float[] { 0, 0, 0, 0 };
 
+                //Attack Cost Percent
+                if (commands.atkPerc > 0)
+                    Constants.attackCostPercent = commands.atkPerc;
+
                 //Undiscovered Minimum
                 if (commands.iuMin > 0)
                     Constants.islandUndiscoveredMinimum = commands.iuMin;
@@ -249,10 +253,7 @@ namespace IslesOfWar
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
                     string discovered = IslandDiscovery.GetIsland(state.players[player].islands.Count, state.islands.Keys.ToArray(), txid, ref random);
-                    double[] resources = Subtract(state.players[player].resources.ToArray(), cost);
-                    state.players[player].resources.Clear();
-                    state.players[player].resources.AddRange(resources);
-                    AddToPools(cost, 3);
+                    double[] resources = new double[cost.Length];
 
                     if (discovered == txid)
                     {
@@ -263,7 +264,17 @@ namespace IslesOfWar
                     else if (discovered != txid && !state.players[player].islands.Contains(discovered))
                     {
                         state.players[player].attackableIsland = discovered;
+
+                        for (int c = 0; c < cost.Length; c++)
+                        {
+                            cost[c] = Math.Floor(cost[c] * Constants.attackCostPercent);
+                        }
                     }
+
+                    resources = Subtract(state.players[player].resources.ToArray(), cost);
+                    state.players[player].resources.Clear();
+                    state.players[player].resources.AddRange(resources);
+                    AddToPools(cost, 3);
                 }
             }
 

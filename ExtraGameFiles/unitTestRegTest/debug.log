@@ -3021,3 +3021,386 @@ CTransaction(hash=e0b3e0a028, ver=2, vin.size=2, vout.size=2, nLockTime=328)
 2019-10-14T10:34:09Z addcon thread exit
 2019-10-14T10:34:09Z scheduler thread interrupt
 2019-10-14T10:34:09Z Dumped mempool: 0s to copy, 0.049968s to dump
+2019-10-15T04:18:14Z 
+
+
+
+
+2019-10-15T04:18:14Z Xaya version v1.2.0.0-2e6cdb716 (release build)
+2019-10-15T04:18:14Z Validating signatures for all blocks.
+2019-10-15T04:18:14Z Setting nMinimumChainWork=0000000000000000000000000000000000000000000000000000000000000000
+2019-10-15T04:18:14Z Using the 'sse4(1way),sse41(4way),avx2(8way)' SHA256 implementation
+2019-10-15T04:18:14Z Using RdRand as an additional entropy source
+2019-10-15T04:18:14Z Default data directory C:\Users\Caz\AppData\Roaming\Xaya
+2019-10-15T04:18:14Z Using data directory C:\Users\Caz\AppData\Roaming\Xaya\regtest
+2019-10-15T04:18:14Z Config file: C:\Users\Caz\AppData\Roaming\Xaya\xaya.conf
+2019-10-15T04:18:14Z Using at most 125 automatic connections (2048 file descriptors available)
+2019-10-15T04:18:14Z Using 16 MiB out of 32/2 requested for signature cache, able to store 524288 elements
+2019-10-15T04:18:14Z Using 16 MiB out of 32/2 requested for script execution cache, able to store 524288 elements
+2019-10-15T04:18:14Z Using 4 threads for script verification
+2019-10-15T04:18:14Z scheduler thread start
+2019-10-15T04:18:14Z WARNING: option -rpcallowip was specified without -rpcbind; this doesn't usually make sense
+2019-10-15T04:18:14Z libevent: getaddrinfo: nodename nor servname provided, or not known
+2019-10-15T04:18:14Z Binding RPC on address ::1 port 18493 failed.
+2019-10-15T04:18:14Z HTTP: creating work queue of depth 16
+2019-10-15T04:18:14Z Config options rpcuser and rpcpassword will soon be deprecated. Locally-run instances may remove rpcuser to use cookie-based auth, or may be replaced with rpcauth. Please see share/rpcauth for rpcauth auth generation.
+2019-10-15T04:18:14Z HTTP: starting 4 worker threads
+2019-10-15T04:18:14Z Using wallet directory C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets
+2019-10-15T04:18:14Z init message: Verifying wallet(s)...
+2019-10-15T04:18:14Z Using BerkeleyDB version Berkeley DB 4.8.30: (April  9, 2010)
+2019-10-15T04:18:14Z Using wallet C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets
+2019-10-15T04:18:14Z BerkeleyEnvironment::Open: LogDir=C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets\database ErrorFile=C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets\db.log
+2019-10-15T04:18:14Z init message: Loading banlist...
+2019-10-15T04:18:14Z Cache configuration:
+2019-10-15T04:18:14Z * Using 2.0 MiB for block index database
+2019-10-15T04:18:14Z * Using 8.0 MiB for chain state database
+2019-10-15T04:18:14Z * Using 440.0 MiB for in-memory UTXO set (plus up to 286.1 MiB of unused mempool space)
+2019-10-15T04:18:14Z init message: Loading block index...
+2019-10-15T04:18:14Z Opening LevelDB in C:\Users\Caz\AppData\Roaming\Xaya\regtest\blocks\index
+2019-10-15T04:18:14Z Opened LevelDB successfully
+2019-10-15T04:18:14Z Using obfuscation key for C:\Users\Caz\AppData\Roaming\Xaya\regtest\blocks\index: 0000000000000000
+2019-10-15T04:18:14Z LoadBlockIndexDB: last block file = 0
+2019-10-15T04:18:14Z LoadBlockIndexDB: last block file info: CBlockFileInfo(blocks=330, size=114012, heights=0...329, time=2011-03-13...2019-10-14)
+2019-10-15T04:18:14Z Checking all blk files are present...
+2019-10-15T04:18:14Z LoadBlockIndexDB(): name history disabled
+2019-10-15T04:18:14Z Opening LevelDB in C:\Users\Caz\AppData\Roaming\Xaya\regtest\chainstate
+2019-10-15T04:18:15Z Opened LevelDB successfully
+2019-10-15T04:18:15Z Using obfuscation key for C:\Users\Caz\AppData\Roaming\Xaya\regtest\chainstate: b65e166b20e7efa6
+2019-10-15T04:18:15Z Upgrading utxo-set database...
+2019-10-15T04:18:15Z [0%]...[DONE].
+2019-10-15T04:18:15Z Loaded best chain: hashBestChain=1fdd6bd904f54852f924ba58803a65e8582ea7dc738184139e5443cfc518916e height=329 date=2019-10-14T09:53:43Z progress=1.000000
+2019-10-15T04:18:15Z init message: Rewinding blocks...
+2019-10-15T04:18:15Z init message: Verifying blocks...
+2019-10-15T04:18:15Z Verifying last 6 blocks at level 3
+2019-10-15T04:18:15Z [0%]...[16%]...[33%]...[50%]...[66%]...[83%]...[99%]...[DONE].
+2019-10-15T04:18:15Z No coin database inconsistencies in last 6 blocks (12 transactions)
+2019-10-15T04:18:15Z  block index             972ms
+2019-10-15T04:18:15Z init message: Loading wallet...
+2019-10-15T04:18:15Z BerkeleyEnvironment::Open: LogDir=C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets\database ErrorFile=C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets\db.log
+2019-10-15T04:18:15Z [default wallet] nFileVersion = 1020000
+2019-10-15T04:18:15Z [default wallet] Keys: 2001 plaintext, 0 encrypted, 2001 w/ metadata, 2001 total. Unknown wallet records: 0
+2019-10-15T04:18:15Z [default wallet] Wallet completed loading in             213ms
+2019-10-15T04:18:15Z [default wallet] setKeyPool.size() = 2000
+2019-10-15T04:18:15Z [default wallet] mapWallet.size() = 0
+2019-10-15T04:18:15Z [default wallet] mapAddressBook.size() = 0
+2019-10-15T04:18:15Z mapBlockIndex.size() = 330
+2019-10-15T04:18:15Z nBestHeight = 329
+2019-10-15T04:18:15Z torcontrol thread start
+2019-10-15T04:18:15Z Imported mempool transactions from disk: 0 succeeded, 0 failed, 0 expired, 0 already there
+2019-10-15T04:18:15Z Bound to [::]:18495
+2019-10-15T04:18:15Z Bound to 0.0.0.0:18495
+2019-10-15T04:18:15Z init message: Loading P2P addresses...
+2019-10-15T04:18:15Z Loaded 0 addresses from peers.dat  41ms
+2019-10-15T04:18:15Z init message: Starting network threads...
+2019-10-15T04:18:15Z init message: Done loading
+2019-10-15T04:18:15Z dnsseed thread start
+2019-10-15T04:18:15Z addcon thread start
+2019-10-15T04:18:15Z net thread start
+2019-10-15T04:18:15Z opencon thread start
+2019-10-15T04:18:15Z msghand thread start
+2019-10-15T04:18:15Z sendupdates thread start
+2019-10-15T04:18:15Z Loading addresses from DNS seeds (could take a while)
+2019-10-15T04:18:15Z 0 addresses found from DNS seeds
+2019-10-15T04:18:15Z dnsseed thread exit
+2019-10-15T04:18:17Z Using BerkeleyDB version Berkeley DB 4.8.30: (April  9, 2010)
+2019-10-15T04:18:17Z Using wallet C:\Users\Caz\AppData\Roaming\Xaya\regtest\wallets\vault.dat
+2019-10-15T04:18:17Z init message: Loading wallet...
+2019-10-15T04:18:17Z [vault.dat] nFileVersion = 1020000
+2019-10-15T04:18:17Z [vault.dat] Keys: 2055 plaintext, 0 encrypted, 2055 w/ metadata, 2055 total. Unknown wallet records: 0
+2019-10-15T04:18:18Z [vault.dat] Wallet completed loading in             674ms
+2019-10-15T04:18:18Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T04:18:18Z [vault.dat] setKeyPool.size() = 2000
+2019-10-15T04:18:18Z [vault.dat] mapWallet.size() = 228
+2019-10-15T04:18:18Z [vault.dat] mapAddressBook.size() = 1
+2019-10-15T04:18:59Z Leaving InitialBlockDownload (latching to false)
+2019-10-15T04:19:16Z Adding fixed seed nodes as DNS doesn't seem to be available.
+2019-10-15T04:21:21Z [vault.dat] keypool reserve 1055
+2019-10-15T04:21:21Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T04:21:21Z [vault.dat] keypool reserve 1056
+2019-10-15T04:21:21Z [vault.dat] Fee Calculation: Fee:59600 Bytes:596 Needed:59600 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 21.9/(21.9 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T04:21:21Z [vault.dat] CommitTransaction:
+CTransaction(hash=e1a4417b85, ver=2, vin.size=2, vout.size=2, nLockTime=0)
+    CTxIn(COutPoint(e0b3e0a028, 1), scriptSig=47304402203eb46fca602f75, nSequence=4294967294)
+    CTxIn(COutPoint(e0b3e0a028, 0), scriptSig=47304402202f9ea1e1a47cb4, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5207702f686f7275734cd37b226722)
+    CTxOut(nValue=24.98080700, scriptPubKey=76a91406770bc99da1f42991687282)
+2019-10-15T04:21:21Z [vault.dat] keypool keep 1056
+2019-10-15T04:21:22Z [vault.dat] AddToWallet e1a4417b85bfdf7553bb74f2643e9442fb4200aa2d8037b82dc447813d000b54  new
+2019-10-15T04:21:22Z [vault.dat] Relaying wtx e1a4417b85bfdf7553bb74f2643e9442fb4200aa2d8037b82dc447813d000b54
+2019-10-15T04:21:22Z [vault.dat] keypool keep 1055
+2019-10-15T04:21:22Z [vault.dat] AddToWallet e1a4417b85bfdf7553bb74f2643e9442fb4200aa2d8037b82dc447813d000b54  
+2019-10-15T04:23:10Z CreateNewBlock(): block weight: 3592 txs: 1 fees: 59600 sigops 408
+2019-10-15T04:23:10Z Checked name database, 3 names.
+2019-10-15T04:23:10Z Names with history: 0
+2019-10-15T04:23:10Z UpdateTip: new best=d346e5267999d69f82599d2166e0d2e31a507c2f76779e17e45adad83e27792d height=330 version=0x30000000 log2_work=19.370687 tx=359 date='2019-10-15T04:23:10Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T04:23:10Z Checked name database, 3 names.
+2019-10-15T04:23:10Z Names with history: 0
+2019-10-15T04:23:10Z [vault.dat] AddToWallet 127396bfd8525132427005238100a3866a7a897a00b1ae9afdad1027b35832d1  new
+2019-10-15T04:23:10Z [vault.dat] AddToWallet e1a4417b85bfdf7553bb74f2643e9442fb4200aa2d8037b82dc447813d000b54  update
+2019-10-15T04:29:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 379 seconds ago)
+2019-10-15T04:39:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1009 seconds ago)
+2019-10-15T04:50:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1639 seconds ago)
+2019-10-15T05:00:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 2269 seconds ago)
+2019-10-15T05:11:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 2899 seconds ago)
+2019-10-15T05:21:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 3529 seconds ago)
+2019-10-15T05:32:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 4159 seconds ago)
+2019-10-15T05:42:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 4789 seconds ago)
+2019-10-15T05:53:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 5419 seconds ago)
+2019-10-15T06:03:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 6049 seconds ago)
+2019-10-15T06:14:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 6679 seconds ago)
+2019-10-15T06:24:59Z Potential stale tip detected, will try using extra outbound peer (last tip update: 7309 seconds ago)
+2019-10-15T06:35:29Z Potential stale tip detected, will try using extra outbound peer (last tip update: 7939 seconds ago)
+2019-10-15T06:46:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 8570 seconds ago)
+2019-10-15T06:56:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 9200 seconds ago)
+2019-10-15T07:00:49Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:00:49Z [vault.dat] keypool reserve 1057
+2019-10-15T07:00:49Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:00:49Z [vault.dat] keypool reserve 1058
+2019-10-15T07:00:49Z [vault.dat] Fee Calculation: Fee:52900 Bytes:529 Needed:52900 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 21.8/(21.8 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:00:49Z [vault.dat] CommitTransaction:
+CTransaction(hash=3ded23a8d7, ver=2, vin.size=2, vout.size=2, nLockTime=330)
+    CTxIn(COutPoint(535fea974b, 1), scriptSig=47304402201e867622456cdc, nSequence=4294967294)
+    CTxIn(COutPoint(e1a4417b85, 1), scriptSig=473044022013cb7f8ec3fe1b, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5205672f696f774c927b22636d6422)
+    CTxOut(nValue=24.98027800, scriptPubKey=76a914aabbf1317ed4fabc7f71f038)
+2019-10-15T07:00:49Z [vault.dat] keypool keep 1058
+2019-10-15T07:00:50Z [vault.dat] AddToWallet 3ded23a8d75ff0dd1d6a273c6cc05a8a94177e54db3cbebfb79324d221eb05c2  new
+2019-10-15T07:00:50Z [vault.dat] Relaying wtx 3ded23a8d75ff0dd1d6a273c6cc05a8a94177e54db3cbebfb79324d221eb05c2
+2019-10-15T07:00:50Z [vault.dat] keypool keep 1057
+2019-10-15T07:00:50Z [vault.dat] AddToWallet 3ded23a8d75ff0dd1d6a273c6cc05a8a94177e54db3cbebfb79324d221eb05c2  
+2019-10-15T07:00:53Z CreateNewBlock(): block weight: 3324 txs: 1 fees: 52900 sigops 408
+2019-10-15T07:00:53Z Checked name database, 3 names.
+2019-10-15T07:00:53Z Names with history: 0
+2019-10-15T07:00:53Z UpdateTip: new best=b4a96f07febc412794a416f49d0e74331d7892ac548ce18a454e79387ddcee89 height=331 version=0x30000000 log2_work=19.375039 tx=361 date='2019-10-15T07:00:53Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T07:00:53Z Checked name database, 3 names.
+2019-10-15T07:00:53Z Names with history: 0
+2019-10-15T07:00:53Z [vault.dat] AddToWallet 18b92fecdbc46686c538dc6bd1739495dade71d9c33bf34c39ffe9e6becd747f  new
+2019-10-15T07:00:53Z [vault.dat] AddToWallet 3ded23a8d75ff0dd1d6a273c6cc05a8a94177e54db3cbebfb79324d221eb05c2  update
+2019-10-15T07:06:08Z CreateNewBlock(): block weight: 1208 txs: 0 fees: 0 sigops 400
+2019-10-15T07:06:08Z Checked name database, 3 names.
+2019-10-15T07:06:08Z Names with history: 0
+2019-10-15T07:06:08Z UpdateTip: new best=4dab5bbf47c3801d742bca8150398b81c445b6aa7999310396ca9d42466f6fc7 height=332 version=0x30000000 log2_work=19.379378 tx=362 date='2019-10-15T07:06:08Z' progress=1.000000 cache=0.0MiB(1txo)
+2019-10-15T07:06:08Z Checked name database, 3 names.
+2019-10-15T07:06:08Z Names with history: 0
+2019-10-15T07:06:08Z [vault.dat] AddToWallet a87f85d9a796d04b193271ce1f8a019e09f246c162ac881ab509c192510632ce  new
+2019-10-15T07:13:30Z CreateNewBlock(): block weight: 1208 txs: 0 fees: 0 sigops 400
+2019-10-15T07:13:30Z Checked name database, 3 names.
+2019-10-15T07:13:30Z Names with history: 0
+2019-10-15T07:13:30Z UpdateTip: new best=20bd351b365ecfb2da25ecc038850b0583d83a6e528f18a29fe3e11fea618868 height=333 version=0x30000000 log2_work=19.383704 tx=363 date='2019-10-15T07:13:30Z' progress=1.000000 cache=0.0MiB(1txo)
+2019-10-15T07:13:30Z Checked name database, 3 names.
+2019-10-15T07:13:30Z Names with history: 0
+2019-10-15T07:13:30Z [vault.dat] AddToWallet 8b743c84e042afa39433cd4ce6002c4302d08a1b508eac8ccfce1936e33419eb  new
+2019-10-15T07:13:58Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:13:58Z [vault.dat] keypool reserve 1059
+2019-10-15T07:13:58Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:13:58Z [vault.dat] keypool reserve 1060
+2019-10-15T07:13:58Z [vault.dat] Fee Calculation: Fee:41300 Bytes:413 Needed:41300 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 22.5/(22.5 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:13:58Z [vault.dat] CommitTransaction:
+CTransaction(hash=78dcd4632f, ver=2, vin.size=2, vout.size=2, nLockTime=333)
+    CTxIn(COutPoint(f12b88e33f, 1), scriptSig=473044022069c6bf0d3aa23c, nSequence=4294967294)
+    CTxIn(COutPoint(3ded23a8d7, 1), scriptSig=473044022073db5853d8708d, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5207702f636169726f1d7b2267223a)
+    CTxOut(nValue=24.97986500, scriptPubKey=76a914e988a113e18294b8eff0b31b)
+2019-10-15T07:13:58Z [vault.dat] keypool keep 1060
+2019-10-15T07:13:58Z [vault.dat] AddToWallet 78dcd4632f73a3dff4d4981c5d79538daa274fc71b331a3f149b11b6e3f18c6a  new
+2019-10-15T07:13:59Z [vault.dat] Relaying wtx 78dcd4632f73a3dff4d4981c5d79538daa274fc71b331a3f149b11b6e3f18c6a
+2019-10-15T07:13:59Z [vault.dat] keypool keep 1059
+2019-10-15T07:13:59Z [vault.dat] AddToWallet 78dcd4632f73a3dff4d4981c5d79538daa274fc71b331a3f149b11b6e3f18c6a  
+2019-10-15T07:14:29Z CreateNewBlock(): block weight: 2860 txs: 1 fees: 41300 sigops 408
+2019-10-15T07:14:29Z Checked name database, 3 names.
+2019-10-15T07:14:29Z Names with history: 0
+2019-10-15T07:14:29Z UpdateTip: new best=ed316ca229c6e977d2a5dd39d79d869601ba8de896cb4612d719d2a0ac58b8e8 height=334 version=0x30000000 log2_work=19.388017 tx=365 date='2019-10-15T07:14:29Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T07:14:29Z Checked name database, 3 names.
+2019-10-15T07:14:29Z Names with history: 0
+2019-10-15T07:14:29Z [vault.dat] AddToWallet 211d060e11dcfbf29a3acdca8835aa2d12eae53d18bd95e34798b4f783038a99  new
+2019-10-15T07:14:29Z [vault.dat] AddToWallet 78dcd4632f73a3dff4d4981c5d79538daa274fc71b331a3f149b11b6e3f18c6a  update
+2019-10-15T07:17:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 181 seconds ago)
+2019-10-15T07:24:59Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:24:59Z [vault.dat] keypool reserve 1061
+2019-10-15T07:24:59Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:24:59Z [vault.dat] keypool reserve 1062
+2019-10-15T07:24:59Z [vault.dat] Fee Calculation: Fee:52600 Bytes:526 Needed:52600 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 23.4/(23.4 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:24:59Z [vault.dat] CommitTransaction:
+CTransaction(hash=7ca1bdca37, ver=2, vin.size=2, vout.size=2, nLockTime=334)
+    CTxIn(COutPoint(3ded23a8d7, 0), scriptSig=47304402207659fbe06c39bf, nSequence=4294967294)
+    CTxIn(COutPoint(78dcd4632f, 1), scriptSig=4730440220452086227eabc5, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=24.97933900, scriptPubKey=76a91458a67330187b6977928f10ad)
+    CTxOut(nValue=0.01000000, scriptPubKey=5205672f696f774c8f7b22636d6422)
+2019-10-15T07:24:59Z [vault.dat] keypool keep 1062
+2019-10-15T07:24:59Z [vault.dat] AddToWallet 7ca1bdca374dc540221eba47c29d6d9fb22874ffdac7c7624e60a60cad18a1b0  new
+2019-10-15T07:25:00Z [vault.dat] Relaying wtx 7ca1bdca374dc540221eba47c29d6d9fb22874ffdac7c7624e60a60cad18a1b0
+2019-10-15T07:25:00Z [vault.dat] keypool keep 1061
+2019-10-15T07:25:00Z [vault.dat] AddToWallet 7ca1bdca374dc540221eba47c29d6d9fb22874ffdac7c7624e60a60cad18a1b0  
+2019-10-15T07:25:53Z CreateNewBlock(): block weight: 3312 txs: 1 fees: 52600 sigops 408
+2019-10-15T07:25:53Z Checked name database, 3 names.
+2019-10-15T07:25:53Z Names with history: 0
+2019-10-15T07:25:53Z UpdateTip: new best=da9d9a551e775daa3429176eb4a486dc6a538da32f2aea97a1259f8d2f89c30e height=335 version=0x30000000 log2_work=19.392317 tx=367 date='2019-10-15T07:25:53Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T07:25:53Z Checked name database, 3 names.
+2019-10-15T07:25:53Z Names with history: 0
+2019-10-15T07:25:53Z [vault.dat] AddToWallet 797bbd83713d081908a0323d9c290cbd68e2c8f30b2d37810a836e8632e101ad  new
+2019-10-15T07:25:53Z [vault.dat] AddToWallet 7ca1bdca374dc540221eba47c29d6d9fb22874ffdac7c7624e60a60cad18a1b0  update
+2019-10-15T07:26:51Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:26:51Z [vault.dat] keypool reserve 1063
+2019-10-15T07:26:51Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:26:51Z [vault.dat] keypool reserve 1064
+2019-10-15T07:26:51Z [vault.dat] Fee Calculation: Fee:49100 Bytes:491 Needed:49100 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 24.3/(24.3 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:26:51Z [vault.dat] CommitTransaction:
+CTransaction(hash=547544be59, ver=2, vin.size=2, vout.size=2, nLockTime=335)
+    CTxIn(COutPoint(7ca1bdca37, 1), scriptSig=473044022026f37072a84a68, nSequence=4294967294)
+    CTxIn(COutPoint(7ca1bdca37, 0), scriptSig=473044022014c6edf3a78a68, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5205672f696f774c6c7b22636d6422)
+    CTxOut(nValue=24.97884800, scriptPubKey=76a914b651dfdf2fdf24d22989b89b)
+2019-10-15T07:26:51Z [vault.dat] keypool keep 1064
+2019-10-15T07:26:51Z [vault.dat] AddToWallet 547544be5900d76ee1312fc76b4423b6d9acfb10e46cdec8060a6d0ab2881184  new
+2019-10-15T07:26:51Z [vault.dat] Relaying wtx 547544be5900d76ee1312fc76b4423b6d9acfb10e46cdec8060a6d0ab2881184
+2019-10-15T07:26:51Z [vault.dat] keypool keep 1063
+2019-10-15T07:26:51Z [vault.dat] AddToWallet 547544be5900d76ee1312fc76b4423b6d9acfb10e46cdec8060a6d0ab2881184  
+2019-10-15T07:26:57Z CreateNewBlock(): block weight: 3172 txs: 1 fees: 49100 sigops 408
+2019-10-15T07:26:58Z Checked name database, 3 names.
+2019-10-15T07:26:58Z Names with history: 0
+2019-10-15T07:26:58Z UpdateTip: new best=2d1acff65df78bedd1d0a3953105207372c1f5835a416ed7dc64b988749d12e1 height=336 version=0x30000000 log2_work=19.396605 tx=369 date='2019-10-15T07:26:57Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T07:26:58Z Checked name database, 3 names.
+2019-10-15T07:26:58Z Names with history: 0
+2019-10-15T07:26:58Z [vault.dat] AddToWallet be3fa005cbaaffe068878e37ba2d7fb3f654ccb0c4be638d7fab3be8648ae0f0  new
+2019-10-15T07:26:58Z [vault.dat] AddToWallet 547544be5900d76ee1312fc76b4423b6d9acfb10e46cdec8060a6d0ab2881184  update
+2019-10-15T07:33:08Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:33:08Z [vault.dat] keypool reserve 1065
+2019-10-15T07:33:08Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:33:08Z [vault.dat] keypool reserve 1066
+2019-10-15T07:33:08Z [vault.dat] Fee Calculation: Fee:41300 Bytes:413 Needed:41300 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 25.2/(25.2 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:33:08Z [vault.dat] CommitTransaction:
+CTransaction(hash=d55882da4f, ver=2, vin.size=2, vout.size=2, nLockTime=336)
+    CTxIn(COutPoint(547544be59, 1), scriptSig=47304402206972b8ede33241, nSequence=4294967294)
+    CTxIn(COutPoint(78dcd4632f, 0), scriptSig=47304402206107eac4420b6d, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=24.97843500, scriptPubKey=76a9141112e39bd1a74170feba50dd)
+    CTxOut(nValue=0.01000000, scriptPubKey=5207702f636169726f1d7b2267223a)
+2019-10-15T07:33:08Z [vault.dat] keypool keep 1066
+2019-10-15T07:33:08Z [vault.dat] AddToWallet d55882da4fc320905c9f857d2c1f2b486905fb67f578f986afc15df89b56fc2c  new
+2019-10-15T07:33:08Z [vault.dat] Relaying wtx d55882da4fc320905c9f857d2c1f2b486905fb67f578f986afc15df89b56fc2c
+2019-10-15T07:33:08Z [vault.dat] keypool keep 1065
+2019-10-15T07:33:08Z [vault.dat] AddToWallet d55882da4fc320905c9f857d2c1f2b486905fb67f578f986afc15df89b56fc2c  
+2019-10-15T07:33:21Z CreateNewBlock(): block weight: 2860 txs: 1 fees: 41300 sigops 408
+2019-10-15T07:33:21Z Checked name database, 3 names.
+2019-10-15T07:33:21Z Names with history: 0
+2019-10-15T07:33:21Z UpdateTip: new best=ae31e16594a4d5134fbd9501d5dbbb6cc064477023f4ee1247cecd330bf6fba1 height=337 version=0x30000000 log2_work=19.400879 tx=371 date='2019-10-15T07:33:21Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T07:33:21Z Checked name database, 3 names.
+2019-10-15T07:33:21Z Names with history: 0
+2019-10-15T07:33:21Z [vault.dat] AddToWallet 05fbd1a777e35dc06f69359dffb6a836caacd4d2b60ad627acb8525d1841fa88  new
+2019-10-15T07:33:21Z [vault.dat] AddToWallet d55882da4fc320905c9f857d2c1f2b486905fb67f578f986afc15df89b56fc2c  update
+2019-10-15T07:38:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 309 seconds ago)
+2019-10-15T07:49:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 939 seconds ago)
+2019-10-15T07:59:23Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:59:23Z [vault.dat] keypool reserve 1067
+2019-10-15T07:59:23Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T07:59:24Z [vault.dat] keypool reserve 1068
+2019-10-15T07:59:24Z [vault.dat] Fee Calculation: Fee:41700 Bytes:417 Needed:41700 Tgt:6 (requested 6) Reason:"Conservative Double Target longer horizon" Decay 0.99520: Estimation: (98128.3 - 1e+099) 100.00% 26.0/(26.0 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T07:59:24Z [vault.dat] CommitTransaction:
+CTransaction(hash=c9b6b7a8ce, ver=2, vin.size=2, vout.size=2, nLockTime=337)
+    CTxIn(COutPoint(547544be59, 0), scriptSig=47304402202286e1b4579703, nSequence=4294967294)
+    CTxIn(COutPoint(d55882da4f, 0), scriptSig=473044022040c611f613c759, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5205672f696f77237b22636d64223a)
+    CTxOut(nValue=24.97801800, scriptPubKey=76a91465d486791598c5b9bdff6a2f)
+2019-10-15T07:59:24Z [vault.dat] keypool keep 1068
+2019-10-15T07:59:24Z [vault.dat] AddToWallet c9b6b7a8ce5a6eeba5b65565761c6b89f617ed4b9ff42a17574e4f33cf4bb080  new
+2019-10-15T07:59:24Z [vault.dat] Relaying wtx c9b6b7a8ce5a6eeba5b65565761c6b89f617ed4b9ff42a17574e4f33cf4bb080
+2019-10-15T07:59:24Z [vault.dat] keypool keep 1067
+2019-10-15T07:59:24Z [vault.dat] AddToWallet c9b6b7a8ce5a6eeba5b65565761c6b89f617ed4b9ff42a17574e4f33cf4bb080  
+2019-10-15T07:59:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1569 seconds ago)
+2019-10-15T08:01:20Z CreateNewBlock(): block weight: 2876 txs: 1 fees: 41700 sigops 408
+2019-10-15T08:01:20Z Checked name database, 3 names.
+2019-10-15T08:01:20Z Names with history: 0
+2019-10-15T08:01:20Z UpdateTip: new best=1bb3da49114d21a0970f031eff8e2430e609f6d98122431d524a3d1ffce277c9 height=338 version=0x30000000 log2_work=19.405141 tx=373 date='2019-10-15T08:01:20Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T08:01:20Z Checked name database, 3 names.
+2019-10-15T08:01:20Z Names with history: 0
+2019-10-15T08:01:20Z [vault.dat] AddToWallet 35ad189053da6636b29637a7809773328420211c9e0cc38d699ee243cf6d5c80  new
+2019-10-15T08:01:20Z [vault.dat] AddToWallet c9b6b7a8ce5a6eeba5b65565761c6b89f617ed4b9ff42a17574e4f33cf4bb080  update
+2019-10-15T08:10:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 520 seconds ago)
+2019-10-15T08:20:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1150 seconds ago)
+2019-10-15T08:31:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1780 seconds ago)
+2019-10-15T08:41:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 2410 seconds ago)
+2019-10-15T08:52:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 3040 seconds ago)
+2019-10-15T09:02:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 3670 seconds ago)
+2019-10-15T09:02:38Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T09:02:38Z [vault.dat] keypool reserve 1069
+2019-10-15T09:02:39Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T09:02:39Z [vault.dat] keypool reserve 1070
+2019-10-15T09:02:39Z [vault.dat] Fee Calculation: Fee:50500 Bytes:505 Needed:50500 Tgt:6 (requested 6) Reason:"Half Target 60% Threshold" Decay 0.96200: Estimation: (98128.3 - 1e+099) 100.00% 13.6/(13.6 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T09:02:39Z [vault.dat] CommitTransaction:
+CTransaction(hash=0cde93a564, ver=2, vin.size=2, vout.size=2, nLockTime=338)
+    CTxIn(COutPoint(c9b6b7a8ce, 0), scriptSig=47304402200f96b293822c89, nSequence=4294967294)
+    CTxIn(COutPoint(c9b6b7a8ce, 1), scriptSig=4730440220410fb7c9f6fb6d, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=24.97751300, scriptPubKey=76a9148ba33e7ccf086a38bfd08554)
+    CTxOut(nValue=0.01000000, scriptPubKey=5205672f696f774c7a7b22636d6422)
+2019-10-15T09:02:39Z [vault.dat] keypool keep 1070
+2019-10-15T09:02:39Z [vault.dat] AddToWallet 0cde93a564efa391a94868c79686dede0bf7d448876f89f3575228a7260a12ab  new
+2019-10-15T09:02:39Z [vault.dat] Relaying wtx 0cde93a564efa391a94868c79686dede0bf7d448876f89f3575228a7260a12ab
+2019-10-15T09:02:39Z [vault.dat] keypool keep 1069
+2019-10-15T09:02:39Z [vault.dat] AddToWallet 0cde93a564efa391a94868c79686dede0bf7d448876f89f3575228a7260a12ab  
+2019-10-15T09:04:07Z CreateNewBlock(): block weight: 3228 txs: 1 fees: 50500 sigops 408
+2019-10-15T09:04:07Z Checked name database, 3 names.
+2019-10-15T09:04:07Z Names with history: 0
+2019-10-15T09:04:07Z UpdateTip: new best=405da0f9d79210d9920692e2c7535c2b6fa370d2c8e9fd79c3ec300630e0a8ad height=339 version=0x30000000 log2_work=19.409391 tx=375 date='2019-10-15T09:04:07Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T09:04:07Z Checked name database, 3 names.
+2019-10-15T09:04:07Z Names with history: 0
+2019-10-15T09:04:07Z [vault.dat] AddToWallet 4b11c32f021755eb37e6e777fd6c2774da97ad283f017dfd68f7daca41d48c15  new
+2019-10-15T09:04:07Z [vault.dat] AddToWallet 0cde93a564efa391a94868c79686dede0bf7d448876f89f3575228a7260a12ab  update
+2019-10-15T09:05:21Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T09:05:21Z [vault.dat] keypool reserve 1071
+2019-10-15T09:05:21Z [vault.dat] keypool added 1 keys (1 internal), size=2000 (1000 internal)
+2019-10-15T09:05:22Z [vault.dat] keypool reserve 1072
+2019-10-15T09:05:22Z [vault.dat] Fee Calculation: Fee:41300 Bytes:413 Needed:41300 Tgt:6 (requested 6) Reason:"Half Target 60% Threshold" Decay 0.96200: Estimation: (98128.3 - 1e+099) 100.00% 14.1/(14.1 0 mem 0.0 out) Fail: (0 - 98128.3) nan% 0.0/(0.0 0 mem 0.0 out)
+2019-10-15T09:05:22Z [vault.dat] CommitTransaction:
+CTransaction(hash=c67a0c96cf, ver=2, vin.size=2, vout.size=2, nLockTime=339)
+    CTxIn(COutPoint(0cde93a564, 0), scriptSig=473044022020319134a63e20, nSequence=4294967294)
+    CTxIn(COutPoint(d55882da4f, 1), scriptSig=473044022070fcc777c61cce, nSequence=4294967294)
+    CScriptWitness()
+    CScriptWitness()
+    CTxOut(nValue=0.01000000, scriptPubKey=5207702f636169726f1d7b2267223a)
+    CTxOut(nValue=24.97710000, scriptPubKey=76a9143680939b9a06e2b449a6bd33)
+2019-10-15T09:05:22Z [vault.dat] keypool keep 1072
+2019-10-15T09:05:22Z [vault.dat] AddToWallet c67a0c96cff0bddd98d9cc756f5524385650cabe6bc2bb704f34d58828d1a804  new
+2019-10-15T09:05:22Z [vault.dat] Relaying wtx c67a0c96cff0bddd98d9cc756f5524385650cabe6bc2bb704f34d58828d1a804
+2019-10-15T09:05:22Z [vault.dat] keypool keep 1071
+2019-10-15T09:05:22Z [vault.dat] AddToWallet c67a0c96cff0bddd98d9cc756f5524385650cabe6bc2bb704f34d58828d1a804  
+2019-10-15T09:07:08Z CreateNewBlock(): block weight: 2860 txs: 1 fees: 41300 sigops 408
+2019-10-15T09:07:08Z Checked name database, 3 names.
+2019-10-15T09:07:08Z Names with history: 0
+2019-10-15T09:07:08Z UpdateTip: new best=a2941bafd7f2957cbaea6676dc9bd4ea8cf7505bd1c23d5299cde6aff26f3bad height=340 version=0x30000000 log2_work=19.413628 tx=377 date='2019-10-15T09:07:08Z' progress=1.000000 cache=0.0MiB(5txo)
+2019-10-15T09:07:08Z Checked name database, 3 names.
+2019-10-15T09:07:08Z Names with history: 0
+2019-10-15T09:07:08Z [vault.dat] AddToWallet 12293bf032154d57223d8f7ef20d4ff154963091d7e741c27672d8a889848d25  new
+2019-10-15T09:07:08Z [vault.dat] AddToWallet c67a0c96cff0bddd98d9cc756f5524385650cabe6bc2bb704f34d58828d1a804  update
+2019-10-15T09:13:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 352 seconds ago)
+2019-10-15T09:23:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 982 seconds ago)
+2019-10-15T09:34:00Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1612 seconds ago)
+2019-10-15T09:34:39Z CreateNewBlock(): block weight: 1208 txs: 0 fees: 0 sigops 400
+2019-10-15T09:34:39Z Checked name database, 3 names.
+2019-10-15T09:34:39Z Names with history: 0
+2019-10-15T09:34:40Z UpdateTip: new best=94afb07dc6931e02e0aed498306dce095e962e16564140a9ea4f15281e7fd7d9 height=341 version=0x30000000 log2_work=19.417853 tx=378 date='2019-10-15T09:34:39Z' progress=1.000000 cache=0.0MiB(1txo)
+2019-10-15T09:34:40Z Checked name database, 3 names.
+2019-10-15T09:34:40Z Names with history: 0
+2019-10-15T09:34:40Z [vault.dat] AddToWallet 7b4cf68a2a997a45999cbaa25af8217f8f838b4860b735c39e784cad20663b23  new
+2019-10-15T09:44:30Z Potential stale tip detected, will try using extra outbound peer (last tip update: 590 seconds ago)
+2019-10-15T09:54:31Z tor: Thread interrupt
+2019-10-15T09:54:31Z opencon thread exit
+2019-10-15T09:54:31Z net thread exit
+2019-10-15T09:54:31Z Shutdown: In progress...
+2019-10-15T09:54:31Z sendupdates thread exit
+2019-10-15T09:54:31Z msghand thread exit
+2019-10-15T09:54:32Z torcontrol thread exit

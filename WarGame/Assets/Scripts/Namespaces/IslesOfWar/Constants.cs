@@ -91,6 +91,7 @@ namespace IslesOfWar
         };
 
         public static float[] islandSearchCost = new float[] { 1000, 0, 0, 0 };
+        public static float attackCostPercent = 0.1f;
         public static int islandUndiscoveredMinimum = 10;
         public static float undiscoveredFalloffRate = 0.3f;
         public static float islandSearchReplenishTime = 150.0f; //Estimated time in blocks it should take to get enough resources to search again.

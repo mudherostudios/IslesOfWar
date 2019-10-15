@@ -90,6 +90,7 @@ namespace IslesOfWar
         {
             public int[] ver;          //Set Version, sets all - 3
             public float iwCost;       //Set IslandSearchCost ********* Need to change the cost method first. *********
+            public float atkPerc;       //Set AttackCostPercent
             public int iuMin;          //Set IslandUndiscoveredMinimum
             public float uFalloff;     //Set UndiscoveredFalloffRate
             public float repTime;      //Set IslandReplenishTime
@@ -368,7 +369,7 @@ namespace IslesOfWar
 
             public static bool DefenseSquad(List<List<int>> squad, double[] availableUnits)
             {
-                bool isValid = squad.Count > 0 && squad.Count < 4;
+                bool isValid = squad.Count > 0 && squad.Count <= 4;
 
                 isValid = HasEnoughTroops(squad, availableUnits, isValid);
 
