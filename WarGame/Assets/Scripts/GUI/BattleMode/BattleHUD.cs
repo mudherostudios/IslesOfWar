@@ -9,7 +9,7 @@ public class BattleHUD : MonoBehaviour
     public Dropdown availableSquadsList;
     public BattlePlanInteraction battleScript;
     private List<string> deployedSquads;
-    
+
     public void AddSquad()
     {
         deployedSquads = new List<string>(battleScript.squadNames);
@@ -95,9 +95,7 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    public void SetDeployedSquads(List<string> deployed)
-    {
-        deployedSquads = new List<string>(deployed);
-    }
+    public void SetDeployedSquads(List<string> deployed) { deployedSquads = new List<string>(deployed); }
+    public void CancelPlans() { battleScript.CancelPlans(); }
 
 }

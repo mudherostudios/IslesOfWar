@@ -50,6 +50,10 @@ public class BattlePlanInteraction : Interaction
     private List<List<int>> squadCounts;
     private List<List<int>> squadPlans;
     public List<string> squadNames;
+    private List<GameObject> opponentMarkers;
+    private List<List<int>> opponentCounts;
+    private List<List<int>> opponentPlans;
+    private List<string> opponentNames;
     private List<GameObject> planMarkers;
 
     private void Start()
@@ -77,16 +81,18 @@ public class BattlePlanInteraction : Interaction
                 
                 currentSquad = selectedSquad.squad;
 
-                if(show)
+                if (show && selectedSquad.owner == 1)
                     ViewCurrentSquad();
+                else if (show && selectedSquad.owner == 0)
+                    ViewCurrentOpponentSquad();
             }
 
-            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost"))
+            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.owner == 1)
             {
                 RemoveSquadPoint(selectedButton.GetComponent<PlanMarker>().index);
             }
 
-            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected)
+            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected && selectedSquad.owner == 1)
             {
                 int position = selectedButton.GetComponent<IndexedNavigationButton>().index;
                 Plan(position);
@@ -134,7 +140,34 @@ public class BattlePlanInteraction : Interaction
         InstantiateAllSquads();
     }
 
-    public void StartWithDefenders(string _islandID)
+    public void StartWithDefenders(string _island)
+    {
+        islandID = _island;
+
+        if (mode == Mode.ATTACK)
+            StartWithDefendersWhileAttacking();
+        else if (mode == Mode.DEFEND)
+            StartWithDefendersWhileDefending();
+    }
+
+    public void StartWithDefendersWhileAttacking()
+    {
+        opponentNames = new List<string>();
+        opponentCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
+        opponentPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
+        clientInterface.InitBattleSquads(true, islandID);
+
+        for (int o = 0; o < opponentCounts.Count; o++)
+        {
+            string defenderName = string.Format("Defender {0}", o.ToString());
+            opponentNames.Add(defenderName);
+        }
+
+        opponentMarkers = new List<GameObject>();
+        InstantiateOppponentSquads();
+    }
+
+    public void StartWithDefendersWhileDefending()
     {
         squadNames = new List<string>();
         List<string> deployedSquads = new List<string>();
@@ -142,8 +175,7 @@ public class BattlePlanInteraction : Interaction
 
         if (PlayerPrefs.HasKey("keys"))
             keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
-
-        islandID = _islandID;
+        
         squadCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
         clientInterface.SetFullBattlePlan(mode == Mode.ATTACK, islandID, squadCounts, squadPlans);
@@ -170,9 +202,26 @@ public class BattlePlanInteraction : Interaction
         {
             squadMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[s].position, Quaternion.identity));
             squadMarkers[s].GetComponent<SquadMarker>().squad = s;
+            squadMarkers[s].GetComponent<SquadMarker>().owner = 1;
+            squadMarkers[s].GetComponent<SquadMarker>().name = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
             currentSquad = s;
             selectedSquad = squadMarkers[s].GetComponent<SquadMarker>();
             ViewCurrentSquad();
+            CloseCurrentSquad();
+        }
+    }
+
+    void InstantiateOppponentSquads()
+    {
+        for (int o = 0; o < opponentCounts.Count; o++)
+        {
+            opponentMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[o].position, Quaternion.identity));
+            opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
+            opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
+            opponentMarkers[o].GetComponent<SquadMarker>().name = opponentNames[o];
+            currentSquad = o;
+            selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
+            ViewCurrentOpponentSquad();
             CloseCurrentSquad();
         }
     }
@@ -203,6 +252,8 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().name = string.Format("{0} Squad", squadName);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
             squadCounts.Add(unitCounts);
             squadPlans.Add(new List<int>());
             squadNames.Add(squadName);
@@ -280,6 +331,33 @@ public class BattlePlanInteraction : Interaction
             }
             else if (mode == Mode.DEFEND)
                 index = squadPlans[currentSquad][0];
+        }
+
+        if (index >= 0)
+            selectedSquad.transform.position = AddOffset(islandStats.hexTiles[index].position);
+        else
+            selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
+    }
+
+    void ViewCurrentOpponentSquad()
+    {
+        int index = 0;
+
+        for (int p = 0; p < opponentPlans[currentSquad].Count; p++)
+        {
+            index = opponentPlans[currentSquad][p];
+            Vector3 position = AddOffset(islandStats.hexTiles[index].position);
+            GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
+            planMarker.GetComponentInChildren<PlanMarker>().index = p;
+            planMarkers.Add(planMarker);
+        }
+
+        index = -1;
+
+        if (opponentPlans[currentSquad].Count > 0)
+        {
+            int tilesInSquadPlan = opponentPlans[currentSquad].Count;
+            index = opponentPlans[currentSquad][0];
         }
 
         if (index >= 0)
@@ -551,6 +629,7 @@ public class BattlePlanInteraction : Interaction
     //------------------------------------------------------------------------------
     //ClientInterface Section
     //------------------------------------------------------------------------------
+    public void CancelPlans() { clientInterface.CancelPlan(mode == Mode.ATTACK); }
     public List<string> GetIslands() { return clientInterface.playerIslandIDs; }
     public string GetAttackableIsland() { return clientInterface.attackableIslandID; }
 }

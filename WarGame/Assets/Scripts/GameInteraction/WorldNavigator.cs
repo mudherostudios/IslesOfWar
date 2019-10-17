@@ -344,14 +344,14 @@ public class WorldNavigator : MonoBehaviour
     //--------------------------------------------------
     //Cancel Orders
     //--------------------------------------------------
-    public void CancelDefensePlan()
+    public void CancelPlans()
     {
-        clientInterface.CancelDefensePlan();
+        battleScript.CancelPlans();
         SetCommandMode();
 
         List<string> keys = new List<string>();
 
-        if (PlayerPrefs.HasKey("keys"))
+        if (PlayerPrefs.HasKey("keys") && battleScript.mode == BattlePlanInteraction.Mode.ATTACK)
         {
             keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
             List<string> remove = new List<string>();

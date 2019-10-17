@@ -485,10 +485,18 @@ public class ClientInterface : MonoBehaviour
     //----------------------------------------------------------------------------------------------------
     //Cancel Functions
     //----------------------------------------------------------------------------------------------------
-    public void CancelDefensePlan()
+    public void CancelPlan(bool isAttackPlan)
     {
-        notificationSystem.PushNotification(1, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)));
-        queuedActions.dfnd = null;
+        if (isAttackPlan)
+        {
+            notificationSystem.PushNotification(1, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 10)));
+            queuedActions.attk = null;
+        }
+        else
+        {
+            notificationSystem.PushNotification(1, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)));
+            queuedActions.dfnd = null;
+        }
     }
 
     //--------------------------------------------------------------
