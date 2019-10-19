@@ -39,7 +39,7 @@ public class ClientInterface : MonoBehaviour
     //Also eventually check to see if queued actions are still valid.
     public void UpdateState()
     {
-        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
+        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject( communication.state));
     }
 
     void SpendResources(double[] resources)
@@ -620,13 +620,13 @@ public class ClientInterface : MonoBehaviour
 
     public List<List<int>> GetDefenderCountsFromIsland(string _islandID)
     {
-        List<List<int>> squadCounts = chainState.islands[_islandID].squadCounts;
+        List<List<int>> squadCounts = JsonConvert.DeserializeObject<List<List<int>>>(JsonConvert.SerializeObject(chainState.islands[_islandID].squadCounts));
         return squadCounts;
     }
 
     public List<List<int>> GetDefenderPlansFromIsland(string _islandID)
     {
-        List<List<int>> squadPlans = chainState.islands[_islandID].squadPlans;
+        List<List<int>> squadPlans = JsonConvert.DeserializeObject<List<List<int>>>(JsonConvert.SerializeObject(chainState.islands[_islandID].squadPlans));
         return squadPlans;
     }
 

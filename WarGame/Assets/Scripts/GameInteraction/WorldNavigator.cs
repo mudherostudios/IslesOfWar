@@ -159,6 +159,7 @@ public class WorldNavigator : MonoBehaviour
         List<GameObject> battleIslandGenerationPrefabs = new List<GameObject>();
         battleIslandGenerationPrefabs.AddRange(tilePrefabs);
         battleIslandGenerationPrefabs.Add(battleIsland);
+        battleScript.navigator = this;
 
         commandScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         commandScript.SetObservationPoints(commandObservationPoint, commandFocusPoint);

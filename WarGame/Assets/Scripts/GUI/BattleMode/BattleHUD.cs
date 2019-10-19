@@ -8,7 +8,7 @@ public class BattleHUD : MonoBehaviour
 {
     public Dropdown availableSquadsList;
     public BattlePlanInteraction battleScript;
-    private List<string> deployedSquads;
+    private List<string> deployedSquads = new List<string>();
 
     public void AddSquad()
     {
@@ -31,25 +31,27 @@ public class BattleHUD : MonoBehaviour
 
     public void RemoveSquad()
     {
-        deployedSquads = battleScript.squadNames;
-
-        if (availableSquadsList.options.Count > 0 && deployedSquads.Count > 0)
+        deployedSquads = new List<string>(battleScript.squadNames);
+        if (deployedSquads != null)
         {
-            int squadIndex = availableSquadsList.value;
-            string squadName = GetKeys()[squadIndex];
-
-            if (deployedSquads.Contains(squadName))
+            if (availableSquadsList.options.Count > 0 && deployedSquads.Count > 0)
             {
-                int index = 0;
+                int squadIndex = availableSquadsList.value;
+                string squadName = GetKeys()[squadIndex];
 
-                for (int i = 0; i < deployedSquads.Count; i++)
+                if (deployedSquads.Contains(squadName))
                 {
-                    if (deployedSquads[i] == squadName)
-                        index = i;
-                }
+                    int index = 0;
 
-                battleScript.RemoveSquad(index);
-                deployedSquads.RemoveAt(index);
+                    for (int i = 0; i < deployedSquads.Count; i++)
+                    {
+                        if (deployedSquads[i] == squadName)
+                            index = i;
+                    }
+
+                    battleScript.RemoveSquad(index);
+                    deployedSquads.RemoveAt(index);
+                }
             }
         }
     }

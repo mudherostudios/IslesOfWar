@@ -14,6 +14,7 @@ public class BattlePlanInteraction : Interaction
         NONE
     }
 
+    public WorldNavigator navigator;
     public string[] battleButtonTypes = new string[] { "SquadMarker", "PlanMarker" };
 
     [Header("Marker Interaction Variables")]
@@ -112,7 +113,6 @@ public class BattlePlanInteraction : Interaction
 
     public void Clean()
     {
-        mode = Mode.NONE;
         CloseCurrentSquad();
 
         for (int s = 0; s < squadMarkers.Count; s++)
@@ -120,9 +120,32 @@ public class BattlePlanInteraction : Interaction
             Destroy(squadMarkers[s]);
         }
 
+        for (int o = 0; o < opponentMarkers.Count; o++)
+        {
+            Destroy(opponentMarkers[o]);
+        }
+
+        squadNames.Clear();
         squadCounts.Clear();
         squadMarkers.Clear();
         squadPlans.Clear();
+
+        opponentNames.Clear();
+        opponentCounts.Clear();
+        opponentMarkers.Clear();
+        opponentPlans.Clear();
+    }
+
+    public void LoadQueuedPlans()
+    {
+        BattleCommand command = new BattleCommand();
+        if (mode == Mode.ATTACK)
+            command = clientInterface.queuedActions.attk;
+        else
+            command = clientInterface.queuedActions.dfnd;
+
+        squadCounts.AddRange(command.sqd);
+        squadPlans.AddRange(command.pln);
     }
 
     public void StartWithQueuedPlan()
@@ -144,10 +167,17 @@ public class BattlePlanInteraction : Interaction
     {
         islandID = _island;
 
+        if (clientInterface.queuedActions.dfnd == null && clientInterface.queuedActions.attk == null)
+            clientInterface.InitBattleSquads(true, islandID);
+
         if (mode == Mode.ATTACK)
             StartWithDefendersWhileAttacking();
         else if (mode == Mode.DEFEND)
             StartWithDefendersWhileDefending();
+
+        LoadQueuedPlans();
+        InstantiateOppponentSquads();
+        InstantiateAllSquads();
     }
 
     public void StartWithDefendersWhileAttacking()
@@ -155,7 +185,6 @@ public class BattlePlanInteraction : Interaction
         opponentNames = new List<string>();
         opponentCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         opponentPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
-        clientInterface.InitBattleSquads(true, islandID);
 
         for (int o = 0; o < opponentCounts.Count; o++)
         {
@@ -164,7 +193,6 @@ public class BattlePlanInteraction : Interaction
         }
 
         opponentMarkers = new List<GameObject>();
-        InstantiateOppponentSquads();
     }
 
     public void StartWithDefendersWhileDefending()
@@ -193,7 +221,6 @@ public class BattlePlanInteraction : Interaction
         PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
 
         hud.SetDeployedSquads(deployedSquads);
-        InstantiateAllSquads();
     }
 
     void InstantiateAllSquads()
@@ -229,7 +256,6 @@ public class BattlePlanInteraction : Interaction
     //------------------------------------------------------------------------------
     //Squad Management Section
     //------------------------------------------------------------------------------
-    
     public void AddSquad(string squadName, int[] counts)
     {
         int maxSquads = 3;
@@ -264,17 +290,20 @@ public class BattlePlanInteraction : Interaction
 
     public void RemoveSquad(int index)
     {
-        if (currentSquad == index)
-            CloseCurrentSquad();
+        if (squadMarkers.Count > index)
+        {
+            if (currentSquad == index)
+                CloseCurrentSquad();
 
-        Destroy(squadMarkers[index]);
-        squadMarkers.RemoveAt(index);
-        squadCounts.RemoveAt(index);
-        squadPlans.RemoveAt(index);
-        squadNames.RemoveAt(index);
+            Destroy(squadMarkers[index]);
+            squadMarkers.RemoveAt(index);
+            squadCounts.RemoveAt(index);
+            squadPlans.RemoveAt(index);
+            squadNames.RemoveAt(index);
 
-        RenumberSquads(index);
-        clientInterface.RemoveSquad(mode == Mode.ATTACK, index);
+            RenumberSquads(index);
+            clientInterface.RemoveSquad(mode == Mode.ATTACK, index);
+        }
     }
 
     void RenumberSquads(int index)
@@ -365,7 +394,6 @@ public class BattlePlanInteraction : Interaction
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }
-
     //------------------------------------------------------------------------------
     //Battleplan Section
     //------------------------------------------------------------------------------
@@ -440,6 +468,14 @@ public class BattlePlanInteraction : Interaction
         ViewCurrentSquad();
     }
 
+    public void CancelPlans()
+    {
+        Clean();
+        clientInterface.CancelPlan(mode == Mode.ATTACK);
+        mode = Mode.NONE;
+        navigator.SetCommandMode();
+    }
+
     //------------------------------------------------------------------------------
     //Camera Movement Section
     //------------------------------------------------------------------------------
@@ -460,6 +496,12 @@ public class BattlePlanInteraction : Interaction
     public void SetExitMode()
     {
         Clean();
+        mode = Mode.NONE;
+    }
+
+    public void SetCommandMode()
+    {
+        navigator.SetCommandMode();
     }
 
     //------------------------------------------------------------------------------
@@ -498,6 +540,7 @@ public class BattlePlanInteraction : Interaction
 
             TurnOnDetails(tempStats.rocks, tempStats.rockProbabilities);
             TurnOnDetails(tempStats.vegetation, tempStats.vegetationProbabilities);
+            TurnOnDefenses(tempStats, island.defenses[h]);
 
             float tempStructureProb = 0;
 
@@ -523,6 +566,19 @@ public class BattlePlanInteraction : Interaction
         }
     }
 
+    void TurnOnDefenses(TileStats stats, char defense)
+    {
+        if (defense != ')')
+        {
+            int blockerType = EncodeUtility.GetYType(defense);
+            int[] bunkerTypes = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(defense));
+            stats.ToggleBlockerSystem(true, blockerType);
+            stats.ToggleBunkerSystem(true, bunkerTypes);
+            stats.ToggleBlockerPrompters(false);
+            stats.ToggleBunkerPrompters(false);
+        }
+    }
+
     void ActivateRandomObject(GameObject[] objects, float noneProbability)
     {
         if (objects != null)
@@ -541,6 +597,7 @@ public class BattlePlanInteraction : Interaction
     public void TurnOffIsland()
     {
         Clean();
+        mode = Mode.NONE;
         foreach (GameObject squad in squadMarkers)
         {
             Destroy(squad);
@@ -629,7 +686,6 @@ public class BattlePlanInteraction : Interaction
     //------------------------------------------------------------------------------
     //ClientInterface Section
     //------------------------------------------------------------------------------
-    public void CancelPlans() { clientInterface.CancelPlan(mode == Mode.ATTACK); }
     public List<string> GetIslands() { return clientInterface.playerIslandIDs; }
     public string GetAttackableIsland() { return clientInterface.attackableIslandID; }
 }

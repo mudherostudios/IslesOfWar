@@ -147,16 +147,6 @@ namespace IslesOfWar
             public string debugBlockData = "";
 
             public State() { }
-            
-            public void Init()
-            {
-                players = new Dictionary<string, PlayerState>();
-                islands = new Dictionary<string, Island>();
-                resourceContributions = new Dictionary<string, List<List<double>>>();
-                depletedContributions = new Dictionary<string, List<string>>();
-                resourcePools = new List<double> { 0, 0, 0 };
-                warbucksPool = 0;
-            }
 
             public State(Dictionary<string, PlayerState> allPlayers, Dictionary<string, Island> allIslands)
             {
@@ -199,6 +189,16 @@ namespace IslesOfWar
                 depletedContributions = depContributions;
                 resourcePools = resPools;
                 warbucksPool = warPool;
+            }
+
+            public void Init()
+            {
+                players = new Dictionary<string, PlayerState>();
+                islands = new Dictionary<string, Island>();
+                resourceContributions = new Dictionary<string, List<List<double>>>();
+                depletedContributions = new Dictionary<string, List<string>>();
+                resourcePools = new List<double> { 0, 0, 0 };
+                warbucksPool = 0;
             }
         }
 
