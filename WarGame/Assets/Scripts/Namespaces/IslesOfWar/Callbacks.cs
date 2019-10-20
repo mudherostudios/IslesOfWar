@@ -128,7 +128,7 @@ namespace IslesOfWar
 
                                 if (processor.CanAttackIsland(player, actions))
                                 {
-                                    processor.AttackIsland(player, actions.attk);
+                                    processor.AttackIsland(player, actions.attk, ref random);
                                 }
                             }
                         }
@@ -156,7 +156,6 @@ namespace IslesOfWar
                 updatedData = undoData;
                 return updatedData;
             }
-
         }   
     }
 }

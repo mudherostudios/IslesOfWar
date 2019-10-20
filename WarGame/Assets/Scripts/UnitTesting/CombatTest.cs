@@ -26,8 +26,8 @@ public class CombatTest : MonoBehaviour
             blufor = new Squad(bluforUnits);
 
             engagement = new Engagement(blufor, opfor);
-
-            EngagementHistory history = engagement.ResolveEngagement();
+            MudHeroRandom random = new MudHeroRandom();
+            EngagementHistory history = engagement.ResolveEngagement(ref random);
 
             Debug.Log(history.winner + " " + history.bluforHistory.Length + " " + (Time.time - time));
         }

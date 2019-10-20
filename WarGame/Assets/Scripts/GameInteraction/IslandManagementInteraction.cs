@@ -440,9 +440,6 @@ public class IslandManagementInteraction : Interaction
 
             int possibleIndexes = islandCount;
 
-            if (clientInterface.chainState.players[clientInterface.player].attackableIsland != "")
-                possibleIndexes += 1;
-
             if (islandIndex + increment >= possibleIndexes)
                 islandIndex = 0;
             else if (islandIndex + increment < 0)
@@ -455,8 +452,6 @@ public class IslandManagementInteraction : Interaction
 
             if (islandIndex < islandCount)
                 island = clientInterface.chainState.islands[islandID];
-            else
-                island = clientInterface.chainState.islands[clientInterface.chainState.players[clientInterface.player].attackableIsland];
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
             SetEditButtons();

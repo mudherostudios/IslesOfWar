@@ -2048,61 +2048,61 @@ public class GSPTesting : MonoBehaviour
 
         //Fail because bad id
         State tempState = JsonConvert.DeserializeObject<State>(savedState);
-        processor.AttackIsland("pimpMacD", new BattleCommand("", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("", goodPlanMin, goodForceMin), ref random);
         bool passedFirst = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedFirst);
 
         //Fail because id doesn't exist
-        processor.AttackIsland("pimpMacD", new BattleCommand("z", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("z", goodPlanMin, goodForceMin), ref random);
         bool passedSecond = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedSecond);
 
         //Fail because id belongs to self
-        processor.AttackIsland("pimpMacD", new BattleCommand("e", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("e", goodPlanMin, goodForceMin), ref random);
         bool passedThird = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedThird);
 
         //Fail because plan was too short
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", new int[][] { }, new int[][] { }));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", new int[][] { }, new int[][] { }), ref random);
         bool passedFourth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedFourth);
 
         //Fail because plan was too long
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", tooLongPlan, tooLongForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", tooLongPlan, tooLongForce), ref random);
         bool passedFifth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedFifth);
 
         //Fail because plan does not match squads
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMax));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMax), ref random);
         bool passedSixth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedSixth);
 
         //Fail because plan is not adjacent
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", notAdjacentPlan, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", notAdjacentPlan, goodForceMin), ref random);
         bool passedSeventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedSeventh);
 
         //Fail because units can not start in center
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", notLandablePlan, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", notLandablePlan, goodForceMin), ref random);
         bool passedEighth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedEighth);
 
         //Fail because not enough units
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, notEnoughTroops));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, notEnoughTroops), ref random);
         bool passedNinth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedNinth);
 
         //Fail because malformed squad
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, badSquadSize));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, badSquadSize), ref random);
         bool passedTenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedTenth);
@@ -2111,7 +2111,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].owner = "pimpMacD";
         tempState.players["cairo"].islands.Remove("a");
         tempState.players["pimpMacD"].islands.Add("a");
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin), ref random);
         bool passedEleventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedEleventh);
@@ -2120,7 +2120,7 @@ public class GSPTesting : MonoBehaviour
         ResetTestData();
         processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5, 1, 2, 6, 4, 9, 10 } };
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin), ref random);
         bool passedTwelfth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedTwelfth);
@@ -2129,7 +2129,7 @@ public class GSPTesting : MonoBehaviour
         ResetTestData();
         processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 0, 1, 4 } };
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin), ref random);
         bool passedThirteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedThirteenth);
@@ -2140,7 +2140,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 100, 100, 100, 0, 0, 0, 0, 0, 0 } };
         tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
         tempState.players["pimpMacD"].units[0]--;
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin), ref random);
         bool passedFourteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedFourteenth);
@@ -2151,7 +2151,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 100, 100, 100, 0, 0, 0, 0, 0, 0 } };
         tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
         tempState.players["pimpMacD"].units[0]--;
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin), ref random);
         bool passedFifteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedFifteenth);
@@ -2161,7 +2161,7 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 5 } };
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
         tempState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(processor.state));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, goodForceMin), ref random);
         bool passedSixteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedSixteenth);
@@ -2172,7 +2172,7 @@ public class GSPTesting : MonoBehaviour
         tempState.players["pimpMacD"].units[0]--;
         processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 0 } };
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMin, tinyForceMin), ref random);
         bool passedSeventeenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedSeventeenth);
@@ -2185,7 +2185,7 @@ public class GSPTesting : MonoBehaviour
         tempState.players["pimpMacD"].islands.Add("a");
         processor.state.islands["a"].squadPlans = new List<List<int>> { new List<int> { 1, 0, 4, 5, 2 }, new List<int> { 9, 8, 4, 5, 10 } };
         processor.state.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 } };
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMax, goodForceMax));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", goodPlanMax, goodForceMax), ref random);
         bool passedEigthteenth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         attackTestingResults += GetPassOrFail(passedEigthteenth);
@@ -2211,7 +2211,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0}, new List<int> { 1000, 1000, 1000, 0, 0, 0, 0, 0, 100 } };
         tempState.islands["a"].defenses = ")))0))))))))";
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, troopsHeavyForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, troopsHeavyForce), ref random);
         bool passedFirst = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedFirst);
@@ -2222,7 +2222,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 1000, 1000, 1000, 0, 0, 0, 0, 0, 100 } };
         tempState.islands["a"].defenses = ")))a))))))))";
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce), ref random);
         bool passedSecond = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedSecond);
@@ -2233,7 +2233,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 0, 0, 0, 0, 0, 900, 900, 0 } };
         tempState.islands["a"].defenses = ")))A))))))))";
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce), ref random);
         bool passedThird = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedThird);
@@ -2243,7 +2243,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 6 }, new List<int> { 10 } };
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 } };
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tankHeavyForce), ref random);
         bool passedFourth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedFourth);
@@ -2253,7 +2253,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadPlans = new List<List<int>> { new List<int> { 10 }, new List<int> { 9 } };
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 1, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int> { 0, 500, 0, 0, 500, 0, 0, 500, 0 } };
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, airHeavyForce), ref random);
         bool passedFifth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedFifth);
@@ -2264,7 +2264,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 }};
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
         processor.state.islands["a"].defenses = "))))))))))a)";
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce), ref random);
         bool passedSixth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedSixth);
@@ -2275,7 +2275,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 0, 0, 0, 500, 500, 500 } };
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
         processor.state.islands["a"].defenses = ")))))))))a))";
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", allTerrainTypesPlan, tinyTroopForce), ref random);
         bool passedSeventh = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedSeventh);
@@ -2286,7 +2286,7 @@ public class GSPTesting : MonoBehaviour
         tempState.islands["a"].squadCounts = new List<List<int>> { new List<int> { 0, 0, 0, 500, 500, 500, 0, 0, 0 } };
         processor.state = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(tempState));
         tempState.players["pimpMacD"].units[0]--;
-        processor.AttackIsland("pimpMacD", new BattleCommand("a", dualAttack, dualTinyTroopForce));
+        processor.AttackIsland("pimpMacD", new BattleCommand("a", dualAttack, dualTinyTroopForce), ref random);
         bool passedEighth = IslandsAreEqual(processor.state.islands, tempState.islands) && PlayersAreEqualExcept("", processor.state.players, tempState.players)
         && DefensePlansAreEqual(processor.state.islands, tempState.islands);
         terrainTestingResults += GetPassOrFail(passedEighth);

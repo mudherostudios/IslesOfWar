@@ -120,20 +120,23 @@ public class BattlePlanInteraction : Interaction
             Destroy(squadMarkers[s]);
         }
 
-        for (int o = 0; o < opponentMarkers.Count; o++)
-        {
-            Destroy(opponentMarkers[o]);
-        }
-
         squadNames.Clear();
         squadCounts.Clear();
         squadMarkers.Clear();
         squadPlans.Clear();
 
-        opponentNames.Clear();
-        opponentCounts.Clear();
-        opponentMarkers.Clear();
-        opponentPlans.Clear();
+        if (opponentMarkers != null)
+        {
+            for (int o = 0; o < opponentMarkers.Count; o++)
+            {
+                Destroy(opponentMarkers[o]);
+            }
+
+            opponentNames.Clear();
+            opponentCounts.Clear();
+            opponentMarkers.Clear();
+            opponentPlans.Clear();
+        }
     }
 
     public void LoadQueuedPlans()
@@ -598,10 +601,6 @@ public class BattlePlanInteraction : Interaction
     {
         Clean();
         mode = Mode.NONE;
-        foreach (GameObject squad in squadMarkers)
-        {
-            Destroy(squad);
-        }
 
         foreach (TileStats stats in islandTiles)
         {

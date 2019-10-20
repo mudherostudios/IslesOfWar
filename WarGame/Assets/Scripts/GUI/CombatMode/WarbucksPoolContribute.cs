@@ -37,8 +37,11 @@ public class WarbucksPoolContribute : MonoBehaviour
 
     public void AddSelected()
     {
-        commandScript.AddIslandToPool(depletedIslandsMenu.options[depletedIslandsMenu.value].text);
-        UpdateAllStats();
+        if (depletedIslandsMenu.options.Count > 0)
+        {
+            commandScript.AddIslandToPool(depletedIslandsMenu.options[depletedIslandsMenu.value].text);
+            UpdateAllStats();
+        }
     }
 
     List<Dropdown.OptionData> GetDepletedIslandsOptions()

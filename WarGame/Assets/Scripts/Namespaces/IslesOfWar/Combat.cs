@@ -404,7 +404,7 @@ namespace IslesOfWar
                     antiAircrafts = 1;
             }
 
-            public void CalculateCasualties(Squad attacker)
+            public void CalculateCasualties(Squad attacker, ref MudHeroRandom random)
             {
                 double[] units = fullSquad;
                 double cumulativeDamage = 0;
@@ -412,8 +412,6 @@ namespace IslesOfWar
 
                 if (totalHealth > attacker.totalDamage)
                 {
-                    System.Random random = new System.Random();
-
                     if (damagedUnit != -1)
                     {
                         if (remainingHealth <= attacker.totalDamage)
@@ -435,7 +433,7 @@ namespace IslesOfWar
 
                     while (cumulativeDamage < attacker.totalDamage && unitCount > 0)
                     {
-                        int deadUnit = GetUnitByProbability(random);
+                        int deadUnit = GetUnitByProbability(ref random);
 
                         cumulativeDamage += Constants.unitHealths[deadUnit];
 
@@ -463,9 +461,9 @@ namespace IslesOfWar
                 SetUnits(units);
             }
 
-            int GetUnitByProbability(System.Random random)
+            int GetUnitByProbability(ref MudHeroRandom random)
             {
-                double threshold = random.NextDouble();
+                double threshold = random.Value();
                 double currentRange = 0.0;
 
                 for (int p = 0; p < unitProbabilities.Length; p++)
@@ -560,7 +558,7 @@ namespace IslesOfWar
                 opfor.CalculateUnitProbabilities();
             }
 
-            public EngagementHistory ResolveEngagement()
+            public EngagementHistory ResolveEngagement(ref MudHeroRandom random)
             {
                 List<double[]> bluforHistory = new List<double[]>();
                 List<double[]> opforHistory = new List<double[]>();
@@ -570,8 +568,8 @@ namespace IslesOfWar
 
                 while (!engagementIsOver)
                 {
-                    blufor.CalculateCasualties(opfor);
-                    opfor.CalculateCasualties(blufor);
+                    blufor.CalculateCasualties(opfor, ref random);
+                    opfor.CalculateCasualties(blufor, ref random);
 
                     double[] healths = CalculateTotalHealth(blufor, opfor);
                     blufor.totalHealth = healths[0];

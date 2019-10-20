@@ -270,6 +270,10 @@ namespace IslesOfWar
                             cost[c] = Math.Floor(cost[c] * Constants.attackCostPercent);
                         }
                     }
+                    else if (discovered != txid && state.players[player].islands.Contains(discovered))
+                    {
+                        cost = new double[4];
+                    }
 
                     resources = Subtract(state.players[player].resources.ToArray(), cost);
                     state.players[player].resources.Clear();
@@ -594,7 +598,7 @@ namespace IslesOfWar
                 }
             }
 
-            public void AttackIsland(string player, BattleCommand attackPlan)
+            public void AttackIsland(string player, BattleCommand attackPlan, ref MudHeroRandom random)
             {
                 bool canAttack = attackPlan.id != null && attackPlan.pln != null && attackPlan.sqd != null;
 
@@ -685,7 +689,7 @@ namespace IslesOfWar
 
                                     //Fight
                                     engagement = new Engagement(defenderSquads[defender], attackerSquads[a]);
-                                    EngagementHistory history = engagement.ResolveEngagement();
+                                    EngagementHistory history = engagement.ResolveEngagement(ref random);
 
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
@@ -750,7 +754,7 @@ namespace IslesOfWar
 
                                     //Fight
                                     engagement = new Engagement(defenderSquads[d], attackerSquads[attackerIndex]);
-                                    EngagementHistory history = engagement.ResolveEngagement();
+                                    EngagementHistory history = engagement.ResolveEngagement(ref random);
 
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
@@ -856,6 +860,7 @@ namespace IslesOfWar
                     state.islands[attackPlan.id].owner = player;
                     state.islands[attackPlan.id].squadPlans = null;
                     state.islands[attackPlan.id].squadCounts = null;
+                    state.players[player].attackableIsland = "";
 
                     state.players[previousOwner].islands.Remove(attackPlan.id);
                     state.players[player].islands.Add(attackPlan.id);
