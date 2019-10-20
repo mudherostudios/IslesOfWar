@@ -263,7 +263,7 @@ public class BattlePlanInteraction : Interaction
         if (mode == Mode.DEFEND)
             maxSquads = 4;
 
-        if (!squadNames.Contains(squadName) && squadNames.Count <= maxSquads)
+        if (!squadNames.Contains(squadName) && squadNames.Count < maxSquads)
         {
             List<int> unitCounts = new List<int>();
             unitCounts.AddRange(counts);

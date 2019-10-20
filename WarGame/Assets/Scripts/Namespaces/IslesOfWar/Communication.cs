@@ -339,13 +339,13 @@ namespace IslesOfWar
             {
                 for (int squad = 0; squad < plan.Count && isValid; squad++)
                 {
-                    isValid = plan[squad].Count == 6 && plan[squad][0] != 5 && plan[squad][0] != 6;
+                    isValid = plan[squad].Count <= 6 && plan[squad][0] != 5 && plan[squad][0] != 6;
 
                     for (int step = 0; step < plan[squad].Count && isValid; step++)
                     {
                         isValid = plan[squad][step] >= 0 && plan[squad][step] <= 11;
 
-                        if (isValid && step < 5)
+                        if (isValid && step < plan[squad].Count-1)
                             isValid = Combat.AdjacencyMatrix.IsAdjacent(plan[squad][step], plan[squad][step + 1]);
                     }
                 }

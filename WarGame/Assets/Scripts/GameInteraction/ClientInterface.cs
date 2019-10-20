@@ -469,9 +469,6 @@ public class ClientInterface : MonoBehaviour
                     cleanedPlans.Add(queuedActions.attk.pln[p].ToArray().ToList());
             }
 
-            queuedActions.attk.pln.Clear();
-            queuedActions.attk.pln = cleanedPlans;
-
             if (cleanedPlans.Count > 0)
             {
                 queuedActions.attk.pln.Clear();
