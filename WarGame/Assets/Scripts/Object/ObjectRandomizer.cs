@@ -7,6 +7,8 @@ public class ObjectRandomizer : MonoBehaviour
     public string objectTag;
     public float probabilityOn;
     public bool setOnStart = false;
+    public Material[] materials;
+    public bool changeMaterial = false;
 
     // Start is called before the first frame update
     void Start()
@@ -14,43 +16,47 @@ public class ObjectRandomizer : MonoBehaviour
         if (setOnStart)
         {
             GameObject[] tempObjects = GameObject.FindGameObjectsWithTag(objectTag);
-            TurnOffObjects(tempObjects);
+            int[][] winnersAndLosers = GetWinnerAndLoserIndices(tempObjects);
+            TurnOffObjects(tempObjects, winnersAndLosers[1]);
+
+            if (changeMaterial)
+                ChangeMaterials(tempObjects, winnersAndLosers[0]);
         }
     }
 
-    public void TurnOffObjects(GameObject[] objects)
+    public void TurnOffObjects(GameObject[] objects, int[] indicesToTurnOff)
     {
-        int[] winners = GetLosingIndices(objects);
-        for (int w = 0; w < winners.Length; w++)
+        for (int i = 0; i < indicesToTurnOff.Length; i++)
         {
-            int winner = winners[w];
+            int winner = indicesToTurnOff[i];
             objects[winner].SetActive(false);
         }
     }
 
-    int[] GetLosingIndices(GameObject[] objects)
+    public void ChangeMaterials(GameObject[] objects, int[] indicesToChange)
+    {
+        for (int i = 0; i < indicesToChange.Length; i++)
+        {
+            int choice = Random.Range(0, materials.Length);
+            objects[indicesToChange[i]].GetComponent<Renderer>().material = materials[choice];
+        }
+    }
+
+    int[][] GetWinnerAndLoserIndices(GameObject[] objects)
     {
         List<int> winners = new List<int>();
-        int totalPossibleWinners = Mathf.CeilToInt((1.0f-probabilityOn) * objects.Length);
-        int breakerCount = 0;
-
-        for (int o = 0; o < totalPossibleWinners; o++, breakerCount++)
+        List<int> losers = new List<int>();
+        
+        for (int o = 0; o < objects.Length; o++)
         {
-            if (breakerCount > objects.Length)
-                o = totalPossibleWinners * 2;
+            float choice = Random.value;
 
-            int winner = Random.Range(0, objects.Length - 1);
-
-            if (winners.Contains(winner))
-            {
-                o -= 1;
-            }
+            if (choice <= probabilityOn)
+                winners.Add(o);
             else
-            {
-                winners.Add(winner);
-            }
+                losers.Add(o);
         }
 
-        return winners.ToArray();
+        return new int[][] { winners.ToArray(), losers.ToArray() };
     }
 }

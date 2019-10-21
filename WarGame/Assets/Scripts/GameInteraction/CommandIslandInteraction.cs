@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using IslesOfWar;
 using IslesOfWar.ClientSide;
@@ -17,6 +18,7 @@ public class CommandIslandInteraction : Interaction
     public SquadGUI squadGUI;
     public NationSelect nationSelect;
     public GameObject commandCenterMenu;
+    public Notifications notificationSystem;
 
     [Header("Camera Variables")]
     public Transform commandCenter;
@@ -118,7 +120,7 @@ public class CommandIslandInteraction : Interaction
     }
 
     public void GotoCommandIsland()
-    {
+    { 
         orbital.ExploreMode(commandCenter, false);
         orbital.SetNewObservePoint(observePoint, focalPoint);
     }
@@ -139,6 +141,11 @@ public class CommandIslandInteraction : Interaction
             unitPurchase.UpdateAllStats(unitPrompter.possiblePurchaseTypes[type]);
             unitPrompter.hiddenObject.SetActive(true);
         }
+    }
+
+    public void PushNotification(int messageType, string message)
+    {
+        notificationSystem.PushNotification(messageType, message);
     }
 
     //----------------------------------------------------------------------

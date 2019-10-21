@@ -19,7 +19,7 @@ public class IslandManagementInteraction : Interaction
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
-    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker;
     public Vector3 islandTileZoom;
 
     [Header("Prefabs")]
@@ -44,6 +44,7 @@ public class IslandManagementInteraction : Interaction
     private float checkedTime;
     private string lastPeekedButton = "None";
     private string lastPeekedName = "None";
+    private Text islandName;
 
     public void Awake()
     {
@@ -334,6 +335,8 @@ public class IslandManagementInteraction : Interaction
         selectionButtons.SetActive(true);
         backToCommandCenterButton.SetActive(true);
         resumeIslandQueueButton.SetActive(false);
+        islandNameTicker.SetActive(true);
+        islandName.text = string.Format("Island {0}", islandID.Substring(0, 10));
     }
 
     public void SetEditGUIState()
@@ -350,6 +353,7 @@ public class IslandManagementInteraction : Interaction
         selectionButtons.SetActive(false);
         backToCommandCenterButton.SetActive(false);
         resumeIslandQueueButton.SetActive(false);
+        islandNameTicker.SetActive(false);
     }
 
     void SetEditButtons()
@@ -366,6 +370,8 @@ public class IslandManagementInteraction : Interaction
             enableBuildBunkersButton.Show(false);
             enableBuildBlockersButton.Show(false);
         }
+
+        islandName.text = string.Format("Island {0}", islandID.Substring(0, 10));
     }
 
     public void SetExitMode()
@@ -598,5 +604,6 @@ public class IslandManagementInteraction : Interaction
         islandIndex = 0;
         islandCount = islands.Length;
         direction = 0;
+        islandName = islandNameTicker.transform.Find("Location").GetComponent<Text>();
     }
 }

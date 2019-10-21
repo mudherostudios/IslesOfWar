@@ -8,6 +8,7 @@ public class BattleIslandsGUI : MonoBehaviour
     public Dropdown islandList;
     public GameObject defendMenu;
     public GameObject attackMenu;
+    public Text attackableIslandName;
     public BattlePlanInteraction battleScript;
     public WorldNavigator navigator;
     public BattleHUD hud;
@@ -50,7 +51,18 @@ public class BattleIslandsGUI : MonoBehaviour
         defendMenu.SetActive(true);
     }
 
-    public void ShowAttackMenu() { attackMenu.SetActive(true); }
+    public void ShowAttackMenu()
+    {
+        attackMenu.SetActive(true);
+        string islandName = battleScript.GetAttackableIsland();
+
+        if (islandName == null || islandName == "")
+            islandName = "No Island to Attack";
+        else
+            islandName = islandName.Substring(0, 10);
+
+        attackableIslandName.text = string.Format("Island {0}", islandName);
+    }
 
     public void HideMenus()
     {

@@ -54,6 +54,7 @@ public class WorldNavigator : MonoBehaviour
     public SquadGUI squadFormation;
     public NationSelect nationSelect;
     public GameObject commandCenterMenu;
+    public BlockChainEffectUpdater sateliteEffects;
     public int unitType;
     public int resourceType;
 
@@ -62,7 +63,7 @@ public class WorldNavigator : MonoBehaviour
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
-    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker;
 
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
@@ -129,6 +130,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.squadGUI = squadFormation;
         commandScript.nationSelect = nationSelect;
         commandScript.commandCenterMenu = commandCenterMenu;
+        commandScript.notificationSystem = notificationSystem;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;
         warbuxPool.commandScript = commandScript;
@@ -150,6 +152,7 @@ public class WorldNavigator : MonoBehaviour
         managementScript.selectionButtons = selectionButtons;
         managementScript.backToCommandCenterButton = backToCommandCenterButton;
         managementScript.resumeIslandQueueButton = resumeIslandQueueButton;
+        managementScript.islandNameTicker = islandNameTicker;
         enableBuildCollectorsButton.managementScript = managementScript;
         enableBuildBunkersButton.managementScript = managementScript;
         enableBuildBlockersButton.managementScript = managementScript;
@@ -212,6 +215,7 @@ public class WorldNavigator : MonoBehaviour
 
         if (lastProgress != communicationScript.blockProgress)
         {
+            sateliteEffects.ReceiverEffect();
             lastProgress = communicationScript.blockProgress;
             clientInterface.UpdateState();
             screenGUI.SetGUIContents();
@@ -253,6 +257,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.enabled = true;
         commandIsland.gameObject.SetActive(true);
         commandScript.GotoCommandIsland();
+        sateliteEffects.StopEffects();
 
         sceneCleanTimer = commandCleanTimer;
     }
@@ -338,6 +343,7 @@ public class WorldNavigator : MonoBehaviour
 
     public void SubmitQueuedActions()
     {
+        sateliteEffects.TransmissionEffect();
         clientInterface.SubmitQueuedActions();
         battleIslandsGUI.hud.ClearDeployedSquads();
     }

@@ -82,6 +82,7 @@ public class SquadGUI : MonoBehaviour
                 keys.Add(squadName);
                 PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
                 PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
+                commandScript.PushNotification(0, string.Format("{0} Squad has been created.", squadName));
             }
         }
 

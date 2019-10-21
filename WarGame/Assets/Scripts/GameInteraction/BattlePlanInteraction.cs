@@ -233,7 +233,8 @@ public class BattlePlanInteraction : Interaction
             squadMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[s].position, Quaternion.identity));
             squadMarkers[s].GetComponent<SquadMarker>().squad = s;
             squadMarkers[s].GetComponent<SquadMarker>().owner = 1;
-            squadMarkers[s].GetComponent<SquadMarker>().name = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
+            squadMarkers[s].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
+            squadMarkers[s].GetComponent<SquadMarker>().SetName();
             currentSquad = s;
             selectedSquad = squadMarkers[s].GetComponent<SquadMarker>();
             ViewCurrentSquad();
@@ -248,7 +249,8 @@ public class BattlePlanInteraction : Interaction
             opponentMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[o].position, Quaternion.identity));
             opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
             opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
-            opponentMarkers[o].GetComponent<SquadMarker>().name = opponentNames[o];
+            opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
+            opponentMarkers[o].GetComponent<SquadMarker>().SetName();
             currentSquad = o;
             selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
             ViewCurrentOpponentSquad();
@@ -281,8 +283,9 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().name = string.Format("{0} Squad", squadName);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetName();
             squadCounts.Add(unitCounts);
             squadPlans.Add(new List<int>());
             squadNames.Add(squadName);
