@@ -90,6 +90,21 @@ public class TileStats : MonoBehaviour
     public void ToggleBunkerPrompters(bool on) { ToggleAllCollection(on, false, bunkerPrompters); }
     public void ToggleBlockerPrompters(bool on) { ToggleAllCollection(on, false, blockerPrompters); }
 
+    public void ToggleBunkerPrompters(bool on, int[] validIndices)
+    {
+        for (int i = 0; i < validIndices.Length; i++)
+        {
+            if (on && validIndices[i] > 0)
+                bunkerPrompters[i].SetActive(true);
+            else if (on && validIndices[i] <= 0)
+                bunkerPrompters[i].SetActive(false);
+            else if (!on && validIndices[i] > 0) 
+                bunkerPrompters[i].SetActive(false);
+            else if (!on && validIndices[i] <= 0)
+                bunkerPrompters[i].SetActive(true);
+        }
+    }
+
     public void ToggleBunkerSystem(bool on, int[] validIndices)
     {
         if (!on)

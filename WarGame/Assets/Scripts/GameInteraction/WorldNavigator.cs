@@ -55,6 +55,7 @@ public class WorldNavigator : MonoBehaviour
     public NationSelect nationSelect;
     public GameObject commandCenterMenu;
     public BlockChainEffectUpdater sateliteEffects;
+    public ActionIdentifier[] actionIdentifiers; //Order by actionType switch for ShowActions() function in this script.
     public int unitType;
     public int resourceType;
 
@@ -112,8 +113,8 @@ public class WorldNavigator : MonoBehaviour
         communicationScript = commObject.GetComponent<CommunicationInterface>();
         SetState();
 
-        if (clientInterface.isPlaying)
-            nationSelect.gameObject.SetActive(false);
+        //Hide if playing show if NOT playing.
+        nationSelect.gameObject.SetActive(!clientInterface.isPlaying);
 
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
@@ -137,6 +138,13 @@ public class WorldNavigator : MonoBehaviour
         searchIslands.commandScript = commandScript;
         squadFormation.commandScript = commandScript;
         nationSelect.commandScript = commandScript;
+        if (actionIdentifiers != null)
+        {
+            for (int a = 0; a < actionIdentifiers.Length; a++)
+            {
+                actionIdentifiers[a].client = clientInterface;
+            }
+        }
 
         //Common Island Generation Variables
         List<GameObject> islandGenerationPrefabs = new List<GameObject>();
@@ -232,6 +240,14 @@ public class WorldNavigator : MonoBehaviour
         commandScript.ShowMenu();
     }
 
+    public void ShowActions()
+    {
+        for (int a = 0; a < actionIdentifiers.Length; a++)
+        {
+            actionIdentifiers[a].ShowIfQueued();
+        }
+    }
+
     public void SetCommandMode()
     {
         traversing = true;
@@ -258,6 +274,7 @@ public class WorldNavigator : MonoBehaviour
         commandIsland.gameObject.SetActive(true);
         commandScript.GotoCommandIsland();
         sateliteEffects.StopEffects();
+        ShowActions();
 
         sceneCleanTimer = commandCleanTimer;
     }

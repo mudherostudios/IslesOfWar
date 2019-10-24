@@ -31,6 +31,7 @@ public class CommandIslandInteraction : Interaction
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
     private ObjectRevealer genericPrompter;
+    private ActionIdentifier actionIdentifier;
     private GameObject showMenuButton;
 
     private void Update()
@@ -56,6 +57,8 @@ public class CommandIslandInteraction : Interaction
             unitPrompter = selectedWorldUIObject.GetComponent<UnitPurchasePrompter>();
             poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
             genericPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
+            actionIdentifier = selectedWorldUIObject.GetComponent<ActionIdentifier>();
+            
             
             hasUnitPurchasePrompter = unitPrompter != null;
             hasPoolPrompter = poolPrompter != null;
@@ -64,6 +67,9 @@ public class CommandIslandInteraction : Interaction
             hasDefendPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[4];
             hasAttackPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[5];
             hasCommandPromtper = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[6];
+
+            if (actionIdentifier != null)
+                actionIdentifier.CancelAction();
            
             showMenuButton.SetActive(true);
             //Close all of the menus.

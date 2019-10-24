@@ -39,7 +39,7 @@ public class ClientInterface : MonoBehaviour
     //Also eventually check to see if queued actions are still valid.
     public void UpdateState()
     {
-        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject( communication.state));
+        chainState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(communication.state));
     }
 
     void SpendResources(double[] resources)
@@ -482,6 +482,71 @@ public class ClientInterface : MonoBehaviour
     //----------------------------------------------------------------------------------------------------
     //Cancel Functions
     //----------------------------------------------------------------------------------------------------
+    public void CancelUnitPurchase(int type)
+    {
+        queuedActions.buy[0 + type*3] = 0;
+        queuedActions.buy[1 + type*3] = 0;
+        queuedActions.buy[2 + type*3] = 0;
+
+        string categoryName = "UNKNOWNS";
+
+        if (type == 0)
+            categoryName = "TROOP";
+        else if (type == 1)
+            categoryName = "TANK";
+        else if (type == 2)
+            categoryName = "AIRCRAFT";
+
+        notificationSystem.PushNotification(1, string.Format("All {0} purchases have been canceled", categoryName));
+
+        CleanUnitPurchases();
+    }
+
+    public void CancelResourceDeposit()
+    {
+        int poolType = queuedActions.pot.rsrc;
+        queuedActions.pot = null;
+
+        string poolName = "UNKNOWN";
+
+        if (poolType == 0)
+            poolName = "OIL";
+        else if (poolType == 1)
+            poolName = "METAL";
+        else if (poolType == 2)
+            poolName = "CONCRETE";
+
+        notificationSystem.PushNotification(1, string.Format("Contribution to the {0} POOL has been canceled.", poolName));
+    }
+
+    public void CancelWarbucksContribution()
+    {
+        queuedActions.dep.Clear();
+        queuedActions.dep = null;
+
+        notificationSystem.PushNotification(1, "Warbuck contributions have been canceled.");
+    }
+
+    public void CancelIslandSearch()
+    {
+        queuedActions.srch = null;
+
+        notificationSystem.PushNotification(1, "Island search has been canceled.");
+    }
+
+    public void CancelIslandDevelopment()
+    {
+        string islandID = queuedActions.bld.id;
+        queuedActions.bld = null;
+        notificationSystem.PushNotification(1, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)));
+    }
+
+    public void CancelNationChange()
+    {
+        queuedActions.nat = null;
+        notificationSystem.PushNotification(1, "Nation change has been canceled.");
+    }
+
     public void CancelPlan(bool isAttackPlan)
     {
         if (isAttackPlan)
@@ -493,6 +558,29 @@ public class ClientInterface : MonoBehaviour
         {
             notificationSystem.PushNotification(1, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)));
             queuedActions.dfnd = null;
+        }
+    }
+
+    public void CancelAllQueuedActions()
+    {
+        queuedActions = new PlayerActions();
+        notificationSystem.PushNotification(1, "All actions have been canceled.");
+    }
+
+    void CleanUnitPurchases()
+    {
+        bool doClean = true;
+        for (int b = 0; b < queuedActions.buy.Count && doClean; b++)
+        {
+            if (queuedActions.buy[b] > 0)
+                doClean = false;
+        }
+
+        if (doClean)
+        {
+            queuedActions.buy.Clear();
+            queuedActions.buy = null;
+            notificationSystem.PushNotification(1, "There are no more units in purchase queue.");
         }
     }
 

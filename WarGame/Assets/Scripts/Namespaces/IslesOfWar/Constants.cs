@@ -91,6 +91,7 @@ namespace IslesOfWar
         };
 
         public static float[] islandSearchCost = new float[] { 1000, 0, 0, 0 };
+        public static float islandModifierExponent = 0.1f;
         public static float attackCostPercent = 0.1f;
         public static int islandUndiscoveredMinimum = 10;
         public static float undiscoveredFalloffRate = 0.3f;

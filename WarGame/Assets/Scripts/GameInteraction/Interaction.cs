@@ -63,13 +63,9 @@ public class Interaction : MonoBehaviour
                         }
                     }
 
-                    if (clickedButtonType == buttonTypes[1])
-                    {
+                    if (clickedButtonType == buttonTypes[1] || isConstructing)
                         RevealObject();
-                    }
-
-                    if(isConstructing)
-                        RevealObject();
+                    
                 }
 
             }

@@ -582,6 +582,7 @@ public class BattlePlanInteraction : Interaction
             stats.ToggleBunkerSystem(true, bunkerTypes);
             stats.ToggleBlockerPrompters(false);
             stats.ToggleBunkerPrompters(false);
+            stats.ToggleBunkerPrompters(true, bunkerTypes);
         }
     }
 

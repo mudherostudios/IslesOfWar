@@ -35,7 +35,7 @@ namespace IslesOfWar
                 //Island Search Cost
                 //Remember to change the islandSearchCost constant for only warbucks.
                 if (commands.iwCost > 0)
-                    Constants.islandSearchCost = new float[] { 0, 0, 0, 0 };
+                    Constants.islandSearchCost = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
 
                 //Attack Cost Percent
                 if (commands.atkPerc > 0)
