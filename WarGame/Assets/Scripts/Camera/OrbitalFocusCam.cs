@@ -10,6 +10,7 @@ public class OrbitalFocusCam : MonoBehaviour
     private Vector3 currentOffset;
     public float exploreAngle;
     public Camera cam;
+    public PlayerAudio playerAudio;
     public float rotationSpeed, camDistance, lerpSpeed, observeLerpSpeed, deltaSensitivity;
     public bool exploring;
 

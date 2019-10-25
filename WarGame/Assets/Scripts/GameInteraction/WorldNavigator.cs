@@ -109,9 +109,10 @@ public class WorldNavigator : MonoBehaviour
 
     private void Start()
     {
+        notificationSystem.playerAudio = orbital.playerAudio;
         GameObject commObject = GameObject.FindGameObjectWithTag("CommunicationInterface");
         communicationScript = commObject.GetComponent<CommunicationInterface>();
-        SetState();
+        SetClient();
 
         //Hide if playing show if NOT playing.
         nationSelect.gameObject.SetActive(!clientInterface.isPlaying);
@@ -190,7 +191,7 @@ public class WorldNavigator : MonoBehaviour
         SetCommandMode();
     }
     
-    void SetState()
+    void SetClient()
     {
         clientInterface.InitStates(communicationScript, notificationSystem);
     }

@@ -82,7 +82,7 @@ public class SquadGUI : MonoBehaviour
                 keys.Add(squadName);
                 PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
                 PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
-                commandScript.PushNotification(0, string.Format("{0} Squad has been created.", squadName));
+                commandScript.PushNotification(0, 0, string.Format("{0} Squad has been created.", squadName));
             }
         }
 
@@ -98,13 +98,19 @@ public class SquadGUI : MonoBehaviour
     public void DisbandSquad()
     {
         List<string> keys = GetKeys();
+        string squad = null;
 
         if (keys.Count > 0)
         {
-            string squad = keys[squadList.value];
+            squad = keys[squadList.value];
             keys.Remove(squad);
             PlayerPrefs.DeleteKey(squad);
             PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+            commandScript.PushNotification(0, 2, string.Format("{0} Squad has been disbanded.", squad));
+        }
+        else
+        {
+            commandScript.PushNotification(0, 1, "There are no squads to disband.");
         }
     }
 

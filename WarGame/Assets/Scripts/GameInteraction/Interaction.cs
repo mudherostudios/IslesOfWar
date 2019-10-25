@@ -65,7 +65,6 @@ public class Interaction : MonoBehaviour
 
                     if (clickedButtonType == buttonTypes[1] || isConstructing)
                         RevealObject();
-                    
                 }
 
             }
@@ -78,25 +77,33 @@ public class Interaction : MonoBehaviour
 
     private void NavigateToDestination()
     {
-        Transform destination = selectedButton.GetComponent<NavigationButton>().navigationDestination;
+        NavigationButton destinationButton = selectedButton.GetComponent<NavigationButton>();
 
-        if (destination != null)
+        if (destinationButton != null)
         {
-            orbital.ExploreMode(destination, true, isIslandManaging);
+            orbital.ExploreMode(destinationButton.navigationDestination, true, isIslandManaging);
+            orbital.playerAudio.QueueAmbientEnvironmentSound(destinationButton.tileAmbience);
+            orbital.playerAudio.PlayEnvironmentEntranceSound(destinationButton.tileEntrance);
             selectedWorldUI = null;
         }
     }
 
     private void RevealObject()
     {
-        GameObject hiddenObject = selectedButton.GetComponent<ObjectRevealer>().hiddenObject;
+        ObjectRevealer objectRevealer = selectedButton.GetComponent<ObjectRevealer>();
 
-        if (hiddenObject != null)
+        if (objectRevealer.hiddenObject != null)
         {
-            if (hiddenObject.activeSelf)
-                hiddenObject.SetActive(false);
-            else if (!hiddenObject.activeSelf)
-                hiddenObject.SetActive(true);
+            if (objectRevealer.hiddenObject.activeSelf)
+            {
+                objectRevealer.hiddenObject.SetActive(false);
+                orbital.playerAudio.PlayGUISound(objectRevealer.hideObjectSound);
+            }
+            else if (!objectRevealer.hiddenObject.activeSelf)
+            {
+                objectRevealer.hiddenObject.SetActive(true);
+                orbital.playerAudio.PlayGUISound(objectRevealer.showObjectSound);
+            }
         }
     }
 

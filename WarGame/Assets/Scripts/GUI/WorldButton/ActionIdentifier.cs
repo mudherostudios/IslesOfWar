@@ -75,7 +75,7 @@ public class ActionIdentifier : MonoBehaviour
                 client.CancelNationChange();
                 break;
             default:
-                client.notificationSystem.PushNotification(3, "Not a valid action type that you can remove.");
+                client.notificationSystem.PushNotification(0, 1, "Not a valid action type that you can remove.");
                 break;
         }
 
@@ -127,7 +127,7 @@ public class ActionIdentifier : MonoBehaviour
                     Show();
                 break;
             default:
-                client.notificationSystem.PushNotification(3, string.Format("This action identifier has no valid type - {0}", gameObject.name));
+                client.notificationSystem.PushNotification(0, 1, string.Format("This action identifier has no valid type - {0}", gameObject.name));
                 break;
         }
     }

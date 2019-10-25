@@ -58,8 +58,7 @@ public class CommandIslandInteraction : Interaction
             poolPrompter = selectedWorldUIObject.GetComponent<PoolPrompter>();
             genericPrompter = selectedWorldUIObject.GetComponent<ObjectRevealer>();
             actionIdentifier = selectedWorldUIObject.GetComponent<ActionIdentifier>();
-            
-            
+
             hasUnitPurchasePrompter = unitPrompter != null;
             hasPoolPrompter = poolPrompter != null;
             hasWarbuxPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[2];
@@ -149,9 +148,14 @@ public class CommandIslandInteraction : Interaction
         }
     }
 
-    public void PushNotification(int messageType, string message)
+    public void PushNotification(int messageType, int soundType, string message)
     {
-        notificationSystem.PushNotification(messageType, message);
+            PushNotification(messageType, soundType, message, null);
+    }
+
+    public void PushNotification(int messageType, int soundType, string message, string notificationName)
+    {
+        notificationSystem.PushNotification(messageType, soundType, message, notificationName);
     }
 
     //----------------------------------------------------------------------

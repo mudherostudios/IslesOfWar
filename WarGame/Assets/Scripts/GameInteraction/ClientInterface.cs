@@ -23,6 +23,7 @@ public class ClientInterface : MonoBehaviour
     public Island queuedIslandDevelopment;
     public List<List<double>> queuedContributions;
     public List<string> queuedDepletedSubmissions;
+    
 
     public void InitStates(CommunicationInterface comms, Notifications _notificationSystem)
     {
@@ -87,14 +88,17 @@ public class ClientInterface : MonoBehaviour
 
         if (immediately)
             SubmitQueuedActions();
-        
-        notificationSystem.PushNotification(1, string.Format("We have submitted a proposal to join {0}.", Constants.countryCodes[nationCode]));
+
+        string message = string.Format("We have submitted a proposal to join {0}.", Constants.countryCodes[nationCode]);
+        notificationSystem.PushNotification(1, 0, message, "nationSuccess");
     }
     
     public bool PurchaseIslandCollector(StructureCost cost)
     {
         DevelopIsland(cost.islandID);
         bool successfulPurchase = false;
+        string collectorName = GetCollectorName(cost.purchaseType);
+        string message = "You are no longer the owner of this island.";
 
         if (chainState.islands[cost.islandID].owner == player)
         {
@@ -129,20 +133,45 @@ public class ClientInterface : MonoBehaviour
                     queuedActions.bld = new IslandBuildOrder(cost.islandID, "000000000000", "))))))))))))");
 
                 queuedActions.bld.col = UpdateCollectorOrder(cost.tileIndex, EncodeUtility.GetBaseTypes(cost.purchaseType), queuedActions.bld.col);
+
+                message = string.Format("1 {0} ordered for construction.", collectorName);
+                notificationSystem.PushNotification(1, 0, message, "collectorSuccess");
+            }
+            else
+            {
+                message = string.Format("You can not build this {0}, check your resources.", collectorName);
+                notificationSystem.PushNotification(1, 1, message, "collectorFailure");
             }
         }
         else
         {
-            notificationSystem.PushNotification(3, "You are no longer the owner of this island.");
+            notificationSystem.PushNotification(1, 1, message);
         }
 
         return successfulPurchase;
+    }
+
+    string GetCollectorName(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return "Oil Pump";
+            case 2:
+                return "Metal Mine";
+            case 3:
+                return "Concrete Processor";
+            default:
+                return "Unkown Collector";
+        }
     }
     
     public bool PurchaseIslandBunker(string islandID, int tileIndex, int purchaseType)
     {
         DevelopIsland(islandID);
         bool successfulPurchase = false;
+        string bunkerName = GetBunkerName(purchaseType);
+        string message = "You are no longer owner of this island.";
 
         if (chainState.islands[islandID].owner == player)
         {
@@ -166,20 +195,45 @@ public class ClientInterface : MonoBehaviour
                     queuedActions.bld = new IslandBuildOrder(islandID, "000000000000", "))))))))))))");
 
                 queuedActions.bld.def = UpdateDefenseOrder(tileIndex, 0, purchaseType, queuedActions.bld.def);
+
+                message = string.Format("1 {0} has been ordered for construction.", bunkerName);
+                notificationSystem.PushNotification(1, 0, message, "defenseSuccess");
+            }
+            else
+            {
+                message = string.Format("You can not build this {0}, check your resoruces.", bunkerName);
+                notificationSystem.PushNotification(1, 1, message, "defenseSuccess");
             }
         }
         else
         {
-            notificationSystem.PushNotification(3, "You are no longer owner of this island.");
+            notificationSystem.PushNotification(1, 1, message);
         }
 
         return successfulPurchase;
+    }
+
+    string GetBunkerName(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return "Anti Troop Bunker";
+            case 2:
+                return "Anti Tank Bunker";
+            case 3:
+                return "Anti Air Bunker";
+            default:
+                return "Unkown Bunker";
+        }
     }
     
     public bool PurchaseIslandBlocker(string islandID, int tileIndex, int purchaseType)
     {
         DevelopIsland(islandID);
         bool successfulPurchase = false;
+        string blockerName = GetBlockerName(purchaseType);
+        string message = "You are no longer owner of this island.";
 
         if (chainState.islands[islandID].owner == player)
         {
@@ -203,14 +257,38 @@ public class ClientInterface : MonoBehaviour
                     queuedActions.bld = new IslandBuildOrder(islandID, "000000000000", "))))))))))))");
 
                 queuedActions.bld.def = UpdateDefenseOrder(tileIndex, purchaseType, 0, queuedActions.bld.def);
+
+                message = string.Format("{0} has been ordered for this tile.", blockerName);
+                notificationSystem.PushNotification(1, 0, message, "defenseSuccess");
+            }
+            else
+            {
+                message = string.Format("You can not build {0}, check your resources.", blockerName.ToLower());
+                notificationSystem.PushNotification(1, 1, message, "defenseFailure");
             }
         }
         else
         {
-            notificationSystem.PushNotification(3, "You are no longer owner of this island.");
+            notificationSystem.PushNotification(1, 1, message);
         }
+        
 
         return successfulPurchase;
+    }
+
+    string GetBlockerName(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return "A Troop Blocker";
+            case 2:
+                return "A Tank Blocker";
+            case 3:
+                return "An Aircraft Blocker";
+            default:
+                return "An Unkown Blocker";
+        }
     }
     
     public void PurchaseUnits(int type, int amount)
@@ -222,17 +300,23 @@ public class ClientInterface : MonoBehaviour
         spend[3] = Constants.unitCosts[type, 3] * amount;
 
         bool canSpend = Validity.HasEnoughResources(spend, GetSubtractedResources());
+        string message = "An error has occured while trying to purchase units.";
 
         if (canSpend)
         {
             SpendResources(spend);
 
-            if(queuedActions.buy == null)
+            if (queuedActions.buy == null)
                 queuedActions.buy = new List<int>(new int[9]);
 
-            queuedActions.buy[type] += amount; 
-            string message = string.Format("{0} total {1} will be ordered after submission.", queuedActions.buy[type], GetUnitName(type));
-            notificationSystem.PushNotification(1, message);
+            queuedActions.buy[type] += amount;
+            message = string.Format("{0} total {1} will be ordered after submission.", queuedActions.buy[type], GetUnitName(type));
+            notificationSystem.PushNotification(1, 0, message, "unitPurchaseSuccess");
+        }
+        else
+        {
+            message = string.Format("You can not this many purchase {0}, check your resources.", GetUnitName(type));
+            notificationSystem.PushNotification(1, 1, message, "unitPurchaseFailure");
         }
     }
 
@@ -267,19 +351,27 @@ public class ClientInterface : MonoBehaviour
     {
         double[] cost = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
         bool canSearch = Validity.HasEnoughResources(cost, GetSubtractedResources());
+        string message = "You can not search for more islands, check your resources.";
 
         if (canSearch)
         {
             SpendResources(cost);
             queuedActions.srch = Constants.islandSearchOptions[0];
-            notificationSystem.PushNotification(1, "An expeditionary force will depart on your command.");
+            message = "An expeditionary force is ready to depart on your command.";
+            notificationSystem.PushNotification(1, 0, message, "searchSuccess");
         }
+        else
+        {
+            notificationSystem.PushNotification(1, 1, message, "searchFailure");
+        }
+        
     }
     
     public void SendResourcePoolContributions(int type, double[] resources)
     {
         double[] fullResources = GetFullResources(resources);
         bool canSend = Validity.HasEnoughResources(fullResources, GetSubtractedResources());
+        string message = string.Format("You can not submit these resources to the {0} Market. Check your resources.", GetPoolName(type));
 
         if (canSend)
         {
@@ -299,8 +391,12 @@ public class ClientInterface : MonoBehaviour
 
             SpendResources(fullResources);
             queuedActions.pot = new ResourceOrder(type, new List<double>(resources));
-            string message = string.Format("Adding resources to the {0} Market.",  GetPoolName(type));
-            notificationSystem.PushNotification(1, message);
+            message = string.Format("Adding resources to the {0} Market.", GetPoolName(type));
+            notificationSystem.PushNotification(1, 0, message, "poolSuccess");
+        }
+        else
+        {
+            notificationSystem.PushNotification(1, 1, message, "poolFailure");
         }
     }
 
@@ -321,12 +417,19 @@ public class ClientInterface : MonoBehaviour
     
     public void AddIslandToPool(string island)
     {
-        if (Validity.DepletedSubmissions(new List<string> { island }, chainState, player))
+        bool isDepleted = Validity.DepletedSubmissions(new List<string> { island }, chainState, player);
+        string message = "This island either still has resources on it or no longer belongs to you.";
+
+        if (isDepleted)
         {
             queuedDepletedSubmissions.Add(island);
             queuedActions.dep = new List<string>() { island };
-            string message = string.Format("Depleted Island {0}... has been queued for reclaimation.", island.Substring(0,10));
-            notificationSystem.PushNotification(1, message);
+            message = string.Format("Depleted Island {0}... is ready for auction.", island.Substring(0, 10));
+            notificationSystem.PushNotification(1, 0, message, "warbucksSuccess");
+        }
+        else
+        {
+            notificationSystem.PushNotification(1, 1, message, "warbucksFailure");
         }
     }
 
@@ -421,8 +524,8 @@ public class ClientInterface : MonoBehaviour
 
             if (log.success)
             {
-                notificationSystem.PushNotification(2, "Actions successfully submitted to the network.");
-                notificationSystem.PushNotification(2, string.Format("Succesful TxID is {0}...", log.message.Substring(0, 10)));
+                notificationSystem.PushNotification(3, -1, "Actions successfully submitted to the network.", null);
+                notificationSystem.PushNotification(3, 0, string.Format("Succesful TxID is {0}...", log.message.Substring(0, 10)), "submitSuccess");
                 queuedActions = new PlayerActions();
                 queuedContributions.Clear();
                 queuedDepletedSubmissions.Clear();
@@ -431,8 +534,8 @@ public class ClientInterface : MonoBehaviour
             }
             else
             {
-                notificationSystem.PushNotification(3, "Action submission to the network has failed.");
-                notificationSystem.PushNotification(3, log.message);
+                notificationSystem.PushNotification(3, -1, "Action submission to the network has failed.", null);
+                notificationSystem.PushNotification(3, 1, log.message, "submitFailure");
             }
         }
     }
@@ -489,15 +592,25 @@ public class ClientInterface : MonoBehaviour
         queuedActions.buy[2 + type*3] = 0;
 
         string categoryName = "UNKNOWNS";
+        string tempCancel = null;
 
         if (type == 0)
+        {
             categoryName = "TROOP";
+            tempCancel = "troopCancel";
+        }
         else if (type == 1)
+        {
             categoryName = "TANK";
+            tempCancel = "tankCancel";
+        }
         else if (type == 2)
+        {
+            tempCancel = "aircraftCancel";
             categoryName = "AIRCRAFT";
+        }
 
-        notificationSystem.PushNotification(1, string.Format("All {0} purchases have been canceled", categoryName));
+        notificationSystem.PushNotification(2, 2, string.Format("All {0} purchases have been canceled", categoryName), tempCancel);
 
         CleanUnitPurchases();
     }
@@ -508,15 +621,25 @@ public class ClientInterface : MonoBehaviour
         queuedActions.pot = null;
 
         string poolName = "UNKNOWN";
+        string tempCancel = null;
 
         if (poolType == 0)
+        {
+            tempCancel = "oilCancel";
             poolName = "OIL";
+        }
         else if (poolType == 1)
+        {
+            tempCancel = "metalCancel";
             poolName = "METAL";
+        }
         else if (poolType == 2)
+        {
+            tempCancel = "concreteCancel";
             poolName = "CONCRETE";
+        }
 
-        notificationSystem.PushNotification(1, string.Format("Contribution to the {0} POOL has been canceled.", poolName));
+        notificationSystem.PushNotification(2, 2, string.Format("Contribution to the {0} POOL has been canceled.", poolName), tempCancel);
     }
 
     public void CancelWarbucksContribution()
@@ -524,39 +647,39 @@ public class ClientInterface : MonoBehaviour
         queuedActions.dep.Clear();
         queuedActions.dep = null;
 
-        notificationSystem.PushNotification(1, "Warbuck contributions have been canceled.");
+        notificationSystem.PushNotification(2, 2, "Warbuck contributions have been canceled.", "warbucksCancel");
     }
 
     public void CancelIslandSearch()
     {
         queuedActions.srch = null;
 
-        notificationSystem.PushNotification(1, "Island search has been canceled.");
+        notificationSystem.PushNotification(2, 2, "Island search has been canceled.", "searchCancel");
     }
 
     public void CancelIslandDevelopment()
     {
         string islandID = queuedActions.bld.id;
         queuedActions.bld = null;
-        notificationSystem.PushNotification(1, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)));
+        notificationSystem.PushNotification(2, 2, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)), "developmentCancel");
     }
 
     public void CancelNationChange()
     {
         queuedActions.nat = null;
-        notificationSystem.PushNotification(1, "Nation change has been canceled.");
+        notificationSystem.PushNotification(2, 2, "Nation change has been canceled.", "nationCancel");
     }
 
     public void CancelPlan(bool isAttackPlan)
     {
         if (isAttackPlan)
         {
-            notificationSystem.PushNotification(1, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 10)));
+            notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 10)), "attackCancel");
             queuedActions.attk = null;
         }
         else
         {
-            notificationSystem.PushNotification(1, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)));
+            notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)), "defendCancel");
             queuedActions.dfnd = null;
         }
     }
@@ -564,7 +687,7 @@ public class ClientInterface : MonoBehaviour
     public void CancelAllQueuedActions()
     {
         queuedActions = new PlayerActions();
-        notificationSystem.PushNotification(1, "All actions have been canceled.");
+        notificationSystem.PushNotification(2, 2, "All actions have been canceled.");
     }
 
     void CleanUnitPurchases()
@@ -580,7 +703,7 @@ public class ClientInterface : MonoBehaviour
         {
             queuedActions.buy.Clear();
             queuedActions.buy = null;
-            notificationSystem.PushNotification(1, "There are no more units in purchase queue.");
+            notificationSystem.PushNotification(2, 2, "All remaining unit purchases have been canceled.");
         }
     }
 

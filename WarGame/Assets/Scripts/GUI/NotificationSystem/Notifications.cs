@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 public class Notifications : MonoBehaviour
 {
+    public PlayerAudio playerAudio;
     public Transform contentParent;
     public GameObject simpleMessage;
     public GameObject notificationPrefab;
-    public Sprite infoIcon, queueIcon, submitIcon;
+    public Sprite infoIcon, queueIcon, submitIcon, cancelIcon;
     public float stayTimer = 2.5f;
     public Vector3 onPosition, offPosition, simpleOnPosition;
     public GameObject onButton, offButton;
@@ -55,7 +56,12 @@ public class Notifications : MonoBehaviour
         onButton.SetActive(true);
     }
 
-    public void PushNotification(int type, string message)
+    public void PushNotification(int type, int soundType, string message)
+    {
+        PushNotification(type, soundType, message, null);
+    }
+
+    public void PushNotification(int type, int soundType, string message, string notificationName)
     {
         Open(true);
 
@@ -72,6 +78,7 @@ public class Notifications : MonoBehaviour
             contentParent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, notifications.Count*32+24);
         }
 
+        playerAudio.PlayGUISound(soundType, notificationName);
         BuildList();
     }
 
@@ -80,13 +87,15 @@ public class Notifications : MonoBehaviour
         switch (type)
         {
             case 0:
-                return infoIcon;
+                return infoIcon; 
             case 1:
-                return queueIcon;
+                return queueIcon; 
             case 2:
+                return cancelIcon; 
+            case 3:
                 return submitIcon;
             default:
-                return infoIcon;
+                return queueIcon;
         }
     }
 
