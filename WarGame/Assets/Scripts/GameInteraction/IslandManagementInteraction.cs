@@ -44,7 +44,7 @@ public class IslandManagementInteraction : Interaction
     private float checkedTime;
     private string lastPeekedButton = "None";
     private string lastPeekedName = "None";
-    private Text islandName;
+    private InputField islandName;
 
     public void Awake()
     {
@@ -336,7 +336,12 @@ public class IslandManagementInteraction : Interaction
         backToCommandCenterButton.SetActive(true);
         resumeIslandQueueButton.SetActive(false);
         islandNameTicker.SetActive(true);
-        islandName.text = string.Format("Island {0}", islandID.Substring(0, 10));
+        string technicalName = string.Format("Island {0}", islandID.Substring(0, 10));
+
+        if (PlayerPrefs.HasKey(technicalName))
+            islandName.text = PlayerPrefs.GetString(technicalName);
+        else
+            islandName.text = technicalName;
     }
 
     public void SetEditGUIState()
@@ -371,7 +376,26 @@ public class IslandManagementInteraction : Interaction
             enableBuildBlockersButton.Show(false);
         }
 
-        islandName.text = string.Format("Island {0}", islandID.Substring(0, 10));
+        string technicalIslandName = string.Format("Island {0}", islandID.Substring(0, 10));
+
+        if (!PlayerPrefs.HasKey(technicalIslandName))
+            islandName.text = technicalIslandName;
+        else
+            islandName.text = PlayerPrefs.GetString(technicalIslandName);
+    }
+
+    public void SaveIslandName()
+    {
+        string technicalIslandName = string.Format("Island {0}", islandID.Substring(0, 10));
+        string playerAssignedName = islandName.text;
+
+        if (playerAssignedName != "")
+            PlayerPrefs.SetString(technicalIslandName, playerAssignedName);
+        else
+        {
+            PlayerPrefs.DeleteKey(technicalIslandName);
+            islandName.text = technicalIslandName;
+        }
     }
 
     public void SetExitMode()
@@ -604,6 +628,6 @@ public class IslandManagementInteraction : Interaction
         islandIndex = 0;
         islandCount = islands.Length;
         direction = 0;
-        islandName = islandNameTicker.transform.Find("Location").GetComponent<Text>();
+        islandName = islandNameTicker.transform.Find("InputField").GetComponent<InputField>();
     }
 }

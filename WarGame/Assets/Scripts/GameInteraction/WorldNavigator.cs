@@ -361,9 +361,19 @@ public class WorldNavigator : MonoBehaviour
 
     public void SubmitQueuedActions()
     {
-        sateliteEffects.TransmissionEffect();
-        clientInterface.SubmitQueuedActions();
-        battleIslandsGUI.hud.ClearDeployedSquads();
+        bool transmitted = clientInterface.SubmitQueuedActions();
+
+        if (transmitted)
+        {
+            sateliteEffects.TransmissionEffect();
+            battleIslandsGUI.hud.ClearDeployedSquads();
+            ShowActions();
+        }
+    }
+
+    public void NameIsland()
+    {
+        managementScript.SaveIslandName();
     }
 
     //--------------------------------------------------

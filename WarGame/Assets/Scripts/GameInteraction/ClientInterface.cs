@@ -320,7 +320,7 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
-    string GetUnitName(int type)
+    public string GetUnitName(int type)
     {
         switch (type)
         {
@@ -502,7 +502,7 @@ public class ClientInterface : MonoBehaviour
     }
     //Battle Planning - End
 
-    public void SubmitQueuedActions()
+    public bool SubmitQueuedActions()
     {
         //Make sure this stays above QueueIsValid. Needs to clean the plans before it checks if they are valid.
         CleanEmptyPlans();
@@ -537,7 +537,11 @@ public class ClientInterface : MonoBehaviour
                 notificationSystem.PushNotification(3, -1, "Action submission to the network has failed.", null);
                 notificationSystem.PushNotification(3, 1, log.message, "submitFailure");
             }
+
+            return log.success;
         }
+
+        return false;
     }
 
     void CleanEmptyPlans()
@@ -559,7 +563,6 @@ public class ClientInterface : MonoBehaviour
             }
             else
                 queuedActions.dfnd = null;
-
         }
 
         if (queuedActions.attk != null)

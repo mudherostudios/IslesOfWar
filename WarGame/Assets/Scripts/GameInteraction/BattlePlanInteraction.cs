@@ -81,11 +81,16 @@ public class BattlePlanInteraction : Interaction
                     CloseCurrentSquad();
                 
                 currentSquad = selectedSquad.squad;
+                hud.SetUnitCounts(selectedSquad.name);
 
                 if (show && selectedSquad.owner == 1)
                     ViewCurrentSquad();
                 else if (show && selectedSquad.owner == 0)
                     ViewCurrentOpponentSquad();
+            }
+            else
+            {
+                hud.HideUnitsBar();
             }
 
             if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.owner == 1)

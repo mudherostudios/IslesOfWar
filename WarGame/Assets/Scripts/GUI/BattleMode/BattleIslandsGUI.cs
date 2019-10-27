@@ -12,17 +12,29 @@ public class BattleIslandsGUI : MonoBehaviour
     public BattlePlanInteraction battleScript;
     public WorldNavigator navigator;
     public BattleHUD hud;
+    private List<string> technicalNames;
 
     public void PopulateIslandList()
     {
         islandList.ClearOptions();
-        islandList.AddOptions(battleScript.GetIslands());
+        technicalNames = battleScript.GetIslands();
+        List<string> playerNamedIslands = new List<string>(technicalNames.ToArray());
+
+        for(int i = 0; i < technicalNames.Count; i++)
+        {
+            string technicalName = string.Format("Island {0}", technicalNames[i].Substring(0, 10));
+
+            if (PlayerPrefs.HasKey(technicalName))
+                playerNamedIslands[i] = PlayerPrefs.GetString(technicalName);
+        }
+
+        islandList.AddOptions(playerNamedIslands);
     }
 
     public void DefendIsland()
     {
         int islandIndex = islandList.value;
-        string islandID = battleScript.GetIslands()[islandIndex];
+        string islandID = technicalNames[islandIndex];
         hud.battleScript = battleScript;
         navigator.SetBattleMode(islandID);
 

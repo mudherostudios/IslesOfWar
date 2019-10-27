@@ -8,6 +8,8 @@ public class BattleHUD : MonoBehaviour
 {
     public Dropdown availableSquadsList;
     public BattlePlanInteraction battleScript;
+    public GameObject unitsBar;
+    public GameObject[] unitCountTabs;
     private List<string> deployedSquads = new List<string>();
 
     public void AddSquad()
@@ -99,5 +101,33 @@ public class BattleHUD : MonoBehaviour
 
     public void SetDeployedSquads(List<string> deployed) { deployedSquads = new List<string>(deployed); }
     public void CancelPlans() { battleScript.CancelPlans(); }
+
+    public void SetUnitCounts(string squadName)
+    {
+        unitsBar.SetActive(true);
+        int[] tempSquad = GetUnits(squadName);
+
+        for (int u = 0; u < tempSquad.Length; u++)
+        {
+            unitCountTabs[u].transform.Find("Name").GetComponent<Text>().text = battleScript.clientInterface.GetUnitName(u);
+            unitCountTabs[u].transform.Find("Count").GetComponent<Text>().text = tempSquad[u].ToString();
+        }
+    }
+
+    int[] GetUnits(string squadName)
+    {
+        string unitsString = PlayerPrefs.GetString(squadName.Split(' ')[0]);
+        return JsonConvert.DeserializeObject<int[]>(unitsString);
+    }
+
+    public void HideUnitsBar()
+    {
+        unitsBar.SetActive(false);
+        for (int u = 0; u < unitCountTabs.Length; u++)
+        {
+            unitCountTabs[u].transform.Find("Name").GetComponent<Text>().text = battleScript.clientInterface.GetUnitName(u);
+            unitCountTabs[u].transform.Find("Count").GetComponent<Text>().text = "N/A";
+        }
+    }
 
 }

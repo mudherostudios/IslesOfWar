@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using IslesOfWar;
+using MudHero;
 
 public class WarbucksPoolContribute : MonoBehaviour
 {
@@ -10,8 +11,8 @@ public class WarbucksPoolContribute : MonoBehaviour
     public Text poolTimer;
     public Text poolOwnership;
     public Dropdown depletedIslandsMenu;
-    public Sprite dropdownGraphic;
     public CommandIslandInteraction commandScript;
+    private List<string> technicalNames;
 
     private double pool = 0;
 
@@ -24,7 +25,9 @@ public class WarbucksPoolContribute : MonoBehaviour
     public void UpdateAllStats()
     {
         depletedIslandsMenu.ClearOptions();
-        depletedIslandsMenu.AddOptions(GetDepletedIslandsOptions());
+        technicalNames = commandScript.GetDepletedIslands();
+        List<string> playerIslandNames = new List<string>(technicalNames.ToArray());
+        depletedIslandsMenu.AddOptions(playerIslandNames);
         pool = commandScript.GetWarbucksPoolSize();
         string poolFormat = "";
 
@@ -39,23 +42,9 @@ public class WarbucksPoolContribute : MonoBehaviour
     {
         if (depletedIslandsMenu.options.Count > 0)
         {
-            commandScript.AddIslandToPool(depletedIslandsMenu.options[depletedIslandsMenu.value].text);
+            commandScript.AddIslandToPool(technicalNames[depletedIslandsMenu.value]);
             UpdateAllStats();
         }
-    }
-
-    List<Dropdown.OptionData> GetDepletedIslandsOptions()
-    {
-        List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
-
-        List<string> depletedIslands = commandScript.GetDepletedIslands();
-
-        foreach (string island in depletedIslands)
-        {
-            options.Add(new Dropdown.OptionData(island, dropdownGraphic));
-        }
-
-        return options;
     }
 
     public void Show()

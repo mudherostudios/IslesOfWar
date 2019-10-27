@@ -147,7 +147,7 @@ public class ConnectGUI : MonoBehaviour
     {
         ConnectionLog log = new ConnectionLog(false, "Could not even attempt to connect.");
 
-        CleanPlayerPrefs();
+        //CleanPlayerPrefs();
 
         if (advanced)
             SetAdvancedOptionsAndPrefs();
