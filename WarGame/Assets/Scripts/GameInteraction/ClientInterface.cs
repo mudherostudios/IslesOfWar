@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 public class ClientInterface : MonoBehaviour
 {
     public State chainState;
+    public ScreenGUI gui;
     public CommunicationInterface communication;
     public Notifications notificationSystem;
     public PlayerActions queuedActions;
@@ -75,6 +76,72 @@ public class ClientInterface : MonoBehaviour
             string collectors = chainState.islands[islandID].collectors;
             string defenses = chainState.islands[islandID].defenses;
             queuedIslandDevelopment = new Island(player, features, collectors, defenses);
+        }
+    }
+
+    public void RevalidateActions()
+    {
+        if (!QueuedAreNull())
+        {
+            //nation,build,units,search,resource,depleted,attack,defend,size;
+            bool[] validities = QueueIsValid();
+            bool hasCancelled = false;
+
+            for (int v = 0; v < validities.Length; v++)
+            {
+                CancelNewlyInvalidAction(v, !validities[v]);
+
+                if (!hasCancelled)
+                    hasCancelled = validities[v];
+            }
+
+            if (hasCancelled)
+                notificationSystem.PushNotification(1, 1, "An action on the network has invalidated some of your queued moves. Please check the log for more info.");
+        }
+    }
+
+    void CancelNewlyInvalidAction(int type, bool cancel)
+    {
+        switch (type)
+        {
+            case 0:
+                if (cancel)
+                    CancelNationChange();
+                break;
+            case 1:
+                if (cancel)
+                    CancelIslandDevelopment();
+                break;
+            case 2:
+                if (cancel)
+                    CancelAllUnitPurchases();
+                break;
+            case 3:
+                if (cancel)
+                    CancelIslandSearch();
+                break;
+            case 4:
+                if (cancel)
+                    CancelResourceDeposit();
+                break;
+            case 5:
+                if (cancel)
+                    CancelWarbucksContribution();
+                break;
+            case 6:
+                if (cancel)
+                    CancelPlan(true);
+                break;
+            case 7:
+                if (cancel)
+                    CancelPlan(false);
+                break;
+            case 8:
+                if (cancel)
+                    notificationSystem.PushNotification(1, -1, "Your actions exceed the length of the Xaya json char limit. Please cancel an action.");
+                break;
+            default:
+                break;
         }
     }
 
@@ -590,6 +657,21 @@ public class ClientInterface : MonoBehaviour
     //----------------------------------------------------------------------------------------------------
     public void CancelUnitPurchase(int type)
     {
+        double[] expenditureTotals = new double[4];
+
+        for (int u = 0; u < 3; u++)
+        {
+            for (int r = 0; r < 4; r++)
+            {
+                expenditureTotals[r] += Constants.unitCosts[u + type * 3, r] * queuedActions.buy[u + type * 3];
+            }
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            queuedExpenditures[i] -= expenditureTotals[i];
+        }
+
         queuedActions.buy[0 + type*3] = 0;
         queuedActions.buy[1 + type*3] = 0;
         queuedActions.buy[2 + type*3] = 0;
@@ -616,12 +698,41 @@ public class ClientInterface : MonoBehaviour
         notificationSystem.PushNotification(2, 2, string.Format("All {0} purchases have been canceled", categoryName), tempCancel);
 
         CleanUnitPurchases();
+        gui.SetGUIContents();
+    }
+
+    void CancelAllUnitPurchases()
+    {
+        double[] expenditureTotals = new double[4];
+
+        for (int u = 0; u < 9; u++)
+        {
+            for (int r = 0; r < 4; r++)
+            {
+                expenditureTotals[r] += Constants.unitCosts[u, r] * queuedActions.buy[u]; 
+            }
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            queuedExpenditures[i] -= expenditureTotals[i];
+        }
+
+        queuedActions.buy = null;
+        notificationSystem.PushNotification(2, 2, "All unit purchases have been canceled.");
+        gui.SetGUIContents();
     }
 
     public void CancelResourceDeposit()
     {
+        for (int r = 0; r < queuedActions.pot.amnt.Count; r++)
+        {
+            queuedExpenditures[r+1] -= queuedActions.pot.amnt[r];
+        }
+
         int poolType = queuedActions.pot.rsrc;
         queuedActions.pot = null;
+        queuedContributions = new List<List<double>>(); 
 
         string poolName = "UNKNOWN";
         string tempCancel = null;
@@ -643,6 +754,7 @@ public class ClientInterface : MonoBehaviour
         }
 
         notificationSystem.PushNotification(2, 2, string.Format("Contribution to the {0} POOL has been canceled.", poolName), tempCancel);
+        gui.SetGUIContents();
     }
 
     public void CancelWarbucksContribution()
@@ -651,26 +763,95 @@ public class ClientInterface : MonoBehaviour
         queuedActions.dep = null;
 
         notificationSystem.PushNotification(2, 2, "Warbuck contributions have been canceled.", "warbucksCancel");
+        gui.SetGUIContents();
     }
 
     public void CancelIslandSearch()
     {
         queuedActions.srch = null;
+        double[] resources = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
+
+        for (int r = 0; r < resources.Length; r++)
+        {
+            queuedExpenditures[r] -= resources[r];
+        }
 
         notificationSystem.PushNotification(2, 2, "Island search has been canceled.", "searchCancel");
+        gui.SetGUIContents();
     }
 
     public void CancelIslandDevelopment()
     {
+        double[] expenditureTotals = new double[4];
+        List<int> collectorTypes = new List<int>();
+        List<int> bunkerTypes = new List<int>();
+        List<int> blockerTypes = new List<int>();
+
+        if (queuedActions.bld.col != "000000000000" || queuedActions.bld.def != "))))))))))))")
+        {
+            for (int c = 0; c < queuedActions.bld.col.Length; c++)
+            {
+                if (queuedActions.bld.col[c] != '0' || queuedActions.bld.def[c] != ')')
+                {
+                    int[] collectors = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(queuedActions.bld.col[c]));
+                    int[] bunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(queuedActions.bld.def[c]));
+                    int blocker = EncodeUtility.GetYType(queuedActions.bld.def[c]);
+
+                    for (int t = 0; t < collectors.Length; t++)
+                    {
+                        if (collectors[t] != 0)
+                            collectorTypes.Add(collectors[t]);
+                        if (bunkers[t] != 0)
+                            bunkerTypes.Add(bunkers[t]);
+                    }
+
+                    if (blocker != 0)
+                        blockerTypes.Add(blocker);
+                }
+            }
+        }
+
+        for (int c = 0; c < collectorTypes.Count; c++)
+        {
+            for (int r = 0; r < 4; r++)
+            {
+                expenditureTotals[r] += Constants.collectorCosts[collectorTypes[c] - 1, r];
+            }
+        }
+
+        for (int b = 0; b < bunkerTypes.Count; b++)
+        {
+            for (int r = 0; r < 4; r++)
+            {
+                expenditureTotals[r] += Constants.bunkerCosts[bunkerTypes[b] - 1, r];
+            }
+        }
+
+        for (int b = 0; b < blockerTypes.Count; b++)
+        {
+            for (int r = 0; r < 4; r++)
+            {
+                expenditureTotals[r] += Constants.blockerCosts[blockerTypes[b] - 1, r];
+            }
+        }
+
+        for (int r = 0; r < expenditureTotals.Length; r++)
+        {
+            queuedExpenditures[r] -= expenditureTotals[r];
+        }
+
+
         string islandID = queuedActions.bld.id;
         queuedActions.bld = null;
         notificationSystem.PushNotification(2, 2, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)), "developmentCancel");
+        gui.SetGUIContents();
     }
 
     public void CancelNationChange()
     {
         queuedActions.nat = null;
         notificationSystem.PushNotification(2, 2, "Nation change has been canceled.", "nationCancel");
+        gui.SetGUIContents();
     }
 
     public void CancelPlan(bool isAttackPlan)
@@ -685,12 +866,15 @@ public class ClientInterface : MonoBehaviour
             notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)), "defendCancel");
             queuedActions.dfnd = null;
         }
+
+        gui.SetGUIContents();
     }
 
     public void CancelAllQueuedActions()
     {
         queuedActions = new PlayerActions();
-        notificationSystem.PushNotification(2, 2, "All actions have been canceled.");
+        notificationSystem.PushNotification(2, 2, "All actions have been canceled. Please wait until next block for accurate resource count.");
+        gui.SetGUIContents();
     }
 
     void CleanUnitPurchases()
@@ -760,6 +944,7 @@ public class ClientInterface : MonoBehaviour
                 return new List<string>();
         }
     }
+
     public string attackableIslandID
     {
         get
@@ -878,7 +1063,12 @@ public class ClientInterface : MonoBehaviour
 
     public double[] GetAllPoolSizes()
     {
-        return new double[] { GetContributionSize(0), GetContributionSize(1), GetContributionSize(2) };
+        double[] pools = new double[] { GetContributionSize(0), GetContributionSize(1), GetContributionSize(2) };
+        pools[0] += chainState.resourcePools[0];
+        pools[1] += chainState.resourcePools[1];
+        pools[2] += chainState.resourcePools[2];
+
+        return pools;
     }
 
     public double[] GetPlayerContributedResources(double[] modifiers)

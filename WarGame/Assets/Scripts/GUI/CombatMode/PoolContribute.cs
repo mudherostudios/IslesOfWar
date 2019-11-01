@@ -37,6 +37,56 @@ public class PoolContribute: MonoBehaviour
         UpdateTimer(0);
     }
 
+    public void Update()
+    {
+        if (gameObject.activeSelf)
+        {
+            if (Input.anyKey)
+                CheckEnoughResources();
+        }
+    }
+
+    void CheckEnoughResources()
+    {
+        int resourceTypeA = 0;
+        int resourceTypeB = 1;
+
+        switch (poolType)
+        {
+            case 0:
+                resourceTypeA = 1;
+                resourceTypeB = 2;
+                break;
+            case 1:
+                resourceTypeA = 0;
+                resourceTypeB = 2;
+                break;
+            case 2:
+                resourceTypeA = 0;
+                resourceTypeB = 1;
+                break;
+            default:
+                break;
+        }
+
+        double inputA = 0;
+        double inputB = 0;
+
+        double.TryParse(tradeAmounts[0].text, out inputA);
+        double.TryParse(tradeAmounts[1].text, out inputB);
+        double[] resources = commandScript.clientInterface.playerResources;
+
+        if (inputA > resources[resourceTypeA])
+            tradeAmounts[0].text = resources[resourceTypeA+1].ToString();
+        else if (inputA < 0)
+            tradeAmounts[0].text = "0";
+
+        if (inputB > resources[resourceTypeB])
+            tradeAmounts[1].text = resources[resourceTypeB+1].ToString();
+        else if (inputB < 0)
+            tradeAmounts[1].text = "0";
+    }
+
     public void Contribute()
     {
         double[] resourcesToSend = new double[3];
@@ -69,6 +119,8 @@ public class PoolContribute: MonoBehaviour
     {
         poolType = type;
         gameObject.SetActive(true);
+        tradeAmounts[0].text = "0";
+        tradeAmounts[1].text = "0";
 
         switch (type)
         {
@@ -119,9 +171,9 @@ public class PoolContribute: MonoBehaviour
         double[] tempPools = commandScript.GetAllPoolSizes();
         modifiers = new double[]
         {
-            tempPools[1]/tempPools[2], tempPools[2]/tempPools[1],
-            tempPools[0]/tempPools[2], tempPools[2]/tempPools[0],
-            tempPools[0]/tempPools[1], tempPools[1]/tempPools[0]
+            tempPools[2]/tempPools[1], tempPools[1]/tempPools[2],
+            tempPools[2]/tempPools[0], tempPools[0]/tempPools[2],
+            tempPools[1]/tempPools[0], tempPools[0]/tempPools[1]
         };
 
         for (int m = 0; m < modifiers.Length; m++)

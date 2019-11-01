@@ -194,6 +194,7 @@ public class WorldNavigator : MonoBehaviour
     void SetClient()
     {
         clientInterface.InitStates(communicationScript, notificationSystem);
+        clientInterface.gui = screenGUI;
     }
 
     private void Update()
