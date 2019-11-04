@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IslesOfWar;
 using IslesOfWar.ClientSide;
 using IslesOfWar.Communication;
 using Newtonsoft.Json;
@@ -19,7 +20,7 @@ public class BattlePlanInteraction : Interaction
 
     [Header("Marker Interaction Variables")]
     public Mode mode = Mode.NONE;
-    public GameObject squadMarkerPrefab;
+    public GameObject[] squadMarkerPrefabs;
     public GameObject planMarkerPrefab;
     public BattleHUD hud;
 
@@ -235,7 +236,8 @@ public class BattlePlanInteraction : Interaction
     {
         for (int s = 0; s < squadCounts.Count; s++)
         {
-            squadMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[s].position, Quaternion.identity));
+            int unitDisplayType = GetUnitTypeByHighestHealth(squadCounts[s]);
+            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[s].position, Quaternion.identity));
             squadMarkers[s].GetComponent<SquadMarker>().squad = s;
             squadMarkers[s].GetComponent<SquadMarker>().owner = 1;
             squadMarkers[s].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
@@ -251,7 +253,8 @@ public class BattlePlanInteraction : Interaction
     {
         for (int o = 0; o < opponentCounts.Count; o++)
         {
-            opponentMarkers.Add(Instantiate(squadMarkerPrefab, squadMarkerWaitPositions[o].position, Quaternion.identity));
+            int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o]);
+            opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
             opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
             opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
             opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
@@ -279,12 +282,13 @@ public class BattlePlanInteraction : Interaction
             unitCounts.AddRange(counts);
 
             int positionIndex = 0;
+            int unitDisplayType = GetUnitTypeByHighestHealth(unitCounts);
 
             if (squadMarkers.Count > 0)
                 positionIndex = squadMarkers.Count - 1;
 
             Vector3 markerPosition = squadMarkerWaitPositions[positionIndex].position;
-            squadMarkers.Add(Instantiate(squadMarkerPrefab, markerPosition, Quaternion.Euler(spawnRotation.x,spawnRotation.y,spawnRotation.z)));
+            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], markerPosition, Quaternion.Euler(spawnRotation.x,spawnRotation.y,spawnRotation.z)));
             squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
@@ -374,7 +378,7 @@ public class BattlePlanInteraction : Interaction
         }
 
         if (index >= 0)
-            selectedSquad.transform.position = AddOffset(islandStats.hexTiles[index].position);
+            selectedSquad.transform.position = AddOffset(islandTiles[index].GetSpawnPositions()[0]);
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }
@@ -401,7 +405,7 @@ public class BattlePlanInteraction : Interaction
         }
 
         if (index >= 0)
-            selectedSquad.transform.position = AddOffset(islandStats.hexTiles[index].position);
+            selectedSquad.transform.position = AddOffset(islandTiles[index].GetSpawnPositions()[0]);
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }
@@ -674,10 +678,10 @@ public class BattlePlanInteraction : Interaction
         offset = generationOffset;
     }
 
-    public void SetBattleVariables(Vector3 markerOffset, Vector3 markerRotation, Transform[] squadWaitPositions, GameObject _squadMarkerPrefab, GameObject _planMarkerPrefab)
+    public void SetBattleVariables(Vector3 markerOffset, Vector3 markerRotation, Transform[] squadWaitPositions, GameObject[] _squadMarkerPrefab, GameObject _planMarkerPrefab)
     {
         squadMarkerWaitPositions = squadWaitPositions;
-        squadMarkerPrefab = _squadMarkerPrefab;
+        squadMarkerPrefabs = _squadMarkerPrefab;
         planMarkerPrefab = _planMarkerPrefab;
         spawnOffset = markerOffset;
         spawnRotation = markerRotation;
@@ -689,6 +693,25 @@ public class BattlePlanInteraction : Interaction
     Vector3 AddOffset(Vector3 position)
     {
         return spawnOffset + position;
+    }
+
+    int GetUnitTypeByHighestHealth(List<int> counts)
+    {
+        int unit = -1;
+        double highestHealth = -1;
+
+        for (int u = 0; u < 9; u++)
+        {
+            double tempHealth = counts[u] * Constants.unitHealths[u];
+
+            if (tempHealth > highestHealth)
+            {
+                unit = u;
+                highestHealth = tempHealth;
+            }
+        }
+
+        return unit;
     }
 
     //------------------------------------------------------------------------------

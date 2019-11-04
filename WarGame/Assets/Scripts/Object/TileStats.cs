@@ -26,6 +26,8 @@ public class TileStats : MonoBehaviour
     [Header("Type Info")]
     public GameObject indexParent;
 
+    private int usedPosition = -1;
+
     void ToggleAllCollection(bool on, bool toggleChildren, GameObject[] collection)
     {
         foreach (GameObject parent in collection)
@@ -153,5 +155,24 @@ public class TileStats : MonoBehaviour
         }
 
         return children;
+    }
+
+    public Vector3[] GetSpawnPositions()
+    {
+        int selection = usedPosition;
+
+        while (selection == usedPosition)
+        {
+            selection = Random.Range(0, 3);
+        }
+
+        Vector3 secondPosition = Vector3.zero;
+
+        if (usedPosition != -1)
+            secondPosition = transform.Find("Combat").GetChild(usedPosition).position;
+
+        usedPosition = selection;
+
+        return new Vector3[] { transform.Find("Combat").GetChild(selection).position, secondPosition };
     }
 }
