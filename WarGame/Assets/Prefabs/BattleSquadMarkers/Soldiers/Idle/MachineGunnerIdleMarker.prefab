@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 341408490603628244}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2036942144520857040}
@@ -141,7 +141,7 @@ MonoBehaviour:
   squad: 0
   owner: 0
   squadName: 
-  textName: {fileID: 0}
+  textName: {fileID: 1961666454303951959}
 --- !u!65 &6529946179669914229
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -153,8 +153,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.4115763, y: 5.464576, z: 1}
-  m_Center: {x: 0.009984791, y: 0.13202906, z: 0}
+  m_Size: {x: 2.3306513, y: 4.414567, z: 1}
+  m_Center: {x: -0.030477762, y: -0.39297533, z: 0}
 --- !u!1 &9086561307028909670
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,15 +258,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400090, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.75
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 400090, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.75
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 400090, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.75
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 400010, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -320,6 +320,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: eed18b26eb5a758408e75975b9bb2dd5, type: 2}
+    - target: {fileID: 9500000, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 400036, guid: 4f7edc6bcb03123448e3de8857612bf0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -27.889967
