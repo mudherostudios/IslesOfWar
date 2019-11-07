@@ -57,10 +57,16 @@ public class BattlePlanInteraction : Interaction
     private List<List<int>> opponentPlans;
     private List<string> opponentNames;
     private List<GameObject> planMarkers;
+    private Transform[][] tileSpawnPositions;
 
     private void Start()
     {
-        
+        tileSpawnPositions = new Transform[12][];
+
+        for (int t = 0; t < tileSpawnPositions.Length; t++)
+        {
+            tileSpawnPositions[t] = new Transform[3];
+        }
     }
 
     private void Update()
@@ -378,7 +384,7 @@ public class BattlePlanInteraction : Interaction
         }
 
         if (index >= 0)
-            selectedSquad.transform.position = AddOffset(islandTiles[index].GetSpawnPositions()[0]);
+            selectedSquad.SetCurrentTile(islandTiles[index], offset);
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }
@@ -405,7 +411,7 @@ public class BattlePlanInteraction : Interaction
         }
 
         if (index >= 0)
-            selectedSquad.transform.position = AddOffset(islandTiles[index].GetSpawnPositions()[0]);
+            selectedSquad.SetCurrentTile(islandTiles[index], offset);
         else
             selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
     }

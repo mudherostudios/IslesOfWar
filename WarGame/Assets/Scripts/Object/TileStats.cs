@@ -25,8 +25,9 @@ public class TileStats : MonoBehaviour
 
     [Header("Type Info")]
     public GameObject indexParent;
+    public Transform spawnCollectionParent;
 
-    private int usedPosition = -1;
+    private List<SquadMarker> squadMarkers;
 
     void ToggleAllCollection(bool on, bool toggleChildren, GameObject[] collection)
     {
@@ -157,22 +158,23 @@ public class TileStats : MonoBehaviour
         return children;
     }
 
-    public Vector3[] GetSpawnPositions()
+    public void SetMarkerOnTile(SquadMarker squadMarker, Vector3 offset)
     {
-        int selection = usedPosition;
+        if (squadMarkers == null)
+            squadMarkers = new List<SquadMarker>();
 
-        while (selection == usedPosition)
-        {
-            selection = Random.Range(0, 3);
-        }
-
-        Vector3 secondPosition = Vector3.zero;
-
-        if (usedPosition != -1)
-            secondPosition = transform.Find("Combat").GetChild(usedPosition).position;
-
-        usedPosition = selection;
-
-        return new Vector3[] { transform.Find("Combat").GetChild(selection).position, secondPosition };
+        squadMarkers.Add(squadMarker);
+        squadMarkers[squadMarkers.Count - 1].transform.position = spawnCollectionParent.GetChild(squadMarkers.Count - 1).position + offset;
     }
+
+    public void MoveMarkerOffTile(SquadMarker squadMarker, Vector3 offset)
+    {
+        squadMarkers.Remove(squadMarker);
+
+        for (int m = 0; m < squadMarkers.Count; m++)
+        {
+            squadMarkers[m].transform.position = spawnCollectionParent.GetChild(m).position + offset;
+        }
+    }
+
 }
