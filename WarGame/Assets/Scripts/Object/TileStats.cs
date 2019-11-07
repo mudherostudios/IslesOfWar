@@ -28,6 +28,7 @@ public class TileStats : MonoBehaviour
     public Transform spawnCollectionParent;
 
     private List<SquadMarker> squadMarkers;
+    private int[] opponentSquadCounts = new int[2]; //Squads not unit counts. Checking for opfor and blufor squads on tile.
 
     void ToggleAllCollection(bool on, bool toggleChildren, GameObject[] collection)
     {
@@ -163,18 +164,56 @@ public class TileStats : MonoBehaviour
         if (squadMarkers == null)
             squadMarkers = new List<SquadMarker>();
 
+        opponentSquadCounts[squadMarker.owner]++;
         squadMarkers.Add(squadMarker);
         squadMarkers[squadMarkers.Count - 1].transform.position = spawnCollectionParent.GetChild(squadMarkers.Count - 1).position + offset;
+        SetRotations();
     }
 
     public void MoveMarkerOffTile(SquadMarker squadMarker, Vector3 offset)
     {
         squadMarkers.Remove(squadMarker);
+        opponentSquadCounts[squadMarker.owner]--;
 
         for (int m = 0; m < squadMarkers.Count; m++)
         {
             squadMarkers[m].transform.position = spawnCollectionParent.GetChild(m).position + offset;
         }
+
+        SetRotations();
     }
 
+    public void SetRotations()
+    {
+        for (int m = 0; m < squadMarkers.Count; m++)
+        {
+            if (squadMarkers[m].displayType < 3 && squadMarkers[m].displayType > 5) // Exclude Tank Types
+            {
+                if (opponentSquadCounts[0] > 0 && opponentSquadCounts[1] > 0) //If there are two opposing forces
+                {
+                    FindEnemy(m);
+                }
+                else
+                {
+                    squadMarkers[m].transform.Rotate(Vector3.up, Random.value * 360);
+                }
+            }
+            else // Tanks
+            {
+                squadMarkers[m].transform.rotation = spawnCollectionParent.GetChild(m).rotation;
+            }
+        }
+    }
+
+    private void FindEnemy(int squad)
+    {
+        for (int s = 0; s < squadMarkers.Count; s++)
+        {
+            if (squadMarkers[squad].owner != squadMarkers[s].owner)
+            {
+                Vector3 target = squadMarkers[squad].transform.position - squadMarkers[s].transform.position;
+                squadMarkers[squad].transform.rotation = Quaternion.Euler(Vector3.RotateTowards(squadMarkers[squad].transform.forward, target, 360.0f, 0.0f));
+            }
+        }
+    }
 }

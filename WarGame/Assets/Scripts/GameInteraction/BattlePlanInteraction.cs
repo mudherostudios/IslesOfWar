@@ -247,7 +247,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[s].GetComponent<SquadMarker>().squad = s;
             squadMarkers[s].GetComponent<SquadMarker>().owner = 1;
             squadMarkers[s].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
-            squadMarkers[s].GetComponent<SquadMarker>().SetName();
+            squadMarkers[s].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
             currentSquad = s;
             selectedSquad = squadMarkers[s].GetComponent<SquadMarker>();
             ViewCurrentSquad();
@@ -264,7 +264,7 @@ public class BattlePlanInteraction : Interaction
             opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
             opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
             opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
-            opponentMarkers[o].GetComponent<SquadMarker>().SetName();
+            opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
             currentSquad = o;
             selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
             ViewCurrentOpponentSquad();
@@ -300,7 +300,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetName();
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
             squadCounts.Add(unitCounts);
             squadPlans.Add(new List<int>());
             squadNames.Add(squadName);
@@ -316,6 +316,7 @@ public class BattlePlanInteraction : Interaction
             if (currentSquad == index)
                 CloseCurrentSquad();
 
+            squadMarkers[index].GetComponent<SquadMarker>().RemoveFromBattleField(offset);
             Destroy(squadMarkers[index]);
             squadMarkers.RemoveAt(index);
             squadCounts.RemoveAt(index);
