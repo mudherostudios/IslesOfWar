@@ -91,9 +91,9 @@ namespace IslesOfWar
             public int[] ver;          //Set Version, sets all - 3
             public float iwCost;       //Set IslandSearchCost ********* Need to change the cost method first. *********
             public float atkPerc;       //Set AttackCostPercent
-            public int iuMin;          //Set IslandUndiscoveredMinimum
-            public float uFalloff;     //Set UndiscoveredFalloffRate
+            public int uPerc;          //Set UndiscoveredPercent
             public float repTime;      //Set IslandReplenishTime
+            public float sqdHlthLmt;    //Set SquadHealthLimit
             public float[] uCost;      //Set UnitCost first is unitType, next 4 are prices - 5
             public float[] bnkCost;    //Set BunkerCost, same as uCost
             public float[] blkCost;    //Set BlockerCost, same as uCost
@@ -312,6 +312,33 @@ namespace IslesOfWar
                 return isValid;
             }
 
+            public static bool SquadHealthSizeLimits(List<List<int>> squadCounts)
+            {
+                bool validSize = true;
+
+                for (int s = 0; s < squadCounts.Count && validSize; s++)
+                {
+                    validSize = SquadHealthSizeLimits(squadCounts[s]);
+                }
+                return validSize;
+            }
+
+            public static bool SquadHealthSizeLimits(List<int> squadCounts)
+            {
+                bool validSize = true;
+                int healths = 0;
+
+                for (int u = 0; u < squadCounts.Count; u++)
+                {
+                    healths += (int)(squadCounts[u] * Constants.unitHealths[u]);
+                }
+
+                if (healths > 1000000)
+                    validSize = false;
+
+                return validSize;
+            }
+
             public static bool HasEnoughTroops(List<List<int>> squad, double[] units, bool isValid)
             {
                 for (int s = 0; s < squad.Count && isValid; s++)
@@ -371,7 +398,8 @@ namespace IslesOfWar
             {
                 bool isValid = squad.Count > 0 && squad.Count <= 4;
 
-                isValid = HasEnoughTroops(squad, availableUnits, isValid);
+                isValid = isValid && HasEnoughTroops(squad, availableUnits, isValid);
+                isValid = isValid && SquadHealthSizeLimits(squad);
 
                 return isValid;
             }
@@ -380,7 +408,8 @@ namespace IslesOfWar
             {
                 bool isValid = squad.Count > 0 && squad.Count <= 3;
 
-                isValid = HasEnoughTroops(squad, availableUnits, isValid);
+                isValid = isValid && HasEnoughTroops(squad, availableUnits, isValid);
+                isValid = isValid && SquadHealthSizeLimits(squad);
 
                 return isValid;
             }

@@ -11,32 +11,13 @@ namespace IslesOfWar
     namespace GameStateProcessing
     {
         public static class IslandDiscovery
-        {
-            public static double[] probabilities;
+        { 
 
-            static void CalculateProbabilities(double playerIslands)
+            public static string GetIsland( string[] islands, string txid, ref MudHeroRandom random)
             {
-                probabilities = new double[2];
-
-                if (playerIslands < Constants.islandUndiscoveredMinimum + 1)
-                {
-                    probabilities[0] = 1.0f;
-                    probabilities[1] = 0.0f;
-                }
-                else
-                {
-                    probabilities[0] = 1.0 / Math.Pow(playerIslands - Constants.islandUndiscoveredMinimum, Constants.undiscoveredFalloffRate);
-                    probabilities[1] = 1.0 - probabilities[0];
-                }
-
-            }
-
-            public static string GetIsland(double playerIslandCount, string[] islands, string txid, ref MudHeroRandom random)
-            {
-                CalculateProbabilities(playerIslandCount);
                 float choice = random.Value();
 
-                if (choice > probabilities[1])
+                if (choice < Constants.undiscoveredPercent || islands.Length == 0)
                     return txid;
                 else
                 {

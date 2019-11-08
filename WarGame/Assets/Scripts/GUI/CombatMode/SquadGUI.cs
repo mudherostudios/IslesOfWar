@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using IslesOfWar;
+using IslesOfWar.Communication;
 using Newtonsoft.Json;
 
 public class SquadGUI : MonoBehaviour
@@ -62,27 +63,30 @@ public class SquadGUI : MonoBehaviour
                 squad.Add(CorrectedValue(u));
             }
 
-            string squadName = "";
-            bool stopLooking = GetSquadCount() >= Constants.randomSquadNames.Length;
-            int r = 0;
-            int loopCount = 0;
-
-            while (stopLooking == false || loopCount > Constants.randomSquadNames.Length * 1.5)
+            if (Validity.SquadHealthSizeLimits(squad))
             {
-                r = Random.Range(0, Constants.randomSquadNames.Length);
-                stopLooking = !PlayerPrefs.HasKey(Constants.randomSquadNames[r]);
-                loopCount++;
-            }
+                string squadName = "";
+                bool stopLooking = GetSquadCount() >= Constants.randomSquadNames.Length;
+                int r = 0;
+                int loopCount = 0;
 
-            squadName = Constants.randomSquadNames[r];
+                while (stopLooking == false || loopCount > Constants.randomSquadNames.Length * 1.5)
+                {
+                    r = Random.Range(0, Constants.randomSquadNames.Length);
+                    stopLooking = !PlayerPrefs.HasKey(Constants.randomSquadNames[r]);
+                    loopCount++;
+                }
 
-            if (!PlayerPrefs.HasKey(squadName))
-            {
-                List<string> keys = GetKeys();
-                keys.Add(squadName);
-                PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
-                PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
-                commandScript.PushNotification(0, 0, string.Format("{0} Squad has been created.", squadName));
+                squadName = Constants.randomSquadNames[r];
+
+                if (!PlayerPrefs.HasKey(squadName))
+                {
+                    List<string> keys = GetKeys();
+                    keys.Add(squadName);
+                    PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+                    PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
+                    commandScript.PushNotification(0, 0, string.Format("{0} Squad has been created.", squadName));
+                }
             }
         }
 

@@ -42,12 +42,8 @@ namespace IslesOfWar
                     Constants.attackCostPercent = commands.atkPerc;
 
                 //Undiscovered Minimum
-                if (commands.iuMin > 0)
-                    Constants.islandUndiscoveredMinimum = commands.iuMin;
-
-                //Undiscovered Falloff Rate
-                if (commands.uFalloff > 0)
-                    Constants.undiscoveredFalloffRate = commands.uFalloff;
+                if (commands.uPerc > 0)
+                    Constants.undiscoveredPercent = commands.uPerc;
 
                 //Island Replenish Search Time
                 if (commands.repTime > 0)
@@ -206,7 +202,7 @@ namespace IslesOfWar
                 //Players get default resources.
                 foreach (KeyValuePair<string, PlayerState> pair in state.players)
                 {
-                    pair.Value.resources[0] += Constants.freeResourceRates[0];
+                    pair.Value.resources[0] += Constants.freeResourceRates[0] * pair.Value.islands.Count;
                     pair.Value.resources[1] += Constants.freeResourceRates[1];
                     pair.Value.resources[2] += Constants.freeResourceRates[2];
                     pair.Value.resources[3] += Constants.freeResourceRates[3];
@@ -252,7 +248,7 @@ namespace IslesOfWar
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
-                    string discovered = IslandDiscovery.GetIsland(state.players[player].islands.Count, state.islands.Keys.ToArray(), txid, ref random);
+                    string discovered = IslandDiscovery.GetIsland(state.islands.Keys.ToArray(), txid, ref random);
                     double[] resources = new double[cost.Length];
 
                     if (discovered == txid)
@@ -410,7 +406,7 @@ namespace IslesOfWar
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
-                    && defensePlan.sqd.Count <= 4;
+                    && defensePlan.sqd.Count <= 4 && Validity.SquadHealthSizeLimits(defensePlan.sqd);
                     
 
                     if (canUpdate)
@@ -480,7 +476,7 @@ namespace IslesOfWar
 
             void RemoveSquadsFromIsland(string player, string islandID)
             {
-                if (state.islands[islandID].squadCounts != null)
+                if (state.islands[islandID].squadCounts != null && state.islands[islandID].owner == player)
                 {
                     for (int s = 0; s < state.islands[islandID].squadCounts.Count; s++)
                     {

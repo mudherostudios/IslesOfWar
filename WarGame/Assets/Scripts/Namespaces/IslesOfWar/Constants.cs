@@ -93,11 +93,11 @@ namespace IslesOfWar
         public static float[] islandSearchCost = new float[] { 1000, 0, 0, 0 };
         public static float islandModifierExponent = 0.1f;
         public static float attackCostPercent = 0.1f;
-        public static int islandUndiscoveredMinimum = 10;
-        public static float undiscoveredFalloffRate = 0.3f;
+        public static float undiscoveredPercent = 0.5f;
         public static float islandSearchReplenishTime = 150.0f; //Estimated time in blocks it should take to get enough resources to search again.
         public static string[] islandSearchOptions = new string[] { "norm" };
-        
+
+        public static float squadHealthLimit = 1000000;
         //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
         public static float[,] unitCosts = new float[,]
         {
@@ -182,7 +182,7 @@ namespace IslesOfWar
         };
 
         public static float[] extractRates = new float[] { 10, 20, 5 };
-        public static float[] freeResourceRates = new float[] {5, 1, 1, 1 };
+        public static float[] freeResourceRates = new float[] {1, 1, 1, 1 };
 
         public static float[] tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
         public static float[] resourceProbabilities = new float[] { 0.15f, 0.2f, 0.1f };

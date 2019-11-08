@@ -257,18 +257,21 @@ public class BattlePlanInteraction : Interaction
 
     void InstantiateOppponentSquads()
     {
-        for (int o = 0; o < opponentCounts.Count; o++)
+        if (opponentCounts != null)
         {
-            int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o]);
-            opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
-            opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
-            opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
-            opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
-            opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
-            currentSquad = o;
-            selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
-            ViewCurrentOpponentSquad();
-            CloseCurrentSquad();
+            for (int o = 0; o < opponentCounts.Count; o++)
+            {
+                int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o]);
+                opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
+                opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
+                opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
+                opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
+                opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
+                currentSquad = o;
+                selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
+                ViewCurrentOpponentSquad();
+                CloseCurrentSquad();
+            }
         }
     }
 
@@ -653,17 +656,18 @@ public class BattlePlanInteraction : Interaction
 
             if (mode != Mode.NONE)
             {
-                if (clientInterface.IslandHasDefenders(_islandID))
-                    StartWithDefenders(_islandID);
-                else if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
-                    clientInterface.InitBattleSquads(mode == Mode.ATTACK, _islandID);
-                else if (clientInterface.queuedActions.dfnd != null || clientInterface.queuedActions.attk != null)
-                    StartWithQueuedPlan();
-
                 islandID = _islandID;
                 Island island = clientInterface.GetIsland(islandID);
                 hexIsland.SetActive(true);
                 PlaceTiles(island);
+
+                if (clientInterface.IslandHasDefenders(islandID))
+                    StartWithDefenders(islandID);
+                else if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
+                    clientInterface.InitBattleSquads(mode == Mode.ATTACK, islandID);
+                else if (clientInterface.queuedActions.dfnd != null || clientInterface.queuedActions.attk != null)
+                    StartWithQueuedPlan();
+
                 return true;
             }
 
