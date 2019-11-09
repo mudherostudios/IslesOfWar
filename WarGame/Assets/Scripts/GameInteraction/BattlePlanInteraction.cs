@@ -49,9 +49,9 @@ public class BattlePlanInteraction : Interaction
 
     //Variables used to submit actions.
     private List<GameObject> squadMarkers;
-    private List<List<int>> squadCounts;
+    public Dictionary<string, int[]> squads;
     private List<List<int>> squadPlans;
-    public List<string> squadNames;
+    private List<List<int>> defenderPlans;
     private List<GameObject> opponentMarkers;
     private List<List<int>> opponentCounts;
     private List<List<int>> opponentPlans;
@@ -80,32 +80,34 @@ public class BattlePlanInteraction : Interaction
             string peeked = PeekButtonType();
             if (peeked == battleButtonTypes[0])
             {
-                bool show = lastSquad != currentSquad || planMarkers.Count == 0;
                 selectedSquad = selectedButton.GetComponent<SquadMarker>();
+
+                bool show = lastSquad != currentSquad || planMarkers.Count == 0;
                 lastSquad = currentSquad;
 
                 if (currentSquad >= 0)
                     CloseCurrentSquad();
-                
+
                 currentSquad = selectedSquad.squad;
-                hud.SetUnitCounts(selectedSquad.name);
+                hud.SetUnitCounts(selectedSquad.textName.text);
 
                 if (show && selectedSquad.owner == 1)
                     ViewCurrentSquad();
                 else if (show && selectedSquad.owner == 0)
                     ViewCurrentOpponentSquad();
+
             }
             else
             {
                 hud.HideUnitsBar();
             }
 
-            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.owner == 1)
+            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.owner == 1 && !selectedSquad.defender)
             {
                 RemoveSquadPoint(selectedButton.GetComponent<PlanMarker>().index);
             }
 
-            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected && selectedSquad.owner == 1)
+            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected && selectedSquad.owner == 1 && !selectedSquad.defender)
             {
                 int position = selectedButton.GetComponent<IndexedNavigationButton>().index;
                 Plan(position);
@@ -123,7 +125,7 @@ public class BattlePlanInteraction : Interaction
         clientInterface.InitBattleSquads(isAttack, islandID);
     }
 
-    public void Clean()
+    public void Clean(bool saveSquadInfo)
     {
         CloseCurrentSquad();
 
@@ -132,10 +134,13 @@ public class BattlePlanInteraction : Interaction
             Destroy(squadMarkers[s]);
         }
 
-        squadNames.Clear();
-        squadCounts.Clear();
         squadMarkers.Clear();
-        squadPlans.Clear();
+
+        if (!saveSquadInfo)
+        {
+            squads.Clear();
+            squadPlans.Clear();
+        }
 
         if (opponentMarkers != null)
         {
@@ -158,9 +163,6 @@ public class BattlePlanInteraction : Interaction
             command = clientInterface.queuedActions.attk;
         else
             command = clientInterface.queuedActions.dfnd;
-
-        squadCounts.AddRange(command.sqd);
-        squadPlans.AddRange(command.pln);
     }
 
     public void StartWithQueuedPlan()
@@ -171,9 +173,7 @@ public class BattlePlanInteraction : Interaction
         else
             command = clientInterface.queuedActions.dfnd;
 
-        islandID = command.id; 
-        squadCounts = new List<List<int>>(command.sqd);
-        squadPlans = new List<List<int>>(command.pln);
+        islandID = command.id;
 
         InstantiateAllSquads();
     }
@@ -212,46 +212,44 @@ public class BattlePlanInteraction : Interaction
 
     public void StartWithDefendersWhileDefending()
     {
-        squadNames = new List<string>();
-        List<string> deployedSquads = new List<string>();
-        List<string> keys = new List<string>();
-
-        if (PlayerPrefs.HasKey("keys"))
-            keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
+        squads = new Dictionary<string, int[]>();
         
-        squadCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
+        List<List<int>> defenderCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
-        clientInterface.SetFullBattlePlan(mode == Mode.ATTACK, islandID, squadCounts, squadPlans);
+        clientInterface.SetFullBattlePlan(mode == Mode.ATTACK, islandID, defenderCounts, squadPlans);
 
-        for (int s = 0; s < squadCounts.Count; s++)
+        for (int s = 0; s < defenderCounts.Count; s++)
         {
             string defenderName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0, 8));
-            if (!PlayerPrefs.HasKey(defenderName)) 
-                squadNames.Add(defenderName);
-            deployedSquads.Add(defenderName);
-            PlayerPrefs.SetString(defenderName, JsonConvert.SerializeObject(squadCounts[s]));
+            if (!squads.ContainsKey(defenderName))
+            {
+                squads.Add(defenderName, defenderCounts[s].ToArray());
+                clientInterface.ownedDefendersOnIsland++;
+            }
         }
 
-        keys.AddRange(squadNames);
-        PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
-
-        hud.SetDeployedSquads(deployedSquads);
+        hud.SetDeployedSquads(squads);
+        
     }
 
     void InstantiateAllSquads()
     {
-        for (int s = 0; s < squadCounts.Count; s++)
+        int squadIndex = 0;
+
+        foreach(KeyValuePair<string, int[]> pair in squads)
         {
-            int unitDisplayType = GetUnitTypeByHighestHealth(squadCounts[s]);
-            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[s].position, Quaternion.identity));
-            squadMarkers[s].GetComponent<SquadMarker>().squad = s;
-            squadMarkers[s].GetComponent<SquadMarker>().owner = 1;
-            squadMarkers[s].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0,8));
-            squadMarkers[s].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
-            currentSquad = s;
-            selectedSquad = squadMarkers[s].GetComponent<SquadMarker>();
+            int unitDisplayType = GetUnitTypeByHighestHealth(pair.Value);
+            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().squad = squadIndex;
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().owner = 1;
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", squadIndex.ToString(), islandID.Substring(0,8));
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
+            currentSquad = squadIndex;
+            selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
+            selectedSquad.defender = true;
             ViewCurrentSquad();
             CloseCurrentSquad();
+            squadIndex++;
         }
     }
 
@@ -261,7 +259,7 @@ public class BattlePlanInteraction : Interaction
         {
             for (int o = 0; o < opponentCounts.Count; o++)
             {
-                int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o]);
+                int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o].ToArray());
                 opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
                 opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
                 opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
@@ -285,13 +283,10 @@ public class BattlePlanInteraction : Interaction
         if (mode == Mode.DEFEND)
             maxSquads = 4;
 
-        if (!squadNames.Contains(squadName) && squadNames.Count < maxSquads)
+        if (!squads.ContainsKey(squadName) && squads.Count < maxSquads)
         {
-            List<int> unitCounts = new List<int>();
-            unitCounts.AddRange(counts);
-
             int positionIndex = 0;
-            int unitDisplayType = GetUnitTypeByHighestHealth(unitCounts);
+            int unitDisplayType = GetUnitTypeByHighestHealth(counts);
 
             if (squadMarkers.Count > 0)
                 positionIndex = squadMarkers.Count - 1;
@@ -304,30 +299,33 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
-            squadCounts.Add(unitCounts);
+            squads.Add(squadName, counts);
             squadPlans.Add(new List<int>());
-            squadNames.Add(squadName);
-
-            clientInterface.AddSquad(mode == Mode.ATTACK, unitCounts);
+            
+            clientInterface.AddSquad(mode == Mode.ATTACK, new List<int>(counts));
         }
     }
 
-    public void RemoveSquad(int index)
+    public void RemoveSquad(string squadName)
     {
-        if (squadMarkers.Count > index)
+        squads.Remove(squadName);
+
+        for (int s = 0; s < squadMarkers.Count; s++)
         {
-            if (currentSquad == index)
-                CloseCurrentSquad();
+            if (squadMarkers[s].GetComponent<SquadMarker>().squadName == squadName)
+            {
+                if (currentSquad == s)
+                    CloseCurrentSquad();
 
-            squadMarkers[index].GetComponent<SquadMarker>().RemoveFromBattleField(offset);
-            Destroy(squadMarkers[index]);
-            squadMarkers.RemoveAt(index);
-            squadCounts.RemoveAt(index);
-            squadPlans.RemoveAt(index);
-            squadNames.RemoveAt(index);
+                squadMarkers[s].GetComponent<SquadMarker>().RemoveFromBattleField(offset);
+                Destroy(squadMarkers[s]);
+                squadMarkers.RemoveAt(s);
+                squadPlans.RemoveAt(s);
+                RenumberSquads(s);
+                clientInterface.RemoveSquad(mode == Mode.ATTACK, s);
 
-            RenumberSquads(index);
-            clientInterface.RemoveSquad(mode == Mode.ATTACK, index);
+                break;
+            }
         }
     }
 
@@ -495,7 +493,7 @@ public class BattlePlanInteraction : Interaction
 
     public void CancelPlans()
     {
-        Clean();
+        Clean(false);
         clientInterface.CancelPlan(mode == Mode.ATTACK);
         mode = Mode.NONE;
         navigator.SetCommandMode();
@@ -520,7 +518,7 @@ public class BattlePlanInteraction : Interaction
     //Likely something with clientInterface
     public void SetExitMode()
     {
-        Clean();
+        Clean(true);
         mode = Mode.NONE;
     }
 
@@ -622,7 +620,7 @@ public class BattlePlanInteraction : Interaction
 
     public void TurnOffIsland()
     {
-        Clean();
+        Clean(true);
         mode = Mode.NONE;
 
         foreach (TileStats stats in islandTiles)
@@ -639,13 +637,12 @@ public class BattlePlanInteraction : Interaction
         if (clientInterface.IslandExists(_islandID))
         {
             squadMarkers = new List<GameObject>();
-            squadCounts = new List<List<int>>();
             squadPlans = new List<List<int>>();
             planMarkers = new List<GameObject>();
             islandTiles = new List<TileStats>();
 
-            if (squadNames == null)
-                squadNames = new List<string>();
+            if (squads == null)
+                squads = new Dictionary<string, int[]>();
 
             if (clientInterface.attackableIslandID == _islandID)
                 mode = Mode.ATTACK;
@@ -706,7 +703,7 @@ public class BattlePlanInteraction : Interaction
         return spawnOffset + position;
     }
 
-    int GetUnitTypeByHighestHealth(List<int> counts)
+    int GetUnitTypeByHighestHealth(int[] counts)
     {
         int unit = -1;
         double highestHealth = -1;

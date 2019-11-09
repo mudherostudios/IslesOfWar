@@ -10,30 +10,28 @@ public class BattleHUD : MonoBehaviour
     public BattlePlanInteraction battleScript;
     public GameObject unitsBar;
     public GameObject[] unitCountTabs;
-    private List<string> deployedSquads = new List<string>();
+    private Dictionary<string, int[]> deployedSquads = new Dictionary<string, int[]>();
+    private Dictionary<string, int[]> deployedDefenders = new Dictionary<string, int[]>();
 
     public void AddSquad()
     {
-        deployedSquads = new List<string>(battleScript.squadNames);
-
-        if (deployedSquads.Count <= 4)
+        if (deployedSquads.Count + deployedDefenders.Count <= 4)
         {
             int squadIndex = availableSquadsList.value;
             List<string> squads = GetKeys();
             string squadToDelpoy = squads[squadIndex];
 
-            if (!deployedSquads.Contains(squadToDelpoy))
+            if (!deployedSquads.ContainsKey(squadToDelpoy))
             {
                 int[] squadCounts = JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(squadToDelpoy)).ToArray();
                 battleScript.AddSquad(squadToDelpoy, squadCounts);
-                deployedSquads.Add(squadToDelpoy);
+                deployedSquads.Add(squadToDelpoy, squadCounts);
             }
         }
     }
 
     public void RemoveSquad()
     {
-        deployedSquads = new List<string>(battleScript.squadNames);
         if (deployedSquads != null)
         {
             if (availableSquadsList.options.Count > 0 && deployedSquads.Count > 0)
@@ -41,18 +39,10 @@ public class BattleHUD : MonoBehaviour
                 int squadIndex = availableSquadsList.value;
                 string squadName = GetKeys()[squadIndex];
 
-                if (deployedSquads.Contains(squadName))
+                if (deployedSquads.ContainsKey(squadName))
                 {
-                    int index = 0;
-
-                    for (int i = 0; i < deployedSquads.Count; i++)
-                    {
-                        if (deployedSquads[i] == squadName)
-                            index = i;
-                    }
-
-                    battleScript.RemoveSquad(index);
-                    deployedSquads.RemoveAt(index);
+                    battleScript.RemoveSquad(squadName);
+                    deployedSquads.Remove(squadName);
                 }
             }
         }
@@ -67,6 +57,7 @@ public class BattleHUD : MonoBehaviour
     public void Hide()
     {
         availableSquadsList.ClearOptions();
+        deployedDefenders.Clear();
         gameObject.SetActive(false);
     }
 
@@ -81,6 +72,11 @@ public class BattleHUD : MonoBehaviour
             return new List<string>();
     }
 
+    public void SetDeployedSquads(Dictionary<string,int[]> squads)
+    {
+        deployedSquads = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(JsonConvert.SerializeObject(squads));
+    }
+
     public void ClearDeployedSquads()
     {
         if (PlayerPrefs.HasKey("keys") && deployedSquads != null)
@@ -89,7 +85,7 @@ public class BattleHUD : MonoBehaviour
             {
                 List<string> keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
 
-                foreach (string squad in deployedSquads)
+                foreach (string squad in deployedSquads.Keys)
                 {
                     keys.Remove(squad);
                 }
@@ -99,13 +95,17 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    public void SetDeployedSquads(List<string> deployed) { deployedSquads = new List<string>(deployed); }
     public void CancelPlans() { battleScript.CancelPlans(); }
 
     public void SetUnitCounts(string squadName)
     {
         unitsBar.SetActive(true);
-        int[] tempSquad = GetUnits(squadName);
+        int[] tempSquad = new int[0];
+
+        if (!squadName.Contains("Defender"))
+            squadName = squadName.Split(' ')[0];
+
+        tempSquad = deployedSquads[squadName];
 
         for (int u = 0; u < tempSquad.Length; u++)
         {
@@ -116,7 +116,8 @@ public class BattleHUD : MonoBehaviour
 
     int[] GetUnits(string squadName)
     {
-        string unitsString = PlayerPrefs.GetString(squadName.Split(' ')[0]);
+        string[] splitSquadName = squadName.Split(' ');
+        string unitsString = PlayerPrefs.GetString(splitSquadName[0]);
         return JsonConvert.DeserializeObject<int[]>(unitsString);
     }
 

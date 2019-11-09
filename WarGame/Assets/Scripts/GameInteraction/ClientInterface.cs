@@ -18,6 +18,7 @@ public class ClientInterface : MonoBehaviour
     public CommunicationInterface communication;
     public Notifications notificationSystem;
     public PlayerActions queuedActions;
+    public int ownedDefendersOnIsland = 0;
     public string player;
 
     public double[] queuedExpenditures;
@@ -865,6 +866,7 @@ public class ClientInterface : MonoBehaviour
         {
             notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)), "defendCancel");
             queuedActions.dfnd = null;
+            ownedDefendersOnIsland = 0;
         }
 
         gui.SetGUIContents();
@@ -1205,11 +1207,25 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.dfnd != null)
         {
-            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].units.ToArray())
+            List<List<int>> tempSqds = new List<List<int>>();
+
+            if (ownedDefendersOnIsland == 0)
+                tempSqds = queuedActions.dfnd.sqd;
+            else
+            {
+                for (int s = ownedDefendersOnIsland-1; s < queuedActions.dfnd.sqd.Count; s++)
+                {
+                    tempSqds.Add(queuedActions.dfnd.sqd[s]);
+                }
+            }
+
+            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(tempSqds, chainState.players[player].units.ToArray())
             && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
 
             if (!defend)
                 queuedActions.dfnd = null;
+            else
+                queuedActions.dfnd.sqd = tempSqds;
         }
 
         size = Validity.UpdateSize(queuedActions);

@@ -6,6 +6,7 @@ public class SquadMarker : WorldButton
 {
     public int squad;
     public int owner;
+    public bool defender = false;
     public int displayType = 0;
     public string squadName;
     public TextMesh textName;
