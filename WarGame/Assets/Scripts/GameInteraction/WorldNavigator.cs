@@ -10,6 +10,7 @@ public class WorldNavigator : MonoBehaviour
     public IslandManagementInteraction managementScript;
     public BattlePlanInteraction battleScript;
     public CommunicationInterface communicationScript;
+    public GameObject tutorial;
 
     [Header("Common Variables")]
     public Notifications notificationSystem;
@@ -105,6 +106,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript = gameObject.AddComponent<CommandIslandInteraction>();
         managementScript = gameObject.AddComponent<IslandManagementInteraction>();
         battleScript = gameObject.AddComponent<BattlePlanInteraction>();
+        tutorial = GameObject.Find("MasterTutorial");
     }
 
     private void Start()
@@ -187,7 +189,13 @@ public class WorldNavigator : MonoBehaviour
         battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
         battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefabs, planMarkerPrefab);
-        
+
+        if (tutorial != null)
+        {
+            tutorial.GetComponent<Tutorial>().SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
+            tutorial.GetComponent<Tutorial>().CheckForPrompters();
+        }
+
         SetCommandMode();
     }
     

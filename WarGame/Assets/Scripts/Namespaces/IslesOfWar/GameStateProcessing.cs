@@ -121,11 +121,10 @@ namespace IslesOfWar
             public static double[] GetCost(int islandCount)
             {
                 double[] cost = new double[4];
-                double modifier = Math.Pow(islandCount, Constants.islandModifierExponent);
-                cost[0] = Math.Ceiling(Constants.islandSearchCost[0] * modifier);
-                cost[1] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[0] * 12 * Constants.extractRates[0] * islandCount * modifier);
-                cost[2] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[1] * 12 * Constants.extractRates[1] * islandCount * modifier);
-                cost[3] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[2] * 12 * Constants.extractRates[2] * islandCount * modifier);
+                cost[0] = Math.Ceiling(Constants.islandSearchCost[0]);
+                cost[1] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[0] * 12 * Constants.extractRates[0] * islandCount);
+                cost[2] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[1] * 12 * Constants.extractRates[1] * islandCount);
+                cost[3] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[2] * 12 * Constants.extractRates[2] * islandCount);
 
                 return cost;
             }
