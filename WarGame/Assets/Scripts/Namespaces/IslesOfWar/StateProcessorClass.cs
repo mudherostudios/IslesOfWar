@@ -259,7 +259,13 @@ namespace IslesOfWar
                     }
                     else if (discovered != txid && !state.players[player].islands.Contains(discovered))
                     {
+                        //Remove player from current attackableIslands "attackPlayers" list.
+                        string tempIslandID = state.players[player].attackableIsland;
+                        if(tempIslandID != null && tempIslandID != "")
+                            state.islands[tempIslandID].attackingPlayers.Remove(player);
+
                         state.players[player].attackableIsland = discovered;
+                        state.islands[discovered].attackingPlayers.Add(player);
 
                         for (int c = 0; c < cost.Length; c++)
                         {
@@ -467,6 +473,7 @@ namespace IslesOfWar
                     for (int i = 0; i < islands.Count; i++)
                     {
                         RemoveSquadsFromIsland(player, islands[i]);
+                        RemoveAttackingPlayerTargets(islands[i]);
                         state.islands.Remove(islands[i]);
                         state.depletedContributions[player].Add(islands[i]);
                         state.players[player].islands.Remove(islands[i]);
@@ -487,6 +494,14 @@ namespace IslesOfWar
                     }
 
                     state.islands[islandID].squadCounts.Clear();
+                }
+            }
+
+            void RemoveAttackingPlayerTargets(string islandID)
+            {
+                foreach(string player in state.islands[islandID].attackingPlayers)
+                {
+                    state.players[player].attackableIsland = null;
                 }
             }
 

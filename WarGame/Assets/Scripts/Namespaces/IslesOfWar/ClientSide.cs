@@ -220,6 +220,7 @@ namespace IslesOfWar
             public List<List<double>> resources; //Should be max of 12 tiles with 3 max resources per tile
             public List<List<int>> squadPlans; //Should be max 4 squads with max 7 zoneIDs of 0-11
             public List<List<int>> squadCounts; //Should be max 4 squads with max 9 slots for counts of unit types
+            public List<string> attackingPlayers; //List of all players who have this island as an attackableIsland.
 
             public Island(){}
 
@@ -229,6 +230,7 @@ namespace IslesOfWar
                 features = _features;
                 collectors = _collectors;
                 defenses = _defenses;
+                attackingPlayers = new List<string>();
             }
 
             //Think of resources as how many times extraction can be made rather than an actual amount.

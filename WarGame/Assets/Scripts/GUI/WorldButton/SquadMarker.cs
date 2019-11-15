@@ -14,7 +14,7 @@ public class SquadMarker : WorldButton
 
     public void SetNameAndType(int type)
     {
-        textName.text = squadName;
+        textName.text = string.Format("{0} Squad",squadName);
         displayType = type;
     }
 

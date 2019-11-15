@@ -296,7 +296,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = string.Format("{0} Squad", squadName);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = squadName;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
             squads.Add(squadName, counts);

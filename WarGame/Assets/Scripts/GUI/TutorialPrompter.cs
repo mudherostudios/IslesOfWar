@@ -45,6 +45,7 @@ public class TutorialPrompter : MonoBehaviour
 
     public void CompleteTutorial()
     {
+        HideTutorial();
         if (worldIndicators != null)
         {
             for (int i = 0; i < worldIndicators.Length; i++)

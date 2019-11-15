@@ -929,7 +929,10 @@ public class ClientInterface : MonoBehaviour
             if (isPlaying)
             {
                 string attackableID = chainState.players[player].attackableIsland;
-                return chainState.islands[attackableID];
+                if (attackableIslandID != null && attackableIslandID != "")
+                    return chainState.islands[attackableID];
+                else
+                    return new Island();
             }
             else
                 return new Island();
