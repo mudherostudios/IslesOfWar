@@ -56,14 +56,7 @@ public class Tutorial : Interaction
 
     public void Update()
     {
-        bool clicked = Input.GetButtonDown("Fire1");
-
         CheckTutorialCondition();
-        
-        if (cam != null)
-        {
-            WorldButtonCheck(clicked);
-        }
     }
 
     public void CompleteTutorial(string tutorialName)

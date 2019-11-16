@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+
 //Orchestrates activity between the main island interaction, manageable island interaction, and battle plan interaction.
 public class WorldNavigator : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class WorldNavigator : MonoBehaviour
     public Notifications notificationSystem;
     public ClientInterface clientInterface;
     public Camera cam;
+    public Camera guiCam;
     public OrbitalFocusCam orbital;
     public ScreenGUI screenGUI;
     public string[] buttonTypes = new string[] { "InputField", "MenuRevealer", "Tile" };
@@ -121,6 +123,7 @@ public class WorldNavigator : MonoBehaviour
 
         screenGUI.client = clientInterface;
         screenGUI.SetGUIContents();
+        guiCam.clearFlags = CameraClearFlags.Depth;
         commandScript.enabled = true;
         managementScript.enabled = false;
         battleScript.enabled = false;

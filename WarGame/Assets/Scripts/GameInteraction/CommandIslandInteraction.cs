@@ -69,8 +69,12 @@ public class CommandIslandInteraction : Interaction
 
             if (actionIdentifier != null)
                 actionIdentifier.CancelAction();
-           
-            showMenuButton.SetActive(true);
+
+            if (selectedWorldUIObject.tag != "UnderConstruction")
+                showMenuButton.SetActive(true);
+            else
+                showMenuButton.SetActive(false);
+
             //Close all of the menus.
             unitPurchase.gameObject.SetActive(false);
             resourcePool.gameObject.SetActive(false);

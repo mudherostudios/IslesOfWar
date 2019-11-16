@@ -35,7 +35,7 @@ public class WarbucksPoolContribute : MonoBehaviour
             poolFormat = "G2";
 
         poolOwnership.text = string.Format("{0:0.00}%", commandScript.GetWarbucksOwnership() * 100);
-        poolSize.text = commandScript.GetWarbucksPoolSize().ToString(poolFormat);
+        poolSize.text = ((int)commandScript.GetWarbucksPoolSize()).ToString(poolFormat);
     }
 
     public void AddSelected()

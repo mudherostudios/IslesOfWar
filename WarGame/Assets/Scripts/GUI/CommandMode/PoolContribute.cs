@@ -158,7 +158,7 @@ public class PoolContribute: MonoBehaviour
         if (pool > 999999999)
             poolFormat = "G2";
 
-        poolAmount.text = (pool + commandScript.clientInterface.chainState.resourcePools[poolType]).ToString(poolFormat);
+        poolAmount.text = ((int)(pool + commandScript.clientInterface.chainState.resourcePools[poolType])).ToString(poolFormat);
         poolOwnership.text = string.Format("{0:0.000}%", ownership);
 
         resourceModifiers[0].text = strModifiers[0];
