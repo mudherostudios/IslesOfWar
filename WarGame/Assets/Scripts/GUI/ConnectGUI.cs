@@ -23,6 +23,7 @@ public class ConnectGUI : MonoBehaviour
     public Vector3 loginPosition;
     public float traverseTime = 1.0f;
     public CommunicationInterface comms;
+    public Tutorial tutorial;
 
     private bool connected = false, prompted = false, traversing = false, advanced = false, neededCreation = false;
     private float totalDistance, lastTime, lastBlock;
@@ -182,6 +183,12 @@ public class ConnectGUI : MonoBehaviour
         }
 
         connected = log.success;
+    }
+
+    public void CompleteTutorial(string tutorialName)
+    {
+        if(tutorial != null)
+            tutorial.AutoCompleteTutorial(tutorialName);
     }
 
     void SetAdvancedOptionsAndPrefs()

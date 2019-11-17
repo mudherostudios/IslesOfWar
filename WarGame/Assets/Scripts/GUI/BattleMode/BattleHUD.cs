@@ -102,15 +102,23 @@ public class BattleHUD : MonoBehaviour
         unitsBar.SetActive(true);
         int[] tempSquad = new int[0];
 
-        if (!squadName.Contains("Defender"))
-            squadName = squadName.Split(' ')[0];
-
         tempSquad = deployedSquads[squadName];
 
         for (int u = 0; u < tempSquad.Length; u++)
         {
             unitCountTabs[u].transform.Find("Name").GetComponent<Text>().text = battleScript.clientInterface.GetUnitName(u);
             unitCountTabs[u].transform.Find("Count").GetComponent<Text>().text = tempSquad[u].ToString();
+        }
+    }
+
+    public void SetUnitCounts(int[] units)
+    {
+        unitsBar.SetActive(true);
+
+        for (int u = 0; u < units.Length; u++)
+        {
+            unitCountTabs[u].transform.Find("Name").GetComponent<Text>().text = battleScript.clientInterface.GetUnitName(u);
+            unitCountTabs[u].transform.Find("Count").GetComponent<Text>().text = units[u].ToString();
         }
     }
 

@@ -261,6 +261,14 @@ public class WorldNavigator : MonoBehaviour
         }
     }
 
+    public void HideActions()
+    {
+        for (int a = 0; a < actionIdentifiers.Length; a++)
+        {
+            actionIdentifiers[a].Hide();
+        }
+    }
+
     public void SetCommandMode()
     {
         traversing = true;
@@ -379,7 +387,26 @@ public class WorldNavigator : MonoBehaviour
         {
             sateliteEffects.TransmissionEffect();
             battleIslandsGUI.hud.ClearDeployedSquads();
-            ShowActions();
+            HideActions();
+        }
+    }
+
+    public void CompleteTutorial(string tutorialName)
+    {
+        if (tutorial != null && tutorial.GetComponent<Tutorial>() != null)
+            tutorial.GetComponent<Tutorial>().AutoCompleteTutorial(tutorialName);
+    }
+
+    public void SkipToSubTutorial(string tutorialNameIndex)
+    {
+        if (tutorial != null)
+        { 
+            string tutorialName = tutorialNameIndex.Split(':')[0];
+            string tutorialIndex = tutorialNameIndex.Split(':')[1];
+            int index = 0;
+            
+            if(int.TryParse(tutorialIndex, out index))
+                tutorial.GetComponent<Tutorial>().SkipToSubTutorial(tutorialName, index);
         }
     }
 

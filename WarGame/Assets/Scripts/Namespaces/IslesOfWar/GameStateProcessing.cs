@@ -125,7 +125,10 @@ namespace IslesOfWar
                 double replenishRate = (islandCount * Constants.freeResourceRates[0] * Constants.islandSearchReplenishTime);
 
                 if (islandCount == 0)
+                {
                     islandCount = 1;
+                    warbuxModifier = 1;
+                }
 
                 cost[0] = Math.Ceiling(Constants.islandSearchCost[0]*warbuxModifier+replenishRate);
                 cost[1] = Math.Ceiling(Constants.islandSearchReplenishTime * Constants.resourceProbabilities[0] * 12 * Constants.extractRates[0] * islandCount);

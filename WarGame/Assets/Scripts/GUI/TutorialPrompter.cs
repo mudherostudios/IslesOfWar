@@ -8,6 +8,7 @@ public class TutorialPrompter : MonoBehaviour
     public string tutorialName;
     public GameObject[] worldIndicators;
     public GameObject[] messages;
+    public int completeThreshold = -1;
     private int lastMessage = -1;
     private int orderIndex = -1;
     private bool hasBeenInitiated = false;
@@ -43,17 +44,30 @@ public class TutorialPrompter : MonoBehaviour
             CompleteTutorial();
     }
 
+    public void SkipToIndex(int index)
+    {
+        orderIndex = index;
+
+        if (orderIndex < messages.Length)
+            ShowTutorial(orderIndex);
+        else
+            CompleteTutorial();
+    }
+
     public void CompleteTutorial()
     {
-        HideTutorial();
-        if (worldIndicators != null)
+        if (orderIndex >= completeThreshold)
         {
-            for (int i = 0; i < worldIndicators.Length; i++)
+            HideTutorial();
+            if (worldIndicators != null)
             {
-                Destroy(worldIndicators[i]);
+                for (int i = 0; i < worldIndicators.Length; i++)
+                {
+                    Destroy(worldIndicators[i]);
+                }
             }
+            tutorial.CompleteTutorial(tutorialName);
         }
-        tutorial.CompleteTutorial(tutorialName);
     }
 
     public void ShowTutorial(int message)
@@ -77,4 +91,16 @@ public class TutorialPrompter : MonoBehaviour
         if (message != -1)
             messages[message].SetActive(false);
     }
+
+    public void CloseTutorial()
+    {
+        for (int m = 0; m < messages.Length; m++)
+        {
+            messages[m].SetActive(false);
+            if (m < worldIndicators.Length)
+                worldIndicators[m].SetActive(false);
+        }
+    }
+
+    public bool isCompletable { get { return orderIndex >= completeThreshold; } }
 }

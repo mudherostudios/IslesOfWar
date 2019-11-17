@@ -89,7 +89,11 @@ public class BattlePlanInteraction : Interaction
                     CloseCurrentSquad();
 
                 currentSquad = selectedSquad.squad;
-                hud.SetUnitCounts(selectedSquad.textName.text);
+
+                if (!selectedSquad.textName.text.Contains("Defender"))
+                    hud.SetUnitCounts(selectedSquad.textName.text);
+                else
+                    hud.SetUnitCounts(clientInterface.chainState.islands[islandID].squadCounts[selectedSquad.squad].ToArray());
 
                 if (show && selectedSquad.owner == 1)
                     ViewCurrentSquad();
@@ -156,6 +160,7 @@ public class BattlePlanInteraction : Interaction
         }
     }
 
+    //I'm 99.9% sure I don't need this anymore considering it does nothing. But just keeping it for now.
     public void LoadQueuedPlans()
     {
         BattleCommand command = new BattleCommand();
@@ -183,7 +188,7 @@ public class BattlePlanInteraction : Interaction
         islandID = _island;
 
         if (clientInterface.queuedActions.dfnd == null && clientInterface.queuedActions.attk == null)
-            clientInterface.InitBattleSquads(true, islandID);
+            clientInterface.InitBattleSquads(mode == Mode.ATTACK, islandID);
 
         if (mode == Mode.ATTACK)
             StartWithDefendersWhileAttacking();
@@ -363,32 +368,36 @@ public class BattlePlanInteraction : Interaction
     {
         int index = 0;
 
-        for (int p = 0; p < squadPlans[currentSquad].Count; p++)
+        if (squadPlans.Count > 0)
         {
-            index = squadPlans[currentSquad][p];
-            Vector3 position =  AddOffset(islandStats.hexTiles[index].position);
-            GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
-            planMarker.GetComponentInChildren<PlanMarker>().index = p;
-            planMarkers.Add(planMarker);
-        }
-
-        index = -1;
-
-        if (squadPlans[currentSquad].Count > 0)
-        {
-            if (mode == Mode.ATTACK)
+            for (int p = 0; p < squadPlans[currentSquad].Count; p++)
             {
-                int tilesInSquadPlan = squadPlans[currentSquad].Count;
-                index = squadPlans[currentSquad][tilesInSquadPlan - 1];
+                index = squadPlans[currentSquad][p];
+                Vector3 position = AddOffset(islandStats.hexTiles[index].position);
+                GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
+                planMarker.GetComponentInChildren<PlanMarker>().index = p;
+                planMarkers.Add(planMarker);
             }
-            else if (mode == Mode.DEFEND)
-                index = squadPlans[currentSquad][0];
-        }
 
-        if (index >= 0)
-            selectedSquad.SetCurrentTile(islandTiles[index], offset);
-        else
-            selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
+
+            index = -1;
+
+            if (squadPlans[currentSquad].Count > 0)
+            {
+                if (mode == Mode.ATTACK)
+                {
+                    int tilesInSquadPlan = squadPlans[currentSquad].Count;
+                    index = squadPlans[currentSquad][tilesInSquadPlan - 1];
+                }
+                else if (mode == Mode.DEFEND)
+                    index = squadPlans[currentSquad][0];
+            }
+
+            if (index >= 0)
+                selectedSquad.SetCurrentTile(islandTiles[index], offset);
+            else
+                selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
+        }
     }
 
     void ViewCurrentOpponentSquad()
