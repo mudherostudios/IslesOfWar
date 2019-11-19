@@ -248,6 +248,11 @@ public class WorldNavigator : MonoBehaviour
             Debug.Log(JsonConvert.SerializeObject(clientInterface.chainState));
     }
 
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
     public void ShowCommandInteractionMenu()
     {
         commandScript.ShowMenu();
