@@ -15,7 +15,15 @@ public class TutorialPrompter : MonoBehaviour
 
     public void Start()
     {
-        tutorial = GameObject.Find("MasterTutorial").GetComponent<Tutorial>();
+        GameObject tutorialObject = GameObject.Find("MasterTutorial");
+
+        if (tutorialObject != null)
+            tutorial = tutorialObject.GetComponent<Tutorial>();
+        else
+        {
+            this.enabled = false;
+            gameObject.SetActive(false);
+        }
     }
 
     public void InitiateTutorial()

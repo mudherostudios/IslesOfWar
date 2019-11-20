@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using IslesOfWar.ClientSide;
+using IslesOfWar;
 using IslesOfWar.GameStateProcessing;
 
 public class Interaction : MonoBehaviour
@@ -153,5 +153,10 @@ public class Interaction : MonoBehaviour
         orbital = _orbital;
         screenGUI = _screenGUI;
         buttonTypes = _buttonTypes;
+    }
+
+    public Constants constants
+    {
+        get { return clientInterface.chainState.currentConstants; }
     }
 }

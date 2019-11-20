@@ -14,7 +14,8 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 0, 0, 0 };
+            public readonly int[] version = { 0, 0, 0 }; //Hand set these here every release
+            public bool isCorrectVersion { get { return state.currentConstants.version[0] == version[0]; } }
             public StateProcessor() { }
 
             public StateProcessor(State _state)
@@ -29,73 +30,73 @@ namespace IslesOfWar
             {
                 //Version
                 if (commands.ver != null)
-                    Constants.version = Deep.Copy(commands.ver);
+                    state.currentConstants.version = Deep.Copy(commands.ver);
 
                 //Island Search Cost
                 //Remember to change the islandSearchCost constant for only warbucks.
                 if (commands.iwCost > 0)
-                    Constants.islandSearchCost = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
+                    state.currentConstants.islandSearchCost = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
 
                 //Attack Cost Percent
                 if (commands.atkPerc > 0)
-                    Constants.attackCostPercent = commands.atkPerc;
+                    state.currentConstants.attackCostPercent = commands.atkPerc;
 
                 //Undiscovered Minimum
                 if (commands.uPerc > 0)
-                    Constants.undiscoveredPercent = commands.uPerc;
+                    state.currentConstants.undiscoveredPercent = commands.uPerc;
 
                 //Island Replenish Search Time
                 if (commands.repTime > 0)
-                    Constants.islandSearchReplenishTime = commands.repTime;
+                    state.currentConstants.islandSearchReplenishTime = commands.repTime;
 
                 //Unit Cost
                 if (Validity.ArraySize(commands.uCost, 5, 5))
                 {
                     int unitIndex = (int)commands.uCost[0];
-                    Constants.unitCosts[unitIndex, 0] = commands.uCost[1];
-                    Constants.unitCosts[unitIndex, 1] = commands.uCost[2];
-                    Constants.unitCosts[unitIndex, 2] = commands.uCost[3];
-                    Constants.unitCosts[unitIndex, 3] = commands.uCost[4];
+                    state.currentConstants.unitCosts[unitIndex, 0] = commands.uCost[1];
+                    state.currentConstants.unitCosts[unitIndex, 1] = commands.uCost[2];
+                    state.currentConstants.unitCosts[unitIndex, 2] = commands.uCost[3];
+                    state.currentConstants.unitCosts[unitIndex, 3] = commands.uCost[4];
                 }
                 //Bunker Cost
                 if (Validity.ArraySize(commands.bnkCost, 5, 5))
                 {
                     int typeIndex = (int)commands.bnkCost[0];
-                    Constants.bunkerCosts[typeIndex, 0] = commands.bnkCost[1];
-                    Constants.bunkerCosts[typeIndex, 1] = commands.bnkCost[2];
-                    Constants.bunkerCosts[typeIndex, 2] = commands.bnkCost[3];
-                    Constants.bunkerCosts[typeIndex, 3] = commands.bnkCost[4];
+                    state.currentConstants.bunkerCosts[typeIndex, 0] = commands.bnkCost[1];
+                    state.currentConstants.bunkerCosts[typeIndex, 1] = commands.bnkCost[2];
+                    state.currentConstants.bunkerCosts[typeIndex, 2] = commands.bnkCost[3];
+                    state.currentConstants.bunkerCosts[typeIndex, 3] = commands.bnkCost[4];
                 }
                 //Blocker Cost
                 if (Validity.ArraySize(commands.blkCost, 5, 5))
                 {
                     int typeIndex = (int)commands.blkCost[0];
-                    Constants.blockerCosts[typeIndex, 0] = commands.blkCost[1];
-                    Constants.blockerCosts[typeIndex, 1] = commands.blkCost[2];
-                    Constants.blockerCosts[typeIndex, 2] = commands.blkCost[3];
-                    Constants.blockerCosts[typeIndex, 3] = commands.blkCost[4];
+                    state.currentConstants.blockerCosts[typeIndex, 0] = commands.blkCost[1];
+                    state.currentConstants.blockerCosts[typeIndex, 1] = commands.blkCost[2];
+                    state.currentConstants.blockerCosts[typeIndex, 2] = commands.blkCost[3];
+                    state.currentConstants.blockerCosts[typeIndex, 3] = commands.blkCost[4];
                 }
                 //Collector Cost
                 if (Validity.ArraySize(commands.colCost, 5, 5))
                 {
                     int typeIndex = (int)commands.colCost[0];
-                    Constants.collectorCosts[typeIndex, 0] = commands.colCost[1];
-                    Constants.collectorCosts[typeIndex, 1] = commands.colCost[2];
-                    Constants.collectorCosts[typeIndex, 2] = commands.colCost[3];
-                    Constants.collectorCosts[typeIndex, 3] = commands.colCost[4];
+                    state.currentConstants.collectorCosts[typeIndex, 0] = commands.colCost[1];
+                    state.currentConstants.collectorCosts[typeIndex, 1] = commands.colCost[2];
+                    state.currentConstants.collectorCosts[typeIndex, 2] = commands.colCost[3];
+                    state.currentConstants.collectorCosts[typeIndex, 3] = commands.colCost[4];
                 }
 
                 //Unit Damages
                 if (Validity.ArraySize(commands.uDmg, 2, 2))
-                    Constants.unitDamages[(int)commands.uDmg[0]] = commands.uDmg[1];
+                    state.currentConstants.unitDamages[(int)commands.uDmg[0]] = commands.uDmg[1];
 
                 //Unit Healths
                 if (Validity.ArraySize(commands.uHp, 2, 2))
-                    Constants.unitHealths[(int)commands.uHp[0]] = commands.uHp[1];
+                    state.currentConstants.unitHealths[(int)commands.uHp[0]] = commands.uHp[1];
 
                 //Unit Order Probabilites
                 if (Validity.ArraySize(commands.uProbs, 2, 2))
-                    Constants.unitOrderProbabilities[(int)commands.uProbs[0]] = commands.uProbs[1];
+                    state.currentConstants.unitOrderProbabilities[(int)commands.uProbs[0]] = commands.uProbs[1];
 
                 //Unit Combat Modifiers
                 if (Validity.ArraySize(commands.ucMods, 13, 13))
@@ -104,7 +105,7 @@ namespace IslesOfWar
 
                     for (int m = 1; m < 13; m++)
                     {
-                        Constants.unitCombatModifiers[unitType, m] = commands.ucMods[m];
+                        state.currentConstants.unitCombatModifiers[unitType, m] = commands.ucMods[m];
                     }
                 }
 
@@ -112,43 +113,43 @@ namespace IslesOfWar
                 if(Validity.ArraySize(commands.mmRes, 3,3))
                 {
                     int resourceType = commands.mmRes[0];
-                    Constants.minMaxResources[resourceType,0] = commands.mmRes[1]; 
-                    Constants.minMaxResources[resourceType,1] = commands.mmRes[2]; 
+                    state.currentConstants.minMaxResources[resourceType,0] = commands.mmRes[1];
+                    state.currentConstants.minMaxResources[resourceType,1] = commands.mmRes[2]; 
                 }
 
                 //Extraction Rates
                 if (Validity.ArraySize(commands.eRates, 3, 3))
-                    Constants.extractRates = Deep.Copy(commands.eRates);
+                    state.currentConstants.extractRates = Deep.Copy(commands.eRates);
 
                 //Free Generation Rates
                 if (Validity.ArraySize(commands.fRates, 4, 4))
-                    Constants.freeResourceRates = Deep.Copy(commands.fRates);
+                    state.currentConstants.freeResourceRates = Deep.Copy(commands.fRates);
 
                 //Tile Probabilities
                 if (Validity.ArraySize(commands.tProbs, 3, 3))
-                    Constants.tileProbabilities = Deep.Copy(commands.tProbs);
+                    state.currentConstants.tileProbabilities = Deep.Copy(commands.tProbs);
 
                 //Resource Probabilities
                 if (Validity.ArraySize(commands.rProbs, 3, 3))
-                    Constants.resourceProbabilities = Deep.Copy(commands.rProbs);
+                    state.currentConstants.resourceProbabilities = Deep.Copy(commands.rProbs);
 
                 //Purchase to Pool Percents
                 if (Validity.ArraySize(commands.poolPerc, 5, 5))
                 {
                     int purchaseType = (int)commands.poolPerc[0];
-                    Constants.purchaseToPoolPercents[purchaseType, 0] = commands.poolPerc[1];
-                    Constants.purchaseToPoolPercents[purchaseType, 1] = commands.poolPerc[2];
-                    Constants.purchaseToPoolPercents[purchaseType, 2] = commands.poolPerc[3];
-                    Constants.purchaseToPoolPercents[purchaseType, 3] = commands.poolPerc[4];
+                    state.currentConstants.purchaseToPoolPercents[purchaseType, 0] = commands.poolPerc[1];
+                    state.currentConstants.purchaseToPoolPercents[purchaseType, 1] = commands.poolPerc[2];
+                    state.currentConstants.purchaseToPoolPercents[purchaseType, 2] = commands.poolPerc[3];
+                    state.currentConstants.purchaseToPoolPercents[purchaseType, 3] = commands.poolPerc[4];
                 }
 
                 //Pool Reward Blocks
                 if (commands.pTimer > 0)
-                    Constants.poolRewardBlocks = commands.pTimer;
+                    state.currentConstants.poolRewardBlocks = commands.pTimer;
 
                 //Warbucks Reward Blocks
                 if (commands.wTimer > 0)
-                    Constants.warbucksRewardBlocks = commands.wTimer;
+                    state.currentConstants.warbucksRewardBlocks = commands.wTimer;
 
                 //Message
                 if (commands.msg != null && commands.msg != "")
@@ -201,10 +202,10 @@ namespace IslesOfWar
                 //Players get default resources.
                 foreach (KeyValuePair<string, PlayerState> pair in state.players)
                 {
-                    pair.Value.resources[0] += Constants.freeResourceRates[0] * pair.Value.islands.Count;
-                    pair.Value.resources[1] += Constants.freeResourceRates[1];
-                    pair.Value.resources[2] += Constants.freeResourceRates[2];
-                    pair.Value.resources[3] += Constants.freeResourceRates[3];
+                    pair.Value.resources[0] += state.currentConstants.freeResourceRates[0] * pair.Value.islands.Count;
+                    pair.Value.resources[1] += state.currentConstants.freeResourceRates[1];
+                    pair.Value.resources[2] += state.currentConstants.freeResourceRates[2];
+                    pair.Value.resources[3] += state.currentConstants.freeResourceRates[3];
                 }
             }
 
@@ -213,19 +214,19 @@ namespace IslesOfWar
                 if (types[0] > 0 && state.islands[island].resources[tile][0] > 0)
                 {
                     state.islands[island].resources[tile][0]--;
-                    state.players[player].resources[1] += Constants.extractRates[0];
+                    state.players[player].resources[1] += state.currentConstants.extractRates[0];
                 }
 
                 if (types[1] > 0 && state.islands[island].resources[tile][1] > 0)
                 {
                     state.islands[island].resources[tile][1]--;
-                    state.players[player].resources[2] += Constants.extractRates[1];
+                    state.players[player].resources[2] += state.currentConstants.extractRates[1];
                 }
 
                 if (types[2] > 0 && state.islands[island].resources[tile][2] > 0)
                 {
                     state.islands[island].resources[tile][2]--;
-                    state.players[player].resources[3] += Constants.extractRates[2];
+                    state.players[player].resources[3] += state.currentConstants.extractRates[2];
                 }
             }
 
@@ -242,17 +243,17 @@ namespace IslesOfWar
 
             public void DiscoverOrScoutIsland(string player, string searchCommand, string txid, ref MudHeroRandom random)
             {
-                double[] cost = IslandSearchCostUtility.GetCost(state.players[player].islands.Count);
+                double[] cost = IslandSearchCostUtility.GetCost(state.players[player].islands.Count, state.currentConstants);
                 bool hasEnoughMoney = Validity.HasEnoughResources(cost, state.players[player].resources.ToArray());
 
                 if (hasEnoughMoney && searchCommand == "norm" && !state.islands.ContainsKey(txid))
                 {
-                    string discovered = IslandDiscovery.GetIsland(state.islands.Keys.ToArray(), txid, ref random);
+                    string discovered = IslandDiscovery.GetIsland(state.islands.Keys.ToArray(), txid, ref random, state.currentConstants.undiscoveredPercent);
                     double[] resources = new double[cost.Length];
 
                     if (discovered == txid)
                     {
-                        Island freshIsland = IslandGenerator.Generate(player, ref random);
+                        Island freshIsland = IslandGenerator.Generate(player, ref random, state.currentConstants);
                         state.islands.Add(txid, freshIsland);
                         state.players[player].islands.Add(discovered);
                     }
@@ -268,7 +269,7 @@ namespace IslesOfWar
 
                         for (int c = 0; c < cost.Length; c++)
                         {
-                            cost[c] = Math.Floor(cost[c] * Constants.attackCostPercent);
+                            cost[c] = Math.Floor(cost[c] * state.currentConstants.attackCostPercent);
                         }
                     }
                     else if (discovered != txid && state.players[player].islands.Contains(discovered))
@@ -349,7 +350,7 @@ namespace IslesOfWar
                         if (develop)
                         {
                             int[] collectorOrder = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(order[t]));
-                            double[][] result = TryPurchaseBuildings(collectorOrder, updated, Constants.collectorCosts, out develop);
+                            double[][] result = TryPurchaseBuildings(collectorOrder, updated, state.currentConstants.collectorCosts, out develop);
                             updated = result[0];
                             AddToPools(result[1], 1);
                         }
@@ -384,10 +385,10 @@ namespace IslesOfWar
 
                             int[][] defenseOrder = EncodeUtility.GetDefenseTypes(blockerType, bunkerType);
                             bool canOrderDefenses = false;
-                            double[][] bunkerResults = TryPurchaseBuildings(defenseOrder[0], updated, Constants.blockerCosts, out canOrderDefenses);
+                            double[][] bunkerResults = TryPurchaseBuildings(defenseOrder[0], updated, state.currentConstants.blockerCosts, out canOrderDefenses);
                             updated = bunkerResults[0];
                             develop = develop && canOrderDefenses;
-                            double[][] blockerResults = TryPurchaseBuildings(defenseOrder[1], updated, Constants.bunkerCosts, out canOrderDefenses);
+                            double[][] blockerResults = TryPurchaseBuildings(defenseOrder[1], updated, state.currentConstants.bunkerCosts, out canOrderDefenses);
                             updated = blockerResults[0];
                             develop = develop && canOrderDefenses;
                             AddToPools(bunkerResults[1], 2);
@@ -411,7 +412,7 @@ namespace IslesOfWar
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
-                    && defensePlan.sqd.Count <= 4 && Validity.SquadHealthSizeLimits(defensePlan.sqd);
+                    && defensePlan.sqd.Count <= 4 && Validity.SquadHealthSizeLimits(defensePlan.sqd, state.currentConstants.unitHealths);
                     
 
                     if (canUpdate)
@@ -614,7 +615,7 @@ namespace IslesOfWar
 
                 if (canAttack)
                     canAttack = canAttack && state.islands.ContainsKey(attackPlan.id) && attackPlan.pln.Count == attackPlan.sqd.Count
-                    && Validity.AttackPlan(attackPlan.pln) && Validity.AttackSquad(attackPlan.sqd, state.players[player].units.ToArray())
+                    && Validity.AttackPlan(attackPlan.pln) && Validity.AttackSquad(attackPlan.sqd, state.players[player].units.ToArray(), state.currentConstants.unitHealths)
                     && !state.players[player].islands.Contains(attackPlan.id);
 
                 bool capturedIsland = false;
@@ -698,8 +699,8 @@ namespace IslesOfWar
                                     defenderSquads[defender].AddBunkers(bunkers);
 
                                     //Fight
-                                    engagement = new Engagement(defenderSquads[defender], attackerSquads[a]);
-                                    EngagementHistory history = engagement.ResolveEngagement(ref random);
+                                    engagement = new Engagement(defenderSquads[defender], attackerSquads[a], state.currentConstants);
+                                    EngagementHistory history = engagement.ResolveEngagement(ref random, state.currentConstants);
 
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
@@ -763,8 +764,8 @@ namespace IslesOfWar
                                     defenderSquads[d] = new Squad(TryPlaceUnitsOnFeature(island[reactPos], defenses[reactPos], dUnits, true, out dReserve));
 
                                     //Fight
-                                    engagement = new Engagement(defenderSquads[d], attackerSquads[attackerIndex]);
-                                    EngagementHistory history = engagement.ResolveEngagement(ref random);
+                                    engagement = new Engagement(defenderSquads[d], attackerSquads[attackerIndex], state.currentConstants);
+                                    EngagementHistory history = engagement.ResolveEngagement(ref random, state.currentConstants);
 
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
@@ -879,10 +880,10 @@ namespace IslesOfWar
 
             void AddToPools(double[] resources, int multiplierType)
             {
-                state.warbucksPool += resources[0] * Constants.purchaseToPoolPercents[multiplierType, 0];
-                state.resourcePools[0] += resources[1] * Constants.purchaseToPoolPercents[multiplierType, 1];
-                state.resourcePools[1] += resources[2] * Constants.purchaseToPoolPercents[multiplierType, 2];
-                state.resourcePools[2] += resources[3] * Constants.purchaseToPoolPercents[multiplierType, 3];
+                state.warbucksPool += resources[0] * state.currentConstants.purchaseToPoolPercents[multiplierType, 0];
+                state.resourcePools[0] += resources[1] * state.currentConstants.purchaseToPoolPercents[multiplierType, 1];
+                state.resourcePools[1] += resources[2] * state.currentConstants.purchaseToPoolPercents[multiplierType, 2];
+                state.resourcePools[2] += resources[3] * state.currentConstants.purchaseToPoolPercents[multiplierType, 3];
             }
 
             //--------------------------------------------------------------------------------------
@@ -1099,15 +1100,15 @@ namespace IslesOfWar
                     {
                         if (order[u] > 0)
                         {
-                            updated[0] -= Constants.unitCosts[u, 0] * order[u];
-                            updated[1] -= Constants.unitCosts[u, 1] * order[u];
-                            updated[2] -= Constants.unitCosts[u, 2] * order[u];
-                            updated[3] -= Constants.unitCosts[u, 3] * order[u];
+                            updated[0] -= state.currentConstants.unitCosts[u, 0] * order[u];
+                            updated[1] -= state.currentConstants.unitCosts[u, 1] * order[u];
+                            updated[2] -= state.currentConstants.unitCosts[u, 2] * order[u];
+                            updated[3] -= state.currentConstants.unitCosts[u, 3] * order[u];
 
-                            cost[0] += Constants.unitCosts[u, 0] * order[u];
-                            cost[1] += Constants.unitCosts[u, 1] * order[u];
-                            cost[2] += Constants.unitCosts[u, 2] * order[u];
-                            cost[3] += Constants.unitCosts[u, 3] * order[u];
+                            cost[0] += state.currentConstants.unitCosts[u, 0] * order[u];
+                            cost[1] += state.currentConstants.unitCosts[u, 1] * order[u];
+                            cost[2] += state.currentConstants.unitCosts[u, 2] * order[u];
+                            cost[3] += state.currentConstants.unitCosts[u, 3] * order[u];
 
                             canPurchase = updated[0] >= 0 && updated[1] >= 0 && updated[2] >= 0 && updated[3] >= 0;
 

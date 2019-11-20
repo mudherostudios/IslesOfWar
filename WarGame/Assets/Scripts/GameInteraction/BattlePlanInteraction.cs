@@ -719,7 +719,7 @@ public class BattlePlanInteraction : Interaction
 
         for (int u = 0; u < 9; u++)
         {
-            double tempHealth = counts[u] * Constants.unitHealths[u];
+            double tempHealth = counts[u] * constants.unitHealths[u];
 
             if (tempHealth > highestHealth)
             {

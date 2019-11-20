@@ -63,21 +63,21 @@ public class SquadGUI : MonoBehaviour
                 squad.Add(CorrectedValue(u));
             }
 
-            if (Validity.SquadHealthSizeLimits(squad))
+            if (Validity.SquadHealthSizeLimits(squad, commandScript.constants.unitHealths))
             {
                 string squadName = "";
-                bool stopLooking = GetSquadCount() >= Constants.randomSquadNames.Length;
+                bool stopLooking = GetSquadCount() >= SquadConstants.randomSquadNames.Length;
                 int r = 0;
                 int loopCount = 0;
 
-                while (stopLooking == false || loopCount > Constants.randomSquadNames.Length * 1.5)
+                while (stopLooking == false || loopCount > SquadConstants.randomSquadNames.Length * 1.5)
                 {
-                    r = Random.Range(0, Constants.randomSquadNames.Length);
-                    stopLooking = !PlayerPrefs.HasKey(Constants.randomSquadNames[r]);
+                    r = Random.Range(0, SquadConstants.randomSquadNames.Length);
+                    stopLooking = !PlayerPrefs.HasKey(SquadConstants.randomSquadNames[r]);
                     loopCount++;
                 }
 
-                squadName = Constants.randomSquadNames[r];
+                squadName = SquadConstants.randomSquadNames[r];
 
                 if (!PlayerPrefs.HasKey(squadName))
                 {

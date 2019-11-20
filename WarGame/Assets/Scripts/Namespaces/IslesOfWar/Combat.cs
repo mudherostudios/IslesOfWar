@@ -404,7 +404,7 @@ namespace IslesOfWar
                     antiAircrafts = 1;
             }
 
-            public void CalculateCasualties(Squad attacker, ref MudHeroRandom random)
+            public void CalculateCasualties(Squad attacker, ref MudHeroRandom random, float[] unitHealths, float[] unitOrderProbabilities)
             {
                 double[] units = fullSquad;
                 double cumulativeDamage = 0;
@@ -428,20 +428,20 @@ namespace IslesOfWar
                             cumulativeDamage = attacker.totalDamage;
                         }
 
-                        CalculateUnitProbabilities(units);
+                        CalculateUnitProbabilities(units, unitOrderProbabilities);
                     }
 
                     while (cumulativeDamage < attacker.totalDamage && unitCount > 0)
                     {
                         int deadUnit = GetUnitByProbability(ref random);
 
-                        cumulativeDamage += Constants.unitHealths[deadUnit];
+                        cumulativeDamage += unitHealths[deadUnit];
 
                         if (cumulativeDamage < attacker.totalDamage)
                         {
                             units[deadUnit]--;
                             unitCount--;
-                            CalculateUnitProbabilities(units);
+                            CalculateUnitProbabilities(units, unitOrderProbabilities);
                         }
                         else
                         {
@@ -479,12 +479,12 @@ namespace IslesOfWar
                 return -1;
             }
 
-            public void CalculateUnitProbabilities()
+            public void CalculateUnitProbabilities(float[] unitOrderProbabilities)
             {
-                CalculateUnitProbabilities(fullSquad);
+                CalculateUnitProbabilities(fullSquad, unitOrderProbabilities);
             }
 
-            public void CalculateUnitProbabilities(double[] units)
+            public void CalculateUnitProbabilities(double[] units, float[] unitOrderProbabilities)
             {
                 double[] relativeProbabilities = new double[units.Length];
                 double[] trueProbabilities = new double[units.Length];
@@ -492,7 +492,7 @@ namespace IslesOfWar
 
                 for (int r = 0; r < relativeProbabilities.Length; r++)
                 {
-                    relativeProbabilities[r] = (float)(units[r]) * Constants.unitOrderProbabilities[r];
+                    relativeProbabilities[r] = (float)(units[r]) * unitOrderProbabilities[r];
                     totalRelatives += relativeProbabilities[r];
                 }
 
@@ -541,24 +541,24 @@ namespace IslesOfWar
         {
             public Squad blufor, opfor;
 
-            public Engagement(Squad _blufor, Squad _opfor)
+            public Engagement(Squad _blufor, Squad _opfor, Constants constants)
             {
                 blufor = _blufor;
                 opfor = _opfor;
 
-                double[] healths = CalculateTotalHealth(blufor, opfor);
+                double[] healths = CalculateTotalHealth(blufor, opfor, constants.unitHealths);
                 blufor.totalHealth = healths[0];
                 opfor.totalHealth = healths[1];
 
-                double[] damages = CalculateTotalDamage(blufor, opfor);
+                double[] damages = CalculateTotalDamage(blufor, opfor, constants.unitDamages, constants.unitCombatModifiers);
                 blufor.totalDamage = damages[0];
                 opfor.totalDamage = damages[1];
 
-                blufor.CalculateUnitProbabilities();
-                opfor.CalculateUnitProbabilities();
+                blufor.CalculateUnitProbabilities(constants.unitOrderProbabilities);
+                opfor.CalculateUnitProbabilities(constants.unitOrderProbabilities);
             }
 
-            public EngagementHistory ResolveEngagement(ref MudHeroRandom random)
+            public EngagementHistory ResolveEngagement(ref MudHeroRandom random, Constants constants)
             {
                 List<double[]> bluforHistory = new List<double[]>();
                 List<double[]> opforHistory = new List<double[]>();
@@ -568,14 +568,14 @@ namespace IslesOfWar
 
                 while (!engagementIsOver)
                 {
-                    blufor.CalculateCasualties(opfor, ref random);
-                    opfor.CalculateCasualties(blufor, ref random);
+                    blufor.CalculateCasualties(opfor, ref random, constants.unitHealths, constants.unitOrderProbabilities);
+                    opfor.CalculateCasualties(blufor, ref random, constants.unitHealths, constants.unitOrderProbabilities);
 
-                    double[] healths = CalculateTotalHealth(blufor, opfor);
+                    double[] healths = CalculateTotalHealth(blufor, opfor, constants.unitHealths);
                     blufor.totalHealth = healths[0];
                     opfor.totalHealth = healths[1];
 
-                    double[] damages = CalculateTotalDamage(blufor, opfor);
+                    double[] damages = CalculateTotalDamage(blufor, opfor, constants.unitDamages, constants.unitCombatModifiers);
                     blufor.totalDamage = damages[0];
                     opfor.totalDamage = damages[1];
 
@@ -604,7 +604,7 @@ namespace IslesOfWar
                 return new EngagementHistory(Get2DHistory(bluforHistory), Get2DHistory(opforHistory), winner, winningSquad);
             }
 
-            double[] CalculateTotalHealth(Squad squadA, Squad squadB)
+            double[] CalculateTotalHealth(Squad squadA, Squad squadB, float[] unitHealths)
             {
                 double[] unitsA = squadA.fullSquad;
                 double[] unitsB = squadB.fullSquad;
@@ -613,14 +613,14 @@ namespace IslesOfWar
 
                 for (int u = 0; u < unitsA.Length; u++)
                 {
-                    totalHealthA += unitsA[u] * Constants.unitHealths[u];
-                    totalHealthB += unitsB[u] * Constants.unitHealths[u];
+                    totalHealthA += unitsA[u] * unitHealths[u];
+                    totalHealthB += unitsB[u] * unitHealths[u];
                 }
 
                 return new double[] { totalHealthA, totalHealthB };
             }
 
-            double[] CalculateTotalDamage(Squad squadA, Squad squadB)
+            double[] CalculateTotalDamage(Squad squadA, Squad squadB, float[] unitDamages, float[,] unitCombatModifiers)
             {
                 double[] unitsA = squadA.fullSquad;
                 double[] unitsB = squadB.fullSquad;
@@ -637,8 +637,8 @@ namespace IslesOfWar
 
                     for (int m = 0; m < unitsB.Length; m++)
                     {
-                        totalAttackA += (unitsA[u] * Constants.unitDamages[u]) * (unitsB[m] * Constants.unitCombatModifiers[u, m]);
-                        totalAttackB += (unitsB[u] * Constants.unitDamages[u]) * (unitsA[m] * Constants.unitCombatModifiers[u, m]);
+                        totalAttackA += (unitsA[u] * unitDamages[u]) * (unitsB[m] * unitCombatModifiers[u, m]);
+                        totalAttackB += (unitsB[u] * unitDamages[u]) * (unitsA[m] * unitCombatModifiers[u, m]);
                     }
                 }
 

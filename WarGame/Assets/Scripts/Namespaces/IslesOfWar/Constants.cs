@@ -1,13 +1,48 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace IslesOfWar
 {
-    public static class Constants
+    public static class SquadConstants
     {
-        public static int[] version = new int[] {0, 0, 0}; //Compatibility GSP Version, Effeciency Version, Client Version
+        //Random names for saving squads in playerPrefs. Does not affect gameStateProcessor logic.
+        [JsonIgnore]
+        public static string[] randomSquadNames = new string[]
+        {
+            "Aardvark", "Aardwolf", "Albatross", "Alligator", "Alpaca", "Anaconda", "Angelfish", "Anglerfish", "Ant", "Anteater", "Antelope",
+            "Antlion", "Ape", "Aphid", "Arctic Fox", "Arctic Wolf", "Armadillo", "Baboon", "Badger", "Bandicoot", "Barnacle", "Barracuda",
+            "Basilisk", "Bass", "Bat", "Bear", "Beaver", "Bedbug", "Bee", "Beetle", "Bison", "Black Widow", "Black Panther", "Blackbird",
+            "Blue Bird", "Blue Jay", "Boa", "Boar", "Bobcat", "Bobolink", "Bonobo", "Buffalo", "Buzzard", "Camel", "Canary", "Capybara",
+            "Cardinal", "Caribou", "Carp", "Cat", "Caterpillar", "Catfish", "Cattle", "Centipede", "Cephalopod", "Chameleon", "Cheetah",
+            "Chickadee", "Chicken", "Chimpanzee", "Chinchilla", "Chipmunk", "Cicada", "Clam", "Clownfish", "Cobra", "Cockroach", "Cod", "Condor",
+            "Constrictor", "Coral", "Cougar", "Cow", "Coyote", "Crab", "Crane", "Crawdad", "Crayfish", "Cricket", "Crocodile", "Crow", "Cuckoo",
+            "Damselfly", "Deer", "Dingo", "Dinosaur", "Dog", "Dolphin", "Donkey", "Dormouse", "Dove", "Dragon", "Dragonfly", "Duck", "Eagle",
+            "Earthworm", "Earwig", "Eel", "Egret", "Elephant", "Elk", "Emu", "Ermine", "Falcon", "Ferret", "Finch", "Firefly", "Fish", "Flamingo",
+            "Flea", "Fly", "Flyingfish", "Fowl", "Fox", "Frog", "Gazelle", "Gecko", "Gerbil", "Gibbon", "Gila", "Giraffe", "Goat",
+            "Goldfish", "Goose", "Gopher", "Gorilla", "Grasshopper", "Grizzly", "Grouse", "Guinea Pig", "Gull", "Guppy", "Halibut", "Hammerhead",
+            "Hamster", "Hare", "Harrier", "Hawk", "Hedgehog", "Hermit", "Heron", "Herring", "Hippopotamus", "Hookworm", "Hornet", "Horse",
+            "Hoverfly", "Hummingbird", "Humpback", "Hyena", "Iguana", "Impala", "Jackal", "Jaguar", "Jay", "Jellyfish", "Kangaroo", "Kingfisher",
+            "Kiwi", "Koala", "Koi", "Komodo", "Krill", "Ladybug", "Lamprey", "Landfowl", "Lark", "Leech", "Lemming", "Lemur", "Leopard", "Lion",
+            "Lizard", "Llama", "Lobster", "Locust", "Loon", "Louse", "Lynx", "Macaw", "Mackerel", "Magpie", "Man o' War", "Manatee", "Mandrill",
+            "Manta", "Mantis", "Marlin", "Marmoset", "Marmot", "Mastodon", "Meadowlark", "Meerkat", "Mink", "Minnow", "Mite", "Mockingbird", "Mole",
+            "Mollusk", "Mongoose", "Monkey", "Moose", "Mosquito", "Moth", "Mouse", "Mule", "Muskox", "Narwhal", "Newt", "Nightingale", "Ocelot",
+            "Octopus", "Opossum", "Orangutan", "Orca", "Ostrich", "Otter", "Owl", "Ox", "Panda", "Panther", "Parakeet", "Parrot", "Parrotfish",
+            "Partridge", "Peacock", "Pelican", "Penguin", "Perch", "Pheasant", "Pig", "Pigeon", "Pike", "Piranha", "Platypus", "Porcupine", "Porpoise",
+            "Possum", "Prairie Dog", "Prawn", "Puffin", "Puma", "Python", "Quail", "Rabbit", "Raccoon", "Rat", "Rattlesnake", "Raven", "Reindeer",
+            "Rhino", "Roadrunner", "Robin", "Rodent", "Rooster", "Roundworm", "Sabertooth", "Salamander", "Salmon", "Sawfish", "Scallop", "Scorpion",
+            "Sea Lion", "Sea Slug", "Sea Snail", "Seahorse", "Shark", "Sheep", "Shrew", "Shrimp", "Silkworm", "Silver Fox", "Silverfish", "Skink",
+            "Skunk", "Sloth", "Slug", "Snail", "Snake", "Snipe", "Sparrow", "Spider", "Spider Monkey", "Squid", "Squirrel", "Starfish", "Stingray",
+            "Stork", "Sturgeon", "Swallow", "Swan", "Swordfish", "Swordtail", "Tapir", "Tarantula", "Tasmanian", "Termite", "Tick", "Tiger", "Tiger Shark",
+            "Toad", "Tortoise", "Toucan", "Trout", "Tuna", "Turkey", "Turtle", "Vampire", "Viper", "Vole", "Vulture", "Wallaby", "Walrus", "Wasp",
+            "Weasel", "Whale", "Whitefish", "Wildcat", "Wildebeest", "Wolf", "Wolverine", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra"
+        };
+    }
 
+    public static class NationConstants
+    {
+        [JsonIgnore]
         public static Dictionary<string, string> countryCodes = new Dictionary<string, string>()
         {
             {"XY", "Republic of Xaya" }, {"AF","Afghanistan"},{"AX","Ãland Islands"},{"AL","Albania"},{"DZ","Algeria"},{"AS","American Samoa"},
@@ -58,146 +93,153 @@ namespace IslesOfWar
             {"VE","Venezuela,Bolivarian Republic of"},{"VN","Viet Nam"},{"VG","Virgin Islands,British"},{"VI","Virgin Islands,U.S."},
             {"WF","Wallis and Futuna"},{"EH","Western Sahara"},{"YE","Yemen"},{"ZM","Zambia"},{"ZW","Zimbabwe"}
         };
+    }
 
-        //Random names for saving squads in playerPrefs. Does not affect gameStateProcessor logic.
-        public static string[] randomSquadNames = new string[]
+    public class Constants
+    {
+        public int[] version; //Compatibility GSP Version, Effeciency Version, Client Version 0,0,0
+
+        public float[] islandSearchCost;
+        public float islandModifierExponent;
+        public float attackCostPercent;
+        public float undiscoveredPercent;
+        public float islandSearchReplenishTime; //Estimated time in blocks it should take to get enough resources to search again.
+        public string[] islandSearchOptions;
+
+        public float squadHealthLimit;
+        public float[,] unitCosts;
+        public float[,] blockerCosts;
+        public float[,] bunkerCosts;
+        public float[,] collectorCosts;
+
+        public float[] unitDamages;
+        public float[] unitHealths;
+        public float[] unitOrderProbabilities;
+        public float[,] unitCombatModifiers;
+
+        public int[,] minMaxResources;
+        public float[] extractRates;
+        public float[] freeResourceRates;
+
+        public float[] tileProbabilities;
+        public float[] resourceProbabilities;
+        public float[,] purchaseToPoolPercents;
+        public int poolRewardBlocks;
+        public int warbucksRewardBlocks;
+
+        public Constants()
         {
-            "Aardvark", "Aardwolf", "Albatross", "Alligator", "Alpaca", "Anaconda", "Angelfish", "Anglerfish", "Ant", "Anteater", "Antelope",
-            "Antlion", "Ape", "Aphid", "Arctic Fox", "Arctic Wolf", "Armadillo", "Baboon", "Badger", "Bandicoot", "Barnacle", "Barracuda",
-            "Basilisk", "Bass", "Bat", "Bear", "Beaver", "Bedbug", "Bee", "Beetle", "Bison", "Black Widow", "Black Panther", "Blackbird",
-            "Blue Bird", "Blue Jay", "Boa", "Boar", "Bobcat", "Bobolink", "Bonobo", "Buffalo", "Buzzard", "Camel", "Canary", "Capybara",
-            "Cardinal", "Caribou", "Carp", "Cat", "Caterpillar", "Catfish", "Cattle", "Centipede", "Cephalopod", "Chameleon", "Cheetah",
-            "Chickadee", "Chicken", "Chimpanzee", "Chinchilla", "Chipmunk", "Cicada", "Clam", "Clownfish", "Cobra", "Cockroach", "Cod", "Condor",
-            "Constrictor", "Coral", "Cougar", "Cow", "Coyote", "Crab", "Crane", "Crawdad", "Crayfish", "Cricket", "Crocodile", "Crow", "Cuckoo",
-            "Damselfly", "Deer", "Dingo", "Dinosaur", "Dog", "Dolphin", "Donkey", "Dormouse", "Dove", "Dragon", "Dragonfly", "Duck", "Eagle",
-            "Earthworm", "Earwig", "Eel", "Egret", "Elephant", "Elk", "Emu", "Ermine", "Falcon", "Ferret", "Finch", "Firefly", "Fish", "Flamingo",
-            "Flea", "Fly", "Flyingfish", "Fowl", "Fox", "Frog", "Gazelle", "Gecko", "Gerbil", "Gibbon", "Gila", "Giraffe", "Goat",
-            "Goldfish", "Goose", "Gopher", "Gorilla", "Grasshopper", "Grizzly", "Grouse", "Guinea Pig", "Gull", "Guppy", "Halibut", "Hammerhead",
-            "Hamster", "Hare", "Harrier", "Hawk", "Hedgehog", "Hermit", "Heron", "Herring", "Hippopotamus", "Hookworm", "Hornet", "Horse",
-            "Hoverfly", "Hummingbird", "Humpback", "Hyena", "Iguana", "Impala", "Jackal", "Jaguar", "Jay", "Jellyfish", "Kangaroo", "Kingfisher",
-            "Kiwi", "Koala", "Koi", "Komodo", "Krill", "Ladybug", "Lamprey", "Landfowl", "Lark", "Leech", "Lemming", "Lemur", "Leopard", "Lion",
-            "Lizard", "Llama", "Lobster", "Locust", "Loon", "Louse", "Lynx", "Macaw", "Mackerel", "Magpie", "Man o' War", "Manatee", "Mandrill",
-            "Manta", "Mantis", "Marlin", "Marmoset", "Marmot", "Mastodon", "Meadowlark", "Meerkat", "Mink", "Minnow", "Mite", "Mockingbird", "Mole",
-            "Mollusk", "Mongoose", "Monkey", "Moose", "Mosquito", "Moth", "Mouse", "Mule", "Muskox", "Narwhal", "Newt", "Nightingale", "Ocelot",
-            "Octopus", "Opossum", "Orangutan", "Orca", "Ostrich", "Otter", "Owl", "Ox", "Panda", "Panther", "Parakeet", "Parrot", "Parrotfish",
-            "Partridge", "Peacock", "Pelican", "Penguin", "Perch", "Pheasant", "Pig", "Pigeon", "Pike", "Piranha", "Platypus", "Porcupine", "Porpoise",
-            "Possum", "Prairie Dog", "Prawn", "Puffin", "Puma", "Python", "Quail", "Rabbit", "Raccoon", "Rat", "Rattlesnake", "Raven", "Reindeer",
-            "Rhino", "Roadrunner", "Robin", "Rodent", "Rooster", "Roundworm", "Sabertooth", "Salamander", "Salmon", "Sawfish", "Scallop", "Scorpion",
-            "Sea Lion", "Sea Slug", "Sea Snail", "Seahorse", "Shark", "Sheep", "Shrew", "Shrimp", "Silkworm", "Silver Fox", "Silverfish", "Skink",
-            "Skunk", "Sloth", "Slug", "Snail", "Snake", "Snipe", "Sparrow", "Spider", "Spider Monkey", "Squid", "Squirrel", "Starfish", "Stingray",
-            "Stork", "Sturgeon", "Swallow", "Swan", "Swordfish", "Swordtail", "Tapir", "Tarantula", "Tasmanian", "Termite", "Tick", "Tiger", "Tiger Shark",
-            "Toad", "Tortoise", "Toucan", "Trout", "Tuna", "Turkey", "Turtle", "Vampire", "Viper", "Vole", "Vulture", "Wallaby", "Walrus", "Wasp",
-            "Weasel", "Whale", "Whitefish", "Wildcat", "Wildebeest", "Wolf", "Wolverine", "Wombat", "Woodpecker", "Worm", "Yak", "Zebra"
-        };
+            version = new int[] { 0, 0, 0 };
 
-        public static float[] islandSearchCost = new float[] { 1000, 0, 0, 0 };
-        public static float islandModifierExponent = 0.1f;
-        public static float attackCostPercent = 0.1f;
-        public static float undiscoveredPercent = 0.5f;
-        public static float islandSearchReplenishTime = 150.0f; //Estimated time in blocks it should take to get enough resources to search again.
-        public static string[] islandSearchOptions = new string[] { "norm" };
+            islandSearchCost = new float[] { 1000, 0, 0, 0 };
+            islandModifierExponent = 0.1f;
+            attackCostPercent = 0.1f;
+            undiscoveredPercent = 0.5f;
+            islandSearchReplenishTime = 150.0f;
+            islandSearchOptions = new string[] { "norm" };
 
-        public static float squadHealthLimit = 1000000;
-        //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
-        public static float[,] unitCosts = new float[,]
-        {
-            {10,    0,      10,     0},
-            {50,    0,      20,     0},
-            {100,   10,     20,     0},
-            {100,   25,     100,    0},
-            {200,   50,     200,    0},
-            {500,   100,    500,    0},
-            {250,   100,    50,     0},
-            {500,   250,    75,     0},
-            {1000,  500,    200,    0}
-        };
+            squadHealthLimit = 1000000;
+            //Warbucks, Oil, Metal, No concrete because no unit cost concrete (maybe).
+            unitCosts = new float[,]
+            {
+                {10,    0,      10,     0},
+                {50,    0,      20,     0},
+                {100,   10,     20,     0},
+                {100,   25,     100,    0},
+                {200,   50,     200,    0},
+                {500,   100,    500,    0},
+                {250,   100,    50,     0},
+                {500,   250,    75,     0},
+                {1000,  500,    200,    0}
+            };
 
-        public static float[,] blockerCosts = new float[,]
-        {
-            {1500, 100, 1000, 100 },
-            {1500, 1000, 500, 500 },
-            {1500, 500, 1000, 1000}
-        };
+            blockerCosts = new float[,]
+            {
+                {1500, 100, 1000, 100 },
+                {1500, 1000, 500, 500 },
+                {1500, 500, 1000, 1000}
+            };
 
-        public static float[,] bunkerCosts = new float[,]
-        {
-            {1500, 100, 1000, 100 },
-            {1500, 1000, 500, 500 },
-            {1500, 500, 1000, 1000}
-        };
+            bunkerCosts = new float[,]
+            {
+                {1500, 100, 1000, 100 },
+                {1500, 1000, 500, 500 },
+                {1500, 500, 1000, 1000}
+            };
 
-        public static float[,] collectorCosts = new float[,]
-        {
-            {1500, 500, 1000, 1000 },
-            {1500, 1000, 500, 1000 },
-            {1500, 1000, 1000, 500 }
-        };
+            collectorCosts = new float[,]
+            {
+                {1500, 500, 1000, 1000 },
+                {1500, 1000, 500, 1000 },
+                {1500, 1000, 1000, 500 }
+            };
 
-        public static float[] unitDamages = new float[]
-        {
-            2.0f, 3.0f, 4.0f,
-            2.5f, 5.0f, 10.0f,
-            8.0f, 12.0f, 14.0f,
-            12.0f, 30.0f, 16.0f
-        };
+            unitDamages = new float[]
+            {
+                2.0f, 3.0f, 4.0f,
+                2.5f, 5.0f, 10.0f,
+                8.0f, 12.0f, 14.0f,
+                12.0f, 30.0f, 16.0f
+            };
 
-        public static float[] unitHealths = new float[]
-        {
-            100.0f, 100.0f, 100.0f,
-            125.0f, 250.0f, 500.0f,
-            200.0f, 300.0f, 200.0f,
-            300.0f, 750.0f, 400.0f
-        };
+            unitHealths = new float[]
+            {
+                100.0f, 100.0f, 100.0f,
+                125.0f, 250.0f, 500.0f,
+                200.0f, 300.0f, 200.0f,
+                300.0f, 750.0f, 400.0f
+            };
 
-        public static float[] unitOrderProbabilities = new float[]
-        {
-            0.5f, 0.4f, 0.3f,
-            0.1f, 0.085f, 0.065f,
-            0.05f, 0.05f, 0.05f,
-            0.01f, 0.01f, 0.01f
-        };
-        
-        //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, airBunk
-        public static float[,] unitCombatModifiers = new float[,]
-        {
-            {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
-            {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
-            {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
-            {1.0f, 1.0f, 1.0f,     1.0f, 0.5f, 0.25f,   0.3f, 0.15f, 0.1f,    1.5f, 0.5f, 1.5f},
-            {0.75f, 0.75f, 0.75f,  0.6f, 0.3f, 0.1f,    1.5f, 1.0f, 0.5f,     1.5f, 0.5f, 1.5f},
-            {0.5f, 0.5f, 0.5f,     2.0f, 1.5f, 1.0f,    0.75f, 0.5f, 0.2f,    1.5f, 0.5f, 1.5f},
-            {2.0f, 2.0f, 2.0f,     2.0f, 1.5f, 1.0f,    1.0f, 1.5f, 0.75f,    0.5f, 0.5f, 0.5f},
-            {1.5f, 1.5f, 1.5f,     2.0f, 1.5f, 1.0f,    0.5f, 1.0f, 1.5f,     1.0f, 1.0f, 1.0f},
-            {1.0f, 1.0f, 1.0f,     1.5f, 1.5f, 1.5f,    0.1f, 0.1f, 0.1f,     2.0f, 2.0f, 2.0f},
-            {2.0f, 2.0f, 2.0f,     1.5f, 0.25f, 0.25f,  2.25f, 1.5f, 1.5f,    0.0f, 0.0f, 0.0f},
-            {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
-            {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
-        };
+            unitOrderProbabilities = new float[]
+            {
+                0.5f, 0.4f, 0.3f,
+                0.1f, 0.085f, 0.065f,
+                0.05f, 0.05f, 0.05f,
+                0.01f, 0.01f, 0.01f
+            };
 
-        public static int[,] minMaxResources = new int[,]
-        {
-            {28750, 80500},
-            {28750, 80500},
-            {28750, 80500}
-        };
+            //12x12 grid - troop, machine, zook, lTank, mTank, hTank, lPlane, mPlane, bomber, troopBunk, tankBunk, airBunk
+            unitCombatModifiers = new float[,]
+            {
+                {1.0f, 1.0f, 1.0f,     0.1f, 0.1f, 0.1f,    0.1f, 0.1f, 0.1f,     0.1f, 0.1f, 0.1f},
+                {1.5f, 1.5f, 1.5f,     0.25f, 0.1f, 0.1f,   0.25f, 0.25f, 0.25f,  0.1f, 0.1f, 0.1f},
+                {0.1f, 0.1f, 0.1f,     1.5f, 1.25f, 1.0f,   1.5f, 1.5f, 1.5f,     1.0f, 1.0f, 1.0f},
+                {1.0f, 1.0f, 1.0f,     1.0f, 0.5f, 0.25f,   0.3f, 0.15f, 0.1f,    1.5f, 0.5f, 1.5f},
+                {0.75f, 0.75f, 0.75f,  0.6f, 0.3f, 0.1f,    1.5f, 1.0f, 0.5f,     1.5f, 0.5f, 1.5f},
+                {0.5f, 0.5f, 0.5f,     2.0f, 1.5f, 1.0f,    0.75f, 0.5f, 0.2f,    1.5f, 0.5f, 1.5f},
+                {2.0f, 2.0f, 2.0f,     2.0f, 1.5f, 1.0f,    1.0f, 1.5f, 0.75f,    0.5f, 0.5f, 0.5f},
+                {1.5f, 1.5f, 1.5f,     2.0f, 1.5f, 1.0f,    0.5f, 1.0f, 1.5f,     1.0f, 1.0f, 1.0f},
+                {1.0f, 1.0f, 1.0f,     1.5f, 1.5f, 1.5f,    0.1f, 0.1f, 0.1f,     2.0f, 2.0f, 2.0f},
+                {2.0f, 2.0f, 2.0f,     1.5f, 0.25f, 0.25f,  2.25f, 1.5f, 1.5f,    0.0f, 0.0f, 0.0f},
+                {1.5f, 1.5f, 1.5f,     4.0f, 3.0f, 2.0f,    0.3f, 0.2f, 0.1f,     0.0f, 0.0f, 0.0f},
+                {1.0f, 1.0f, 1.0f,     1.5f, 0.25f, 0.25f,  4.0f, 3.5f, 2.0f,     0.0f, 0.0f, 0.0f}
+            };
 
-        public static float[] extractRates = new float[] { 10, 20, 5 };
-        public static float[] freeResourceRates = new float[] {1, 1, 1, 1 };
+            minMaxResources = new int[,]
+            {
+                {28750, 80500},
+                {28750, 80500},
+                {28750, 80500}
+            };
 
-        public static float[] tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
-        public static float[] resourceProbabilities = new float[] { 0.15f, 0.2f, 0.1f };
+            extractRates = new float[] { 10, 20, 5 };
+            freeResourceRates = new float[] { 1, 1, 1, 1 };
 
-        //X = Warbucks Oil Metal Lime 
-        //Y = Units Collectors Defenses Search
-        public static float[,] purchaseToPoolPercents = new float[,]
-        {
-            {0.15f, 0.05f, 0.05f, 0.05f},
-            {0.15f, 0.05f, 0.05f, 0.05f},
-            {0.15f, 0.05f, 0.05f, 0.05f},
-            {0.15f, 0.05f, 0.05f, 0.05f}
-        };
+            tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
+            resourceProbabilities = new float[] { 0.15f, 0.2f, 0.1f };
 
-        public static int poolRewardBlocks = 7000;
-        public static int warbucksRewardBlocks = 7000;
+            //X = Warbucks Oil Metal Concrete 
+            //Y = Units Collectors Defenses Search
+            purchaseToPoolPercents = new float[,]
+            {
+                {0.15f, 0.05f, 0.05f, 0.05f},
+                {0.15f, 0.05f, 0.05f, 0.05f},
+                {0.15f, 0.05f, 0.05f, 0.05f},
+                {0.15f, 0.05f, 0.05f, 0.05f}
+            };
+
+            poolRewardBlocks = 7000;
+            warbucksRewardBlocks = 7000;
+        }
     }
 }

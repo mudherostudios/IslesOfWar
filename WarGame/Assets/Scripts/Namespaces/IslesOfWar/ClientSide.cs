@@ -144,6 +144,7 @@ namespace IslesOfWar
             public Dictionary<string, List<string>> depletedContributions;
             public List<double> resourcePools;
             public double warbucksPool;
+            public Constants currentConstants;
             public string debugBlockData = "";
 
             public State() { }
@@ -193,6 +194,7 @@ namespace IslesOfWar
 
             public void Init()
             {
+                currentConstants = new Constants();
                 players = new Dictionary<string, PlayerState>();
                 islands = new Dictionary<string, Island>();
                 resourceContributions = new Dictionary<string, List<List<double>>>();
@@ -234,7 +236,7 @@ namespace IslesOfWar
             }
 
             //Think of resources as how many times extraction can be made rather than an actual amount.
-            public void SetResources(ref MudHeroRandom random)
+            public void SetResources(ref MudHeroRandom random, int[,] minMaxResources)
             {
                 if (resources == null && features != null)
                 {
@@ -249,7 +251,7 @@ namespace IslesOfWar
                         {
                             if (tileTypes[r] > 0)
                             {
-                                float rand = random.Range(Constants.minMaxResources[r, 0], Constants.minMaxResources[r, 1]);
+                                float rand = random.Range(minMaxResources[r, 0], minMaxResources[r, 1]);
                                 rand = Mathf.CeilToInt(rand);
                                 resources[t].Add(rand);
                             }
@@ -403,21 +405,15 @@ namespace IslesOfWar
         {
             public string islandID;
             public int tileIndex, purchaseType;
+            public double[] resources;
 
-            public StructureCost(string _islandID, int _tileIndex, int _purchaseType)
+            public StructureCost(string _islandID, int _tileIndex, int _purchaseType, Constants constants)
             {
                 islandID = _islandID;
                 tileIndex = _tileIndex;
                 purchaseType = _purchaseType;
-            }
-
-            public double[] resources
-            {
-                get
-                {
-                    return new double[] {Constants.collectorCosts[purchaseType-1,0], Constants.collectorCosts[purchaseType-1, 1],
-                    Constants.collectorCosts[purchaseType-1, 2], Constants.collectorCosts[purchaseType-1,3] };
-                }
+                resources = new double[] {constants.collectorCosts[purchaseType-1,0], constants.collectorCosts[purchaseType-1, 1],
+                constants.collectorCosts[purchaseType-1, 2], constants.collectorCosts[purchaseType-1,3] };
             }
         }
 

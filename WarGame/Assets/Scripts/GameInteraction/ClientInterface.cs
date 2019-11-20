@@ -157,7 +157,7 @@ public class ClientInterface : MonoBehaviour
         if (immediately)
             SubmitQueuedActions();
 
-        string message = string.Format("We have submitted a proposal to join {0}.", Constants.countryCodes[nationCode]);
+        string message = string.Format("We have submitted a proposal to join {0}.", NationConstants.countryCodes[nationCode]);
         notificationSystem.PushNotification(1, 0, message, "nationSuccess");
     }
     
@@ -249,8 +249,8 @@ public class ClientInterface : MonoBehaviour
             double[] cost = new double[4];
 
             if (successfulPurchase)
-                cost = new double[] {Constants.bunkerCosts[purchaseType-1 ,0], Constants.bunkerCosts[purchaseType - 1, 1],
-                Constants.bunkerCosts[purchaseType-1 ,2], Constants.bunkerCosts[purchaseType-1 ,3]};
+                cost = new double[] {chainState.currentConstants.bunkerCosts[purchaseType-1 ,0], chainState.currentConstants.bunkerCosts[purchaseType - 1, 1],
+                chainState.currentConstants.bunkerCosts[purchaseType-1 ,2], chainState.currentConstants.bunkerCosts[purchaseType-1 ,3]};
 
             successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, GetSubtractedResources());
 
@@ -311,8 +311,8 @@ public class ClientInterface : MonoBehaviour
             double[] cost = new double[4];
 
             if (successfulPurchase)
-                cost = new double[] {Constants.blockerCosts[purchaseType-1 ,0], Constants.blockerCosts[purchaseType - 1, 1],
-                Constants.blockerCosts[purchaseType-1 ,2], Constants.blockerCosts[purchaseType-1 ,3]};
+                cost = new double[] {chainState.currentConstants.blockerCosts[purchaseType-1 ,0], chainState.currentConstants.blockerCosts[purchaseType - 1, 1],
+                chainState.currentConstants.blockerCosts[purchaseType-1 ,2], chainState.currentConstants.blockerCosts[purchaseType-1 ,3]};
 
             successfulPurchase = successfulPurchase && Validity.HasEnoughResources(cost, GetSubtractedResources());
 
@@ -362,10 +362,10 @@ public class ClientInterface : MonoBehaviour
     public void PurchaseUnits(int type, int amount)
     {
         double[] spend = new double[4];
-        spend[0] = Constants.unitCosts[type, 0] * amount;
-        spend[1] = Constants.unitCosts[type, 1] * amount;
-        spend[2] = Constants.unitCosts[type, 2] * amount;
-        spend[3] = Constants.unitCosts[type, 3] * amount;
+        spend[0] = chainState.currentConstants.unitCosts[type, 0] * amount;
+        spend[1] = chainState.currentConstants.unitCosts[type, 1] * amount;
+        spend[2] = chainState.currentConstants.unitCosts[type, 2] * amount;
+        spend[3] = chainState.currentConstants.unitCosts[type, 3] * amount;
 
         bool canSpend = Validity.HasEnoughResources(spend, GetSubtractedResources());
         string message = "An error has occured while trying to purchase units.";
@@ -417,14 +417,14 @@ public class ClientInterface : MonoBehaviour
     
     public void SearchForIslands()
     {
-        double[] cost = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
+        double[] cost = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count, chainState.currentConstants);
         bool canSearch = Validity.HasEnoughResources(cost, GetSubtractedResources());
         string message = "You can not search for more islands, check your resources.";
 
         if (canSearch)
         {
             SpendResources(cost);
-            queuedActions.srch = Constants.islandSearchOptions[0];
+            queuedActions.srch = chainState.currentConstants.islandSearchOptions[0];
             message = "An expeditionary force is ready to depart on your command.";
             notificationSystem.PushNotification(1, 0, message, "searchSuccess");
         }
@@ -664,7 +664,7 @@ public class ClientInterface : MonoBehaviour
         {
             for (int r = 0; r < 4; r++)
             {
-                expenditureTotals[r] += Constants.unitCosts[u + type * 3, r] * queuedActions.buy[u + type * 3];
+                expenditureTotals[r] += chainState.currentConstants.unitCosts[u + type * 3, r] * queuedActions.buy[u + type * 3];
             }
         }
 
@@ -710,7 +710,7 @@ public class ClientInterface : MonoBehaviour
         {
             for (int r = 0; r < 4; r++)
             {
-                expenditureTotals[r] += Constants.unitCosts[u, r] * queuedActions.buy[u]; 
+                expenditureTotals[r] += chainState.currentConstants.unitCosts[u, r] * queuedActions.buy[u]; 
             }
         }
 
@@ -770,7 +770,7 @@ public class ClientInterface : MonoBehaviour
     public void CancelIslandSearch()
     {
         queuedActions.srch = null;
-        double[] resources = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
+        double[] resources = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count, chainState.currentConstants);
 
         for (int r = 0; r < resources.Length; r++)
         {
@@ -816,7 +816,7 @@ public class ClientInterface : MonoBehaviour
         {
             for (int r = 0; r < 4; r++)
             {
-                expenditureTotals[r] += Constants.collectorCosts[collectorTypes[c] - 1, r];
+                expenditureTotals[r] += chainState.currentConstants.collectorCosts[collectorTypes[c] - 1, r];
             }
         }
 
@@ -824,7 +824,7 @@ public class ClientInterface : MonoBehaviour
         {
             for (int r = 0; r < 4; r++)
             {
-                expenditureTotals[r] += Constants.bunkerCosts[bunkerTypes[b] - 1, r];
+                expenditureTotals[r] += chainState.currentConstants.bunkerCosts[bunkerTypes[b] - 1, r];
             }
         }
 
@@ -832,7 +832,7 @@ public class ClientInterface : MonoBehaviour
         {
             for (int r = 0; r < 4; r++)
             {
-                expenditureTotals[r] += Constants.blockerCosts[blockerTypes[b] - 1, r];
+                expenditureTotals[r] += chainState.currentConstants.blockerCosts[blockerTypes[b] - 1, r];
             }
         }
 
@@ -901,6 +901,8 @@ public class ClientInterface : MonoBehaviour
     //--------------------------------------------------------------
     public bool isPlaying { get { return chainState.players.Keys.Contains(player); } }
     public int currentBlock { get { return communication.blockProgress; } }
+    public int blocksUntilWarbuxReward { get { return chainState.currentConstants.warbucksRewardBlocks - (currentBlock % chainState.currentConstants.warbucksRewardBlocks); } }
+    public int blocksUntilResourceReward { get { return chainState.currentConstants.poolRewardBlocks - (currentBlock % chainState.currentConstants.poolRewardBlocks); } }
     public Island[] playerIslands
     {
         get
@@ -1139,7 +1141,7 @@ public class ClientInterface : MonoBehaviour
     public double[] GetIslandSearchCost()
     {
         if (isPlaying)
-            return IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count);
+            return IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count, chainState.currentConstants);
         else
             return new double[4];
     }
@@ -1169,7 +1171,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.buy != null)
         {
-            units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].resources.ToArray());
+            units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].resources.ToArray(), chainState.currentConstants.unitCosts);
 
             if (!units)
                 queuedActions.buy = null;
@@ -1201,7 +1203,7 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.attk != null)
         {
-            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].units.ToArray())
+            attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
             && chainState.players[player].attackableIsland == queuedActions.attk.id;
 
             if (!attack)
@@ -1222,7 +1224,7 @@ public class ClientInterface : MonoBehaviour
                 }
             }
 
-            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(tempSqds, chainState.players[player].units.ToArray())
+            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(tempSqds, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
             && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
 
             if (!defend)

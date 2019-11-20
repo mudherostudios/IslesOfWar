@@ -11,10 +11,13 @@ public class UnitPurchase: MonoBehaviour
     public Text[] unitButtonTexts;
     public InputField purchaseAmount;
     public CommandIslandInteraction commandScript;
+    public Constants constants;
     public int type = 0;
     public int[] relativeTypes;
 
-    public void UpdateAllStats() { UpdateAllStats(type); }
+    public void Initiate(Constants _constants) { constants = _constants; }
+
+    //public void UpdateAllStats() { UpdateAllStats(type); }
 
     public void UpdateAllStats(int _type)
     {
@@ -27,9 +30,9 @@ public class UnitPurchase: MonoBehaviour
         uint.TryParse(sAmount, out amount);
         purchaseAmount.text = amount.ToString();
 
-        double warbucks = amount * Constants.unitCosts[type, 0];
-        double oil = amount * Constants.unitCosts[type, 1];
-        double metal = amount * Constants.unitCosts[type, 2];
+        double warbucks = amount * constants.unitCosts[type, 0];
+        double oil = amount * constants.unitCosts[type, 1];
+        double metal = amount * constants.unitCosts[type, 2];
 
         if (warbucks > 10000)
             formatW = "G2";
@@ -49,7 +52,7 @@ public class UnitPurchase: MonoBehaviour
         type = relativeTypes[unitType];
         unitImages[type].gameObject.SetActive(true);
         gameObject.SetActive(true);
-        UpdateAllStats();
+        UpdateAllStats(type);
     }
 
     public void SetMenu(int[] possibleTypes)

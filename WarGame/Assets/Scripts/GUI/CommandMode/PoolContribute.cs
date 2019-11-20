@@ -27,11 +27,11 @@ public class PoolContribute: MonoBehaviour
     public double[] playerContributions, totalContributed;
     private Dictionary<string, List<List<double>>> resources;
 
-    public void Initialize(string _player, Dictionary<string, List<List<double>>> _resources, int currentXayaBlock)
+    public void Initialize(string _player, Dictionary<string, List<List<double>>> _resources, int _blocksLeft)
     {
         player = _player;
         resources = _resources;
-        blocksLeft = Constants.poolRewardBlocks - (currentXayaBlock % Constants.poolRewardBlocks);
+        blocksLeft = _blocksLeft;
 
         UpdateAllStats();
         UpdateTimer(0);
@@ -109,9 +109,9 @@ public class PoolContribute: MonoBehaviour
         UpdateAllStats();
     }
 
-    public void UpdateTimer(int currentXayaBlock)
+    public void UpdateTimer(int _blocksLeft)
     {
-        blocksLeft = Constants.poolRewardBlocks - (currentXayaBlock % Constants.poolRewardBlocks);
+        blocksLeft = _blocksLeft;
         poolTimer.text = string.Format("{0} blocks left.", blocksLeft);
     }
 

@@ -16,10 +16,9 @@ public class WarbucksPoolContribute : MonoBehaviour
 
     private double pool = 0;
 
-    public void UpdateTimer(int currentXayaBlock)
+    public void UpdateTimer(int blocksLeft)
     {
-        double left = Constants.warbucksRewardBlocks - (currentXayaBlock % Constants.warbucksRewardBlocks);
-        poolTimer.text = string.Format("{0} blocks left.", left.ToString());
+        poolTimer.text = string.Format("{0} blocks left.", blocksLeft.ToString());
     }
 
     public void UpdateAllStats()

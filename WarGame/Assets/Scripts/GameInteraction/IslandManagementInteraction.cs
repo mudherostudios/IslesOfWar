@@ -118,7 +118,7 @@ public class IslandManagementInteraction : Interaction
             int tileIndex = prompter.indexParent.GetComponent<IndexedNavigationButton>().index;
             int purchaseType = prompter.purchaseType;
 
-            StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType);
+            StructureCost cost = new StructureCost(islandID, tileIndex, purchaseType, clientInterface.chainState.currentConstants);
 
             if (clientInterface.PurchaseIslandCollector(cost))
             {
@@ -187,20 +187,20 @@ public class IslandManagementInteraction : Interaction
 
                 if (isCollector)
                 {
-                    cost = new double[] {Constants.collectorCosts[type-1, 0], Constants.collectorCosts[type-1, 1],
-                    Constants.collectorCosts[type-1, 2] , Constants.collectorCosts[type-1, 3] };
+                    cost = new double[] {constants.collectorCosts[type-1, 0], constants.collectorCosts[type-1, 1],
+                    constants.collectorCosts[type-1, 2] , constants.collectorCosts[type-1, 3] };
                     category = 0;
                 }
                 else if (isBunker)
                 {
-                    cost = new double[] {Constants.bunkerCosts[type-1, 0], Constants.bunkerCosts[type-1, 1],
-                    Constants.bunkerCosts[type-1, 2] , Constants.bunkerCosts[type-1, 3] };
+                    cost = new double[] {constants.bunkerCosts[type-1, 0], constants.bunkerCosts[type-1, 1],
+                    constants.bunkerCosts[type-1, 2] , constants.bunkerCosts[type-1, 3] };
                     category = 1;
                 }
                 else if (isBlocker)
                 {
-                    cost = new double[] {Constants.blockerCosts[type-1, 0], Constants.blockerCosts[type-1, 1],
-                    Constants.blockerCosts[type-1, 2] , Constants.blockerCosts[type-1, 3] };
+                    cost = new double[] {constants.blockerCosts[type-1, 0], constants.blockerCosts[type-1, 1],
+                    constants.blockerCosts[type-1, 2] , constants.blockerCosts[type-1, 3] };
                     category = 2;
                 }
 

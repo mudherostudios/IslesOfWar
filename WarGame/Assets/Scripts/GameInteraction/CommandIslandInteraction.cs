@@ -181,6 +181,8 @@ public class CommandIslandInteraction : Interaction
     public void ChangeNation(string nationCode, bool immediately) { clientInterface.ChangeNation(nationCode, immediately); orbital.Focus(); }
     public void SubmitAllActions() { clientInterface.SubmitQueuedActions(); orbital.Focus();}
     public int GetCurrentXayaBlock() { return clientInterface.currentBlock; }
+    public int GetBlocksRemainingForWarbucksReward() { return clientInterface.blocksUntilWarbuxReward; }
+    public int GetBlocksRemainingForResourceReward() { return clientInterface.blocksUntilResourceReward; }
     //----------------------------------------------------------------------
     //Gamestate Variables
     //----------------------------------------------------------------------

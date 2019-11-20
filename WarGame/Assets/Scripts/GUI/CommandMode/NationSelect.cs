@@ -62,8 +62,8 @@ public class NationSelect : MonoBehaviour
 
     public void SetList()
     {
-        keys = new List<string>(Constants.countryCodes.Keys);
-        List<string> values = new List<string>(Constants.countryCodes.Values);
+        keys = new List<string>(NationConstants.countryCodes.Keys);
+        List<string> values = new List<string>(NationConstants.countryCodes.Values);
         List<string> options = new List<string>();
 
         for (int k = 0; k < keys.Count; k++)

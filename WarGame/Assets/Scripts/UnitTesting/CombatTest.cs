@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IslesOfWar;
 using IslesOfWar.Combat;
 
 public class CombatTest : MonoBehaviour
@@ -9,11 +10,12 @@ public class CombatTest : MonoBehaviour
     public Engagement engagement;
     public long[] opforUnits = new long[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     public long[] bluforUnits = new long[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    Constants constants;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        constants = new Constants();
     }
 
     // Update is called once per frame
@@ -24,10 +26,9 @@ public class CombatTest : MonoBehaviour
             float time = Time.time;
             opfor = new Squad(opforUnits);
             blufor = new Squad(bluforUnits);
-
-            engagement = new Engagement(blufor, opfor);
+            engagement = new Engagement(blufor, opfor, constants);
             MudHeroRandom random = new MudHeroRandom();
-            EngagementHistory history = engagement.ResolveEngagement(ref random);
+            EngagementHistory history = engagement.ResolveEngagement(ref random, constants);
 
             Debug.Log(history.winner + " " + history.bluforHistory.Length + " " + (Time.time - time));
         }

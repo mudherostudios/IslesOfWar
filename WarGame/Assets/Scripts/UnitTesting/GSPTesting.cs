@@ -39,13 +39,15 @@ public class GSPTesting : MonoBehaviour
     string terrainTestingResults = "";
     string[] label;
     string[] results;
-    float[,] colCost = Constants.collectorCosts;
+    Constants constants = new Constants();
+    float[,] colCost;
     int passCount;
     int failCount;
 
     void Start()
     {
         ResetTestData();
+        colCost = constants.collectorCosts;
     }
 
     void Update()
@@ -1308,9 +1310,9 @@ public class GSPTesting : MonoBehaviour
 
         //Succeed in only free resource updates with no collectors
         ClearPlayers();
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedFirst = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, savedIslands)
         && ResourcesAreEqual(processor.state.islands, savedIslands);
@@ -1321,9 +1323,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].collectors = "100000000000";
         alteredIslands["a"].collectors = "100000000000";
         alteredIslands["a"].resources[0][0]--; 
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedSecond = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1342,9 +1344,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["l"].collectors = "100000000000";
         alteredIslands["l"].collectors = "100000000000";
         alteredIslands["l"].resources[0][0]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedThird = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1357,9 +1359,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].collectors = "200000000000";
         alteredIslands["a"].collectors = "200000000000";
         alteredIslands["a"].resources[0][1]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedFourth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1378,9 +1380,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["j"].collectors = "020000000000";
         alteredIslands["j"].collectors = "020000000000";
         alteredIslands["j"].resources[1][1]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedFifth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1393,9 +1395,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["a"].collectors = "300000000000";
         alteredIslands["a"].collectors = "300000000000";
         alteredIslands["a"].resources[0][2]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedSixth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1414,9 +1416,9 @@ public class GSPTesting : MonoBehaviour
         processor.state.islands["n"].collectors = "300000000000";
         alteredIslands["n"].collectors = "300000000000";
         alteredIslands["n"].resources[0][2]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] + Constants.extractRates[2] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
         processor.UpdateIslandAndPlayerResources();
         bool passedSeventh = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1455,20 +1457,20 @@ public class GSPTesting : MonoBehaviour
         players["pimpMacD"].resources.AddRange(new double[] { 0, 0, 0, 0 });
         players["nox"].resources.AddRange(new double[] { 0, 0, 0, 0 });
 
-        players["cairo"].resources[0] = Constants.freeResourceRates[0];
-        players["cairo"].resources[1] = Constants.freeResourceRates[1] + (Constants.extractRates[0] * 2);
-        players["cairo"].resources[2] = Constants.freeResourceRates[2] + (Constants.extractRates[1] * 2);
-        players["cairo"].resources[3] = Constants.freeResourceRates[3] + Constants.extractRates[2];
+        players["cairo"].resources[0] = constants.freeResourceRates[0];
+        players["cairo"].resources[1] = constants.freeResourceRates[1] + (constants.extractRates[0] * 2);
+        players["cairo"].resources[2] = constants.freeResourceRates[2] + (constants.extractRates[1] * 2);
+        players["cairo"].resources[3] = constants.freeResourceRates[3] + constants.extractRates[2];
 
-        players["pimpMacD"].resources[0] = Constants.freeResourceRates[0];
-        players["pimpMacD"].resources[1] = Constants.freeResourceRates[1];
-        players["pimpMacD"].resources[2] = Constants.freeResourceRates[2] + Constants.extractRates[1];
-        players["pimpMacD"].resources[3] = Constants.freeResourceRates[3] + Constants.extractRates[2];
+        players["pimpMacD"].resources[0] = constants.freeResourceRates[0];
+        players["pimpMacD"].resources[1] = constants.freeResourceRates[1];
+        players["pimpMacD"].resources[2] = constants.freeResourceRates[2] + constants.extractRates[1];
+        players["pimpMacD"].resources[3] = constants.freeResourceRates[3] + constants.extractRates[2];
 
-        players["nox"].resources[0] = Constants.freeResourceRates[0];
-        players["nox"].resources[1] = Constants.freeResourceRates[1] + Constants.extractRates[0];
-        players["nox"].resources[2] = Constants.freeResourceRates[2];
-        players["nox"].resources[3] = Constants.freeResourceRates[3] + Constants.extractRates[2];
+        players["nox"].resources[0] = constants.freeResourceRates[0];
+        players["nox"].resources[1] = constants.freeResourceRates[1] + constants.extractRates[0];
+        players["nox"].resources[2] = constants.freeResourceRates[2];
+        players["nox"].resources[3] = constants.freeResourceRates[3] + constants.extractRates[2];
 
         processor.UpdateIslandAndPlayerResources();
         bool passedEighth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
@@ -1484,9 +1486,9 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["a"].resources[0][2]--;
         alteredIslands["a"].resources[5][0]--;
         alteredIslands["a"].resources[11][1]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         processor.UpdateIslandAndPlayerResources();
         bool passedNinth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1511,9 +1513,9 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["o"].resources[0][0]--;
         alteredIslands["o"].resources[1][1]--;
         alteredIslands["o"].resources[8][2]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + Constants.extractRates[1], Constants.freeResourceRates[3] + Constants.extractRates[2] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
         processor.UpdateIslandAndPlayerResources();
         bool passedTenth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1529,9 +1531,9 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["o"].resources[0][1]--;
         alteredIslands["o"].resources[5][1]--;
         alteredIslands["o"].resources[5][2]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + (Constants.extractRates[1] * 2), Constants.freeResourceRates[3] + Constants.extractRates[2] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
         processor.UpdateIslandAndPlayerResources();
         bool passedEleventh = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -1553,9 +1555,9 @@ public class GSPTesting : MonoBehaviour
         alteredIslands["o"].resources[0][1]--;
         alteredIslands["o"].resources[5][1]--;
         alteredIslands["o"].resources[5][2]--;
-        players["cairo"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + (Constants.extractRates[1] * 2), Constants.freeResourceRates[3] + Constants.extractRates[2] });
-        players["pimpMacD"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1], Constants.freeResourceRates[2], Constants.freeResourceRates[3] });
-        players["nox"].resources.AddRange(new double[] { Constants.freeResourceRates[0], Constants.freeResourceRates[1] + Constants.extractRates[0], Constants.freeResourceRates[2] + (Constants.extractRates[1] * 2), Constants.freeResourceRates[3] + Constants.extractRates[2] });
+        players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
+        players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
+        players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
         processor.UpdateIslandAndPlayerResources();
         bool passedTwelfth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
@@ -2297,7 +2299,7 @@ public class GSPTesting : MonoBehaviour
     {
         foreach (KeyValuePair<string, Island> pair in processor.state.islands)
         {
-            pair.Value.SetResources(ref random);
+            pair.Value.SetResources(ref random, constants.minMaxResources);
         }
     }
 
@@ -2370,21 +2372,21 @@ public class GSPTesting : MonoBehaviour
 
         islands = new Dictionary<string, Island>
         {
-            {IIDs[0], IslandGenerator.Generate("cairo", ref random)},
-            {IIDs[1], IslandGenerator.Generate("cairo", ref random)},
-            {IIDs[2], IslandGenerator.Generate("cairo", ref random)},
-            {IIDs[3], IslandGenerator.Generate("cairo", ref random)},
-            {IIDs[4], IslandGenerator.Generate("pimpMacD", ref random)},
-            {IIDs[5], IslandGenerator.Generate("pimpMacD", ref random)},
-            {IIDs[6], IslandGenerator.Generate("pimpMacD", ref random)},
-            {IIDs[7], IslandGenerator.Generate("pimpMacD", ref random)},
-            {IIDs[8], IslandGenerator.Generate("pimpMacD", ref random)},
-            {IIDs[9], IslandGenerator.Generate("nox", ref random)},
-            {IIDs[10], IslandGenerator.Generate("nox", ref random)},
-            {IIDs[11], IslandGenerator.Generate("nox", ref random)},
-            {IIDs[12], IslandGenerator.Generate("nox", ref random)},
-            {IIDs[13], IslandGenerator.Generate("nox", ref random)},
-            {IIDs[14], IslandGenerator.Generate("nox", ref random)}
+            {IIDs[0], IslandGenerator.Generate("cairo", ref random, constants)},
+            {IIDs[1], IslandGenerator.Generate("cairo", ref random, constants)},
+            {IIDs[2], IslandGenerator.Generate("cairo", ref random, constants)},
+            {IIDs[3], IslandGenerator.Generate("cairo", ref random, constants)},
+            {IIDs[4], IslandGenerator.Generate("pimpMacD", ref random, constants)},
+            {IIDs[5], IslandGenerator.Generate("pimpMacD", ref random, constants)},
+            {IIDs[6], IslandGenerator.Generate("pimpMacD", ref random, constants)},
+            {IIDs[7], IslandGenerator.Generate("pimpMacD", ref random, constants)},
+            {IIDs[8], IslandGenerator.Generate("pimpMacD", ref random, constants)},
+            {IIDs[9], IslandGenerator.Generate("nox", ref random, constants)},
+            {IIDs[10], IslandGenerator.Generate("nox", ref random, constants)},
+            {IIDs[11], IslandGenerator.Generate("nox", ref random, constants)},
+            {IIDs[12], IslandGenerator.Generate("nox", ref random, constants)},
+            {IIDs[13], IslandGenerator.Generate("nox", ref random, constants)},
+            {IIDs[14], IslandGenerator.Generate("nox", ref random, constants)}
         };
 
         processor.state = new State(players, islands);
@@ -2420,10 +2422,10 @@ public class GSPTesting : MonoBehaviour
 
         for (int b = 0; b < bunkerCounts.Length; b++)
         {
-            cost[0] += bunkerCounts[b] * Constants.bunkerCosts[b, 0];
-            cost[1] += bunkerCounts[b] * Constants.bunkerCosts[b, 1];
-            cost[2] += bunkerCounts[b] * Constants.bunkerCosts[b, 2];
-            cost[3] += bunkerCounts[b] * Constants.bunkerCosts[b, 3];
+            cost[0] += bunkerCounts[b] * constants.bunkerCosts[b, 0];
+            cost[1] += bunkerCounts[b] * constants.bunkerCosts[b, 1];
+            cost[2] += bunkerCounts[b] * constants.bunkerCosts[b, 2];
+            cost[3] += bunkerCounts[b] * constants.bunkerCosts[b, 3];
         }
 
         return cost;
@@ -2435,10 +2437,10 @@ public class GSPTesting : MonoBehaviour
 
         for (int b = 0; b < blockerCounts.Length; b++)
         {
-            cost[0] += blockerCounts[b] * Constants.blockerCosts[b, 0];
-            cost[1] += blockerCounts[b] * Constants.blockerCosts[b, 1];
-            cost[2] += blockerCounts[b] * Constants.blockerCosts[b, 2];
-            cost[3] += blockerCounts[b] * Constants.blockerCosts[b, 3];
+            cost[0] += blockerCounts[b] * constants.blockerCosts[b, 0];
+            cost[1] += blockerCounts[b] * constants.blockerCosts[b, 1];
+            cost[2] += blockerCounts[b] * constants.blockerCosts[b, 2];
+            cost[3] += blockerCounts[b] * constants.blockerCosts[b, 3];
         }
 
         return cost;
@@ -2450,10 +2452,10 @@ public class GSPTesting : MonoBehaviour
 
         for (int i = 0; i < typeCount.Length; i++)
         {
-            finalPrice[0] += typeCount[i] * Constants.collectorCosts[i, 0];
-            finalPrice[1] += typeCount[i] * Constants.collectorCosts[i, 1];
-            finalPrice[2] += typeCount[i] * Constants.collectorCosts[i, 2];
-            finalPrice[3] += typeCount[i] * Constants.collectorCosts[i, 3];
+            finalPrice[0] += typeCount[i] * constants.collectorCosts[i, 0];
+            finalPrice[1] += typeCount[i] * constants.collectorCosts[i, 1];
+            finalPrice[2] += typeCount[i] * constants.collectorCosts[i, 2];
+            finalPrice[3] += typeCount[i] * constants.collectorCosts[i, 3];
         }
 
         return finalPrice;

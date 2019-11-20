@@ -153,7 +153,7 @@ namespace IslesOfWar
             public static bool Nation(string nationCode)
             {
                 if (nationCode.Length == 2)
-                    if (Constants.countryCodes.ContainsKey(nationCode))
+                    if (NationConstants.countryCodes.ContainsKey(nationCode))
                         return true;
 
                 return false;
@@ -206,28 +206,28 @@ namespace IslesOfWar
 
                     if (defenses[0][0] > 0)
                     {
-                        resources[0] += Constants.blockerCosts[defenses[0][0], 0];
-                        resources[1] += Constants.blockerCosts[defenses[0][0], 1];
-                        resources[2] += Constants.blockerCosts[defenses[0][0], 2];
-                        resources[3] += Constants.blockerCosts[defenses[0][0], 3];
+                        resources[0] += actualState.currentConstants.blockerCosts[defenses[0][0], 0];
+                        resources[1] += actualState.currentConstants.blockerCosts[defenses[0][0], 1];
+                        resources[2] += actualState.currentConstants.blockerCosts[defenses[0][0], 2];
+                        resources[3] += actualState.currentConstants.blockerCosts[defenses[0][0], 3];
                     }
 
                     for (int type = 0; type < 3; type++)
                     {
                         if (collectors[type] > 0)
                         {
-                            resources[0] += Constants.collectorCosts[type, 0];
-                            resources[1] += Constants.collectorCosts[type, 1];
-                            resources[2] += Constants.collectorCosts[type, 2];
-                            resources[3] += Constants.collectorCosts[type, 3];
+                            resources[0] += actualState.currentConstants.collectorCosts[type, 0];
+                            resources[1] += actualState.currentConstants.collectorCosts[type, 1];
+                            resources[2] += actualState.currentConstants.collectorCosts[type, 2];
+                            resources[3] += actualState.currentConstants.collectorCosts[type, 3];
                         }
                         
                         if (defenses[1][type] > 0)
                         {
-                            resources[0] += Constants.bunkerCosts[type, 0];
-                            resources[1] += Constants.bunkerCosts[type, 1];
-                            resources[2] += Constants.bunkerCosts[type, 2];
-                            resources[3] += Constants.bunkerCosts[type, 3];
+                            resources[0] += actualState.currentConstants.bunkerCosts[type, 0];
+                            resources[1] += actualState.currentConstants.bunkerCosts[type, 1];
+                            resources[2] += actualState.currentConstants.bunkerCosts[type, 2];
+                            resources[3] += actualState.currentConstants.bunkerCosts[type, 3];
                         }
                     }
 
@@ -240,17 +240,17 @@ namespace IslesOfWar
                 return hasEnoughResources;
             }
 
-            public static bool PurchaseUnits(List<int> purchases, double[] currentResources)
+            public static bool PurchaseUnits(List<int> purchases, double[] currentResources, float[,] unitCosts)
             {
                 bool canPurchase = purchases.Count == 9;
                 double[] resources = new double[4];
 
                 for (int p = 0; p < purchases.Count && canPurchase; p++)
                 {
-                    resources[0] = purchases[p] * Constants.unitCosts[p, 0];
-                    resources[1] = purchases[p] * Constants.unitCosts[p, 1];
-                    resources[2] = purchases[p] * Constants.unitCosts[p, 2];
-                    resources[3] = purchases[p] * Constants.unitCosts[p, 3];
+                    resources[0] = purchases[p] * unitCosts[p, 0];
+                    resources[1] = purchases[p] * unitCosts[p, 1];
+                    resources[2] = purchases[p] * unitCosts[p, 2];
+                    resources[3] = purchases[p] * unitCosts[p, 3];
                 }
 
                 for (int r = 0; r < 4 && canPurchase; r++)
@@ -312,25 +312,25 @@ namespace IslesOfWar
                 return isValid;
             }
 
-            public static bool SquadHealthSizeLimits(List<List<int>> squadCounts)
+            public static bool SquadHealthSizeLimits(List<List<int>> squadCounts, float[] constantHealts)
             {
                 bool validSize = true;
 
                 for (int s = 0; s < squadCounts.Count && validSize; s++)
                 {
-                    validSize = SquadHealthSizeLimits(squadCounts[s]);
+                    validSize = SquadHealthSizeLimits(squadCounts[s], constantHealts);
                 }
                 return validSize;
             }
 
-            public static bool SquadHealthSizeLimits(List<int> squadCounts)
+            public static bool SquadHealthSizeLimits(List<int> squadCounts, float[] constantHealts)
             {
                 bool validSize = true;
                 int healths = 0;
 
                 for (int u = 0; u < squadCounts.Count; u++)
                 {
-                    healths += (int)(squadCounts[u] * Constants.unitHealths[u]);
+                    healths += (int)(squadCounts[u] * constantHealts[u]);
                 }
 
                 if (healths > 1000000)
@@ -394,22 +394,22 @@ namespace IslesOfWar
                 return isValid;
             }
 
-            public static bool DefenseSquad(List<List<int>> squad, double[] availableUnits)
+            public static bool DefenseSquad(List<List<int>> squad, double[] availableUnits, float[] constantHealts)
             {
                 bool isValid = squad.Count > 0 && squad.Count <= 4;
 
                 isValid = isValid && HasEnoughTroops(squad, availableUnits, isValid);
-                isValid = isValid && SquadHealthSizeLimits(squad);
+                isValid = isValid && SquadHealthSizeLimits(squad, constantHealts);
 
                 return isValid;
             }
 
-            public static bool AttackSquad(List<List<int>> squad, double[] availableUnits)
+            public static bool AttackSquad(List<List<int>> squad, double[] availableUnits, float[] constantHealts)
             {
                 bool isValid = squad.Count > 0 && squad.Count <= 3;
 
                 isValid = isValid && HasEnoughTroops(squad, availableUnits, isValid);
-                isValid = isValid && SquadHealthSizeLimits(squad);
+                isValid = isValid && SquadHealthSizeLimits(squad, constantHealts);
 
                 return isValid;
             }

@@ -72,7 +72,7 @@ namespace IslesOfWar
                     }
 
                     //Resource Loop
-                    if (Constants.version[0] == processor.version[0])
+                    if (processor.isCorrectVersion)
                     {
                         processor.UpdateIslandAndPlayerResources();
 
@@ -133,13 +133,14 @@ namespace IslesOfWar
                             }
                         }
                     }
-                    else if (Constants.version[0] != processor.version[0])
+                    else if (!processor.isCorrectVersion)
                     {
                         processor.state.debugBlockData = string.Format
                         (
                             "The current version {0}.{1}.{2} is not compatible with your version of {3}.{4}.{5}, please download the latest version.",
-                            Constants.version[0], Constants.version[1], Constants.version[2],
-                            processor.version[0], processor.version[1], processor.version[2]
+                            processor.state.currentConstants.version[0], processor.state.currentConstants.version[1],
+                            processor.state.currentConstants.version[2], processor.version[0], processor.version[1], 
+                            processor.version[2]
                         );
                     }
 
