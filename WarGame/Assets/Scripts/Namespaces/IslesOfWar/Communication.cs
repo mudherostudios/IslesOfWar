@@ -89,11 +89,14 @@ namespace IslesOfWar
         public class AdminCommands
         {
             public int[] ver;          //Set Version, sets all - 3
-            public float iwCost;       //Set IslandSearchCost ********* Need to change the cost method first. *********
-            public float atkPerc;       //Set AttackCostPercent
+            public string status;      //Set mode, currently only used for isInMaintenanceMode;
+            public decimal packCost;   //Set ResourcePackCost
+            public float[] packAmnt;   //Set ResourcePackAmount, sets all - 4
+            public float[] iwCost;     //Set IslandSearchCost, sets all - 4 (only using first right now though) 
+            public float atkPerc;      //Set AttackCostPercent
             public int uPerc;          //Set UndiscoveredPercent
             public float repTime;      //Set IslandReplenishTime
-            public float sqdHlthLmt;    //Set SquadHealthLimit
+            public float sqdHlthLmt;   //Set SquadHealthLimit
             public float[] uCost;      //Set UnitCost first is unitType, next 4 are prices - 5
             public float[] bnkCost;    //Set BunkerCost, same as uCost
             public float[] blkCost;    //Set BlockerCost, same as uCost

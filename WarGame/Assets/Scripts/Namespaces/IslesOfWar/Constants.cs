@@ -98,6 +98,10 @@ namespace IslesOfWar
     public class Constants
     {
         public int[] version; //Compatibility GSP Version, Effeciency Version, Client Version 0,0,0
+        public bool isInMaintenanceMode;
+
+        public decimal resourcePackCost;
+        public float[] resourcePackAmount;
 
         public float[] islandSearchCost;
         public float islandModifierExponent;
@@ -130,6 +134,10 @@ namespace IslesOfWar
         public Constants()
         {
             version = new int[] { 0, 0, 0 };
+            isInMaintenanceMode = false;
+
+            resourcePackCost = 50.0M;
+            resourcePackAmount = new float[] {10000, 20000, 20000, 20000};
 
             islandSearchCost = new float[] { 1000, 0, 0, 0 };
             islandModifierExponent = 0.1f;

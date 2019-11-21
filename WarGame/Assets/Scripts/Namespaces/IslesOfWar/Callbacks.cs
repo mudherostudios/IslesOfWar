@@ -72,7 +72,7 @@ namespace IslesOfWar
                     }
 
                     //Resource Loop
-                    if (processor.isCorrectVersion)
+                    if (processor.isCorrectVersion && !processor.isInMaintenanceMode)
                     {
                         processor.UpdateIslandAndPlayerResources();
 

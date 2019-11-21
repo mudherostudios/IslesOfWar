@@ -8,10 +8,14 @@ public class BlockChainEffectUpdater : MonoBehaviour
     public GameObject incomingEffect;
     private ParticleSystem outEffect, inEffect;
 
-    public void Start()
+    public void Awake()
     {
         outEffect = outgoingEffect.GetComponent<ParticleSystem>();
         inEffect = incomingEffect.GetComponent<ParticleSystem>();
+    }
+
+    public void Start()
+    {
         StopEffects();
     }
 
