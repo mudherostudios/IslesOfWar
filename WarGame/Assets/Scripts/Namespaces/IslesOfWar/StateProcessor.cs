@@ -14,7 +14,7 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 0, 0, 0 }; //Hand set these here every release
+            public readonly int[] version = { 0, 0, 0 };  //Hand set these here every release
             public bool isCorrectVersion { get { return state.currentConstants.version[0] == version[0]; } }
             public bool isInMaintenanceMode { get { return state.currentConstants.isInMaintenanceMode; } }
             public StateProcessor() { }
@@ -193,6 +193,21 @@ namespace IslesOfWar
                 }
             }
 
+            public void SellPacksToPlayer(string player, int packCount, decimal amount)
+            {
+                decimal totalRequired = packCount * state.currentConstants.resourcePackCost;
+
+                if (totalRequired == amount)
+                {
+                    List<double> purchasedResources = new List<double>();
+                    purchasedResources.Add(state.currentConstants.resourcePackAmount[0] * packCount);
+                    purchasedResources.Add(state.currentConstants.resourcePackAmount[1] * packCount);
+                    purchasedResources.Add(state.currentConstants.resourcePackAmount[2] * packCount);
+                    purchasedResources.Add(state.currentConstants.resourcePackAmount[3] * packCount);
+
+                    state.players[player].resources = Add(state.players[player].resources, purchasedResources);
+                }
+            }
 
             public void UpdateIslandAndPlayerResources()
             {

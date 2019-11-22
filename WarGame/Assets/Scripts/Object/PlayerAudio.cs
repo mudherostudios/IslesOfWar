@@ -33,6 +33,8 @@ public class PlayerAudio : MonoBehaviour
     public AudioClip warbucksFailure;
     public AudioClip submitSuccess;
     public AudioClip submitFailure;
+    public AudioClip resourcePackSuccess;
+    public AudioClip resourcePackFailure;
 
     [Header("Cancel Sounds")]
     public AudioClip genericCancel;
@@ -48,6 +50,7 @@ public class PlayerAudio : MonoBehaviour
     public AudioClip nationCancel;
     public AudioClip attackCancel;
     public AudioClip defendCancel;
+    public AudioClip resourcePackCancel;
 
     public void Start()
     {
@@ -173,6 +176,8 @@ public class PlayerAudio : MonoBehaviour
                 return warbucksSuccess;
             case "submitSuccess":
                 return submitSuccess;
+            case "resourcePackSuccess":
+                return resourcePackSuccess;
             default:
                 return genericSuccess;
         }
@@ -198,6 +203,8 @@ public class PlayerAudio : MonoBehaviour
                 return warbucksFailure;
             case "submitFailure":
                 return submitFailure;
+            case "resourcePackFailure":
+                return resourcePackFailure;
             default:
                 return genericFailure;
         }
@@ -231,6 +238,8 @@ public class PlayerAudio : MonoBehaviour
                 return attackCancel;
             case "defendCancel":
                 return defendCancel;
+            case "resourcePackCancel":
+                return resourcePackCancel;
             default:
                 return genericCancel;
         }

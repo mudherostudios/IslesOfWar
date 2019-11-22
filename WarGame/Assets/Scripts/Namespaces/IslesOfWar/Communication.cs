@@ -84,6 +84,14 @@ namespace IslesOfWar
             public List<string> dep;    //Depleted Island Submissions
             public BattleCommand attk;  //Attack Plan
             public BattleCommand dfnd;  //Defend Orders
+            public int igBuy;           //In game purchases. Pack count.
+        }
+
+        public class NameUpdateOptions
+        {
+            public Dictionary<string, decimal> sendCoins;
+
+            public NameUpdateOptions() { }
         }
 
         public class AdminCommands
@@ -151,6 +159,12 @@ namespace IslesOfWar
                 {
                     return false;
                 }
+            }
+
+            public static bool PropertyExists(dynamic dyn, string property)
+            {
+                IDictionary dynDict = (IDictionary)dyn;
+                return dynDict.Contains(property);
             }
 
             public static bool Nation(string nationCode)

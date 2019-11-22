@@ -83,12 +83,23 @@ namespace IslesOfWar
                             foreach (dynamic element in moves)
                             {
                                 string player = element["name"].ToString();
+                                dynamic transactions = null;
                                 PlayerActions actions = new PlayerActions();
 
                                 if (Validity.JSON(element["move"].ToString()))
                                     actions = JsonConvert.DeserializeObject<PlayerActions>(element["move"].ToString());
                                 else
                                     continue;
+
+                                if (actions.igBuy > 0)
+                                {
+                                    if (Validity.JSON(element["out"].ToString()))
+                                        transactions = JsonConvert.DeserializeObject<dynamic>(element["out"].ToString());
+
+                                    if (Validity.PropertyExists(transactions, processor.state.currentConstants.recieveAddress))
+                                        processor.SellPacksToPlayer(player, actions.igBuy, transactions[processor.state.currentConstants.recieveAddress]);
+                                }
+                                
 
                                 if (actions.nat != null)
                                     processor.AddPlayerOrUpdateNation(player, actions.nat);

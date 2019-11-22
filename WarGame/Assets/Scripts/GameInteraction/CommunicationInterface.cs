@@ -185,9 +185,19 @@ public class CommunicationInterface : MonoBehaviour
 
     public ConnectionLog SendCommand(string command)
     {
-        ConnectionLog log = xayaCommands.ExecutePlayerCommand(selectedUser, command);
+        return SendCommand(command, new object());
+    }
+
+    public ConnectionLog SendCommand(string command, object options)
+    {
+        ConnectionLog log = xayaCommands.ExecutePlayerCommand(selectedUser, command, options);
         progressMessage = log.message;
         return log;
+    }
+
+    public bool HasSufficientFunds(string account, decimal spendAmount)
+    {
+        return xayaCommands.HasSufficientChi(account, spendAmount);
     }
 
     public void CreateName(string name)

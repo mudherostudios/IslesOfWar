@@ -95,7 +95,7 @@ public class Notifications : MonoBehaviour
             case 3:
                 return submitIcon;
             default:
-                return queueIcon;
+                return infoIcon;
         }
     }
 

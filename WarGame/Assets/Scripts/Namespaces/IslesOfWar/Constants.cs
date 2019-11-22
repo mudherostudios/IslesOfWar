@@ -99,6 +99,7 @@ namespace IslesOfWar
     {
         public int[] version; //Compatibility GSP Version, Effeciency Version, Client Version 0,0,0
         public bool isInMaintenanceMode;
+        public string recieveAddress;
 
         public decimal resourcePackCost;
         public float[] resourcePackAmount;
@@ -135,6 +136,7 @@ namespace IslesOfWar
         {
             version = new int[] { 0, 0, 0 };
             isInMaintenanceMode = false;
+            recieveAddress = "";
 
             resourcePackCost = 50.0M;
             resourcePackAmount = new float[] {10000, 20000, 20000, 20000};

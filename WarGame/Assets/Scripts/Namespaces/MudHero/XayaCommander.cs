@@ -61,7 +61,7 @@ namespace MudHero
                     playerName = playerNames[index];
             }
 
-            public ConnectionLog ExecutePlayerCommand(string player, string command)
+            public ConnectionLog ExecutePlayerCommand(string player, string command, object options)
             {
                 ConnectionLog log = new ConnectionLog();
                 if (xayaService == null || networkBlockCount == 0)
@@ -72,7 +72,7 @@ namespace MudHero
                 }
                 else
                 {
-                    log.message = xayaService.NameUpdate(player, command, new object());
+                    log.message = xayaService.NameUpdate(player, command, options);
                     log.success = true;
                     return log;
                 }
@@ -94,6 +94,11 @@ namespace MudHero
                 }
 
                 return log;
+            }
+
+            public bool HasSufficientChi(string account, decimal spendAmount)
+            {
+                return spendAmount == xayaService.GetBalance(account);
             }
 
             public int GetBlockHeight(string hash)

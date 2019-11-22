@@ -97,7 +97,7 @@ public class ClientInterface : MonoBehaviour
             }
 
             if (hasCancelled)
-                notificationSystem.PushNotification(1, 1, "An action on the network has invalidated some of your queued moves. Please check the log for more info.");
+                notificationSystem.PushNotification(2, 1, "An action on the network has invalidated some of your queued moves. Please check the log for more info.");
         }
     }
 
@@ -139,7 +139,7 @@ public class ClientInterface : MonoBehaviour
                 break;
             case 8:
                 if (cancel)
-                    notificationSystem.PushNotification(1, -1, "Your actions exceed the length of the Xaya json char limit. Please cancel an action.");
+                    notificationSystem.PushNotification(2, -1, "Your actions exceed the length of the Xaya json char limit. Please cancel an action.");
                 break;
             default:
                 break;
@@ -151,14 +151,31 @@ public class ClientInterface : MonoBehaviour
     //------------------------------------------------------------------
     public void ChangeNation(string nationCode, bool immediately)
     {
+        string message = string.Format("We have submitted a proposal to join {0}.", NationConstants.countryCodes[nationCode]);
+
         if (Validity.Nation(nationCode))
             queuedActions.nat = nationCode;
 
         if (immediately)
+        {
             SubmitQueuedActions();
-
-        string message = string.Format("We have submitted a proposal to join {0}.", NationConstants.countryCodes[nationCode]);
+            message = string.Format("We have joined {0}.", NationConstants.countryCodes[nationCode]);
+        }
+        
         notificationSystem.PushNotification(1, 0, message, "nationSuccess");
+    }
+
+    public void BuyResourcePack(int count)
+    {
+        if (communication.HasSufficientFunds(player, count * chainState.currentConstants.resourcePackCost))
+        {
+            queuedActions.igBuy = count;
+            notificationSystem.PushNotification(1, 0, "Resource Pack Purchase is ready for submission.", "resourcePackSuccess");
+        }
+        else
+        {
+            notificationSystem.PushNotification(2, 1, "Sorry, but you don't have sufficient funds.", "resourcePackFailure");
+        }
     }
     
     public bool PurchaseIslandCollector(StructureCost cost)
@@ -208,12 +225,12 @@ public class ClientInterface : MonoBehaviour
             else
             {
                 message = string.Format("You can not build this {0}, check your resources.", collectorName);
-                notificationSystem.PushNotification(1, 1, message, "collectorFailure");
+                notificationSystem.PushNotification(2, 1, message, "collectorFailure");
             }
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message);
+            notificationSystem.PushNotification(2, 1, message);
         }
 
         return successfulPurchase;
@@ -270,12 +287,12 @@ public class ClientInterface : MonoBehaviour
             else
             {
                 message = string.Format("You can not build this {0}, check your resoruces.", bunkerName);
-                notificationSystem.PushNotification(1, 1, message, "defenseSuccess");
+                notificationSystem.PushNotification(2, 1, message, "defenseSuccess");
             }
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message);
+            notificationSystem.PushNotification(2, 1, message);
         }
 
         return successfulPurchase;
@@ -332,12 +349,12 @@ public class ClientInterface : MonoBehaviour
             else
             {
                 message = string.Format("You can not build {0}, check your resources.", blockerName.ToLower());
-                notificationSystem.PushNotification(1, 1, message, "defenseFailure");
+                notificationSystem.PushNotification(2, 1, message, "defenseFailure");
             }
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message);
+            notificationSystem.PushNotification(2, 1, message);
         }
         
 
@@ -384,7 +401,7 @@ public class ClientInterface : MonoBehaviour
         else
         {
             message = string.Format("You can not this many purchase {0}, check your resources.", GetUnitName(type));
-            notificationSystem.PushNotification(1, 1, message, "unitPurchaseFailure");
+            notificationSystem.PushNotification(2, 1, message, "unitPurchaseFailure");
         }
     }
 
@@ -430,7 +447,7 @@ public class ClientInterface : MonoBehaviour
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message, "searchFailure");
+            notificationSystem.PushNotification(2, 1, message, "searchFailure");
         }
         
     }
@@ -464,7 +481,7 @@ public class ClientInterface : MonoBehaviour
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message, "poolFailure");
+            notificationSystem.PushNotification(2, 1, message, "poolFailure");
         }
     }
 
@@ -497,7 +514,7 @@ public class ClientInterface : MonoBehaviour
         }
         else
         {
-            notificationSystem.PushNotification(1, 1, message, "warbucksFailure");
+            notificationSystem.PushNotification(2, 1, message, "warbucksFailure");
         }
     }
 
@@ -588,7 +605,26 @@ public class ClientInterface : MonoBehaviour
 
         if (isValid && !QueuedAreNull())
         {
-            ConnectionLog log = communication.SendCommand(command);
+            ConnectionLog log;
+
+            if (queuedActions.igBuy == 0)
+                log = communication.SendCommand(command);
+            else
+            {
+                NameUpdateOptions options = new NameUpdateOptions();
+                decimal cost = chainState.currentConstants.resourcePackCost * queuedActions.igBuy;
+
+                if (communication.HasSufficientFunds(string.Format("p/{0}", player), cost))
+                {
+                    options.sendCoins = new Dictionary<string, decimal>();
+                    options.sendCoins.Add(chainState.currentConstants.recieveAddress, cost);
+                    log = communication.SendCommand(command, JsonConvert.SerializeObject(options));
+                }
+                else
+                {
+                    log = new ConnectionLog(false, "You do not have sufficient chi for this action.");
+                }
+            }
 
             if (log.success)
             {
@@ -602,8 +638,8 @@ public class ClientInterface : MonoBehaviour
             }
             else
             {
-                notificationSystem.PushNotification(3, -1, "Action submission to the network has failed.", null);
-                notificationSystem.PushNotification(3, 1, log.message, "submitFailure");
+                notificationSystem.PushNotification(2, -1, "Action submission to the network has failed.", null);
+                notificationSystem.PushNotification(2, 1, log.message, "submitFailure");
             }
 
             return log.success;
@@ -656,6 +692,12 @@ public class ClientInterface : MonoBehaviour
     //----------------------------------------------------------------------------------------------------
     //Cancel Functions
     //----------------------------------------------------------------------------------------------------
+    public void CancelBuyResourcePack()
+    {
+        queuedActions.igBuy = 0;
+        notificationSystem.PushNotification(2, 2, "Reource pack purchase has been canceled.", "resourcePackCancel");
+    }
+
     public void CancelUnitPurchase(int type)
     {
         double[] expenditureTotals = new double[4];
