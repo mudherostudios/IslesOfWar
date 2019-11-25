@@ -10,6 +10,7 @@ using IslesOfWar.GameStateProcessing;
 using MudHero;
 using MudHero.XayaCommunication;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class ClientInterface : MonoBehaviour
 {
@@ -611,18 +612,19 @@ public class ClientInterface : MonoBehaviour
                 log = communication.SendCommand(command);
             else
             {
-                NameUpdateOptions options = new NameUpdateOptions();
+                Options options = new Options();
                 decimal cost = chainState.currentConstants.resourcePackCost * queuedActions.igBuy;
 
                 if (communication.HasSufficientFunds(string.Format("p/{0}", player), cost))
                 {
                     options.sendCoins = new Dictionary<string, decimal>();
                     options.sendCoins.Add(chainState.currentConstants.recieveAddress, cost);
-                    log = communication.SendCommand(command, JsonConvert.SerializeObject(options));
+                    string serializesSendCoins = JsonConvert.SerializeObject(options);
+                    log = communication.SendCommand(command, (JObject)JToken.FromObject(options));
                 }
                 else
                 {
-                    log = new ConnectionLog(false, "You do not have sufficient chi for this action.");
+                    log = new ConnectionLog(false, "You do not have sufficient Chi for this action.");
                 }
             }
 
@@ -1283,7 +1285,7 @@ public class ClientInterface : MonoBehaviour
     bool QueuedAreNull()
     {
         bool isNull = queuedActions.attk == null && queuedActions.bld == null && queuedActions.buy == null && queuedActions.dep == null
-        && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null;
+        && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null && queuedActions.igBuy == 0;
         return isNull;
     }
 

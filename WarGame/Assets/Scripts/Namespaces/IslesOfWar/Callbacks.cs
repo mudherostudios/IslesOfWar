@@ -83,7 +83,7 @@ namespace IslesOfWar
                             foreach (dynamic element in moves)
                             {
                                 string player = element["name"].ToString();
-                                dynamic transactions = null;
+                                Dictionary<string,decimal> transactions = new Dictionary<string, decimal>();
                                 PlayerActions actions = new PlayerActions();
 
                                 if (Validity.JSON(element["move"].ToString()))
@@ -94,9 +94,9 @@ namespace IslesOfWar
                                 if (actions.igBuy > 0)
                                 {
                                     if (Validity.JSON(element["out"].ToString()))
-                                        transactions = JsonConvert.DeserializeObject<dynamic>(element["out"].ToString());
+                                        transactions = JsonConvert.DeserializeObject<Dictionary<string,decimal>>(element["out"].ToString());
 
-                                    if (Validity.PropertyExists(transactions, processor.state.currentConstants.recieveAddress))
+                                    if (transactions.ContainsKey(processor.state.currentConstants.recieveAddress))
                                         processor.SellPacksToPlayer(player, actions.igBuy, transactions[processor.state.currentConstants.recieveAddress]);
                                 }
                                 

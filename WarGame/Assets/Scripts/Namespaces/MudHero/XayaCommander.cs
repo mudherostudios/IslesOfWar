@@ -73,7 +73,17 @@ namespace MudHero
                 else
                 {
                     log.message = xayaService.NameUpdate(player, command, options);
-                    log.success = true;
+
+                    if (log.message == null)
+                    {
+                        log.message = "Did not recieve a response from the Xaya Daemon.";
+                        log.success = false;
+                    }
+                    else
+                    {
+                        log.success = true;
+                    }
+
                     return log;
                 }
             }
@@ -98,7 +108,8 @@ namespace MudHero
 
             public bool HasSufficientChi(string account, decimal spendAmount)
             {
-                return spendAmount == xayaService.GetBalance(account);
+                decimal currentBalance = xayaService.GetBalance();
+                return spendAmount <= currentBalance;
             }
 
             public int GetBlockHeight(string hash)

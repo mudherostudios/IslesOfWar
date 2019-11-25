@@ -1,6 +1,9 @@
 ﻿using BitcoinLib.Services.Coins.XAYA;
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Net.Http.Headers;
 using System.Data;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -162,7 +165,6 @@ namespace MudHero
                 ShutdownDaemon();
                 return "Shutting Down.";
             }
-
 
             public void Stop()
             {

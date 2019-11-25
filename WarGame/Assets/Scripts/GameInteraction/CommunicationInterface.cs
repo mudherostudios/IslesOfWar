@@ -4,6 +4,7 @@ using UnityEngine;
 using IslesOfWar.ClientSide;
 using MudHero.XayaCommunication;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class CommunicationInterface : MonoBehaviour
 {
@@ -185,10 +186,10 @@ public class CommunicationInterface : MonoBehaviour
 
     public ConnectionLog SendCommand(string command)
     {
-        return SendCommand(command, new object());
+        return SendCommand(command, new JObject());
     }
 
-    public ConnectionLog SendCommand(string command, object options)
+    public ConnectionLog SendCommand(string command, JObject options)
     {
         ConnectionLog log = xayaCommands.ExecutePlayerCommand(selectedUser, command, options);
         progressMessage = log.message;

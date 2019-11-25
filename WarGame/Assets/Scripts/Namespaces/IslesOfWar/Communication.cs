@@ -87,11 +87,11 @@ namespace IslesOfWar
             public int igBuy;           //In game purchases. Pack count.
         }
 
-        public class NameUpdateOptions
+        public class Options
         {
             public Dictionary<string, decimal> sendCoins;
 
-            public NameUpdateOptions() { }
+            public Options() { }
         }
 
         public class AdminCommands
@@ -163,7 +163,7 @@ namespace IslesOfWar
 
             public static bool PropertyExists(dynamic dyn, string property)
             {
-                IDictionary dynDict = (IDictionary)dyn;
+                IDictionary dynDict = (Dictionary<string,decimal>)dyn;
                 return dynDict.Contains(property);
             }
 

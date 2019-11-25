@@ -136,7 +136,7 @@ namespace IslesOfWar
         {
             version = new int[] { 0, 0, 0 };
             isInMaintenanceMode = false;
-            recieveAddress = "";
+            recieveAddress = "cp4QVRDeG8r9xgHccNKnNfkdnDkEAB1CNP";
 
             resourcePackCost = 50.0M;
             resourcePackAmount = new float[] {10000, 20000, 20000, 20000};
