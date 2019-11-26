@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MudHero;
 using IslesOfWar.ClientSide;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -82,9 +83,24 @@ namespace IslesOfWar
             public string srch;         //Island Search
             public ResourceOrder pot;   //Resource Pot Submission
             public List<string> dep;    //Depleted Island Submissions
+            public MarketOrderAction opn;//Starts a new Market Order
+            public string cls;          //Closes/Cancels a Market Order - Order ID
+            public string[] acpt;       //Accepts a Market Order and it's terms - Order ID, SellerName
             public BattleCommand attk;  //Attack Plan
             public BattleCommand dfnd;  //Defend Orders
             public int igBuy;           //In game purchases. Pack count.
+        }
+
+        public class MarketOrderAction
+        {
+            public double[] sell;
+            public double[] buy;
+
+            public MarketOrderAction(double[] resourcesToSell, double[] resourcesToBuy)
+            {
+                sell = Deep.Copy(resourcesToSell);
+                buy = Deep.Copy(resourcesToBuy);
+            }
         }
 
         public class Options
@@ -99,6 +115,8 @@ namespace IslesOfWar
             public int[] ver;          //Set Version, sets all - 3
             public string status;      //Set mode, currently only used for isInMaintenanceMode;
             public decimal packCost;   //Set ResourcePackCost
+            public float[] mrktPrcnt;  //Set MarketFeePercent, sets all - 4
+            public float[] mrktFee;    //Set MinMarketFee, sets all - 4
             public float[] packAmnt;   //Set ResourcePackAmount, sets all - 4
             public float[] iwCost;     //Set IslandSearchCost, sets all - 4 (only using first right now though) 
             public float atkPerc;      //Set AttackCostPercent
@@ -116,6 +134,9 @@ namespace IslesOfWar
             public int[] mmRes;        //Set MinMaxResoruces, first is resourceType, next 2 are min and max respectively - 3
             public float[] eRates;     //Set ExtractRates, sets all - 3
             public float[] fRates;     //Set FreeResourceRates, sets all - 4
+            public int ePrd;           //Set ExtractPeriod
+            public int fPrd;           //Set FreeResourcePeriod
+            public int dayBlk;         //Set AssumedDailyBlocks
             public float[] tProbs;     //Set TileProbabilities, sets all - 3
             public float[] rProbs;     //Set ResourceProbabilities, set all - 3
             public float[] poolPerc;   //Set PurchaseToPoolPercents, first is YType, next 4 are percents per resource - 5
@@ -309,6 +330,18 @@ namespace IslesOfWar
                 }
 
                 return canSubmit;
+            }
+
+            public static bool MarketOrder(MarketOrderAction order)
+            {
+                bool isValid = order.sell != null && order.buy != null;
+
+                if (isValid)
+                {
+                    isValid = isValid && ArraySize(order.sell, 4, 4) && ArraySize(order.buy, 4, 4);
+                }
+
+                return isValid;
             }
 
             public static bool AttackPlan(List<List<int>> plan)

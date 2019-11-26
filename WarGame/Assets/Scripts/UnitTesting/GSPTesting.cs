@@ -1313,7 +1313,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedFirst = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, savedIslands)
         && ResourcesAreEqual(processor.state.islands, savedIslands);
         resourceUpdateResults += GetPassOrFail(passedFirst);
@@ -1326,7 +1326,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedSecond = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedSecond);
@@ -1347,7 +1347,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedThird = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedThird);
@@ -1362,7 +1362,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedFourth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedFourth);
@@ -1383,7 +1383,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedFifth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedFifth);
@@ -1398,7 +1398,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedSixth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedSixth);
@@ -1419,7 +1419,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] + constants.extractRates[2] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedSeventh = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedSeventh);
@@ -1472,7 +1472,7 @@ public class GSPTesting : MonoBehaviour
         players["nox"].resources[2] = constants.freeResourceRates[2];
         players["nox"].resources[3] = constants.freeResourceRates[3] + constants.extractRates[2];
 
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedEighth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedEighth);
@@ -1489,7 +1489,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedNinth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedNinth);
@@ -1516,7 +1516,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + constants.extractRates[1], constants.freeResourceRates[3] + constants.extractRates[2] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedTenth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedTenth);
@@ -1534,7 +1534,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedEleventh = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedEleventh);
@@ -1558,7 +1558,7 @@ public class GSPTesting : MonoBehaviour
         players["cairo"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
         players["pimpMacD"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1], constants.freeResourceRates[2], constants.freeResourceRates[3] });
         players["nox"].resources.AddRange(new double[] { constants.freeResourceRates[0], constants.freeResourceRates[1] + constants.extractRates[0], constants.freeResourceRates[2] + (constants.extractRates[1] * 2), constants.freeResourceRates[3] + constants.extractRates[2] });
-        processor.UpdateIslandAndPlayerResources();
+        processor.UpdateIslandAndPlayerResources(1);
         bool passedTwelfth = PlayersAreEqualExcept("", processor.state.players, players) && IslandsAreEqual(processor.state.islands, alteredIslands)
         && ResourcesAreEqual(processor.state.islands, alteredIslands);
         resourceUpdateResults += GetPassOrFail(passedTwelfth);

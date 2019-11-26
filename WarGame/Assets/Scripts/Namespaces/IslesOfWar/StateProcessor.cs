@@ -47,6 +47,14 @@ namespace IslesOfWar
                 if (commands.packAmnt != null)
                     state.currentConstants.resourcePackAmount = Deep.Copy(commands.packAmnt);
 
+                //Market Fee Percent
+                if (Validity.ArraySize(commands.mrktPrcnt, 4, 4)) 
+                    state.currentConstants.marketFeePrecent = Deep.Copy(commands.mrktPrcnt);
+
+                //Min Market Fee
+                if (Validity.ArraySize(commands.mrktFee, 4, 4)) 
+                    state.currentConstants.minMarketFee = Deep.Copy(commands.mrktFee);
+
                 //Island Search Cost
                 if (commands.iwCost != null)
                     state.currentConstants.islandSearchCost = Deep.Copy(commands.iwCost);
@@ -139,6 +147,18 @@ namespace IslesOfWar
                 if (Validity.ArraySize(commands.fRates, 4, 4))
                     state.currentConstants.freeResourceRates = Deep.Copy(commands.fRates);
 
+                //Resource Extract Period
+                if (commands.ePrd > 0)
+                    state.currentConstants.extractPeriod = commands.ePrd;
+
+                //Free Resource Period
+                if (commands.fPrd > 0)
+                    state.currentConstants.freeResourcePeriod = commands.fPrd;
+
+                //Assumed Daily Blocks
+                if (commands.dayBlk > 0)
+                    state.currentConstants.assumedDailyBlocks = commands.dayBlk;
+
                 //Tile Probabilities
                 if (Validity.ArraySize(commands.tProbs, 3, 3))
                     state.currentConstants.tileProbabilities = Deep.Copy(commands.tProbs);
@@ -209,32 +229,38 @@ namespace IslesOfWar
                 }
             }
 
-            public void UpdateIslandAndPlayerResources()
+            public void UpdateIslandAndPlayerResources(int height)
             {
-                foreach (KeyValuePair<string, Island> pair in state.islands)
+                if (height % state.currentConstants.extractPeriod == 0)
                 {
-                    string collectors = pair.Value.collectors;
-                    string owner = pair.Value.owner;
-                    if (collectors != "000000000000")
+                    foreach (KeyValuePair<string, Island> pair in state.islands)
                     {
-                        for (int t = 0; t < collectors.Length; t++)
+                        string collectors = pair.Value.collectors;
+                        string owner = pair.Value.owner;
+                        if (collectors != "000000000000")
                         {
-                            if (collectors[t] != '0')
+                            for (int t = 0; t < collectors.Length; t++)
                             {
-                                int[] types = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(collectors[t]));
-                                UpdatePlayerResources(pair.Key, owner, t, types);
+                                if (collectors[t] != '0')
+                                {
+                                    int[] types = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(collectors[t]));
+                                    UpdatePlayerResources(pair.Key, owner, t, types);
+                                }
                             }
                         }
                     }
                 }
 
                 //Players get default resources.
-                foreach (KeyValuePair<string, PlayerState> pair in state.players)
+                if (height % state.currentConstants.freeResourcePeriod == 0)
                 {
-                    pair.Value.resources[0] += state.currentConstants.freeResourceRates[0] * pair.Value.islands.Count;
-                    pair.Value.resources[1] += state.currentConstants.freeResourceRates[1];
-                    pair.Value.resources[2] += state.currentConstants.freeResourceRates[2];
-                    pair.Value.resources[3] += state.currentConstants.freeResourceRates[3];
+                    foreach (KeyValuePair<string, PlayerState> pair in state.players)
+                    {
+                        pair.Value.resources[0] += state.currentConstants.freeResourceRates[0] * pair.Value.islands.Count;
+                        pair.Value.resources[1] += state.currentConstants.freeResourceRates[1];
+                        pair.Value.resources[2] += state.currentConstants.freeResourceRates[2];
+                        pair.Value.resources[3] += state.currentConstants.freeResourceRates[3];
+                    }
                 }
             }
 
@@ -569,6 +595,106 @@ namespace IslesOfWar
                     else
                     {
                         state.resourceContributions[player][order.rsrc] = Add(state.resourceContributions[player][order.rsrc], order.amnt);
+                    }
+                }
+            }
+
+            public void OpenOrder(string player, MarketOrderAction order, string txID)
+            {
+                //Make sure to add fee to pool
+                if (Validity.MarketOrder(order))
+                {
+                    string orderID = txID.Substring(0, 8);
+                    MarketOrder goodOrder = new MarketOrder(Deep.Copy(order.sell), Deep.Copy(order.buy), orderID);
+
+                    if (!state.resourceMarket.ContainsKey(player))
+                    {
+                        List<MarketOrder> initOrders = new List<MarketOrder>();
+                        initOrders.Add(goodOrder);
+                        state.resourceMarket.Add(player, initOrders);
+                    }
+                    else
+                    {
+                        state.resourceMarket[player].Add(goodOrder);
+                    }
+
+                    double[] totalCost = new double[4];
+                    double[] fees = new double[3];
+                    double buxFee = 0;
+
+                    for (int f = 0; f < fees.Length; f++)
+                    {
+                        double fee = Math.Round(state.currentConstants.marketFeePrecent[f] * order.sell[f]);
+                        double cost = fee + order.sell[f];
+
+                        if (cost < state.currentConstants.minMarketFee[f])
+                            cost = state.currentConstants.minMarketFee[f];
+
+                        totalCost[f] = cost;
+
+                        if (f > 0)
+                            fees[f - 1] = fee;
+                        else
+                            buxFee = fee;
+                    }
+
+                    if (Validity.HasEnoughResources(totalCost, state.players[player].resources.ToArray()))
+                    {
+                        state.players[player].resources = new List<double>(Subtract(state.players[player].resources.ToArray(), totalCost));
+                        state.resourcePools = new List<double>(Add(state.resourcePools.ToArray(), fees));
+                        state.warbucksPool += buxFee;
+                    }
+                }
+            }
+
+            public void CloseOrder(string player, string orderID)
+            {
+                if (state.resourceMarket.ContainsKey(player))
+                {
+                    foreach (MarketOrder order in state.resourceMarket[player])
+                    {
+                        if (order.orderID == orderID)
+                        {
+                            state.players[player].resources = new List<double>(Add(state.players[player].resources.ToArray(), order.selling));
+                            state.resourceMarket[player].Remove(order);
+                            if (state.resourceMarket[player].Count == 0)
+                                state.resourceMarket.Remove(player);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            public void AcceptOrder(string player, string seller, string orderID)
+            {
+                if (state.resourceMarket.ContainsKey(seller))
+                {
+                    double[] sell = new double[0];
+                    double[] buy = new double[0];
+                    string id;
+                    MarketOrder order = new MarketOrder();
+
+                    foreach (MarketOrder ord in state.resourceMarket[seller])
+                    {
+                        if (ord.orderID == orderID)
+                        {
+                            order = ord;
+                            sell = ord.selling;
+                            buy = ord.buying;
+                            id = ord.orderID;
+                            break;
+                        }
+                    }
+
+                    if (buy.Length == 4)
+                    {
+                        if (Validity.HasEnoughResources(buy, state.players[player].resources.ToArray()))
+                        {
+                            state.players[player].resources = new List<double>(Subtract(state.players[player].resources.ToArray(), buy));
+                            state.players[player].resources = new List<double>(Add(state.players[player].resources.ToArray(), sell));
+                            state.players[seller].resources = new List<double>(Add(state.players[player].resources.ToArray(), buy));
+                            state.resourceMarket[seller].Remove(order);
+                        }
                     }
                 }
             }

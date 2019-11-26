@@ -46,6 +46,7 @@ namespace IslesOfWar
                     dynamic moves = data["moves"];
                     dynamic admin = data["admin"];
                     string rng = data["block"]["rngseed"];
+                    int height = data["block"]["height"];
                     StateProcessor processor;
                     int seed = HexToInt.Get(rng.Substring(0,8));
                     MudHeroRandom random = new MudHeroRandom(seed);
@@ -71,10 +72,11 @@ namespace IslesOfWar
                         }
                     }
 
-                    //Resource Loop
+                    //Check Version and Mode
                     if (processor.isCorrectVersion && !processor.isInMaintenanceMode)
                     {
-                        processor.UpdateIslandAndPlayerResources();
+                        //Resource Loop
+                        processor.UpdateIslandAndPlayerResources(height);
 
                         //Main Loop
                         string serializedMove = JsonConvert.SerializeObject(moves);
@@ -123,6 +125,15 @@ namespace IslesOfWar
 
                                     if (actions.pot != null)
                                         processor.SubmitResourcesToPool(player, actions.pot);
+
+                                    if (actions.opn != null)
+                                        processor.OpenOrder(player, actions.opn, JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(element["txid"])));
+
+                                    if (actions.cls != null)
+                                        processor.CloseOrder(player, actions.cls);
+
+                                    if (Validity.ArraySize(actions.acpt, 2, 2))
+                                        processor.AcceptOrder(player, actions.acpt[0], actions.acpt[1]);
                                 }
                             }
 

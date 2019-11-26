@@ -23,6 +23,7 @@ public class ClientInterface : MonoBehaviour
     public string player;
 
     public double[] queuedExpenditures;
+    public double[] queuedBuyOrder;
     public Island queuedIslandDevelopment;
     public List<List<double>> queuedContributions;
     public List<string> queuedDepletedSubmissions;
@@ -52,6 +53,14 @@ public class ClientInterface : MonoBehaviour
         queuedExpenditures[1] += resources[1];
         queuedExpenditures[2] += resources[2];
         queuedExpenditures[3] += resources[3];
+    }
+
+    void UnspendResources(double[] resources)
+    {
+        queuedExpenditures[0] -= resources[0];
+        queuedExpenditures[1] -= resources[1];
+        queuedExpenditures[2] -= resources[2];
+        queuedExpenditures[3] -= resources[3];
     }
 
     void UpdateCollectors(string islandID, int tileIndex, int[] updatedCollectorTypes)
@@ -177,6 +186,75 @@ public class ClientInterface : MonoBehaviour
         {
             notificationSystem.PushNotification(2, 1, "Sorry, but you don't have sufficient funds.", "resourcePackFailure");
         }
+    }
+
+    public void PlaceMarketOrder(double[] resourcesToSell, double[] resourcesToBuy)
+    {
+        double[] totalAfterFee = new double[4];
+
+        for (int f = 0; f > totalAfterFee.Length; f++)
+        {
+            totalAfterFee[f] = Math.Round(resourcesToSell[f] * (chainState.currentConstants.marketFeePrecent[f] + 1));
+        }
+
+        if (Validity.HasEnoughResources(totalAfterFee, playerResources))
+        {
+            queuedActions.opn = new MarketOrderAction(resourcesToSell, resourcesToBuy);
+            SpendResources(totalAfterFee);
+            notificationSystem.PushNotification(1, 0, "Our resource order is waiting for approval.", "marketOpenSuccess");
+        }
+        else 
+        {
+            notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketOpenFailure");
+        }
+    }
+
+    public void CloseMarketOrder(string id)
+    {
+        queuedActions.cls = id;
+        bool stillOrdered = false;
+
+        foreach (MarketOrder order in chainState.resourceMarket[player])
+        {
+            stillOrdered = order.orderID == id;
+
+            if (stillOrdered)
+                break;
+        }
+
+        if (stillOrdered)
+            notificationSystem.PushNotification(1, 0, "We will close the order after submission.", "marketCloseSuccess");
+        else
+            notificationSystem.PushNotification(1, 0, "Someone fulfilled the order before we could cancel.", "marketCloseFalse");
+    }
+
+    public void AcceptMarketOrder(string seller, int index, string id)
+    {
+        if (chainState.resourceMarket.ContainsKey(seller))
+        {
+            if (chainState.resourceMarket[seller].Count > index)
+            {
+                if (chainState.resourceMarket[seller][index].orderID == id)
+                {
+                    if (Validity.HasEnoughResources(chainState.resourceMarket[seller][index].buying, playerResources))
+                    {
+                        queuedActions.acpt = new string[] { seller, id };
+                        queuedBuyOrder = Deep.Copy(chainState.resourceMarket[seller][index].buying);
+                        SpendResources(queuedBuyOrder);
+                        string message = string.Format("A purchase order to {0} will be filled after submission", seller);
+                        notificationSystem.PushNotification(1, 0, message, "marketAcceptSuccess");
+                        return;
+                    }
+                    else
+                    {
+                        notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketAcceptFailure");
+                        return;
+                    }
+                }
+            }
+        }
+
+        notificationSystem.PushNotification(2, 1, "The order is no longer available on the market.", "marketAcceptFailure");
     }
     
     public bool PurchaseIslandCollector(StructureCost cost)
@@ -697,7 +775,38 @@ public class ClientInterface : MonoBehaviour
     public void CancelBuyResourcePack()
     {
         queuedActions.igBuy = 0;
-        notificationSystem.PushNotification(2, 2, "Reource pack purchase has been canceled.", "resourcePackCancel");
+        notificationSystem.PushNotification(2, 2, "Resource pack purchase has been canceled.", "resourcePackCancel");
+    }
+
+    public void CancelOpenOrder()
+    {
+        double[] cost = new double[4];
+
+        for (int c = 0; c < cost.Length; c++)
+        {
+            double fee = Math.Round(queuedActions.opn.sell[c] * chainState.currentConstants.marketFeePrecent[c]);
+            if (fee < chainState.currentConstants.minMarketFee[c])
+                fee = chainState.currentConstants.minMarketFee[c];
+
+            cost[c] = fee + queuedActions.opn.sell[c];
+        }
+
+        UnspendResources(cost);
+        queuedActions.opn = null;
+        notificationSystem.PushNotification(2,2,"We have canceled our order.", "openOrderCancel");
+    }
+
+    public void CancelCloseOrder()
+    {
+        queuedActions.cls = null;
+        notificationSystem.PushNotification(2, 2, "We have chosen to keep our order on the market.", "closeOrderCancel");
+    }
+
+    public void CancelAcceptOrder()
+    {
+        UnspendResources(queuedBuyOrder);
+        queuedActions.acpt = null;
+        notificationSystem.PushNotification(2, 2, "We have retracted our request to purchase resources.", "acceptOrderCancel");
     }
 
     public void CancelUnitPurchase(int type)
@@ -712,10 +821,7 @@ public class ClientInterface : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < 4; i++)
-        {
-            queuedExpenditures[i] -= expenditureTotals[i];
-        }
+        UnspendResources(expenditureTotals);
 
         queuedActions.buy[0 + type*3] = 0;
         queuedActions.buy[1 + type*3] = 0;

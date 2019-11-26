@@ -103,6 +103,8 @@ namespace IslesOfWar
 
         public decimal resourcePackCost;
         public float[] resourcePackAmount;
+        public float[] marketFeePrecent;
+        public float[] minMarketFee;
 
         public float[] islandSearchCost;
         public float islandModifierExponent;
@@ -125,6 +127,9 @@ namespace IslesOfWar
         public int[,] minMaxResources;
         public float[] extractRates;
         public float[] freeResourceRates;
+        public int extractPeriod;
+        public int freeResourcePeriod;
+        public int assumedDailyBlocks;
 
         public float[] tileProbabilities;
         public float[] resourceProbabilities;
@@ -140,12 +145,14 @@ namespace IslesOfWar
 
             resourcePackCost = 50.0M;
             resourcePackAmount = new float[] {10000, 20000, 20000, 20000};
+            marketFeePrecent = new float[] { 0.15f, 0.07f, 0.07f, 0.07f };
+            minMarketFee = new float[] { 50, 200, 600, 100};
 
-            islandSearchCost = new float[] { 1000, 0, 0, 0 };
+            islandSearchCost = new float[] { 100, 0, 0, 0 };
             islandModifierExponent = 0.1f;
             attackCostPercent = 0.1f;
             undiscoveredPercent = 0.5f;
-            islandSearchReplenishTime = 150.0f;
+            islandSearchReplenishTime = 1.0f; //Full Day
             islandSearchOptions = new string[] { "norm" };
 
             squadHealthLimit = 1000000;
@@ -227,13 +234,16 @@ namespace IslesOfWar
 
             minMaxResources = new int[,]
             {
-                {28750, 80500},
-                {28750, 80500},
-                {28750, 80500}
+                {320, 448},
+                {320, 448},
+                {320, 448}
             };
 
             extractRates = new float[] { 10, 20, 5 };
             freeResourceRates = new float[] { 1, 1, 1, 1 };
+            extractPeriod = 150;
+            freeResourcePeriod = 480;
+            assumedDailyBlocks = 9600;
 
             tileProbabilities = new float[] { 0.65f, 0.25f, 0.1f };
             resourceProbabilities = new float[] { 0.15f, 0.2f, 0.1f };
@@ -248,8 +258,8 @@ namespace IslesOfWar
                 {0.15f, 0.05f, 0.05f, 0.05f}
             };
 
-            poolRewardBlocks = 7000;
-            warbucksRewardBlocks = 7000;
+            poolRewardBlocks = 9600;
+            warbucksRewardBlocks = 9600;
         }
     }
 }
