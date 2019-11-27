@@ -196,9 +196,14 @@ public class CommunicationInterface : MonoBehaviour
         return log;
     }
 
-    public bool HasSufficientFunds(string account, decimal spendAmount)
+    public bool HasSufficientFunds(decimal spendAmount)
     {
-        return xayaCommands.HasSufficientChi(account, spendAmount);
+        return xayaCommands.HasSufficientChi(spendAmount);
+    }
+
+    public decimal GetFunds()
+    {
+        return xayaCommands.GetBalance();
     }
 
     public void CreateName(string name)

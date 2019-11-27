@@ -57,6 +57,7 @@ public class WorldNavigator : MonoBehaviour
     public SquadGUI squadFormation;
     public NationSelect nationSelect;
     public GameObject commandCenterMenu;
+    public GameObject mainMarketMenu;
     public BlockChainEffectUpdater sateliteEffects;
     public ActionIdentifier[] actionIdentifiers; //Order by actionType switch for ShowActions() function in this script.
     public int unitType;
@@ -137,6 +138,7 @@ public class WorldNavigator : MonoBehaviour
         commandScript.squadGUI = squadFormation;
         commandScript.nationSelect = nationSelect;
         commandScript.commandCenterMenu = commandCenterMenu;
+        commandScript.mainMarketMenu = mainMarketMenu;
         commandScript.notificationSystem = notificationSystem;
         unitPurchase.commandScript = commandScript;
         resourcePool.commandScript = commandScript;

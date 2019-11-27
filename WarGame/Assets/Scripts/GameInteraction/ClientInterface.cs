@@ -177,7 +177,7 @@ public class ClientInterface : MonoBehaviour
 
     public void BuyResourcePack(int count)
     {
-        if (communication.HasSufficientFunds(player, count * chainState.currentConstants.resourcePackCost))
+        if (communication.HasSufficientFunds(count * chainState.currentConstants.resourcePackCost))
         {
             queuedActions.igBuy = count;
             notificationSystem.PushNotification(1, 0, "Resource Pack Purchase is ready for submission.", "resourcePackSuccess");
@@ -693,7 +693,7 @@ public class ClientInterface : MonoBehaviour
                 Options options = new Options();
                 decimal cost = chainState.currentConstants.resourcePackCost * queuedActions.igBuy;
 
-                if (communication.HasSufficientFunds(string.Format("p/{0}", player), cost))
+                if (communication.HasSufficientFunds(cost))
                 {
                     options.sendCoins = new Dictionary<string, decimal>();
                     options.sendCoins.Add(chainState.currentConstants.recieveAddress, cost);

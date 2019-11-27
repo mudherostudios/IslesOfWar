@@ -72,6 +72,9 @@ public class ActionIdentifier : MonoBehaviour
                 client.CancelIslandDevelopment();
                 break;
             case 9:
+                client.CancelBuyResourcePack();
+                break;
+            case 10:
                 client.CancelNationChange();
                 break;
             default:
@@ -123,6 +126,10 @@ public class ActionIdentifier : MonoBehaviour
                     Show();
                 break;
             case 9:
+                if (client.queuedActions.igBuy != 0)
+                    Show();
+                break;
+            case 10:
                 if (client.queuedActions.nat != null && client.isPlaying)
                     Show();
                 break;

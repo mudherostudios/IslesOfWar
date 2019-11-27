@@ -21,6 +21,7 @@ public class UnitPurchase: MonoBehaviour
 
     public void UpdateAllStats(int _type)
     {
+        constants = commandScript.clientInterface.chainState.currentConstants;
         type = _type;
         string formatW = "";
         string formatO = "";

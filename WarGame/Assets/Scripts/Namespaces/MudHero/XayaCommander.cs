@@ -106,7 +106,7 @@ namespace MudHero
                 return log;
             }
 
-            public bool HasSufficientChi(string account, decimal spendAmount)
+            public bool HasSufficientChi(decimal spendAmount)
             {
                 decimal currentBalance = xayaService.GetBalance();
                 return spendAmount <= currentBalance;
@@ -115,6 +115,11 @@ namespace MudHero
             public int GetBlockHeight(string hash)
             {
                 return xayaService.GetBlock(hash).Height;
+            }
+
+            public decimal GetBalance()
+            {
+                return xayaService.GetBalance();
             }
 
             public int networkBlockCount

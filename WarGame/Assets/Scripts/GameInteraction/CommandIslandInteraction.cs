@@ -18,6 +18,7 @@ public class CommandIslandInteraction : Interaction
     public SquadGUI squadGUI;
     public NationSelect nationSelect;
     public GameObject commandCenterMenu;
+    public GameObject mainMarketMenu;
     public Notifications notificationSystem;
 
     [Header("Camera Variables")]
@@ -26,8 +27,8 @@ public class CommandIslandInteraction : Interaction
     public Transform focalPoint;
     
     private string[] commandButtonTypes = new string[] 
-    { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter", "CommandPrompter", "ConstructionPrompter" };
-    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter, hasCommandPromtper;
+    { "UnitPrompt", "ResourcePrompt", "WarbuxPrompter", "SearchIslandsPrompter", "DefendPrompter", "AttackPrompter", "CommandPrompter", "ConstructionPrompter", "MainMarketPrompter" };
+    private bool hasUnitPurchasePrompter, hasPoolPrompter, hasWarbuxPrompter, hasSearchPrompter, hasDefendPrompter, hasAttackPrompter, hasCommandPromtper, hasMarketPrompter;
     private UnitPurchasePrompter unitPrompter;
     private PoolPrompter poolPrompter;
     private ObjectRevealer genericPrompter;
@@ -66,6 +67,7 @@ public class CommandIslandInteraction : Interaction
             hasDefendPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[4];
             hasAttackPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[5];
             hasCommandPromtper = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[6];
+            hasMarketPrompter = genericPrompter != null && genericPrompter.buttonType == commandButtonTypes[7];
 
             if (actionIdentifier != null)
                 actionIdentifier.CancelAction();
@@ -75,17 +77,31 @@ public class CommandIslandInteraction : Interaction
             else
                 showMenuButton.SetActive(false);
 
-            //Close all of the menus.
-            unitPurchase.gameObject.SetActive(false);
-            resourcePool.gameObject.SetActive(false);
-            warbucksPool.gameObject.SetActive(false);
-            searchIslands.gameObject.SetActive(false);
-            commandCenterMenu.SetActive(false);
-            battleIslandsGUI.HideMenus();
-            squadGUI.Close();
-            if (clientInterface.isPlaying)
-                nationSelect.gameObject.SetActive(false);
+            CloseMenus();
         }
+    }
+
+    public void CloseMenus()
+    {
+        //Close all of the menus.
+        unitPurchase.gameObject.SetActive(false);
+        resourcePool.gameObject.SetActive(false);
+        warbucksPool.gameObject.SetActive(false);
+        searchIslands.gameObject.SetActive(false);
+        commandCenterMenu.SetActive(false);
+        mainMarketMenu.SetActive(false);
+
+        int childCount = mainMarketMenu.transform.parent.childCount;
+
+        for (int c = 0; c < childCount; c++)
+        {
+            mainMarketMenu.transform.parent.GetChild(c).gameObject.SetActive(false);
+        }
+
+        battleIslandsGUI.HideMenus();
+        squadGUI.Close();
+        if (clientInterface.isPlaying)
+            nationSelect.gameObject.SetActive(false);
     }
 
     public void ShowMenu()
@@ -104,6 +120,8 @@ public class CommandIslandInteraction : Interaction
             battleIslandsGUI.ShowAttackMenu();
         else if (hasCommandPromtper)
             commandCenterMenu.SetActive(true);
+        else if (hasMarketPrompter)
+            mainMarketMenu.SetActive(true);
         
         orbital.Defocus();
     }
