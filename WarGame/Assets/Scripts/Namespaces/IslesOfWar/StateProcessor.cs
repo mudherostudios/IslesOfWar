@@ -31,7 +31,7 @@ namespace IslesOfWar
             {
                 //Version
                 if (commands.ver != null)
-                    state.currentConstants.version = Deep.Copy(commands.ver);
+                    state.currentConstants.version = Deep.CopyObject<int[]>(commands.ver);
 
                 //Modes, currently just maintenance mode for stopping the game if there is a major exploit or flaw/bug
                 if (commands.status == "maintenance")
@@ -45,19 +45,19 @@ namespace IslesOfWar
 
                 //Resource pack amount 
                 if (commands.packAmnt != null)
-                    state.currentConstants.resourcePackAmount = Deep.Copy(commands.packAmnt);
+                    state.currentConstants.resourcePackAmount = Deep.CopyObject<float[]>(commands.packAmnt);
 
                 //Market Fee Percent
                 if (Validity.ArraySize(commands.mrktPrcnt, 4, 4)) 
-                    state.currentConstants.marketFeePrecent = Deep.Copy(commands.mrktPrcnt);
+                    state.currentConstants.marketFeePrecent = Deep.CopyObject<float[]>(commands.mrktPrcnt);
 
                 //Min Market Fee
                 if (Validity.ArraySize(commands.mrktFee, 4, 4)) 
-                    state.currentConstants.minMarketFee = Deep.Copy(commands.mrktFee);
+                    state.currentConstants.minMarketFee = Deep.CopyObject<float[]>(commands.mrktFee);
 
                 //Island Search Cost
                 if (commands.iwCost != null)
-                    state.currentConstants.islandSearchCost = Deep.Copy(commands.iwCost);
+                    state.currentConstants.islandSearchCost = Deep.CopyObject<float[]>(commands.iwCost);
 
                 //Attack Cost Percent
                 if (commands.atkPerc > 0)
@@ -141,11 +141,11 @@ namespace IslesOfWar
 
                 //Extraction Rates
                 if (Validity.ArraySize(commands.eRates, 3, 3))
-                    state.currentConstants.extractRates = Deep.Copy(commands.eRates);
+                    state.currentConstants.extractRates = Deep.CopyObject<float[]>(commands.eRates);
 
                 //Free Generation Rates
                 if (Validity.ArraySize(commands.fRates, 4, 4))
-                    state.currentConstants.freeResourceRates = Deep.Copy(commands.fRates);
+                    state.currentConstants.freeResourceRates = Deep.CopyObject<float[]>(commands.fRates);
 
                 //Resource Extract Period
                 if (commands.ePrd > 0)
@@ -161,11 +161,11 @@ namespace IslesOfWar
 
                 //Tile Probabilities
                 if (Validity.ArraySize(commands.tProbs, 3, 3))
-                    state.currentConstants.tileProbabilities = Deep.Copy(commands.tProbs);
+                    state.currentConstants.tileProbabilities = Deep.CopyObject<float[]>(commands.tProbs);
 
                 //Resource Probabilities
                 if (Validity.ArraySize(commands.rProbs, 3, 3))
-                    state.currentConstants.resourceProbabilities = Deep.Copy(commands.rProbs);
+                    state.currentConstants.resourceProbabilities = Deep.CopyObject<float[]>(commands.rProbs);
 
                 //Purchase to Pool Percents
                 if (Validity.ArraySize(commands.poolPerc, 5, 5))
@@ -601,36 +601,20 @@ namespace IslesOfWar
 
             public void OpenOrder(string player, MarketOrderAction order, string txID)
             {
-                //Make sure to add fee to pool
                 if (Validity.MarketOrder(order))
                 {
-                    string orderID = txID.Substring(0, 8);
-                    MarketOrder goodOrder = new MarketOrder(Deep.Copy(order.sell), Deep.Copy(order.buy), orderID);
-
-                    if (!state.resourceMarket.ContainsKey(player))
-                    {
-                        List<MarketOrder> initOrders = new List<MarketOrder>();
-                        initOrders.Add(goodOrder);
-                        state.resourceMarket.Add(player, initOrders);
-                    }
-                    else
-                    {
-                        state.resourceMarket[player].Add(goodOrder);
-                    }
-
                     double[] totalCost = new double[4];
                     double[] fees = new double[3];
                     double buxFee = 0;
 
-                    for (int f = 0; f < fees.Length; f++)
+                    for (int f = 0; f < totalCost.Length; f++)
                     {
                         double fee = Math.Round(state.currentConstants.marketFeePrecent[f] * order.sell[f]);
-                        double cost = fee + order.sell[f];
 
-                        if (cost < state.currentConstants.minMarketFee[f])
-                            cost = state.currentConstants.minMarketFee[f];
+                        if (fee < state.currentConstants.minMarketFee[f] && fee > 0)
+                            fee = state.currentConstants.minMarketFee[f];
 
-                        totalCost[f] = cost;
+                        totalCost[f] = order.sell[f] + fee;
 
                         if (f > 0)
                             fees[f - 1] = fee;
@@ -640,6 +624,20 @@ namespace IslesOfWar
 
                     if (Validity.HasEnoughResources(totalCost, state.players[player].resources.ToArray()))
                     {
+                        string orderID = txID.Substring(0, 8);
+                        MarketOrder goodOrder = new MarketOrder(Deep.CopyObject<double[]>(order.sell), Deep.CopyObject<double[]>(order.buy), orderID);
+
+                        if (!state.resourceMarket.ContainsKey(player))
+                        {
+                            List<MarketOrder> initOrders = new List<MarketOrder>();
+                            initOrders.Add(goodOrder);
+                            state.resourceMarket.Add(player, initOrders);
+                        }
+                        else
+                        {
+                            state.resourceMarket[player].Add(goodOrder);
+                        }
+
                         state.players[player].resources = new List<double>(Subtract(state.players[player].resources.ToArray(), totalCost));
                         state.resourcePools = new List<double>(Add(state.resourcePools.ToArray(), fees));
                         state.warbucksPool += buxFee;

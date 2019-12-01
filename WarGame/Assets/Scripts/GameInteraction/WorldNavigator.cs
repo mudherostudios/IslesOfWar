@@ -424,6 +424,16 @@ public class WorldNavigator : MonoBehaviour
         managementScript.SaveIslandName();
     }
 
+    public void PushNotification(int type, int soundType, string message)
+    {
+        notificationSystem.PushNotification(type, soundType, message);
+    }
+
+    public void PushNotification(int type, int soundType, string message, string notificationName)
+    {
+        notificationSystem.PushNotification(type, soundType, message, notificationName);
+    }
+
     //--------------------------------------------------
     //Cancel Orders
     //--------------------------------------------------

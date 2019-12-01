@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace MudHero
 {
     public static class HexToInt 
@@ -17,21 +19,9 @@ namespace MudHero
 
     public static class Deep
     {
-        public static T[] Copy<T>(List<T> original)
+        public static T CopyObject<T>(object original)
         {
-            return Copy(original.ToArray());
-        }
-
-        public static T[] Copy<T>(T[] original)
-        {
-            T[] copy = new T[original.Length];
-
-            for (int i = 0; i < copy.Length; i++)
-            {
-                copy[i] = original[i];
-            }
-
-            return copy;
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(original));
         }
 
         public static T[][] Convert<T>(List<List<T>> original)
@@ -48,13 +38,13 @@ namespace MudHero
 
         public static int[] Merge(int[] a, int[] b)
         {
-            int[] biggest = Copy(a);
-            int[] smallest = Copy(b);
+            int[] biggest = CopyObject<int[]>(a);
+            int[] smallest = CopyObject<int[]>(b);
 
             if (a.Length < b.Length)
             {
-                biggest = Copy(b);
-                smallest = Copy(a);
+                biggest = CopyObject<int[]>(b);
+                smallest = CopyObject<int[]>(a);
             }
 
             for (int i = 0; i < smallest.Length; i++)

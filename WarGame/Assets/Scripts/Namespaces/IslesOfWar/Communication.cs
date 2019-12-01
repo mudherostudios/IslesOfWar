@@ -98,8 +98,8 @@ namespace IslesOfWar
 
             public MarketOrderAction(double[] resourcesToSell, double[] resourcesToBuy)
             {
-                sell = Deep.Copy(resourcesToSell);
-                buy = Deep.Copy(resourcesToBuy);
+                sell = Deep.CopyObject<double[]>(resourcesToSell);
+                buy = Deep.CopyObject<double[]>(resourcesToBuy);
             }
         }
 
@@ -342,6 +342,55 @@ namespace IslesOfWar
                 }
 
                 return isValid;
+            }
+
+            public static bool PlayerCanAcceptOrder(Dictionary<string, List<MarketOrder>> market, string seller, string id, string buyer)
+            {
+                int index = -1;
+                return PlayerCanAcceptOrder(market, seller, id, buyer, out index);
+            }
+
+            public static bool PlayerCanAcceptOrder(Dictionary<string, List<MarketOrder>> market, string seller, string id, string buyer, out int index)
+            {
+                bool canAccept = market.ContainsKey(seller) && buyer != seller;
+                int foundIndex = -1;
+
+                if (canAccept)
+                {
+                    bool found = false;
+                    
+                    for(int o = 0; o < market[seller].Count && !found; o++)
+                    {
+                        found = market[seller][o].orderID == id;
+
+                        if (found)
+                            foundIndex = o;
+                    }
+                    
+                    canAccept = found;
+                }
+
+                index = foundIndex;
+                return canAccept;
+            }
+
+            public static bool PlayerCanCloseOrder(Dictionary<string, List<MarketOrder>> marketData, string player, string orderID)
+            {
+                bool canClose = marketData.ContainsKey(player);
+
+                if (canClose)
+                {
+                    List<MarketOrder> playerOrders = marketData[player];
+                    bool tempCan = false;
+                    for (int o = 0; o < playerOrders.Count && !tempCan; o++)
+                    {
+                        if (playerOrders[o].orderID == orderID)
+                            tempCan = true;
+                    }
+                    canClose = canClose && tempCan;
+                }
+
+                return canClose;
             }
 
             public static bool AttackPlan(List<List<int>> plan)

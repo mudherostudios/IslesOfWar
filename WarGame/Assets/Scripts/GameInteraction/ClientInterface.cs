@@ -225,32 +225,32 @@ public class ClientInterface : MonoBehaviour
         if (stillOrdered)
             notificationSystem.PushNotification(1, 0, "We will close the order after submission.", "marketCloseSuccess");
         else
-            notificationSystem.PushNotification(1, 0, "Someone fulfilled the order before we could cancel.", "marketCloseFalse");
+            notificationSystem.PushNotification(1, 0, "We can not find the order, someone possibly accepted it.", "marketCloseFailure");
     }
 
-    public void AcceptMarketOrder(string seller, int index, string id)
+    public void AcceptMarketOrder(string seller, string id)
     {
-        if (chainState.resourceMarket.ContainsKey(seller))
+        int index = -1;
+        bool acceptOrder = Validity.PlayerCanAcceptOrder(chainState.resourceMarket, seller, id, player, out index);
+
+        if (index >= 0)
         {
-            if (chainState.resourceMarket[seller].Count > index)
+            if (acceptOrder)
+                acceptOrder = Validity.HasEnoughResources(chainState.resourceMarket[seller][index].buying, playerResources);
+
+            if (acceptOrder)
             {
-                if (chainState.resourceMarket[seller][index].orderID == id)
-                {
-                    if (Validity.HasEnoughResources(chainState.resourceMarket[seller][index].buying, playerResources))
-                    {
-                        queuedActions.acpt = new string[] { seller, id };
-                        queuedBuyOrder = Deep.Copy(chainState.resourceMarket[seller][index].buying);
-                        SpendResources(queuedBuyOrder);
-                        string message = string.Format("A purchase order to {0} will be filled after submission", seller);
-                        notificationSystem.PushNotification(1, 0, message, "marketAcceptSuccess");
-                        return;
-                    }
-                    else
-                    {
-                        notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketAcceptFailure");
-                        return;
-                    }
-                }
+                queuedActions.acpt = new string[] { seller, id };
+                queuedBuyOrder = Deep.CopyObject<double[]>(chainState.resourceMarket[seller][index].buying);
+                SpendResources(queuedBuyOrder);
+                string message = string.Format("A purchase order to {0} will be filled after submission", seller);
+                notificationSystem.PushNotification(1, 0, message, "marketAcceptSuccess");
+                return;
+            }
+            else
+            {
+                notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketAcceptFailure");
+                return;
             }
         }
 
@@ -1301,7 +1301,8 @@ public class ClientInterface : MonoBehaviour
     //------------------------------------------------------------------
     public bool[] QueueIsValid()
     {
-        bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true, size = true;
+        bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true,
+        openOrder = true, closeOrder = true, acceptOrder = true, size = true;
 
         if (queuedActions.nat != null)
         {
@@ -1383,15 +1384,50 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.dfnd.sqd = tempSqds;
         }
 
+        if (queuedActions.opn != null)
+        {
+            if (queuedActions.opn.sell == new double[4])
+                openOrder = false;
+            if (queuedActions.opn.buy == new double[4])
+                openOrder = false;
+
+            if (!openOrder)
+                queuedActions.opn = null;
+        }
+
+        if (queuedActions.cls != null && queuedActions.cls != "")
+        {
+            if (!Validity.PlayerCanCloseOrder(chainState.resourceMarket, player, queuedActions.cls))
+                closeOrder = false;
+
+            if (!closeOrder)
+                queuedActions.cls = null;
+        }
+
+        if (queuedActions.acpt != null)
+        {
+            if (!Validity.PlayerCanAcceptOrder(chainState.resourceMarket, queuedActions.acpt[0], queuedActions.acpt[1], player))
+                acceptOrder = false;
+
+            if (!acceptOrder)
+                queuedActions.acpt = null;
+        }
+
         size = Validity.UpdateSize(queuedActions);
 
-        return new bool[] { nation, build, units, search, resource, depleted, attack, defend, size };
+        return new bool[] 
+        {
+            nation, build, units, search, resource, depleted,
+            attack, defend, openOrder, closeOrder, acceptOrder, size
+        };
     }
 
     bool QueuedAreNull()
     {
         bool isNull = queuedActions.attk == null && queuedActions.bld == null && queuedActions.buy == null && queuedActions.dep == null
-        && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null && queuedActions.igBuy == 0;
+        && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null && queuedActions.igBuy == 0
+        && queuedActions.opn == null && queuedActions.cls == null && queuedActions.acpt == null;
+
         return isNull;
     }
 

@@ -151,8 +151,10 @@ namespace IslesOfWar
 
             public MarketOrder(double[] sell, double[] buy, string ID)
             {
-                selling = Deep.Copy(sell);
-                buying = Deep.Copy(buy);
+                if (sell == null || buy == null)
+                    Debug.LogError("DAFUQ THERE BE BUGS MY MAN!");
+                selling = Deep.CopyObject<double[]>(sell);
+                buying = Deep.CopyObject<double[]>(buy);
                 orderID = ID;
             }
         }
@@ -496,7 +498,7 @@ namespace IslesOfWar
 
             public static int[] GetBaseTypes(int type)
             {
-                return Deep.Copy(decodeTable[type]);
+                return Deep.CopyObject<int[]>(decodeTable[type]);
             }
 
             public static int GetXType(char type)
