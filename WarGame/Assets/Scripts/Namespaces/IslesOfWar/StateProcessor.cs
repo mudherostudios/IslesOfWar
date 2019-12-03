@@ -692,6 +692,9 @@ namespace IslesOfWar
                             state.players[player].resources = new List<double>(Add(state.players[player].resources.ToArray(), sell));
                             state.players[seller].resources = new List<double>(Add(state.players[player].resources.ToArray(), buy));
                             state.resourceMarket[seller].Remove(order);
+
+                            if (state.resourceMarket[seller].Count == 0)
+                                state.resourceMarket.Remove(seller);
                         }
                     }
                 }
