@@ -44,7 +44,7 @@ public class PurchasePackMenu : MonoBehaviour
             oilAmount.text = (constants.resourcePackAmount[1] * packs).ToString();
             metalAmount.text = (constants.resourcePackAmount[2] * packs).ToString();
             concreteAmount.text = (constants.resourcePackAmount[3] * packs).ToString();
-            chiAmount.text = (constants.resourcePackCost * packs).ToString("G4", CultureInfo.InvariantCulture);
+            chiAmount.text = (constants.resourcePackCost * packs).ToString("G8", CultureInfo.InvariantCulture);
         }
     }
 

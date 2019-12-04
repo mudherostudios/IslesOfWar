@@ -131,7 +131,7 @@ public class MarketMenu : PlayerTrading
 
     void SetUserTitle(int count)
     {
-        userTitle.text = string.Format("Users ({0})", count.ToString("G6"));
+        userTitle.text = string.Format("Users ({0})", count.ToString("G8"));
     }
 
     void SetOrdersTitle(string user)
@@ -149,7 +149,7 @@ public class MarketMenu : PlayerTrading
             userChunk = string.Format("{0}'s", temp);
         }
 
-        orderTitle.text = string.Format("{0} - Open Orders ({1})", userChunk, count.ToString("G4"));
+        orderTitle.text = string.Format("{0} - Open Orders ({1})", userChunk, count.ToString("G8"));
     }
 
     void AdjustUserContentWindow(int count)

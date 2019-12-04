@@ -125,7 +125,7 @@ public class Interaction : MonoBehaviour
         if (amount < 10000)
             orderOfMag = amount.ToString();
         else
-            orderOfMag = amount.ToString("G3", CultureInfo.InvariantCulture);
+            orderOfMag = amount.ToString("G8", CultureInfo.InvariantCulture);
         return orderOfMag;
     }
 

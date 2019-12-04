@@ -95,9 +95,9 @@ public class BattlePlanInteraction : Interaction
                 else
                     hud.SetUnitCounts(clientInterface.chainState.islands[islandID].squadCounts[selectedSquad.squad].ToArray());
 
-                if (show && selectedSquad.owner == 1)
+                if (show && selectedSquad.isPlayers)
                     ViewCurrentSquad();
-                else if (show && selectedSquad.owner == 0)
+                else if (show && !selectedSquad.isPlayers)
                     ViewCurrentOpponentSquad();
 
             }
@@ -106,12 +106,12 @@ public class BattlePlanInteraction : Interaction
                 hud.HideUnitsBar();
             }
 
-            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.owner == 1 && !selectedSquad.defender)
+            if (peeked == battleButtonTypes[1] && clicked && Input.GetButton("Boost") && selectedSquad.isPlayers && !selectedSquad.defender)
             {
                 RemoveSquadPoint(selectedButton.GetComponent<PlanMarker>().index);
             }
 
-            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected && selectedSquad.owner == 1 && !selectedSquad.defender)
+            if (currentSquad >= 0 && peeked == buttonTypes[2] && affected && selectedSquad.isPlayers && !selectedSquad.defender)
             {
                 int position = selectedButton.GetComponent<IndexedNavigationButton>().index;
                 Plan(position);
@@ -246,9 +246,8 @@ public class BattlePlanInteraction : Interaction
             int unitDisplayType = GetUnitTypeByHighestHealth(pair.Value);
             squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squad = squadIndex;
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().owner = 1;
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", squadIndex.ToString(), islandID.Substring(0,8));
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true);
             currentSquad = squadIndex;
             selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
             selectedSquad.defender = true;
@@ -267,9 +266,8 @@ public class BattlePlanInteraction : Interaction
                 int unitDisplayType = GetUnitTypeByHighestHealth(opponentCounts[o].ToArray());
                 opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
                 opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
-                opponentMarkers[o].GetComponent<SquadMarker>().owner = 0;
                 opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
-                opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
+                opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, false);
                 currentSquad = o;
                 selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
                 ViewCurrentOpponentSquad();
@@ -302,8 +300,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = squadName;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().owner = 1;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true);
             squads.Add(squadName, counts);
             squadPlans.Add(new List<int>());
             

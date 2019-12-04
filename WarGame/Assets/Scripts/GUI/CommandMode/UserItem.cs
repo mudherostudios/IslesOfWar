@@ -21,7 +21,7 @@ public class UserItem : MonoBehaviour, IPointerClickHandler
         if (temp.Length > 12)
             temp = user.Substring(0, 12);
 
-        info.text = string.Format("{0}: {1} items", temp, orderCounts.ToString("G4"));
+        info.text = string.Format("{0}: {1} items", temp, orderCounts.ToString("G8"));
     }
 
     public void SetTextColor(Color color)

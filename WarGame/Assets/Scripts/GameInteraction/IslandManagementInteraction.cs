@@ -542,7 +542,15 @@ public class IslandManagementInteraction : Interaction
             {
                 string feature = clientInterface.chainState.islands[islandID].features[t].ToString();
                 string collector = clientInterface.chainState.islands[islandID].collectors[t].ToString();
-                TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents, feature, collector);
+                string queuedCollector = "";
+                bool canBuildQueued = clientInterface.queuedActions.bld != null;
+
+                if (canBuildQueued)
+                    canBuildQueued = clientInterface.queuedActions.bld.id == islandID;
+                if(canBuildQueued)
+                    queuedCollector = clientInterface.queuedActions.bld.col[t].ToString();
+
+                TurnOnResourcesAndCollectors(islandTiles[t].resourceParents, islandTiles[t].collectorParents, feature, collector, queuedCollector);
             }
             else
             {
@@ -552,16 +560,18 @@ public class IslandManagementInteraction : Interaction
         }
     }
 
-    void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built)
+    void TurnOnResourcesAndCollectors(GameObject[] resources, GameObject[] collectors, string type, string built, string queued)
     {
         int r = EncodeUtility.GetXType(type);
         int c = EncodeUtility.GetXType(built);
+        int q = EncodeUtility.GetXType(queued);
         GameObject resourceObject = null;
+        
 
         if (r == 1 || r == 4 || r == 5 || r == 7)
         {
             resourceObject = resources[0];
-            if (c == 1 || c == 4 || c == 5 || c == 7)
+            if (c == 1 || c == 4 || c == 5 || c == 7 || q == 1 || q == 4 || q == 5 || q == 7)
                 resourceObject = collectors[0];
            
             ActivateRandomChild(resourceObject.transform);
@@ -570,7 +580,7 @@ public class IslandManagementInteraction : Interaction
         if (r == 2 || r == 4 || r == 6 || r == 7)
         {
             resourceObject = resources[1];
-            if (c == 2 || c == 4 || c == 6 || c == 7)
+            if (c == 2 || c == 4 || c == 6 || c == 7 || q == 2 || q == 4 || q == 6 || q == 7)
                 resourceObject = collectors[1];
 
             ActivateRandomChild(resourceObject.transform);
@@ -579,7 +589,7 @@ public class IslandManagementInteraction : Interaction
         if (r == 3 || r == 5 || r == 6 || r == 7)
         {
             resourceObject = resources[2];
-            if (c == 3 || c == 5 || c == 6 || c == 7)
+            if (c == 3 || c == 5 || c == 6 || c == 7 || q == 3 || q == 5 || q == 6 || q == 7)
                 resourceObject = collectors[2];
 
             ActivateRandomChild(resourceObject.transform);

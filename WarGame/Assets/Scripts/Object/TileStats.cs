@@ -164,7 +164,10 @@ public class TileStats : MonoBehaviour
         if (squadMarkers == null)
             squadMarkers = new List<SquadMarker>();
 
-        opponentSquadCounts[squadMarker.owner]++;
+        int owner = 0; //0 is players
+        if (!squadMarker.isPlayers)
+            owner = 1;
+        opponentSquadCounts[owner]++;
         squadMarkers.Add(squadMarker);
         squadMarkers[squadMarkers.Count - 1].transform.position = spawnCollectionParent.GetChild(squadMarkers.Count - 1).position + offset;
         SetRotations();
@@ -172,8 +175,11 @@ public class TileStats : MonoBehaviour
 
     public void MoveMarkerOffTile(SquadMarker squadMarker, Vector3 offset)
     {
+        int owner = 0; //0 is players
+        if (!squadMarker.isPlayers)
+            owner = 1;
         squadMarkers.Remove(squadMarker);
-        opponentSquadCounts[squadMarker.owner]--;
+        opponentSquadCounts[owner]--;
 
         for (int m = 0; m < squadMarkers.Count; m++)
         {
@@ -209,7 +215,7 @@ public class TileStats : MonoBehaviour
     {
         for (int s = 0; s < squadMarkers.Count; s++)
         {
-            if (squadMarkers[squad].owner != squadMarkers[s].owner)
+            if (!squadMarkers[s].isPlayers)
             {
                 Vector3 target = squadMarkers[squad].transform.position - squadMarkers[s].transform.position;
                 squadMarkers[squad].transform.rotation = Quaternion.Euler(Vector3.RotateTowards(squadMarkers[squad].transform.forward, target, 360.0f, 0.0f));

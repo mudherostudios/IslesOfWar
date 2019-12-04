@@ -526,6 +526,8 @@ namespace IslesOfWar
                     converted = 6;
                 else if ("&7hH".Contains(type))
                     converted = 7;
+                else
+                    converted = -1;
 
                 return converted;
             }

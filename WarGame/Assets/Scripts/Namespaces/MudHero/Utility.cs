@@ -1,8 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MudHero
 {
+    public static class File
+    {
+        public static void Save(string data, string location)
+        {
+            using (FileStream stream = new FileStream(location, FileMode.Create))
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream))
+                {
+                    writer.Write(data);
+                    writer.Close();
+                }
+            }
+        }
+
+        public static void Load()
+        {
+            
+        }
+    }
+
     public static class HexToInt 
     {
         public static int Get(string hex)
