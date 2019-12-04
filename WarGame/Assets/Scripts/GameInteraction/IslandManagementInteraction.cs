@@ -61,7 +61,19 @@ public class IslandManagementInteraction : Interaction
             if (canBuildBunkers)
             {
                 char bunkerChar = clientInterface.playerIslands[islandIndex].defenses[indexLocation];
-                int bunkerType = EncodeUtility.GetXType(bunkerChar);
+                char queuedDefense = '\n';
+
+                if (clientInterface.queuedActions.bld != null)
+                    if (islandID == clientInterface.queuedActions.bld.id)
+                        queuedDefense = clientInterface.queuedIslandDevelopment.defenses[indexLocation];
+
+                int bunkerType = -1;
+
+                if (queuedDefense != '\n')
+                    bunkerType = EncodeUtility.GetXType(queuedDefense);
+                else
+                    bunkerType = EncodeUtility.GetXType(bunkerChar);
+
                 int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
                 islandTiles[lastIndexLocation].ToggleBunkerSystem(false, new int[1]);
                 islandTiles[indexLocation].ToggleBunkerSystem(true, existingBunkers);
@@ -69,7 +81,19 @@ public class IslandManagementInteraction : Interaction
             else if (canBuildBlockers)
             {
                 char blockerChar = clientInterface.playerIslands[islandIndex].defenses[indexLocation];
-                int blockerType = EncodeUtility.GetYType(blockerChar);
+                char queuedDefense = '\n';
+
+                if (clientInterface.queuedActions.bld != null)
+                    if (islandID == clientInterface.queuedActions.bld.id)
+                        queuedDefense = clientInterface.queuedIslandDevelopment.defenses[indexLocation];
+
+                int blockerType = -1;
+
+                if (queuedDefense != '\n')
+                    blockerType = EncodeUtility.GetYType(queuedDefense);
+                else
+                    blockerType = EncodeUtility.GetYType(blockerChar);
+
                 islandTiles[lastIndexLocation].ToggleBlockerSystem(false, 0);
                 islandTiles[indexLocation].ToggleBlockerSystem(true, blockerType);
             }
@@ -338,10 +362,7 @@ public class IslandManagementInteraction : Interaction
         islandNameTicker.SetActive(true);
         string technicalName = string.Format("Island {0}", islandID.Substring(0, 10));
 
-        if (PlayerPrefs.HasKey(technicalName))
-            islandName.text = PlayerPrefs.GetString(technicalName);
-        else
-            islandName.text = technicalName;
+        islandName.text = SaveLoad.GetIslandName(technicalName);
     }
 
     public void SetEditGUIState()
@@ -378,24 +399,17 @@ public class IslandManagementInteraction : Interaction
 
         string technicalIslandName = string.Format("Island {0}", islandID.Substring(0, 10));
 
-        if (!PlayerPrefs.HasKey(technicalIslandName))
-            islandName.text = technicalIslandName;
-        else
-            islandName.text = PlayerPrefs.GetString(technicalIslandName);
+        islandName.text = SaveLoad.GetIslandName(technicalIslandName);
     }
 
     public void SaveIslandName()
     {
         string technicalIslandName = string.Format("Island {0}", islandID.Substring(0, 10));
         string playerAssignedName = islandName.text;
+        SaveLoad.SetIslandName(technicalIslandName, playerAssignedName);
 
-        if (playerAssignedName != "")
-            PlayerPrefs.SetString(technicalIslandName, playerAssignedName);
-        else
-        {
-            PlayerPrefs.DeleteKey(technicalIslandName);
+        if(playerAssignedName == "")
             islandName.text = technicalIslandName;
-        }
     }
 
     public void SetExitMode()

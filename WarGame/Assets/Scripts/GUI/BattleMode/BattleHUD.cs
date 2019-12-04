@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +19,12 @@ public class BattleHUD : MonoBehaviour
         if (deployedSquads.Count + deployedDefenders.Count <= 4)
         {
             int squadIndex = availableSquadsList.value;
-            List<string> squads = GetKeys();
+            List<string> squads = GetSquads();
             string squadToDelpoy = squads[squadIndex];
 
             if (!deployedSquads.ContainsKey(squadToDelpoy))
             {
-                int[] squadCounts = JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(squadToDelpoy)).ToArray();
+                int[] squadCounts = SaveLoad.state.allUserSquads[battleScript.clientInterface.player].squads[squadToDelpoy].ToArray();
                 battleScript.AddSquad(squadToDelpoy, squadCounts);
                 deployedSquads.Add(squadToDelpoy, squadCounts);
             }
@@ -37,7 +38,7 @@ public class BattleHUD : MonoBehaviour
             if (availableSquadsList.options.Count > 0 && deployedSquads.Count > 0)
             {
                 int squadIndex = availableSquadsList.value;
-                string squadName = GetKeys()[squadIndex];
+                string squadName = GetSquads()[squadIndex];
 
                 if (deployedSquads.ContainsKey(squadName))
                 {
@@ -50,7 +51,7 @@ public class BattleHUD : MonoBehaviour
 
     public void Show()
     {
-        availableSquadsList.AddOptions(GetKeys());
+        availableSquadsList.AddOptions(GetSquads());
         gameObject.SetActive(true);
     }
 
@@ -61,13 +62,10 @@ public class BattleHUD : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    List<string> GetKeys()
+    List<string> GetSquads()
     {
-        if (PlayerPrefs.HasKey("keys"))
-        {
-            string prefKeys = PlayerPrefs.GetString("keys");
-            return JsonConvert.DeserializeObject<List<string>>(prefKeys);
-        }
+        if (SaveLoad.HasSquads(battleScript.clientInterface.player))
+            return SaveLoad.state.allUserSquads[battleScript.clientInterface.player].squads.Keys.ToList();
         else
             return new List<string>();
     }
@@ -79,18 +77,14 @@ public class BattleHUD : MonoBehaviour
 
     public void ClearDeployedSquads()
     {
-        if (PlayerPrefs.HasKey("keys") && deployedSquads != null)
+        if (deployedSquads != null && SaveLoad.HasSquads(battleScript.clientInterface.player))
         {
             if (deployedSquads.Count > 0)
             {
-                List<string> keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
-
                 foreach (string squad in deployedSquads.Keys)
                 {
-                    keys.Remove(squad);
+                    SaveLoad.state.allUserSquads[battleScript.clientInterface.player].squads.Remove(squad);
                 }
-
-                PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
             }
         }
     }
@@ -125,8 +119,7 @@ public class BattleHUD : MonoBehaviour
     int[] GetUnits(string squadName)
     {
         string[] splitSquadName = squadName.Split(' ');
-        string unitsString = PlayerPrefs.GetString(splitSquadName[0]);
-        return JsonConvert.DeserializeObject<int[]>(unitsString);
+        return SaveLoad.GetSquad(battleScript.clientInterface.player, splitSquadName[0]);
     }
 
     public void HideUnitsBar()

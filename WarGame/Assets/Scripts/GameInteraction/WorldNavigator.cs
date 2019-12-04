@@ -442,28 +442,9 @@ public class WorldNavigator : MonoBehaviour
         battleScript.CancelPlans();
         SetCommandMode();
 
-        List<string> keys = new List<string>();
-
-        if (PlayerPrefs.HasKey("keys") && battleScript.mode == BattlePlanInteraction.Mode.ATTACK)
+        if (battleScript.mode == BattlePlanInteraction.Mode.ATTACK)
         {
-            keys = JsonConvert.DeserializeObject<List<string>>(PlayerPrefs.GetString("keys"));
-            List<string> remove = new List<string>();
-
-            for (int k = 0; k < keys.Count; k++)
-            {
-                if (keys[k].Contains("Defender"))
-                {
-                    PlayerPrefs.DeleteKey(keys[k]);
-                    remove.Add(keys[k]);
-                }
-            }
-
-            foreach(string name in remove)
-            {
-                keys.Remove(name);
-            }
-
-            PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+            SaveLoad.state.allUserSquads.Remove("Defender");
         }
     }
 }

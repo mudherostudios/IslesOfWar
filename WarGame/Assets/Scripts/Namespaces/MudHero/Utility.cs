@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MudHero
 {
-    public static class File
+    public static class GameFile
     {
         public static void Save(string data, string location)
         {
@@ -19,9 +18,23 @@ namespace MudHero
             }
         }
 
-        public static void Load()
+        public static string Load(string location)
         {
-            
+            string data = "";
+
+            if (File.Exists(location))
+            {
+                using (FileStream stream = new FileStream(location, FileMode.Open))
+                {
+                    using (BinaryReader reader = new BinaryReader(stream))
+                    {
+                        data = reader.ReadString();
+                        reader.Close();
+                    }
+                }
+            }
+
+            return data;
         }
     }
 

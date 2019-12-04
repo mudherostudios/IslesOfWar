@@ -13,8 +13,7 @@ public class ConnectGUI : MonoBehaviour
     public InputField username, password, walletPassword;
     public InputField daemonPort, gsrPort, walletName, createNameInput;
     public Toggle useCookie;
-    public Toggle useRegtest, useMain, useTest;
-    public Text blockProgression, messages, progressMessages, chainLabel, walletNameLabel;
+    public Text blockProgression, messages, progressMessages, walletNameLabel;
     public Image walletUnderscore;
     public Dropdown usernamesList;
     public Color onColor, offColor;
@@ -25,34 +24,27 @@ public class ConnectGUI : MonoBehaviour
     public CommunicationInterface comms;
     public Tutorial tutorial;
 
-    private bool connected = false, prompted = false, traversing = false, advanced = false, neededCreation = false;
+    private bool connected = false, prompted = false, traversing = false, neededCreation = false;
     private float totalDistance, lastTime, lastBlock;
+
+    private void Awake()
+    {
+        SaveLoad.LoadPreferences();
+    }
 
     private void Start()
     {
-        if (PlayerPrefs.HasKey("username"))
-            username.text = PlayerPrefs.GetString("username");
-        if (PlayerPrefs.HasKey("userpassword"))
-            password.text = PlayerPrefs.GetString("userpassword");
-        if (PlayerPrefs.HasKey("walletpassword"))
-            walletPassword.text = PlayerPrefs.GetString("walletpassword");
-        if(PlayerPrefs.HasKey("useCookie"))
-        {
-            int cookie = PlayerPrefs.GetInt("useCookie");
+        if (SaveLoad.state.username != null)
+            username.text = SaveLoad.state.username;
+        if (SaveLoad.state.password != null)
+            password.text = SaveLoad.state.password;
+        if (SaveLoad.state.walletPassword != null)
+            walletPassword.text = SaveLoad.state.walletPassword;
 
-            if (cookie == 0)
-                useCookie.isOn = false;
-            else
-                useCookie.isOn = true;
-        }
-
+        useCookie.isOn = SaveLoad.state.useCookies;
         CookieToggleUpdate();
 
-        if (PlayerPrefs.HasKey("advanced"))
-            SwitchAdvancedOptions(PlayerPrefs.GetInt("advanced") == 1);
-        else
-            SwitchAdvancedOptions(false);
-
+        SwitchAdvancedOptions(SaveLoad.state.useAdvanced);
         LoadAdvancedOptions();
     }
 
@@ -106,9 +98,7 @@ public class ConnectGUI : MonoBehaviour
 
         usernamesList.ClearOptions();
         usernamesList.AddOptions(names);
-
-        if (PlayerPrefs.HasKey("User"))
-            usernamesList.value = PlayerPrefs.GetInt("User");
+        usernamesList.value = SaveLoad.state.selectedName;
 
         userPanel.SetActive(true);
         loginButton.SetActive(true);
@@ -136,7 +126,8 @@ public class ConnectGUI : MonoBehaviour
 
     public void Login()
     {
-        PlayerPrefs.SetInt("User", usernamesList.value);
+        SaveLoad.state.selectedName = usernamesList.value;
+        SaveLoad.SavePreferences();
         comms.SelectUser(comms.nameList[usernamesList.value]);
         messages.text = "Loading...";
         userPanel.SetActive(false);
@@ -148,26 +139,24 @@ public class ConnectGUI : MonoBehaviour
     {
         ConnectionLog log = new ConnectionLog(false, "Could not even attempt to connect.");
 
-        //CleanPlayerPrefs();
-
-        if (advanced)
+        if (SaveLoad.state.useAdvanced)
             SetAdvancedOptionsAndPrefs();
 
         if (!useCookie.isOn)
         {
-            PlayerPrefs.SetString("username", username.text);
-            PlayerPrefs.SetString("userpassword", password.text);
+            SaveLoad.state.username = username.text;
+            SaveLoad.state.password = password.text;
             log = comms.Connect(username.text, password.text, walletPassword.text);
-            PlayerPrefs.SetInt("useCookie", 0);
+            SaveLoad.state.useCookies = false;
         }
         else
         {
             string cookiePassword = GetCookiePassword();
             log = comms.Connect("__cookie__", cookiePassword, walletPassword.text);
-            PlayerPrefs.SetInt("useCookie", 1);
+            SaveLoad.state.useCookies = true;
         }
         
-        PlayerPrefs.SetString("walletpassword", walletPassword.text);
+        SaveLoad.state.walletPassword = walletPassword.text;
 
         if (log.success)
         {
@@ -195,88 +184,31 @@ public class ConnectGUI : MonoBehaviour
     {
         int dPort = int.Parse(daemonPort.text);
         int gPort = int.Parse(gsrPort.text);
-        int chain = 0;
 
-        if (useTest.isOn)
-            chain = 1;
-        if (useRegtest.isOn)
-            chain = 2;
+        SaveLoad.state.daemonPort = dPort;
+        SaveLoad.state.gspPort = gPort;
+        SaveLoad.state.walletName = walletName.text;
 
-        if (advanced)
-            PlayerPrefs.SetInt("advanced", 1);
-        else
-            PlayerPrefs.SetInt("advanced", 0);
-
-        PlayerPrefs.SetInt("daemonPort", dPort);
-        PlayerPrefs.SetInt("gsrPort", gPort);
-        PlayerPrefs.SetInt("chain", chain);
-        PlayerPrefs.SetString("wallet", walletName.text);
-
-        string advancedWalletName = "";
-
-        if (advanced)
-            advancedWalletName = string.Format("/wallet/{0}", walletName.text);
-
+        string advancedWalletName = string.Format("/wallet/{0}", walletName.text);
         comms.SetAdvancedOptions(daemonPort.text, gsrPort.text, advancedWalletName);
     }
 
     void LoadAdvancedOptions()
     {
-        if (PlayerPrefs.HasKey("daemonPort"))
-            daemonPort.text = PlayerPrefs.GetInt("daemonPort").ToString();
-        if (PlayerPrefs.HasKey("gsrPort"))
-            gsrPort.text = PlayerPrefs.GetInt("gsrPort").ToString();
+        daemonPort.text = SaveLoad.state.daemonPort.ToString();
+        gsrPort.text = SaveLoad.state.gspPort.ToString();
 
-        if (PlayerPrefs.HasKey("chain"))
-        {
-            switch (PlayerPrefs.GetInt("chain"))
-            {
-                case 0:
-                    useMain.isOn = true;
-                    break;
-                case 1:
-                    useTest.isOn = true;
-                    break;
-                case 2:
-                    useRegtest.isOn = true;
-                    break;
-                default:
-                    useMain.isOn = true;
-                    break;
-            }
-
-            TogglePorts();
-        }
-
-        if(PlayerPrefs.HasKey("wallet"))
-            walletName.text = PlayerPrefs.GetString("wallet");
-    }
-
-    void CleanPlayerPrefs()
-    {
-        int user = 0;
-
-        if (PlayerPrefs.HasKey("User"))
-            user = PlayerPrefs.GetInt("User");
-
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.SetInt("User", user);
+        if(SaveLoad.state.walletName != null)
+            walletName.text = SaveLoad.state.walletName;
     }
 
     string GetCookiePassword()
     {
         string cookiePassword = "";
-        string chainFolder = "";
-
-        if (useMain.isOn)
-            chainFolder = "Xaya/.cookie";
-        if (useTest.isOn)
-            chainFolder = "Xaya/test/.cookie";
-        if (useRegtest.isOn)
-            chainFolder = "Xaya/regtest/.cookie";
+        string cookieFolder = "Xaya/regtest/.cookie";
 
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string filePath = Path.Combine(folderPath, chainFolder);
+        string filePath = Path.Combine(folderPath, cookieFolder);
         string parsedValue = "";
 
         if (File.Exists(filePath))
@@ -302,79 +234,41 @@ public class ConnectGUI : MonoBehaviour
         {
             username.enabled = true;
             username.placeholder.GetComponent<Text>().text = "Enter RPC Username...";
-            if (PlayerPrefs.HasKey("username"))
-                username.text = PlayerPrefs.GetString("username");
+            if (SaveLoad.state.username != null)
+                username.text = SaveLoad.state.username;
 
             password.enabled = true;
             password.placeholder.GetComponent<Text>().text = "Enter RPC Password...";
-            if (PlayerPrefs.HasKey("userpassword"))
-                password.text = PlayerPrefs.GetString("userpassword");
+            if (SaveLoad.state.password != null)
+                password.text = SaveLoad.state.password;
         }
     }
 
     public void ToggleAdvancedOptions()
     {
-        SwitchAdvancedOptions(!advanced);
+        SwitchAdvancedOptions(!SaveLoad.state.useAdvanced);
     }
  
     public void SwitchAdvancedOptions(bool isAdvanced)
     {
         Color selectedColor = onColor;
-        advanced = isAdvanced;
+        SaveLoad.state.useAdvanced = isAdvanced;
 
-        if (!advanced)
+        if (!isAdvanced)
             selectedColor = offColor;
 
         daemonPort.transform.Find("Text").GetComponent<Text>().color = selectedColor;
         daemonPort.transform.Find("Title").GetComponent<Text>().color = selectedColor;
-        daemonPort.enabled = advanced;
+        daemonPort.enabled = isAdvanced;
 
         gsrPort.transform.Find("Text").GetComponent<Text>().color = selectedColor;
         gsrPort.transform.Find("Title").GetComponent<Text>().color = selectedColor;
-        gsrPort.enabled = advanced;
+        gsrPort.enabled = isAdvanced;
 
         walletName.transform.Find("Text").GetComponent<Text>().color = selectedColor;
         walletNameLabel.color = selectedColor;
         walletUnderscore.color = selectedColor;
-        walletName.enabled = advanced;
-
-        chainLabel.color = selectedColor;
-        useMain.transform.Find("Label").GetComponent<Text>().color = selectedColor;
-        useTest.transform.Find("Label").GetComponent<Text>().color = selectedColor;
-        useRegtest.transform.Find("Label").GetComponent<Text>().color = selectedColor;
-        useMain.transform.Find("Background").GetChild(0).GetComponent<Image>().color= selectedColor;
-        useTest.transform.Find("Background").GetChild(0).GetComponent<Image>().color = selectedColor;
-        useRegtest.transform.Find("Background").GetChild(0).GetComponent<Image>().color = selectedColor;
-
-        useMain.enabled = advanced;
-        useTest.enabled = advanced;
-        useRegtest.enabled = advanced;
-
-        int setAdvanced = 0;
-
-        if (advanced)
-            setAdvanced = 1;
-
-        PlayerPrefs.SetInt("advanced", setAdvanced);
-    }
-
-    public void TogglePorts()
-    {
-        if(useMain.isOn)
-        {
-            daemonPort.text = 8396.ToString();
-            gsrPort.text = 8900.ToString();
-        }
-        else if (useTest.isOn)
-        {
-            daemonPort.text = 18396.ToString();
-            gsrPort.text = 8900.ToString();
-        }
-        else if (useRegtest.isOn)
-        {
-            daemonPort.text = 18493.ToString();
-            gsrPort.text = 8900.ToString();
-        }
+        walletName.enabled = isAdvanced;
     }
 
     void ProgressMessageUpdate()

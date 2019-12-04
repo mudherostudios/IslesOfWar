@@ -23,9 +23,7 @@ public class BattleIslandsGUI : MonoBehaviour
         for(int i = 0; i < technicalNames.Count; i++)
         {
             string technicalName = string.Format("Island {0}", technicalNames[i].Substring(0, 10));
-
-            if (PlayerPrefs.HasKey(technicalName))
-                playerNamedIslands[i] = PlayerPrefs.GetString(technicalName);
+            playerNamedIslands[i] = SaveLoad.GetIslandName(technicalName);
         }
 
         islandList.AddOptions(playerNamedIslands);

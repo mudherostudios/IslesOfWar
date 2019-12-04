@@ -61,6 +61,7 @@ public class BattlePlanInteraction : Interaction
 
     private void Start()
     {
+        hud.battleScript = this;
         tileSpawnPositions = new Transform[12][];
 
         for (int t = 0; t < tileSpawnPositions.Length; t++)

@@ -52,10 +52,8 @@ public class Settings : MonoBehaviour
 
     private void Start()
     {
-        if (!PlayerPrefs.HasKey("settings"))
-            InitSettings();
-        else
-            LoadSettings();
+        SaveLoad.LoadPreferences();
+        LoadSettings();
     }
 
     private void OnLevelWasLoaded(int level)
@@ -74,15 +72,9 @@ public class Settings : MonoBehaviour
         }
     }
 
-    void InitSettings()
-    {
-        settings = new RawSettings();
-        PlayerPrefs.SetString("settings", JsonConvert.SerializeObject(settings));
-    }
-
     void LoadSettings()
     {
-        settings = JsonConvert.DeserializeObject<RawSettings>(PlayerPrefs.GetString("settings"));
+        settings = SaveLoad.state.settings;
         LoadVolume();
         LoadGraphics();
         if (SceneManager.GetActiveScene().name == "IslandMenu")
@@ -287,13 +279,13 @@ public class Settings : MonoBehaviour
 
     public void SaveSettings()
     {
-        PlayerPrefs.SetString("settings", JsonConvert.SerializeObject(settings));
+        SaveLoad.state.settings = settings;
+        SaveLoad.SavePreferences();
     }
 
     public void ClearCache()
     {
-        settings = new RawSettings();
-        PlayerPrefs.SetString("settings", JsonConvert.SerializeObject(settings));
+        SaveLoad.ResetSaveState(true);
         LoadSettings();
     }
 }

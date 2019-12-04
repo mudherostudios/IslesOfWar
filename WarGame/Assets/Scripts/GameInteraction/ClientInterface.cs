@@ -994,6 +994,7 @@ public class ClientInterface : MonoBehaviour
 
         string islandID = queuedActions.bld.id;
         queuedActions.bld = null;
+        queuedIslandDevelopment = null;
         notificationSystem.PushNotification(2, 2, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)), "developmentCancel");
         gui.SetGUIContents();
     }

@@ -20,13 +20,14 @@ public class Tutorial : Interaction
 
     private void Awake()
     {
+        SaveLoad.LoadPreferences();
         DontDestroyOnLoad(this);
         CheckForPrompters();
     }
 
     public void CheckForPrompters()
     {
-        string[] completedTutorials = PlayerPrefs.GetString("completedTutorials").Split(',');
+        string[] completedTutorials = SaveLoad.state.completedTutorials.ToArray();
         GameObject[] prompterObjects = GameObject.FindGameObjectsWithTag("TutorialPrompter");
         prompters = new Dictionary<string, TutorialPrompter>();
 
@@ -73,8 +74,7 @@ public class Tutorial : Interaction
     {
         if (prompters[tutorialName].isCompletable)
         {
-            string completedTutorials = PlayerPrefs.GetString("completedTutorials");
-            PlayerPrefs.SetString("completedTutorials", string.Format("{0},{1}", completedTutorials, tutorialName));
+            SaveLoad.AddToCompletedTutorials(tutorialName);
             tutorialStages.Remove(tutorialName);
             prompters[tutorialName].CloseTutorial();
         }
@@ -83,6 +83,8 @@ public class Tutorial : Interaction
 
         if (tutorialStages.Count == 0)
             Destroy(gameObject);
+
+        SaveLoad.SavePreferences();
     }
 
     public void CheckTutorialCondition()
@@ -190,39 +192,9 @@ public class Tutorial : Interaction
     public bool unitPurchaseSkipped { get { return tutorialStages[0] == "unitPurchase" && PlayerHasCollectors() && PlayerHasUnits(); } }
     public bool formSquads { get { return tutorialStages[0] == "formSquads" && PlayerHasUnits(); } }
     //Just in case they were experimenting with remove squads.
-    public bool formSquadsAgain
-    {
-        get
-        {
-            bool hasKeys = PlayerPrefs.HasKey("keys");
-            if (hasKeys)
-                return tutorialStages[0] == "defend" && PlayerHasUnits() && PlayerPrefs.GetString("keys") == "";
-            else
-                return false;
-        }
-    }
-    public bool formSquadsSkipped
-    {
-        get
-        {
-            bool hasKeys = PlayerPrefs.HasKey("keys");
-            if (hasKeys)
-                return tutorialStages[0] == "formSquads" && PlayerHasUnits() && PlayerPrefs.GetString("keys") != "";
-            else
-                return false;
-        }
-    }
-    public bool defend
-    {
-        get
-        {
-            bool hasKeys = PlayerPrefs.HasKey("keys");
-            if (hasKeys)
-                return tutorialStages[0] == "defend" && PlayerPrefs.GetString("keys") != "";
-            else
-                return false;
-        }
-    }
+    public bool formSquadsAgain { get { return tutorialStages[0] == "defend" && PlayerHasUnits() && !SaveLoad.HasSquads(clientInterface.player); } }
+    public bool formSquadsSkipped { get { return tutorialStages[0] == "formSquads" && PlayerHasUnits() && SaveLoad.HasSquads(clientInterface.player); } }
+    public bool defend { get { return tutorialStages[0] == "defend" && SaveLoad.HasSquads(clientInterface.player); } }
     public bool attack { get { return tutorialStages[0] == "attack" && clientInterface.attackableIsland.owner != null; } }
     public bool resourcePools
     {

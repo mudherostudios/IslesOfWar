@@ -73,18 +73,14 @@ public class SquadGUI : MonoBehaviour
                 while (stopLooking == false || loopCount > SquadConstants.randomSquadNames.Length * 1.5)
                 {
                     r = Random.Range(0, SquadConstants.randomSquadNames.Length);
-                    stopLooking = !PlayerPrefs.HasKey(SquadConstants.randomSquadNames[r]);
+                    squadName = SquadConstants.randomSquadNames[r];
+                    stopLooking = !SaveLoad.HasParticularSquad(commandScript.clientInterface.player, squadName);
                     loopCount++;
                 }
 
-                squadName = SquadConstants.randomSquadNames[r];
-
-                if (!PlayerPrefs.HasKey(squadName))
+                if (!SaveLoad.HasParticularSquad(commandScript.clientInterface.player, squadName))
                 {
-                    List<string> keys = GetKeys();
-                    keys.Add(squadName);
-                    PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
-                    PlayerPrefs.SetString(squadName, JsonConvert.SerializeObject(squad));
+                    SaveLoad.AddSquad(commandScript.clientInterface.player, squadName, squad);
                     commandScript.PushNotification(0, 0, string.Format("{0} Squad has been created.", squadName));
                 }
             }
@@ -96,20 +92,18 @@ public class SquadGUI : MonoBehaviour
     public void UpdateSquadList()
     {
         squadList.ClearOptions();
-        squadList.AddOptions(GetKeys());
+        squadList.AddOptions(SaveLoad.GetSquadNames(commandScript.clientInterface.player));
     }
 
     public void DisbandSquad()
     {
-        List<string> keys = GetKeys();
         string squad = null;
+        List<string> squadNames = SaveLoad.GetSquadNames(commandScript.clientInterface.player);
 
-        if (keys.Count > 0)
+        if (squadNames.Count > 0)
         {
-            squad = keys[squadList.value];
-            keys.Remove(squad);
-            PlayerPrefs.DeleteKey(squad);
-            PlayerPrefs.SetString("keys", JsonConvert.SerializeObject(keys));
+            squad = squadNames[squadList.value];
+            SaveLoad.RemoveSquad(commandScript.clientInterface.player, squad);
             commandScript.PushNotification(0, 2, string.Format("{0} Squad has been disbanded.", squad));
         }
         else
@@ -120,12 +114,12 @@ public class SquadGUI : MonoBehaviour
 
     int[] GetTotalUnitsInSquads()
     {
-        List<string> keys = GetKeys();
+        List<string> squads = SaveLoad.GetSquadNames(commandScript.clientInterface.player);
         int[] total = new int[9];
 
-        for (int k = 0; k < keys.Count; k++)
+        for (int s = 0; s < squads.Count; s++)
         {
-            int[] units = JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(keys[k])).ToArray();
+            int[] units = SaveLoad.GetSquad(commandScript.clientInterface.player, squads[s]);
 
             for (int u = 0; u < 9; u++)
             {
@@ -149,20 +143,8 @@ public class SquadGUI : MonoBehaviour
 
     int GetSquadCount()
     {
-        return GetKeys().Count;
+        return SaveLoad.GetSquadNames(commandScript.clientInterface.player).Count;
     }
-
-    List<string> GetKeys()
-    {
-        if (PlayerPrefs.HasKey("keys"))
-        {
-            string prefKeys = PlayerPrefs.GetString("keys");
-            return JsonConvert.DeserializeObject<List<string>>(prefKeys);
-        }
-        else
-            return new List<string>();
-    }
-
     
 
     void SetAllFieldsToZero()
