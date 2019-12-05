@@ -49,7 +49,12 @@ public class UnitPurchase: MonoBehaviour
 
     public void ShowMenu(int unitType)
     {
-        unitImages[type].gameObject.SetActive(false);
+        for (int u = 0; u < 9; u++)
+        {
+            unitImages[u].gameObject.SetActive(false);
+        }
+
+        purchaseAmount.text = "0";
         type = relativeTypes[unitType];
         unitImages[type].gameObject.SetActive(true);
         gameObject.SetActive(true);

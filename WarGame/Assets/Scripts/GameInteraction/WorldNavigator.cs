@@ -175,6 +175,7 @@ public class WorldNavigator : MonoBehaviour
 
         //Battle Variables
         battleScript.hud = battleIslandsGUI.hud;
+        battleIslandsGUI.hud.battleScript = battleScript;
         List<GameObject> battleIslandGenerationPrefabs = new List<GameObject>();
         battleIslandGenerationPrefabs.AddRange(tilePrefabs);
         battleIslandGenerationPrefabs.Add(battleIsland);

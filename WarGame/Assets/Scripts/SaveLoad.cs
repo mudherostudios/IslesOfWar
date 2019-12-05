@@ -38,11 +38,13 @@ public class SaveState
 
 public class UserSquads
 {
-    public Dictionary<string, List<int>> squads;
+    public Dictionary<string, int[]> squads;
 
-    public UserSquads(string name, List<int> counts)
+    public UserSquads() { }
+
+    public UserSquads(string name, int[] counts)
     {
-        squads = new Dictionary<string, List<int>>();
+        squads = new Dictionary<string, int[]>();
         squads.Add(name, counts);
     }
 }
@@ -97,7 +99,7 @@ public static class SaveLoad
             state.islandNames.Add(technicalName, playerAssignedName);
     }
 
-    public static void AddSquad(string player, string squad, List<int> counts)
+    public static void AddSquad(string player, string squad, int[] counts)
     {
         if (HasSquads(player))
             state.allUserSquads[player].squads.Add(squad, counts);

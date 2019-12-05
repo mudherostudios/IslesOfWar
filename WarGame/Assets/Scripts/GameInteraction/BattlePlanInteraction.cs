@@ -92,7 +92,7 @@ public class BattlePlanInteraction : Interaction
                 currentSquad = selectedSquad.squad;
 
                 if (!selectedSquad.textName.text.Contains("Defender"))
-                    hud.SetUnitCounts(selectedSquad.textName.text);
+                    hud.SetUnitCounts(selectedSquad.squadName);
                 else
                     hud.SetUnitCounts(clientInterface.chainState.islands[islandID].squadCounts[selectedSquad.squad].ToArray());
 
