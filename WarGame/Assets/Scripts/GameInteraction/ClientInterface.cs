@@ -657,6 +657,40 @@ public class ClientInterface : MonoBehaviour
         }
     }
 
+    public void WithdrawSquad(string islandID, int index)
+    {
+        string message = "You are no longer owner of this island";
+        if (playerIslandIDs.Contains(islandID))
+        {
+            if (queuedActions.rmv == null)
+            {
+                queuedActions.rmv = new SquadWithdrawl(islandID, index);
+                message = string.Format("Defender {0} has been scheduled for withdrawl from {1}", index, islandID.Substring(0, 8));
+                notificationSystem.PushNotification(1, 0, message, "withdrawlSuccess");
+            }
+            else
+            {
+                if (queuedActions.rmv.id == islandID)
+                {
+                    List<int> squads = new List<int>(queuedActions.rmv.sqds);
+                    squads.Add(index);
+                    queuedActions.rmv.sqds = squads.ToArray();
+                    message = string.Format("Defender {0} has been scheduled for withdrawl from {1}", index, islandID.Substring(0, 8));
+                    notificationSystem.PushNotification(1, 0, message, "withdrawlSuccess");
+                }
+                else
+                {
+                    message = "There is already anCancel island awaiting troop withdrawl. Submit you actions then proceed.";
+                    notificationSystem.PushNotification(2, 1, message, "withdrawlFailure");
+                }
+            }
+        }
+        else
+        {
+            notificationSystem.PushNotification(2, 1, message, "withdrawlFailure");
+        }
+    }
+
     public void SetFullBattlePlan(bool isAttack, string island, List<List<int>> counts, List<List<int>> plans)
     {
         if (isAttack)
@@ -995,7 +1029,7 @@ public class ClientInterface : MonoBehaviour
         string islandID = queuedActions.bld.id;
         queuedActions.bld = null;
         queuedIslandDevelopment = null;
-        notificationSystem.PushNotification(2, 2, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,10)), "developmentCancel");
+        notificationSystem.PushNotification(2, 2, string.Format("Development plans for Island #{0} have been canceled.", islandID.Substring(0,8)), "developmentCancel");
         gui.SetGUIContents();
     }
 
@@ -1010,14 +1044,29 @@ public class ClientInterface : MonoBehaviour
     {
         if (isAttackPlan)
         {
-            notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 10)), "attackCancel");
             queuedActions.attk = null;
+            notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 8)), "attackCancel");
         }
         else
         {
-            notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 10)), "defendCancel");
-            queuedActions.dfnd = null;
-            ownedDefendersOnIsland = 0;
+            string id = "";
+
+            if (queuedActions.rmv != null)
+            {
+                id = queuedActions.rmv.id;
+                queuedActions.rmv = null;
+                notificationSystem.PushNotification(2, 2, string.Format("Unit withdrawl from island {0}... has been canceled.", queuedActions.rmv.id.Substring(0, 8)), "withdrawlCancel");
+            }
+
+            if (queuedActions.dfnd != null)
+            {
+                id = queuedActions.dfnd.id;
+                queuedActions.dfnd = null;
+                ownedDefendersOnIsland = 0;
+                notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 8)), "defendCancel");
+            }
+
+            notificationSystem.PushNotification(2, -1, string.Format("Defensive Plans have changed for {0}...", id.Substring(0, 8)), null);
         }
 
         gui.SetGUIContents();
@@ -1303,7 +1352,7 @@ public class ClientInterface : MonoBehaviour
     public bool[] QueueIsValid()
     {
         bool nation = true, build = true, units = true, search = true, resource = true, depleted = true, attack = true, defend = true,
-        openOrder = true, closeOrder = true, acceptOrder = true, size = true;
+        openOrder = true, closeOrder = true, acceptOrder = true, remove = true, size = true;
 
         if (queuedActions.nat != null)
         {
@@ -1405,6 +1454,20 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.cls = null;
         }
 
+        if (queuedActions.rmv != null)
+        {
+            remove = queuedActions.rmv.id != null && queuedActions.rmv.sqds != null;
+
+            if (remove)
+                remove = chainState.players[player].islands.Contains(queuedActions.rmv.id);
+
+            if(remove)
+                remove =  queuedActions.rmv.sqds.Length <= 4 && queuedActions.rmv.sqds.Length > 0;
+
+            if (!remove)
+                queuedActions.rmv = null;
+        }
+
         if (queuedActions.acpt != null)
         {
             if (!Validity.PlayerCanAcceptOrder(chainState.resourceMarket, queuedActions.acpt[0], queuedActions.acpt[1], player))
@@ -1419,7 +1482,7 @@ public class ClientInterface : MonoBehaviour
         return new bool[] 
         {
             nation, build, units, search, resource, depleted,
-            attack, defend, openOrder, closeOrder, acceptOrder, size
+            attack, defend, openOrder, closeOrder, remove, acceptOrder, size
         };
     }
 
@@ -1427,7 +1490,7 @@ public class ClientInterface : MonoBehaviour
     {
         bool isNull = queuedActions.attk == null && queuedActions.bld == null && queuedActions.buy == null && queuedActions.dep == null
         && queuedActions.dfnd == null && queuedActions.nat == null && queuedActions.pot == null && queuedActions.srch == null && queuedActions.igBuy == 0
-        && queuedActions.opn == null && queuedActions.cls == null && queuedActions.acpt == null;
+        && queuedActions.opn == null && queuedActions.cls == null && queuedActions.rmv == null && queuedActions.acpt == null;
 
         return isNull;
     }

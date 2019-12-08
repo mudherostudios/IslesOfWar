@@ -117,6 +117,9 @@ namespace IslesOfWar
                                     if (actions.bld != null)
                                         processor.DevelopIsland(player, actions.bld);
 
+                                    if (actions.rmv != null)
+                                        processor.RemovePlansFromIsland(player, actions.rmv);
+
                                     if (actions.dfnd != null)
                                         processor.UpdateDefensePlan(player, actions.dfnd);
 

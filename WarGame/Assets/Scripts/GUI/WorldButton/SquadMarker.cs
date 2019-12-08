@@ -14,12 +14,14 @@ public class SquadMarker : WorldButton
     public Material enemyTeamMaterial;
     public TextMesh textName;
     public TileStats currentTile;
+    public GameObject removeSquadButton;
 
-    public void SetNameAndType(int type, bool _isPlayers)
+    public void SetNameAndType(int type, bool _isPlayers, bool isDefender)
     {
         isPlayers = _isPlayers; 
         textName.text = string.Format("{0} Squad",squadName);
         displayType = type;
+        defender = isDefender;
 
         if (type <= 2)
         {
@@ -47,4 +49,16 @@ public class SquadMarker : WorldButton
         if(currentTile != null)
             currentTile.MoveMarkerOffTile(this, offset);
     }
+
+    public void ShowWithdrawlOption()
+    {
+        if (isPlayers && defender)
+            removeSquadButton.SetActive(true);
+    }
+
+    public void HideWithdrawlOption()
+    {
+        removeSquadButton.SetActive(false);
+    }
 }
+

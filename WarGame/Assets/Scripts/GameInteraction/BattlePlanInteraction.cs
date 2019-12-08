@@ -79,10 +79,22 @@ public class BattlePlanInteraction : Interaction
         if (clicked || affected)
         {
             string peeked = PeekButtonType();
+
+            if (peeked == "Withdrawl")
+            {
+                CloseCurrentSquad();
+                int squadIndex = -1;
+                int.TryParse(selectedSquad.squadName.Split(' ')[1], out squadIndex);
+                clientInterface.WithdrawSquad(islandID, squadIndex);
+                RemoveSquad(selectedSquad.squadName);
+            }
+
             if (peeked == battleButtonTypes[0])
             {
+                if(selectedSquad != null)
+                    selectedSquad.HideWithdrawlOption();
                 selectedSquad = selectedButton.GetComponent<SquadMarker>();
-
+                selectedSquad.ShowWithdrawlOption();
                 bool show = lastSquad != currentSquad || planMarkers.Count == 0;
                 lastSquad = currentSquad;
 
@@ -226,7 +238,7 @@ public class BattlePlanInteraction : Interaction
 
         for (int s = 0; s < defenderCounts.Count; s++)
         {
-            string defenderName = string.Format("Defender {0}-{1}", s.ToString(), islandID.Substring(0, 8));
+            string defenderName = string.Format("Defender {0}", s.ToString());
             if (!squads.ContainsKey(defenderName))
             {
                 squads.Add(defenderName, defenderCounts[s].ToArray());
@@ -247,11 +259,10 @@ public class BattlePlanInteraction : Interaction
             int unitDisplayType = GetUnitTypeByHighestHealth(pair.Value);
             squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squad = squadIndex;
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}-{1}", squadIndex.ToString(), islandID.Substring(0,8));
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true);
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}", squadIndex.ToString());
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, true);
             currentSquad = squadIndex;
             selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
-            selectedSquad.defender = true;
             ViewCurrentSquad();
             CloseCurrentSquad();
             squadIndex++;
@@ -268,7 +279,7 @@ public class BattlePlanInteraction : Interaction
                 opponentMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[o].position, Quaternion.identity));
                 opponentMarkers[o].GetComponent<SquadMarker>().squad = o;
                 opponentMarkers[o].GetComponent<SquadMarker>().squadName = opponentNames[o];
-                opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, false);
+                opponentMarkers[o].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, false, false);
                 currentSquad = o;
                 selectedSquad = opponentMarkers[o].GetComponent<SquadMarker>();
                 ViewCurrentOpponentSquad();
@@ -301,7 +312,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = squadName;
-            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true);
+            squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, false);
             squads.Add(squadName, counts);
             squadPlans.Add(new List<int>());
             
@@ -360,6 +371,7 @@ public class BattlePlanInteraction : Interaction
             Destroy(marker);
         }
         planMarkers.Clear();
+
     }
 
     void ViewCurrentSquad()

@@ -75,6 +75,32 @@ namespace IslesOfWar
             }
         }
 
+        public class SquadWithdrawl
+        {
+            public string id;
+            public int[] sqds;
+
+            public SquadWithdrawl() { }
+
+            public SquadWithdrawl(string _id)
+            {
+                id = _id;
+                sqds = new int[] { 0, 1, 2, 3 };
+            }
+
+            public SquadWithdrawl(string _id, int squad)
+            {
+                id = _id;
+                sqds = new int[] { squad };
+            }
+
+            public SquadWithdrawl(string _id, int[] squads)
+            {
+                id = _id;
+                sqds = squads;
+            }
+        }
+
         public class PlayerActions
         {
             public string nat;          //Create Or Change Nation
@@ -88,6 +114,7 @@ namespace IslesOfWar
             public string[] acpt;       //Accepts a Market Order and it's terms - Order ID, SellerName
             public BattleCommand attk;  //Attack Plan
             public BattleCommand dfnd;  //Defend Orders
+            public SquadWithdrawl rmv;  //Remove Squads from Island.
             public int igBuy;           //In game purchases. Pack count.
         }
 

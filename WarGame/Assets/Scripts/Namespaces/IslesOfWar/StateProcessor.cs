@@ -460,6 +460,41 @@ namespace IslesOfWar
                     return currentResources;
             }
 
+            public void RemovePlansFromIsland(string player, SquadWithdrawl remove)
+            {
+                bool canRemove = remove.id != null && remove.sqds != null;
+
+                if (canRemove)
+                    canRemove = remove.sqds.Length <= 4 && state.players[player].islands.Contains(remove.id);
+
+                /*  
+                 *I think it is important to discard all data if any of it is malformed.
+                 *I have done this consistently to all actions. 
+                 *This one requires that we do a loop to check all indices before we act on each index.
+                 *Hence two loops that normally should be combined.
+                */
+                for (int s = 0; s < remove.sqds.Length && canRemove; s++)
+                {
+                    canRemove = remove.sqds[s] < remove.sqds.Length && remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
+                }
+
+                if (canRemove)
+                {
+                    Array.Sort(remove.sqds);
+                    Array.Reverse(remove.sqds);
+                    int[] totalRemoved = new int[9];
+                    for (int s = 0; s < remove.sqds.Length; s++)
+                    {
+                        totalRemoved = Add(totalRemoved, state.islands[remove.id].squadCounts[remove.sqds[s]].ToArray());
+                        state.islands[remove.id].squadCounts.RemoveAt(remove.sqds[s]);
+                        state.islands[remove.id].squadPlans.RemoveAt(remove.sqds[s]);
+                    }
+
+                    List<double> converted = Deep.ConvertToDoubleList(totalRemoved.ToList());
+                    state.players[player].units = Add(state.players[player].units, converted);
+                }
+            }
+
             public void UpdateDefensePlan(string player, BattleCommand defensePlan)
             {
                 bool canUpdate = defensePlan.id != null && defensePlan.pln != null && defensePlan.sqd != null;
@@ -467,13 +502,20 @@ namespace IslesOfWar
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
-                    && defensePlan.sqd.Count <= 4 && Validity.SquadHealthSizeLimits(defensePlan.sqd, state.currentConstants.unitHealths);
-                    
+                    && Validity.SquadHealthSizeLimits(defensePlan.sqd, state.currentConstants.unitHealths);
+
+                    if (canUpdate && state.islands[defensePlan.id].squadCounts == null)
+                    {
+                        state.islands[defensePlan.id].squadCounts = new List<List<int>>();
+                        state.islands[defensePlan.id].squadPlans = new List<List<int>>();
+                    }
+
+                    if (canUpdate)
+                        canUpdate = state.islands[defensePlan.id].squadCounts.Count + defensePlan.sqd.Count <= 4;
 
                     if (canUpdate)
                     {
                         double[] totalUnits = state.players[player].units.ToArray();
-                        totalUnits = Add(totalUnits, state.islands[defensePlan.id].GetTotalSquadMembers());
 
                         canUpdate = HasEnoughUnits(totalUnits, defensePlan.sqd) && DefensePlansAreAdjacent(defensePlan.pln);
 
@@ -494,8 +536,8 @@ namespace IslesOfWar
                             double[] finalUnitCount = Subtract(totalUnits, totalUnitsToRemove);
                             state.players[player].units.Clear();
                             state.players[player].units.AddRange(finalUnitCount);
-                            state.islands[defensePlan.id].squadCounts = defensePlan.sqd;
-                            state.islands[defensePlan.id].squadPlans = defensePlan.pln;
+                            state.islands[defensePlan.id].squadCounts.AddRange(defensePlan.sqd);
+                            state.islands[defensePlan.id].squadPlans.AddRange(defensePlan.pln);
                         }
                     }
                 }
@@ -1331,6 +1373,16 @@ namespace IslesOfWar
             }
 
             double[] Add(double[] a, double[] b)
+            {
+                for (int u = 0; u < a.Length && u < b.Length; u++)
+                {
+                    a[u] += b[u];
+                }
+
+                return a;
+            }
+
+            int[] Add(int[] a, int[] b)
             {
                 for (int u = 0; u < a.Length && u < b.Length; u++)
                 {
