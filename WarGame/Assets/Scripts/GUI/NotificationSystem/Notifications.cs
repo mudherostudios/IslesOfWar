@@ -56,12 +56,7 @@ public class Notifications : MonoBehaviour
         onButton.SetActive(true);
     }
 
-    public void PushNotification(int type, int soundType, string message)
-    {
-        PushNotification(type, soundType, message, null);
-    }
-
-    public void PushNotification(int type, int soundType, string message, string notificationName)
+    public void PushNotification(int type, int soundType, string message, string notificationName=null)
     {
         Open(true);
 

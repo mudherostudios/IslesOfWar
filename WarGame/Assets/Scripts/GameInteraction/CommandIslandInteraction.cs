@@ -48,10 +48,10 @@ public class CommandIslandInteraction : Interaction
         WorldButtonCheck(clicked, new List<string> { commandButtonTypes[0] });
 
         if (resourcePool.gameObject.activeSelf)
-            resourcePool.UpdateTimer(GetCurrentXayaBlock());
+            resourcePool.UpdateTimer(clientInterface.chainState.currentConstants.poolRewardBlocks - GetCurrentXayaBlock());
 
         if (warbucksPool.gameObject.activeSelf)
-            warbucksPool.UpdateTimer(GetCurrentXayaBlock());
+            warbucksPool.UpdateTimer(clientInterface.chainState.currentConstants.warbucksRewardBlocks - GetCurrentXayaBlock());
 
         if (clicked && !EventSystem.current.IsPointerOverGameObject() && selectedWorldUIObject != null)
         {

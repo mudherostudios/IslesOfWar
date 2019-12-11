@@ -466,13 +466,7 @@ namespace IslesOfWar
 
                 if (canRemove)
                     canRemove = remove.sqds.Length <= 4 && state.players[player].islands.Contains(remove.id);
-
-                /*  
-                 *I think it is important to discard all data if any of it is malformed.
-                 *I have done this consistently to all actions. 
-                 *This one requires that we do a loop to check all indices before we act on each index.
-                 *Hence two loops that normally should be combined.
-                */
+                
                 for (int s = 0; s < remove.sqds.Length && canRemove; s++)
                 {
                     canRemove = remove.sqds[s] < remove.sqds.Length && remove.sqds[s] < state.islands[remove.id].squadCounts.Count;

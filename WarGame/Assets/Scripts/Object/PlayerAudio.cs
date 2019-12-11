@@ -120,12 +120,7 @@ public class PlayerAudio : MonoBehaviour
         }
     }
 
-    public void PlayGuiSound(int type)
-    {
-        PlayGUISound(type, null);
-    }
-
-    public void PlayGUISound(int type, string clipName)
+    public void PlayGUISound(int type, string clipName=null)
     {
         AudioClip tempClip = genericFailure;
         AudioClip tempGeneric = genericFailure;

@@ -20,6 +20,9 @@ public class SaveState
     public List<string> completedTutorials;
     public Dictionary<string, UserSquads> allUserSquads;
     public RawSettings settings;
+    public double lastSavedBlockInformation;
+    public Dictionary<string, List<BlockInfo>> unseenBlockInformation;
+    public Dictionary<string, UserMessageStates> userMessageStates;
 
     public SaveState()
     {
@@ -33,6 +36,9 @@ public class SaveState
         completedTutorials = new List<string>();
         allUserSquads = new Dictionary<string, UserSquads>();
         settings = new RawSettings();
+        lastSavedBlockInformation = 0;
+        unseenBlockInformation = new Dictionary<string, List<BlockInfo>>();
+        userMessageStates = new Dictionary<string, UserMessageStates>();
     }
 }
 
@@ -46,6 +52,22 @@ public class UserSquads
     {
         squads = new Dictionary<string, int[]>();
         squads.Add(name, counts);
+    }
+}
+
+public class BlockInfo
+{
+    public string type;
+    public string message;
+    public double block;
+
+    public BlockInfo(){}
+
+    public BlockInfo(string _type, string _message, double _block)
+    {
+        type = _type;
+        message = _message;
+        block = _block;
     }
 }
 
@@ -156,4 +178,80 @@ public static class SaveLoad
         if (!state.completedTutorials.Contains(tutorialStage))
             state.completedTutorials.Add(tutorialStage);
     }
+
+    public static void AddBlockInfo(string player, string type, string message, double block, bool save = true)
+    {
+        if (block >= state.lastSavedBlockInformation)
+        {
+            save = save && block > state.lastSavedBlockInformation;
+            if (save)
+                SavePreferences();
+            if (state.unseenBlockInformation.ContainsKey(player))
+            {
+                if (state.unseenBlockInformation[player] != null)
+                    state.unseenBlockInformation[player].Add(new BlockInfo(type, message, block));
+                else
+                    state.unseenBlockInformation[player] = new List<BlockInfo>() { new BlockInfo(type, message, block) };
+            }
+            else
+                state.unseenBlockInformation.Add(player, new List<BlockInfo>() { new BlockInfo(type, message, block) });
+
+            state.lastSavedBlockInformation = block;
+        }
+    }
+
+    public static BlockInfo ReadBlockInfo(string player)
+    {
+        BlockInfo info = new BlockInfo("empty", "There are no pending messages.", 0);
+
+        if (state.unseenBlockInformation.Keys.Contains(player))
+        {
+            if (state.unseenBlockInformation[player] != null)
+            {
+                if (state.unseenBlockInformation[player].Count > 0)
+                {
+                    info = state.unseenBlockInformation[player][0];
+                    state.unseenBlockInformation[player].RemoveAt(0);
+                    SavePreferences();
+                }
+            }
+        }
+
+        return info;
+    }
+
+    public static string PeekMessage(string player, int index = 0)
+    {
+        if (state.unseenBlockInformation.ContainsKey(player))
+        {
+            if (state.unseenBlockInformation[player] != null)
+                if(state.unseenBlockInformation[player].Count > index)
+                    return state.unseenBlockInformation[player][index].message;
+        }
+
+        return null;
+    }
+
+    public static string PeekMessageType(string player, int index = 0)
+    {
+        if (state.unseenBlockInformation.ContainsKey(player))
+        {
+            if (state.unseenBlockInformation[player] != null)
+                if (state.unseenBlockInformation[player].Count > index)
+                    return state.unseenBlockInformation[player][index].type;
+        }
+
+        return null;
+    }
+
+    public static int GetMessagesLength(string player)
+    {
+        if(state.unseenBlockInformation.ContainsKey(player))
+            if(state.unseenBlockInformation[player] != null)
+                return state.unseenBlockInformation.Count;
+
+        return 0;
+    } 
+
+    public static double lastBlock { get { return state.lastSavedBlockInformation; } }
 }

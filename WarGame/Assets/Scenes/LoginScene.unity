@@ -9225,6 +9225,7 @@ GameObject:
   - component: {fileID: 1329419266}
   - component: {fileID: 1329419265}
   - component: {fileID: 1329419267}
+  - component: {fileID: 1329419268}
   m_Layer: 0
   m_Name: CommunicationInterface
   m_TagString: CommunicationInterface
@@ -9291,6 +9292,23 @@ MonoBehaviour:
   mainCam: {fileID: 2055316094}
   elements: {fileID: 0}
   mixer: {fileID: 24100000, guid: 8a130f81abe4aa54c97fefb024158054, type: 2}
+--- !u!114 &1329419268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1329419264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e91520a87324534a98e58e74265e8c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  commsInterface: {fileID: 1329419265}
+  clientInterface: {fileID: 0}
+  frameToCheck: 120
+  doneSyncing: 0
+  resetBlockEvents: 1
 --- !u!1 &1331821623
 GameObject:
   m_ObjectHideFlags: 0
@@ -14033,13 +14051,9 @@ MonoBehaviour:
   walletName: {fileID: 1135329195}
   createNameInput: {fileID: 843787116}
   useCookie: {fileID: 1298532280}
-  useRegtest: {fileID: 698357068}
-  useMain: {fileID: 127005864}
-  useTest: {fileID: 2088862448}
   blockProgression: {fileID: 76794197}
   messages: {fileID: 2055287071}
   progressMessages: {fileID: 1054895364}
-  chainLabel: {fileID: 1642311147}
   walletNameLabel: {fileID: 1789484042}
   walletUnderscore: {fileID: 496360122}
   usernamesList: {fileID: 836635415}
