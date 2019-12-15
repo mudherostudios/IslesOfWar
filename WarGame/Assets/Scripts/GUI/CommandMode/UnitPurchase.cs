@@ -17,7 +17,7 @@ public class UnitPurchase: MonoBehaviour
 
     public void Initiate(Constants _constants) { constants = _constants; }
 
-    //public void UpdateAllStats() { UpdateAllStats(type); }
+    public void UpdateAllStats() { UpdateAllStats(type); }
 
     public void UpdateAllStats(int _type)
     {

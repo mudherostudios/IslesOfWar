@@ -1044,8 +1044,8 @@ public class ClientInterface : MonoBehaviour
     {
         if (isAttackPlan)
         {
-            queuedActions.attk = null;
             notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 8)), "attackCancel");
+            queuedActions.attk = null;
         }
         else
         {
@@ -1054,16 +1054,16 @@ public class ClientInterface : MonoBehaviour
             if (queuedActions.rmv != null)
             {
                 id = queuedActions.rmv.id;
-                queuedActions.rmv = null;
                 notificationSystem.PushNotification(2, 2, string.Format("Unit withdrawl from island {0}... has been canceled.", queuedActions.rmv.id.Substring(0, 8)), "withdrawlCancel");
+                queuedActions.rmv = null;
             }
 
             if (queuedActions.dfnd != null)
             {
                 id = queuedActions.dfnd.id;
-                queuedActions.dfnd = null;
                 ownedDefendersOnIsland = 0;
                 notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 8)), "defendCancel");
+                queuedActions.dfnd = null;
             }
 
             notificationSystem.PushNotification(2, -1, string.Format("Defensive Plans have changed for {0}...", id.Substring(0, 8)), null);
