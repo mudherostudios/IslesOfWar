@@ -132,7 +132,7 @@ public class ConnectGUI : MonoBehaviour
         messages.text = "Loading...";
         userPanel.SetActive(false);
         loginButton.SetActive(false);
-        SceneManager.LoadSceneAsync(1);
+        SceneManager.LoadSceneAsync(2);
     }
 
     public void Connect()
