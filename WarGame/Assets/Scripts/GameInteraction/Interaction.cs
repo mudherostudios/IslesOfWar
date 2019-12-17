@@ -82,7 +82,8 @@ public class Interaction : MonoBehaviour
         if (destinationButton != null)
         {
             orbital.ExploreMode(destinationButton.navigationDestination, true, isIslandManaging);
-            orbital.playerAudio.QueueAmbientEnvironmentSound(destinationButton.tileAmbience);
+			if(destinationButton.tileAmbience != null)
+				orbital.playerAudio.QueueAmbientEnvironmentSound(destinationButton.tileAmbience);
             orbital.playerAudio.PlayEnvironmentEntranceSound(destinationButton.tileEntrance);
             selectedWorldUI = null;
         }
