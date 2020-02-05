@@ -244,13 +244,6 @@ public class WorldNavigator : MonoBehaviour
             clientInterface.UpdateState();
             screenGUI.SetGUIContents();
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            Debug.Log(clientInterface.chainState.debugBlockData);
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            Debug.Log(JsonConvert.SerializeObject(clientInterface.chainState));
-        if (Input.GetKeyDown(KeyCode.B))
-            clientInterface.BuyResourcePack(1);
     }
 
     public void Quit()

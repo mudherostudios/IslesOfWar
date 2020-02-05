@@ -20,6 +20,7 @@ namespace MudHero
             int network = 0;
             string gameNamespace = "";
             string storageType = "";
+            public string lastProcessedBlock = "";
 
             public void SetInfoVariables(ConnectionInfo _daemonConnectionInfo, ConnectionInfo _gsrConnectionInfo, StateProcessorPathInfo _pathInfo, int net, string storage, string game)
             {
@@ -80,15 +81,15 @@ namespace MudHero
                 {
                     if (communicator.isConnectedToXayaDaemon && wrapper != null)
                     {
-                        //Hangs/Crashes here for some reason if sqlite mode is selected.
-                        wrapper.xayaGameService.WaitForChange();
+                        wrapper.xayaGameService.WaitForChange(lastProcessedBlock);
 
                         GameStateResult actualState = wrapper.xayaGameService.GetCurrentState();
+                        lastProcessedBlock = actualState.blockhash;
 
                         if (actualState != null)
                         {
                             yield return Ninja.JumpToUnity;
-                            communicator.UpdateBlockProgress(actualState.blockhash, actualState.gamestate);
+                            communicator.UpdateBlockProgress(lastProcessedBlock, actualState.gamestate);
                             yield return Ninja.JumpBack;
 
                             yield return null;

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 
 public class UserMessageStates
@@ -257,9 +258,19 @@ public class BlockchainEvents : MonoBehaviour
         return alteredIslands;
     }
 
-    private void OnLevelWasLoaded(int level)
+    void OnEnable()
     {
-        if (level == 1)
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "IslandMenu")
         {
             clientInterface = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<WorldNavigator>().clientInterface;
             doneSyncing = true;

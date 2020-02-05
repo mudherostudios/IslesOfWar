@@ -56,9 +56,19 @@ public class Settings : MonoBehaviour
         LoadSettings();
     }
 
-    private void OnLevelWasLoaded(int level)
+    void OnEnable()
     {
-        if (level == 1)
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "IslandMenu")
         {
             mainCam = GameObject.FindGameObjectWithTag("MainCamera");
             elements = GameObject.FindGameObjectWithTag("SettingsElements").GetComponent<SettingsElements>();
