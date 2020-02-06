@@ -11,15 +11,15 @@ namespace IslesOfWar
     {
         public static class Callback
         {
-            public static int chain = 2;
+            public static int chain = 0;
 
             public static string SetGenesisInfo(out int height, out string hashHex)
             {
                 //Mover Block Heights Temporary to test out stuff.
                 if (chain == 0) // Mainnet
                 {
-                    height = 125000;
-                    hashHex = "2aed5640a3be8a2f32cdea68c3d72d7196a7efbfe2cbace34435a3eef97561f2";
+                    height = 1568000;
+                    hashHex = "0cea767f0fa72268eb91c2359a69fc81cd915a64aac4a79c88ba2c720983c31c";
                 }
                 else if (chain == 1) // Testnet
                 {

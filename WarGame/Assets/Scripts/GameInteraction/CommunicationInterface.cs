@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 public class CommunicationInterface : MonoBehaviour
 {
     [Header("Game Info")]
-    public int network = 2;
+    public int network = 0;
     public string gameSpace = "iow";
     public string storageType = "sqlite";
 
