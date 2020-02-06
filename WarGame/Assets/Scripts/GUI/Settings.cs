@@ -29,12 +29,12 @@ public class RawSettings
         guiVolume = 1.0f;
         environmentVolume = 1.0f;
         musicVolume = 1.0f;
-        shadowQuality = 6;
+        shadowQuality = 5;
         textureQuality = 4;
         fps = 3;
         screenWidth = 1024;
         screenHeight = 768;
-        fullscreen = true;
+        fullscreen = false;
         antiAliasing = true;
         postProcessing = true;
         blur = true;
