@@ -814,33 +814,42 @@ public class ClientInterface : MonoBehaviour
 
     public void CancelOpenOrder()
     {
-        double[] cost = new double[4];
-
-        for (int c = 0; c < cost.Length; c++)
+        if (queuedActions.opn != null)
         {
-            double fee = Math.Round(queuedActions.opn.sell[c] * chainState.currentConstants.marketFeePrecent[c]);
-            if (fee < chainState.currentConstants.minMarketFee[c])
-                fee = chainState.currentConstants.minMarketFee[c];
+            double[] cost = new double[4];
 
-            cost[c] = fee + queuedActions.opn.sell[c];
+            for (int c = 0; c < cost.Length; c++)
+            {
+                double fee = Math.Round(queuedActions.opn.sell[c] * chainState.currentConstants.marketFeePrecent[c]);
+                if (fee < chainState.currentConstants.minMarketFee[c])
+                    fee = chainState.currentConstants.minMarketFee[c];
+
+                cost[c] = fee + queuedActions.opn.sell[c];
+            }
+
+            UnspendResources(cost);
+            queuedActions.opn = null;
+            notificationSystem.PushNotification(2, 2, "We have canceled our order.", "openOrderCancel");
         }
-
-        UnspendResources(cost);
-        queuedActions.opn = null;
-        notificationSystem.PushNotification(2,2,"We have canceled our order.", "openOrderCancel");
     }
 
     public void CancelCloseOrder()
     {
-        queuedActions.cls = null;
-        notificationSystem.PushNotification(2, 2, "We have chosen to keep our order on the market.", "closeOrderCancel");
+        if (queuedActions.cls != null)
+        {
+            queuedActions.cls = null;
+            notificationSystem.PushNotification(2, 2, "We have chosen to keep our order on the market.", "closeOrderCancel");
+        }
     }
 
     public void CancelAcceptOrder()
     {
-        UnspendResources(queuedBuyOrder);
-        queuedActions.acpt = null;
-        notificationSystem.PushNotification(2, 2, "We have retracted our request to purchase resources.", "acceptOrderCancel");
+        if (queuedActions.acpt != null)
+        {
+            UnspendResources(queuedBuyOrder);
+            queuedActions.acpt = null;
+            notificationSystem.PushNotification(2, 2, "We have retracted our request to purchase resources.", "acceptOrderCancel");
+        }
     }
 
     public void CancelUnitPurchase(int type)

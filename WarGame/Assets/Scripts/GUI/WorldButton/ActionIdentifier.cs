@@ -77,6 +77,11 @@ public class ActionIdentifier : MonoBehaviour
             case 10:
                 client.CancelNationChange();
                 break;
+            case 11:
+                client.CancelAcceptOrder();
+                client.CancelOpenOrder();
+                client.CancelCloseOrder();
+                break;
             default:
                 client.notificationSystem.PushNotification(0, 1, "Not a valid action type that you can remove.");
                 break;
@@ -131,6 +136,10 @@ public class ActionIdentifier : MonoBehaviour
                 break;
             case 10:
                 if (client.queuedActions.nat != null && client.isPlaying)
+                    Show();
+                break;
+            case 11:
+                if (client.queuedActions.opn != null || client.queuedActions.cls != null || client.queuedActions.acpt != null)
                     Show();
                 break;
             default:

@@ -86,6 +86,11 @@ public class ScreenGUI : MonoBehaviour
             converted = amount / 1000;
             place = "K";
         }
+        else
+        {
+            converted = amount;
+            place = "";
+        }
 
         return string.Format("{0:F1} {1}", converted, place);
     }
