@@ -50,7 +50,7 @@ public class CommunicationInterface : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
         if (Input.GetKeyDown(KeyCode.S))
-            Debug.Log(gameState);
+            System.IO.File.WriteAllText("C:\\Users\\Douglas\\Desktop\\gamestate.txt", gameState);
     }
 
     public State state { get { return JsonConvert.DeserializeObject<State>(gameState); } }
