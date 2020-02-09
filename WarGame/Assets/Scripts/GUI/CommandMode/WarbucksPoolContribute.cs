@@ -28,13 +28,9 @@ public class WarbucksPoolContribute : MonoBehaviour
         List<string> playerIslandNames = new List<string>(technicalNames.ToArray());
         depletedIslandsMenu.AddOptions(playerIslandNames);
         pool = commandScript.GetWarbucksPoolSize();
-        string poolFormat = "";
-
-        if (pool > 999999999)
-            poolFormat = "G2";
 
         poolOwnership.text = string.Format("{0:0.00}%", commandScript.GetWarbucksOwnership() * 100);
-        poolSize.text = ((int)commandScript.GetWarbucksPoolSize()).ToString(poolFormat);
+        poolSize.text = GetOrderOfMagnitudeString(commandScript.GetWarbucksPoolSize());
     }
 
     public void AddSelected()
@@ -50,5 +46,34 @@ public class WarbucksPoolContribute : MonoBehaviour
     {
         gameObject.SetActive(true);
         UpdateAllStats();
+    }
+
+    string GetOrderOfMagnitudeString(double amount)
+    {
+        double converted = 0;
+        string place = "";
+
+        if (amount >= 1000000000000)
+        {
+            converted = amount / 1000000000000;
+            place = "T";
+        }
+        else if (amount >= 1000000000)
+        {
+            converted = amount / 1000000000;
+            place = "B";
+        }
+        else if (amount >= 1000000)
+        {
+            converted = amount / 1000000;
+            place = "M";
+        }
+        else if (amount >= 1000)
+        {
+            converted = amount / 1000;
+            place = "K";
+        }
+
+        return string.Format("{0:F1} {1}", converted, place);
     }
 }

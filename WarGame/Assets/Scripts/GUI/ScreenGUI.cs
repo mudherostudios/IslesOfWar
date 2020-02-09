@@ -63,13 +63,31 @@ public class ScreenGUI : MonoBehaviour
 
     string GetOrderOfMagnitudeString(double amount)
     {
-        string orderOfMag = "";
+        double converted = 0;
+        string place = "";
 
-        if (amount < 10000)
-            orderOfMag = amount.ToString();
-        else
-            orderOfMag = amount.ToString("G8", CultureInfo.InvariantCulture);
-        return orderOfMag;
+        if (amount >= 1000000000000)
+        {
+            converted = amount / 1000000000000;
+            place = "T";
+        }
+        else if (amount >= 1000000000)
+        {
+            converted = amount / 1000000000;
+            place = "B";
+        }
+        else if (amount >= 1000000)
+        {
+            converted = amount / 1000000;
+            place = "M";
+        }
+        else if (amount >= 1000)
+        {
+            converted = amount / 1000;
+            place = "K";
+        }
+
+        return string.Format("{0:F1} {1}", converted, place);
     }
 
     public void SetToolTip(string content)

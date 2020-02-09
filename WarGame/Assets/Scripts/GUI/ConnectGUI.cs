@@ -205,7 +205,7 @@ public class ConnectGUI : MonoBehaviour
     string GetCookiePassword()
     {
         string cookiePassword = "";
-        string cookieFolder = "Xaya/regtest/.cookie";
+        string cookieFolder = "Xaya/.cookie";
 
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         string filePath = Path.Combine(folderPath, cookieFolder);

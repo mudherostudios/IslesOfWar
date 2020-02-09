@@ -18,6 +18,7 @@ public class PoolContribute: MonoBehaviour
     public Text poolOwnership;
     public Text poolTitle;
     public CommandIslandInteraction commandScript;
+    public GameObject errorMessage;
 
     private string player;
     private int blocksLeft;
@@ -35,15 +36,6 @@ public class PoolContribute: MonoBehaviour
 
         UpdateAllStats();
         UpdateTimer(0);
-    }
-
-    public void Update()
-    {
-        if (gameObject.activeSelf)
-        {
-            if (Input.anyKey)
-                CheckEnoughResources();
-        }
     }
 
     void CheckEnoughResources()
@@ -76,12 +68,12 @@ public class PoolContribute: MonoBehaviour
         double.TryParse(tradeAmounts[1].text, out inputB);
         double[] resources = commandScript.clientInterface.playerResources;
 
-        if (inputA > resources[resourceTypeA])
+        if (inputA > resources[resourceTypeA + 1])
             tradeAmounts[0].text = resources[resourceTypeA+1].ToString();
         else if (inputA < 0)
             tradeAmounts[0].text = "0";
 
-        if (inputB > resources[resourceTypeB])
+        if (inputB > resources[resourceTypeB + 1])
             tradeAmounts[1].text = resources[resourceTypeB+1].ToString();
         else if (inputB < 0)
             tradeAmounts[1].text = "0";
@@ -150,19 +142,57 @@ public class PoolContribute: MonoBehaviour
         UpdateAllStats();
     }
 
+    public void ShowErrorMessage()
+    {
+        Transform messageText = errorMessage.transform.Find("MessageText");
+
+        if (messageText != null)
+        {
+            messageText.GetComponent<Text>().text = "You can only submit to one resource pool at a time.";
+        }
+
+        errorMessage.SetActive(true);
+    }
+
     public void UpdateAllStats()
     {
         CalculatePoolStates();
-        string poolFormat = "";
 
-        if (pool > 999999999)
-            poolFormat = "G2";
-
-        poolAmount.text = ((int)(pool + commandScript.clientInterface.chainState.resourcePools[poolType])).ToString(poolFormat);
+        double poolSize = pool + commandScript.clientInterface.chainState.resourcePools[poolType];
+        poolAmount.text = GetOrderOfMagnitudeString(poolSize);
         poolOwnership.text = string.Format("{0:0.000}%", ownership);
 
         resourceModifiers[0].text = strModifiers[0];
         resourceModifiers[1].text = strModifiers[1];
+    }
+
+    string GetOrderOfMagnitudeString(double amount)
+    {
+        double converted = 0;
+        string place = "";
+
+        if (amount >= 1000000000000)
+        {
+            converted = amount / 1000000000000;
+            place = "T";
+        }
+        else if (amount >= 1000000000)
+        {
+            converted = amount / 1000000000;
+            place = "B";
+        }
+        else if (amount >= 1000000)
+        {
+            converted = amount / 1000000;
+            place = "M";
+        }
+        else if (amount >= 1000)
+        {
+            converted = amount / 1000;
+            place = "K";
+        }
+
+        return string.Format("{0:F1} {1}", converted, place);
     }
 
     void CalculatePoolStates()

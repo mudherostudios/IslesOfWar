@@ -271,10 +271,10 @@ namespace IslesOfWar
 
                     if (defenses[0][0] > 0)
                     {
-                        resources[0] += actualState.currentConstants.blockerCosts[defenses[0][0], 0];
-                        resources[1] += actualState.currentConstants.blockerCosts[defenses[0][0], 1];
-                        resources[2] += actualState.currentConstants.blockerCosts[defenses[0][0], 2];
-                        resources[3] += actualState.currentConstants.blockerCosts[defenses[0][0], 3];
+                        resources[0] += actualState.currentConstants.blockerCosts[defenses[0][0]-1, 0];
+                        resources[1] += actualState.currentConstants.blockerCosts[defenses[0][0]-1, 1];
+                        resources[2] += actualState.currentConstants.blockerCosts[defenses[0][0]-1, 2];
+                        resources[3] += actualState.currentConstants.blockerCosts[defenses[0][0]-1, 3];
                     }
 
                     for (int type = 0; type < 3; type++)

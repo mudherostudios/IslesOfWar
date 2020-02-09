@@ -118,6 +118,8 @@ public class CommandIslandInteraction : Interaction
             warbucksPool.Show();
         else if (hasPoolPrompter && clientInterface.queuedContributions.Count == 0)
             resourcePool.ShowMenu(poolPrompter.poolType);
+        else if (hasPoolPrompter && clientInterface.queuedContributions.Count > 0)
+            resourcePool.ShowErrorMessage();
         else if (hasUnitPurchasePrompter)
             unitPurchase.SetMenu(unitPrompter.possiblePurchaseTypes);
         else if (hasSearchPrompter)

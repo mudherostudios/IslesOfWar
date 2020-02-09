@@ -31,12 +31,12 @@ public class NationSelect : MonoBehaviour
     {
         int index = countryList.value;
         string countryCode = keys[index];
-        string filePath = string.Format("{0}/{1}.png", fullPathToFlags, countryCode.ToLower());
+        string filePath = string.Format("{0}/{1}", fullPathToFlags, countryCode.ToLower());
         string resourcePath = string.Format("{0}/{1}", resourcePathToFlags, countryCode.ToLower());
 
-        if (File.Exists(filePath))
+        if (File.Exists(filePath + ".png"))
         {
-            Texture flagTexture = (Texture)Resources.Load(resourcePath);
+            Texture flagTexture = Resources.Load<Texture>(resourcePath); //Resources.Load<Texture2D>("Flags") also make sure that the textures are set as sprites
             flag.material.SetTexture("_MainTex", flagTexture);
 
             int height = flagTexture.height;

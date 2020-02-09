@@ -746,4 +746,15 @@ public class BattlePlanInteraction : Interaction
     //------------------------------------------------------------------------------
     public List<string> GetIslands() { return clientInterface.playerIslandIDs; }
     public string GetAttackableIsland() { return clientInterface.attackableIslandID; }
+    public string GetOwnerOfAttackableIsland()
+    {
+        string islandID = GetAttackableIsland();
+
+        if (islandID != "" && islandID != null)
+        {
+            return clientInterface.GetIsland(islandID).owner;
+        }
+
+        return "";
+    }
 }

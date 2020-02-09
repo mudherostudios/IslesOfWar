@@ -23,9 +23,6 @@ public class UnitPurchase: MonoBehaviour
     {
         constants = commandScript.clientInterface.chainState.currentConstants;
         type = _type;
-        string formatW = "";
-        string formatO = "";
-        string formatM = "";
         string sAmount = purchaseAmount.text;
         uint amount = 0;
         uint.TryParse(sAmount, out amount);
@@ -35,16 +32,9 @@ public class UnitPurchase: MonoBehaviour
         double oil = amount * constants.unitCosts[type, 1];
         double metal = amount * constants.unitCosts[type, 2];
 
-        if (warbucks > 10000)
-            formatW = "G2";
-        if (oil > 10000)
-            formatO = "G2";
-        if (metal > 10000)
-            formatM = "G2";
-
-        resourceCosts[0].text = warbucks.ToString(formatW);
-        resourceCosts[1].text = oil.ToString(formatO);
-        resourceCosts[2].text = metal.ToString(formatM);
+        resourceCosts[0].text = GetOrderOfMagnitudeString(warbucks);
+        resourceCosts[1].text = GetOrderOfMagnitudeString(oil);
+        resourceCosts[2].text = GetOrderOfMagnitudeString(metal);
     }
 
     public void ShowMenu(int unitType)
@@ -106,5 +96,34 @@ public class UnitPurchase: MonoBehaviour
         int amount = 0;
         int.TryParse(sAmount, out amount);
         commandScript.PurchaseUnit(type, amount);
+    }
+
+    string GetOrderOfMagnitudeString(double amount)
+    {
+        double converted = 0;
+        string place = "";
+
+        if (amount >= 1000000000000)
+        {
+            converted = amount / 1000000000000;
+            place = "T";
+        }
+        else if (amount >= 1000000000)
+        {
+            converted = amount / 1000000000;
+            place = "B";
+        }
+        else if (amount >= 1000000)
+        {
+            converted = amount / 1000000;
+            place = "M";
+        }
+        else if (amount >= 1000)
+        {
+            converted = amount / 1000;
+            place = "K";
+        }
+
+        return string.Format("{0:F1} {1}", converted, place);
     }
 }

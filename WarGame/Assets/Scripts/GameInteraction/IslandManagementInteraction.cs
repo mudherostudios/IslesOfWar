@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using IslesOfWar;
 using IslesOfWar.ClientSide;
 
@@ -19,7 +20,7 @@ public class IslandManagementInteraction : Interaction
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
-    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker, submitIslandName;
     public Vector3 islandTileZoom;
 
     [Header("Prefabs")]
@@ -75,8 +76,8 @@ public class IslandManagementInteraction : Interaction
                     bunkerType = EncodeUtility.GetXType(bunkerChar);
 
                 int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
-                islandTiles[lastIndexLocation].ToggleBunkerSystem(false, new int[1]);
-                islandTiles[indexLocation].ToggleBunkerSystem(true, existingBunkers);
+                islandTiles[lastIndexLocation].ToggleBunkerPrompters(true, new int[3]); //true and 0 turns off index
+                islandTiles[indexLocation].ToggleBunkerPrompters(false, existingBunkers); //false and 0 turns on index
             }
             else if (canBuildBlockers)
             {
@@ -94,8 +95,14 @@ public class IslandManagementInteraction : Interaction
                 else
                     blockerType = EncodeUtility.GetYType(blockerChar);
 
-                islandTiles[lastIndexLocation].ToggleBlockerSystem(false, 0);
-                islandTiles[indexLocation].ToggleBlockerSystem(true, blockerType);
+
+                islandTiles[lastIndexLocation].ToggleBlockerPrompters(false);
+
+                if (blockerType == 0)
+                {
+                    islandTiles[indexLocation].ToggleBlockerSystem(true, 0);
+                }
+
             }
         }
 
@@ -245,6 +252,14 @@ public class IslandManagementInteraction : Interaction
                     lastPeekedName = "None";
                 }
             }
+
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                costSlider.TurnOn(false);
+                lastPeekedButton = "None";
+                lastPeekedName = "None";
+            }
+
         }
     }
 
@@ -345,9 +360,15 @@ public class IslandManagementInteraction : Interaction
             ToggleAllTileResourcesAndCollectors(true);
         }
         else if (type == 1)
+        {
             canBuildBunkers = canBuild;
+            ToggleAllBunkers(true);
+        }
         else if (type == 2)
+        {
             canBuildBlockers = canBuild;
+            ToggleAllBlockers(true);
+        }
 
         SetEditGUIState();
     }
@@ -363,6 +384,7 @@ public class IslandManagementInteraction : Interaction
         string technicalName = string.Format("Island {0}", islandID.Substring(0, 10));
 
         islandName.text = SaveLoad.GetIslandName(technicalName);
+        submitIslandName.GetComponent<Button>().interactable = false;
     }
 
     public void SetEditGUIState()
@@ -400,6 +422,7 @@ public class IslandManagementInteraction : Interaction
         string technicalIslandName = string.Format("Island {0}", islandID.Substring(0, 10));
 
         islandName.text = SaveLoad.GetIslandName(technicalIslandName);
+        submitIslandName.GetComponent<Button>().interactable = false;
     }
 
     public void SaveIslandName()
@@ -410,6 +433,9 @@ public class IslandManagementInteraction : Interaction
 
         if(playerAssignedName == "")
             islandName.text = technicalIslandName;
+
+
+        submitIslandName.GetComponent<Button>().interactable = false;
     }
 
     public void SetExitMode()
@@ -417,9 +443,11 @@ public class IslandManagementInteraction : Interaction
         if (canBuildCollectors)
             ToggleAllTileResourcesAndCollectors(false);
         else if (canBuildBlockers)
-            islandTiles[indexLocation].ToggleBlockerSystem(false, 0);
-        else if(canBuildBunkers)
-            islandTiles[indexLocation].ToggleBunkerSystem(false, new int[1]);
+            ToggleAllBlockers(false);
+        else if (canBuildBunkers)
+            ToggleAllBunkers(false);
+
+        ToggleOffAllPrompters();
 
         canBuildCollectors = false;
         canBuildBunkers = false;
@@ -545,6 +573,36 @@ public class IslandManagementInteraction : Interaction
 
             ActivateRandomObject(tempStats.structures, tempStructureProb);
             islandTiles.Add(tempStats);
+        }
+    }
+
+    void ToggleAllBlockers(bool on)
+    {
+        for (int t = 0; t < islandTiles.Count; t++)
+        {
+            char blockerChar = clientInterface.playerIslands[islandIndex].defenses[t];
+            int blockerType = EncodeUtility.GetYType(blockerChar);
+            islandTiles[t].ToggleSpecificBlocker(on, blockerType);
+        }
+    }
+
+    void ToggleAllBunkers(bool on)
+    {
+        for (int t = 0; t < islandTiles.Count; t++)
+        {
+            char bunkerChar = clientInterface.playerIslands[islandIndex].defenses[t];
+            int bunkerType = EncodeUtility.GetXType(bunkerChar);
+            int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
+            islandTiles[t].TurnOnValidBunkers(existingBunkers);
+        }
+    }
+
+    void ToggleOffAllPrompters()
+    {
+        for (int t = 0; t < islandTiles.Count; t++)
+        {
+            islandTiles[t].ToggleBunkerPrompters(false);
+            islandTiles[t].ToggleBlockerPrompters(false);
         }
     }
 

@@ -9,6 +9,7 @@ public class BattleIslandsGUI : MonoBehaviour
     public GameObject defendMenu;
     public GameObject attackMenu;
     public Text attackableIslandName;
+    public Text ownerOfIslandName;
     public BattlePlanInteraction battleScript;
     public WorldNavigator navigator;
     public BattleHUD hud;
@@ -65,13 +66,18 @@ public class BattleIslandsGUI : MonoBehaviour
     {
         attackMenu.SetActive(true);
         string islandName = battleScript.GetAttackableIsland();
+        string ownerName = battleScript.GetOwnerOfAttackableIsland();//Get owner name.
 
         if (islandName == null || islandName == "")
             islandName = "No Island to Attack";
         else
             islandName = islandName.Substring(0, 10);
 
+        if (ownerName == null || ownerName == "")
+            ownerName = "No Enemy to Attack";
+
         attackableIslandName.text = string.Format("Island {0}", islandName);
+        ownerOfIslandName.text = ownerName;
     }
 
     public void HideMenus()

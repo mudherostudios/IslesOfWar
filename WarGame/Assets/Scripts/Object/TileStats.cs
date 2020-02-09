@@ -109,6 +109,11 @@ public class TileStats : MonoBehaviour
         }
     }
 
+    public void TurnOnValidBunkers(int[] validIndices)
+    {
+        ToggleOnValidCollection(false, bunkers, validIndices);
+    }
+
     public void ToggleBunkerSystem(bool on, int[] validIndices)
     {
         if (!on)
@@ -145,6 +150,14 @@ public class TileStats : MonoBehaviour
             ToggleBlockers(false);
             ToggleBlockerPrompters(false);
         }
+    }
+
+    public void ToggleSpecificBlocker(bool on, int type)
+    {
+        if (!on || type == 0)
+            ToggleBlockers(false);
+        else
+            blockers[type - 1].SetActive(true);
     }
 
     StructurePurchasePrompter[] GetChildren(Transform parent)

@@ -68,7 +68,7 @@ public class WorldNavigator : MonoBehaviour
     public EnableBuildButton enableBuildBunkersButton;
     public EnableBuildButton enableBuildBlockersButton;
     public CostSlider costSlider;
-    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker;
+    public GameObject selectionButtons, backToCommandCenterButton, resumeIslandQueueButton, islandNameTicker, submitIslandName;
 
     [Header("Camera Observe Points")]
     public Transform commandObservationPoint;
@@ -169,6 +169,7 @@ public class WorldNavigator : MonoBehaviour
         managementScript.backToCommandCenterButton = backToCommandCenterButton;
         managementScript.resumeIslandQueueButton = resumeIslandQueueButton;
         managementScript.islandNameTicker = islandNameTicker;
+        managementScript.submitIslandName = submitIslandName;
         enableBuildCollectorsButton.managementScript = managementScript;
         enableBuildBunkersButton.managementScript = managementScript;
         enableBuildBlockersButton.managementScript = managementScript;

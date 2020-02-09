@@ -49,6 +49,8 @@ public class CommunicationInterface : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+        if (Input.GetKeyDown(KeyCode.S))
+            Debug.Log(gameState);
     }
 
     public State state { get { return JsonConvert.DeserializeObject<State>(gameState); } }
