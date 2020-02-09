@@ -496,7 +496,7 @@ namespace IslesOfWar
                 if (canUpdate)
                 {
                     canUpdate = state.players[player].islands.Contains(defensePlan.id) && defensePlan.pln.Count == defensePlan.sqd.Count
-                    && Validity.SquadHealthSizeLimits(defensePlan.sqd, state.currentConstants.unitHealths);
+                    && defensePlan.pln.Count > 0 && Validity.SquadHealthSizeLimits(defensePlan.sqd, state.currentConstants.unitHealths);
 
                     if (canUpdate && state.islands[defensePlan.id].squadCounts == null)
                     {
@@ -543,10 +543,15 @@ namespace IslesOfWar
 
                 for (int i = 0; i < islands.Count && canSubmit; i++)
                 {
-                    canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]) &&
-                    state.islands[islands[i]].IsDepleted();
+                    canSubmit = state.players[player].islands.Contains(islands[i]) && state.islands.ContainsKey(islands[i]);
 
-                    if (state.islands[islands[i]].resources != null)
+                    if (canSubmit) //Order for this one is important for IsDepleted() and making sure the island is in the dictionary.
+                        canSubmit = canSubmit && state.islands[islands[i]].resources != null;
+
+                    if (canSubmit)
+                        canSubmit = canSubmit && state.islands[islands[i]].IsDepleted();
+
+                    if (canSubmit)
                     {
                         for (int t = 0; t < state.islands[islands[i]].resources.Count && canSubmit; t++)
                         {
@@ -726,7 +731,7 @@ namespace IslesOfWar
                         {
                             state.players[player].resources = new List<double>(Subtract(state.players[player].resources.ToArray(), buy));
                             state.players[player].resources = new List<double>(Add(state.players[player].resources.ToArray(), sell));
-                            state.players[seller].resources = new List<double>(Add(state.players[player].resources.ToArray(), buy));
+                            state.players[seller].resources = new List<double>(Add(state.players[seller].resources.ToArray(), buy));
                             state.resourceMarket[seller].Remove(order);
 
                             if (state.resourceMarket[seller].Count == 0)
@@ -759,6 +764,7 @@ namespace IslesOfWar
                     }
 
                     state.warbucksPool = 0;
+                    state.depletedContributions.Clear();
                 }
             }
 
@@ -796,7 +802,7 @@ namespace IslesOfWar
                     for (int p = 0; p < totalPoints.Length; p++)
                     {
                         if (totalPoints[p] != 0)
-                            state.resourcePools[p + 1] = 0.0;
+                            state.resourcePools[p] = 0.0;
                     }
                 }
             }

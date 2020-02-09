@@ -56,8 +56,8 @@ public class CommandIslandInteraction : Interaction
 
         if (warbucksPool.gameObject.activeSelf)
         {
-            int remainder = GetCurrentXayaBlock() % clientInterface.chainState.currentConstants.poolRewardBlocks;
-            int timeLeft = clientInterface.chainState.currentConstants.poolRewardBlocks - remainder;
+            int remainder = GetCurrentXayaBlock() % clientInterface.chainState.currentConstants.warbucksRewardBlocks;
+            int timeLeft = clientInterface.chainState.currentConstants.warbucksRewardBlocks - remainder;
             warbucksPool.UpdateTimer(timeLeft);
         }
 

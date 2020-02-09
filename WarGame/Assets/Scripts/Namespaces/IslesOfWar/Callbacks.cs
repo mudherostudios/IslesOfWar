@@ -78,10 +78,22 @@ namespace IslesOfWar
                         //Resource Loop
                         processor.UpdateIslandAndPlayerResources(height);
 
+                        //Reward Resource Pools
+                        if(height % processor.state.currentConstants.poolRewardBlocks == 0)
+                        {
+                            processor.RewardResourcePools();
+                        }
+
+                        //Reward Warbux Pool
+                        if (height % processor.state.currentConstants.warbucksRewardBlocks == 0)
+                        {
+                            processor.RewardDepletedPool();
+                        }
+
                         //Main Loop
                         string serializedMove = JsonConvert.SerializeObject(moves);
                         if (serializedMove.Length > 4)
-                        {
+                        { 
                             foreach (dynamic element in moves)
                             {
                                 string player = element["name"].ToString();

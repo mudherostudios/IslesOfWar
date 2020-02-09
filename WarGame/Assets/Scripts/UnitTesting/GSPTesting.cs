@@ -56,6 +56,8 @@ public class GSPTesting : MonoBehaviour
             TestAll();
     }
 
+
+
     void TestAll()
     {
         passCount = 0;
@@ -139,6 +141,10 @@ public class GSPTesting : MonoBehaviour
         nationResults += GetPassOrFail(passedEighth);
     }
 
+    //***********************************************************************************************************************
+    //Most of these are wrong because the Island search costs have changed considerably.
+    //Have to recalculate each one by hand.
+    //***********************************************************************************************************************
     void SearchIslandsTest()
     {
         ResetTestData();
@@ -149,30 +155,39 @@ public class GSPTesting : MonoBehaviour
         //Don't test any random non existent names because that is checked before it passes to this.
         //Fail to find island because found self
         processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
-        bool passedFirst = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == ""
-        && processor.state.players["cairo"].resources[0] == 2000 && processor.state.players["cairo"].resources[1] == 5000
-        && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
-        && processor.state.players["pimpMacD"].islands.Count == 5 && processor.state.players["pimpMacD"].attackableIsland == ""
-        && processor.state.players["pimpMacD"].resources[0] == 1000 && processor.state.players["pimpMacD"].resources[1] == 2500
-        && processor.state.players["pimpMacD"].resources[2] == 2000 && processor.state.players["pimpMacD"].resources[3] == 500
-        && processor.state.players["nox"].islands.Count == 6 && processor.state.players["nox"].attackableIsland == ""
-        && processor.state.players["nox"].resources[0] == 0 && processor.state.players["nox"].resources[1] == 0
-        && processor.state.players["nox"].resources[2] == 0 && processor.state.players["nox"].resources[3] == 0
-        && processor.state.islands.Count == 15 && !processor.state.islands.ContainsKey("p");
+        bool[] firstTests = new bool[] 
+        {
+            processor.state.players["cairo"].islands.Count == 4, processor.state.players["cairo"].attackableIsland == "",
+            processor.state.players["cairo"].resources[0] == 3000, processor.state.players["cairo"].resources[1] == 7500,
+            processor.state.players["cairo"].resources[2] == 6000, processor.state.players["cairo"].resources[3] == 1500,
+            processor.state.players["pimpMacD"].islands.Count == 5, processor.state.players["pimpMacD"].attackableIsland == "",
+            processor.state.players["pimpMacD"].resources[0] == 1000, processor.state.players["pimpMacD"].resources[1] == 2500,
+            processor.state.players["pimpMacD"].resources[2] == 2000, processor.state.players["pimpMacD"].resources[3] == 500,
+            processor.state.players["nox"].islands.Count == 6, processor.state.players["nox"].attackableIsland == "",
+            processor.state.players["nox"].resources[0] == 0, processor.state.players["nox"].resources[1] == 0,
+            processor.state.players["nox"].resources[2] == 0, processor.state.players["nox"].resources[3] == 0,
+            processor.state.islands.Count == 15 , !processor.state.islands.ContainsKey("p")
+        };
+
+        bool passedFirst = CalculatePassOrFail(firstTests);
         searchIslandResults += GetPassOrFail(passedFirst);
 
         //Find attackable island
         processor.DiscoverOrScoutIsland("cairo", "norm", "p", ref random);
-        bool passedSecond = processor.state.players["cairo"].islands.Count == 4 && processor.state.players["cairo"].attackableIsland == "h"
-        && processor.state.players["cairo"].resources[0] == 1000 && processor.state.players["cairo"].resources[1] == 2500
-        && processor.state.players["cairo"].resources[2] == 6000 && processor.state.players["cairo"].resources[3] == 1500
-        && processor.state.players["pimpMacD"].islands.Count == 5 && processor.state.players["pimpMacD"].attackableIsland == ""
-        && processor.state.players["pimpMacD"].resources[0] == 1000 && processor.state.players["pimpMacD"].resources[1] == 2500
-        && processor.state.players["pimpMacD"].resources[2] == 2000 && processor.state.players["pimpMacD"].resources[3] == 500
-        && processor.state.players["nox"].islands.Count == 6 && processor.state.players["nox"].attackableIsland == ""
-        && processor.state.players["nox"].resources[0] == 0 && processor.state.players["nox"].resources[1] == 0
-        && processor.state.players["nox"].resources[2] == 0 && processor.state.players["nox"].resources[3] == 0
-        && processor.state.islands.Count == 15 && !processor.state.islands.ContainsKey("p");
+        bool[] secondTests = new bool[] 
+        {
+            processor.state.players["cairo"].islands.Count == 4, processor.state.players["cairo"].attackableIsland == "h",
+            processor.state.players["cairo"].resources[0] == 3000, processor.state.players["cairo"].resources[1] == 7500,
+            processor.state.players["cairo"].resources[2] == 6000, processor.state.players["cairo"].resources[3] == 1500,
+            processor.state.players["pimpMacD"].islands.Count == 5, processor.state.players["pimpMacD"].attackableIsland == "",
+            processor.state.players["pimpMacD"].resources[0] == 1000, processor.state.players["pimpMacD"].resources[1] == 2500,
+            processor.state.players["pimpMacD"].resources[2] == 2000, processor.state.players["pimpMacD"].resources[3] == 500,
+            processor.state.players["nox"].islands.Count == 6, processor.state.players["nox"].attackableIsland == "",
+            processor.state.players["nox"].resources[0] == 0, processor.state.players["nox"].resources[1] == 0,
+            processor.state.players["nox"].resources[2] == 0, processor.state.players["nox"].resources[3] == 0,
+            processor.state.islands.Count == 15 && !processor.state.islands.ContainsKey("p")
+        };
+        bool passedSecond = CalculatePassOrFail(secondTests);
         searchIslandResults += GetPassOrFail(passedSecond);
 
         //Find new island
@@ -306,6 +321,9 @@ public class GSPTesting : MonoBehaviour
 
     }
 
+    //***********************************************************************************************************************
+    //Tests that are failing in this section are because islands are different because of a different random number generator
+    //***********************************************************************************************************************
     //Has some fail testing of defenses in the beginning of this function because I didn't realize how big the DevelopIsland function testing
     //was going to be. So I just left them and stopped at the end of the collector testing. The remainder of defense testing will be in a 
     //different function.
@@ -315,6 +333,9 @@ public class GSPTesting : MonoBehaviour
         purchaseCollectorsResults = "";
 
         double[][] playerResources = new double[][] { new double[4], new double[4], new double[4] };
+        char[] motherLode = processor.state.islands["a"].features.ToCharArray();
+        motherLode[0] = '7';
+        processor.state.islands["a"].features = new string(motherLode);
         Array.Copy(processor.state.players["cairo"].resources.ToArray(), playerResources[0], 4);
         Array.Copy(processor.state.players["pimpMacD"].resources.ToArray(), playerResources[1], 4);
         Array.Copy(processor.state.players["nox"].resources.ToArray(), playerResources[2], 4);
@@ -361,22 +382,34 @@ public class GSPTesting : MonoBehaviour
 
         //Fail because collectors are not long enough. #2
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "10", "))))))))))))"));
-        bool passedSeventh = IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0])
-        && IslandsAreEqual(savedIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
-        && PlayersAreEqualExcept("", players, processor.state.players);
+        bool[] seventhTests = new bool[] 
+        {
+            IsEqual(processor.state.players["cairo"].resources.ToArray(), playerResources[0]),
+            IslandsAreEqual(savedIslands, processor.state.islands),
+            IslandFeaturesWereNotAltered(savedIslands, processor.state.islands),
+            PlayersAreEqualExcept("", players, processor.state.players)
+        };
+        bool passedSeventh = CalculatePassOrFail(seventhTests);
         purchaseCollectorsResults += GetPassOrFail(passedSeventh);
 
         //Eight Moved to Defenses as Second
 
-        //Succeed in development of oil collector on first tile with null defense
+        //Succeed in development of metal collector on first tile with null defense
         Dictionary<string, Island> alteredIslands = JsonConvert.DeserializeObject<Dictionary<string, Island>>(JsonConvert.SerializeObject(savedIslands));
         processor.state.players["cairo"].resources.Clear();
         processor.state.players["cairo"].resources.AddRange(GetCostOfCollectors(new int[] { 1, 0, 0 }));
         alteredIslands["a"].collectors = "100000000000";
         processor.DevelopIsland("cairo", new IslandBuildOrder("a", "100000000000", null));
-        bool passedNinth = IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 })
-        && IslandsAreEqual(alteredIslands, processor.state.islands) && IslandFeaturesWereNotAltered(savedIslands, processor.state.islands)
-        && PlayersAreEqualExcept("cairo", players, processor.state.players);
+        bool[] ninthTests = new bool[] 
+        {
+            IsEqual(processor.state.players["cairo"].resources.ToArray(), new double[] { 0, 0, 0, 0 }),
+            IslandsAreEqual(alteredIslands, processor.state.islands),
+            IslandFeaturesWereNotAltered(savedIslands, processor.state.islands),
+            PlayersAreEqualExcept("cairo", players, processor.state.players)
+        };
+        PrintTests(ninthTests);
+        PrintList(processor.state.players["cairo"].resources);
+        bool passedNinth = CalculatePassOrFail(ninthTests);
         purchaseCollectorsResults += GetPassOrFail(passedNinth);
 
         //Succeed in development of metal collector on first tile with null defense
@@ -2294,7 +2327,6 @@ public class GSPTesting : MonoBehaviour
         terrainTestingResults += GetPassOrFail(passedEighth);
     }
 
-
     void SetIslandResources(ref MudHeroRandom random)
     {
         foreach (KeyValuePair<string, Island> pair in processor.state.islands)
@@ -2359,9 +2391,6 @@ public class GSPTesting : MonoBehaviour
         //Initialize Random Seed to get the same islands everytime.
         //Changing this seed will break a lot of the tests.
         random = new MudHeroRandom(1337);
-        processor = new StateProcessor();
-        processor.state = new State();
-        processor.state.Init();
 
         players = new Dictionary<string, PlayerState>
         {
@@ -2389,7 +2418,8 @@ public class GSPTesting : MonoBehaviour
             {IIDs[14], IslandGenerator.Generate("nox", ref random, constants)}
         };
 
-        processor.state = new State(players, islands);
+        processor = new StateProcessor(new State(players, islands));
+        processor.state.currentConstants = new Constants();
     }
 
     double[] Add(double[] a, double[] b)
@@ -2646,5 +2676,46 @@ public class GSPTesting : MonoBehaviour
         string testTotals = string.Format("\n- TestTotals - \nPasses : {0} \nFails    : {1} \nPercent: {2:00.00}%\n", passCount, failCount, ((float)passCount/(passCount+failCount))*100);
 
         return string.Format("{0:00.00}%\n{1}{2}", ((float)passCount / (passCount + failCount)) * 100, entireResults, testTotals);
+    }
+
+    bool CalculatePassOrFail(bool[] tests)
+    {
+        bool pass = true;
+
+        for (int b = 0; b < tests.Length; b++)
+        {
+            pass = pass && tests[b];
+        }
+
+        return pass;
+    }
+
+    void PrintTests(bool[] tests)
+    {
+        string testResults = "";
+
+        for (int b = 0; b < tests.Length; b++)
+        {
+            testResults += b + ": " + tests[b] + "\n";
+        }
+
+        Debug.Log(testResults);
+    }
+
+    void PrintState()
+    {
+        string jsonState = JsonConvert.SerializeObject(processor.state);
+        Debug.Log(jsonState);
+    }
+
+    void PrintList(List<double> array)
+    {
+        string arrayValues = "";
+        for (int i = 0; i < array.Count; i++)
+        {
+            arrayValues += i + ":" + array[i] + "\n";
+        }
+
+        Debug.Log(arrayValues);
     }
 }

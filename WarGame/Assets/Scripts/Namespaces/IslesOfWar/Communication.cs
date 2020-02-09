@@ -62,15 +62,18 @@ namespace IslesOfWar
                 id = _id;
                 pln = new List<List<int>>();
                 sqd = new List<List<int>>();
-                
-                for (int s = 0; s < plan.Length; s++)
+
+                if (_id != null && plan != null && squad != null)
                 {
-                    pln.Add(new List<int>(plan[s]));
-                }
-                    
-                for (int s = 0; s < squad.Length; s++)
-                {
-                    sqd.Add(new List<int>(squad[s]));
+                    for (int s = 0; s < plan.Length; s++)
+                    {
+                        pln.Add(new List<int>(plan[s]));
+                    }
+
+                    for (int s = 0; s < squad.Length; s++)
+                    {
+                        sqd.Add(new List<int>(squad[s]));
+                    }
                 }
             }
         }
@@ -147,7 +150,7 @@ namespace IslesOfWar
             public float[] packAmnt;   //Set ResourcePackAmount, sets all - 4
             public float[] iwCost;     //Set IslandSearchCost, sets all - 4 (only using first right now though) 
             public float atkPerc;      //Set AttackCostPercent
-            public int uPerc;          //Set UndiscoveredPercent
+            public float uPerc;        //Set UndiscoveredPercent
             public float repTime;      //Set IslandReplenishTime
             public float sqdHlthLmt;   //Set SquadHealthLimit
             public float[] uCost;      //Set UnitCost first is unitType, next 4 are prices - 5
