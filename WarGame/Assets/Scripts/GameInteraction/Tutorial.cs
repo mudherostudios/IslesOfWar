@@ -129,7 +129,7 @@ public class Tutorial : Interaction
                     prompters["unitPurchase"].InitiateTutorial();
                 else if (formSquadsSkipped)
                     CompleteTutorial("formSquads");
-                else if (formSquads || formSquadsAgain)
+                else if (formSquads || formSquadsAgain && false)
                     prompters["formSquads"].InitiateTutorial();
                 else if (defend)
                     prompters["defend"].InitiateTutorial();

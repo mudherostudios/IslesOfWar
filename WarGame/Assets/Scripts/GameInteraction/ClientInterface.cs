@@ -1428,7 +1428,7 @@ public class ClientInterface : MonoBehaviour
                 tempSqds = queuedActions.dfnd.sqd;
             else
             {
-                for (int s = ownedDefendersOnIsland-1; s < queuedActions.dfnd.sqd.Count; s++)
+                for (int s = ownedDefendersOnIsland; s < queuedActions.dfnd.sqd.Count; s++)
                 {
                     tempSqds.Add(queuedActions.dfnd.sqd[s]);
                 }

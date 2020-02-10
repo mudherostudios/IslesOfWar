@@ -21,7 +21,7 @@ public class MarketOrderTesting : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ResetState();
-            RewardDepleted();
+            UnitDefend();
         }
     }
 
@@ -71,14 +71,30 @@ public class MarketOrderTesting : MonoBehaviour
         Debug.Log(processor.state.players["cairo"].resources[0]);
     }
 
+    void UnitDefend()
+    {
+        int[][] squads = new int[][] { new int[] { 12, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        int[][] plans = new int[][] { new int[] { 0 } };
+        int[][] squads2 = new int[][] { new int[] { 25, 0, 0, 0, 0, 0, 0, 0, 0 }, new int[] { 13, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        int[][] plans2 = new int[][] { new int[] { 0 }, new int[] { 0 } };
+        BattleCommand defensePlan = new BattleCommand("a", plans, squads);
+        BattleCommand defensePlan2 = new BattleCommand("a", plans2, squads2);
+        processor.UpdateDefensePlan("pimpMacD",defensePlan);
+        processor.UpdateDefensePlan("pimpMacD",defensePlan2);
+    }
+
     void ResetState()
     {
         random = new MudHeroRandom(1337);
+        islands = new Dictionary<string, Island>();
+        Island aIsland = new Island("pimpMacD", "aA00Aa0A0aa0", "000000000000", "))))))))))))");
+        aIsland.SetResources(ref random, new int[,] { { 0, 0 }, { 0, 0 }, { 0, 0 } });
+        islands.Add("a", aIsland);
 
         players = new Dictionary<string, PlayerState>
         {
             {"cairo", new PlayerState("US", new double[9], new double[] {3000, 7500, 6000, 1500}, new string[] {}, "") },
-            {"pimpMacD", new PlayerState("US", new double[] {50, 25, 12, 5, 2, 1, 5, 2, 1 }, new double[] {1000, 2500, 2000, 500}, new string[] {}, "") },
+            {"pimpMacD", new PlayerState("US", new double[] {50, 25, 12, 5, 2, 1, 5, 2, 1 }, new double[] {1000, 2500, 2000, 500}, new string[] {"a"}, "") },
             {"nox", new PlayerState("MX", new double[] {100, 50, 25, 10, 5, 2, 10, 5, 1 }, new double[] {0, 0, 0, 0}, new string[] {}, "") }
         };
 
