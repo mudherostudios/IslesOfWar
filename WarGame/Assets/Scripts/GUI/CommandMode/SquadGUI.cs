@@ -170,6 +170,7 @@ public class SquadGUI : MonoBehaviour
             SaveLoad.RemoveSquad(commandScript.clientInterface.player, squad);
             SaveLoad.SavePreferences();
             UpdateSquadList();
+            allSquadCounts = GetTotalUnitsInAllSquads();
             commandScript.PushNotification(0, 2, string.Format("{0} Squad has been disbanded.", squad));
         }
         else
