@@ -47,10 +47,10 @@ public class BattleIslandsGUI : MonoBehaviour
     public void AttackIsland()
     {
         hud.battleScript = battleScript;
-
-        if (battleScript.GetAttackableIsland() != "")
+        string attackID = battleScript.GetAttackableIsland();
+        if ( attackID != "" && attackID != null)
         {
-            navigator.SetBattleMode(battleScript.GetAttackableIsland());
+            navigator.SetBattleMode(attackID);
             attackMenu.SetActive(false);
             hud.Show();
         }
@@ -69,14 +69,13 @@ public class BattleIslandsGUI : MonoBehaviour
         string ownerName = battleScript.GetOwnerOfAttackableIsland();//Get owner name.
 
         if (islandName == null || islandName == "")
-            islandName = "No Island to Attack";
+            attackableIslandName.text = "No Island to Attack";
         else
-            islandName = islandName.Substring(0, 10);
+            attackableIslandName.text = string.Format("Island {0}", islandName.Substring(0, 10));
 
         if (ownerName == null || ownerName == "")
             ownerName = "No Enemy to Attack";
-
-        attackableIslandName.text = string.Format("Island {0}", islandName);
+        
         ownerOfIslandName.text = ownerName;
     }
 
