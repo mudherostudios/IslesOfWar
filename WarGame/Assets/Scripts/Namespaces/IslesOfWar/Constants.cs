@@ -139,7 +139,7 @@ namespace IslesOfWar
 
         public Constants()
         {
-            version = new int[] { 0, 0, 3 };
+            version = new int[] { 0, 0, 6 };
             isInMaintenanceMode = false;
             recieveAddress = "CWjRsUeXNA2c4jBS6TsABMGVqKL3fBNpHL";
 

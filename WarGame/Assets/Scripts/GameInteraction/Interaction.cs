@@ -160,4 +160,5 @@ public class Interaction : MonoBehaviour
     {
         get { return clientInterface.chainState.currentConstants; }
     }
+
 }

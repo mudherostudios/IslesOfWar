@@ -19,6 +19,7 @@ public class SquadGUI : MonoBehaviour
     private int[] totalUnitsInSquad = new int[9];
     private int[] allSquadCounts = new int[9];
     private int unitClass = 0;
+    private int currentBlock = 0; 
 
     private void Start()
     {
@@ -235,5 +236,13 @@ public class SquadGUI : MonoBehaviour
 
         removeMenu.SetActive(false);
         gameObject.SetActive(false);
+    }
+
+    public void OpenSquadFormationMenu()
+    {
+        allSquadCounts = GetTotalUnitsInAllSquads();
+        SetAllFieldsToZero();
+        SwitchTotalNames(0);
+        gameObject.SetActive(true);
     }
 }

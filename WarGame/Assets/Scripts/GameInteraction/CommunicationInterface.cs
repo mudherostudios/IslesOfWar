@@ -49,8 +49,11 @@ public class CommunicationInterface : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
-        if (Input.GetKeyDown(KeyCode.S))
-            System.IO.File.WriteAllText("C:\\Users\\Douglas\\Desktop\\gamestate.txt", gameState);
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+            System.IO.File.WriteAllText(currentDirectory+"\\gamestate.txt", gameState);
+        }
     }
 
     public State state { get { return JsonConvert.DeserializeObject<State>(gameState); } }
