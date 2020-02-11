@@ -10,6 +10,7 @@ public class PlayerAudio : MonoBehaviour
     public AudioSource musicSource;
     public float fadeTimer;
 
+    private RawSettings settings;
     private AudioSource queuedSource;
     private AudioClip queuedClip;
     private float queuedTime;
@@ -57,6 +58,7 @@ public class PlayerAudio : MonoBehaviour
         queuedTime = Time.time;
         isDoneTiming = true;
         queuedSource = gameObject.AddComponent<AudioSource>();
+        settings = SaveLoad.settings;
     }
 
     public void Update()
@@ -78,8 +80,8 @@ public class PlayerAudio : MonoBehaviour
         float inVolume = (Time.time - queuedTime) / fadeTimer;
         float outVolume = 1.0f - inVolume;
 
-        queuedSource.volume = inVolume;
-        environmentSource.volume = outVolume;
+        queuedSource.volume = inVolume * settings.environmentVolume;
+        environmentSource.volume = outVolume * settings.environmentVolume;
     }
 
     void SwapEnvironmentClips()

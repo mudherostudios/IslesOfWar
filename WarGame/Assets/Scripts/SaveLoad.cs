@@ -254,4 +254,5 @@ public static class SaveLoad
     } 
 
     public static double lastBlock { get { return state.lastSavedBlockInformation; } }
+    public static RawSettings settings { get { return state.settings; } }
 }
