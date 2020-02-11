@@ -510,12 +510,21 @@ public class BattlePlanInteraction : Interaction
         ViewCurrentSquad();
     }
 
-    public void CancelPlans()
+    public void CancelPlans(bool travelToHQ=true, int option=0)
     {
+        bool isAttack = mode == Mode.ATTACK;
+
+        if (option == 1)
+            isAttack = true;
+        else if (option == 2)
+            isAttack = false;
+
         Clean(false);
-        clientInterface.CancelPlan(mode == Mode.ATTACK);
+        clientInterface.CancelPlan(isAttack);
         mode = Mode.NONE;
-        navigator.SetCommandMode();
+        hud.CleanSquads();
+        if(travelToHQ)
+            navigator.SetCommandMode();
     }
 
     //------------------------------------------------------------------------------

@@ -1075,7 +1075,7 @@ public class ClientInterface : MonoBehaviour
                 queuedActions.dfnd = null;
             }
 
-            notificationSystem.PushNotification(2, -1, string.Format("Defensive Plans have changed for {0}...", id.Substring(0, 8)), null);
+            //notificationSystem.PushNotification(2, -1, string.Format("Defensive Plans have changed for {0}...", id.Substring(0, 8)), null);
         }
 
         gui.SetGUIContents();

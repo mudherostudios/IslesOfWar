@@ -58,7 +58,6 @@ public class BattleHUD : MonoBehaviour
     public void Hide()
     {
         availableSquadsList.ClearOptions();
-        deployedDefenders.Clear();
         gameObject.SetActive(false);
     }
 
@@ -75,6 +74,7 @@ public class BattleHUD : MonoBehaviour
         deployedSquads = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(JsonConvert.SerializeObject(squads));
     }
 
+    //Used to let the save file know the squads are deployed and not usable.
     public void ClearDeployedSquads()
     {
         if (deployedSquads != null && SaveLoad.HasSquads(battleScript.clientInterface.player))
@@ -89,7 +89,17 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    public void CancelPlans() { battleScript.CancelPlans(); }
+    public void CancelPlans()
+    {
+        battleScript.CancelPlans();
+        deployedSquads.Clear();
+    }
+
+    //Clean the hud of squads, but keep them in settings for later use.
+    public void CleanSquads()
+    {
+        deployedSquads.Clear();
+    }
 
     public void SetUnitCounts(string squadName)
     {

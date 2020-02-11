@@ -5,11 +5,18 @@ using UnityEngine;
 public class ActionIdentifier : MonoBehaviour
 {
     public ClientInterface client;
+    public WorldNavigator gameMaster;
     public GameObject identifier;
     public GameObject invalidIdentifier;
     public int actionType = -1;
     public int subType = -1;
     bool isValid = true;
+
+    public void Start()
+    {
+        GameObject master = GameObject.FindGameObjectWithTag("GameMaster");
+        gameMaster = master.GetComponent<WorldNavigator>();
+    }
 
     public void Hide()
     {
@@ -63,10 +70,10 @@ public class ActionIdentifier : MonoBehaviour
                 client.CancelIslandSearch();
                 break;
             case 6: //DefensePlan
-                client.CancelPlan(false);
+                gameMaster.CancelPlans(true,2);
                 break;
             case 7: //AttackPlan
-                client.CancelPlan(true);
+                gameMaster.CancelPlans(true,1);
                 break;
             case 8:
                 client.CancelIslandDevelopment();

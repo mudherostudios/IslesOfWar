@@ -88,7 +88,7 @@ public class WorldNavigator : MonoBehaviour
     public float commandCleanTimer;
     public float managementCleanTimer;
     public float battleCleanTimer;
-    
+
     public enum Mode
     {
         COMMAND,
@@ -205,7 +205,7 @@ public class WorldNavigator : MonoBehaviour
 
         SetCommandMode();
     }
-    
+
     void SetClient()
     {
         clientInterface.InitStates(communicationScript, notificationSystem);
@@ -404,12 +404,12 @@ public class WorldNavigator : MonoBehaviour
     public void SkipToSubTutorial(string tutorialNameIndex)
     {
         if (tutorial != null)
-        { 
+        {
             string tutorialName = tutorialNameIndex.Split(':')[0];
             string tutorialIndex = tutorialNameIndex.Split(':')[1];
             int index = 0;
-            
-            if(int.TryParse(tutorialIndex, out index))
+
+            if (int.TryParse(tutorialIndex, out index))
                 tutorial.GetComponent<Tutorial>().SkipToSubTutorial(tutorialName, index);
         }
     }
@@ -432,10 +432,9 @@ public class WorldNavigator : MonoBehaviour
     //--------------------------------------------------
     //Cancel Orders
     //--------------------------------------------------
-    public void CancelPlans()
+    public void CancelPlans(bool isActionIdentifier=false, int option=0)
     {
-        battleScript.CancelPlans();
-        SetCommandMode();
+        battleScript.CancelPlans(!isActionIdentifier, option);
 
         if (battleScript.mode == BattlePlanInteraction.Mode.ATTACK)
         {

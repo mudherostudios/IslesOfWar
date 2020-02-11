@@ -179,7 +179,7 @@ public class CommandIslandInteraction : Interaction
             unitPrompter.hiddenObject.SetActive(true);
         }
     }
-
+    
     public void PushNotification(int messageType, int soundType, string message)
     {
             PushNotification(messageType, soundType, message, null);
