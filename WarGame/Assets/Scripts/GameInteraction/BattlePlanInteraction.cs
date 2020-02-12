@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar;
@@ -173,17 +174,7 @@ public class BattlePlanInteraction : Interaction
         }
     }
 
-    //I'm 99.9% sure I don't need this anymore considering it does nothing. But just keeping it for now.
     public void LoadQueuedPlans()
-    {
-        BattleCommand command = new BattleCommand();
-        if (mode == Mode.ATTACK)
-            command = clientInterface.queuedActions.attk;
-        else
-            command = clientInterface.queuedActions.dfnd;
-    }
-
-    public void StartWithQueuedPlan()
     {
         BattleCommand command = new BattleCommand();
         if (mode == Mode.ATTACK)
@@ -193,24 +184,19 @@ public class BattlePlanInteraction : Interaction
 
         islandID = command.id;
 
-        InstantiateAllSquads();
-    }
+        if (command.pln != null && squads != null)
+        {
+            if (squads.Count > 0)
+            {
+                squadPlans = command.pln;
+                string[] squadNames = squads.Keys.ToArray();
 
-    public void StartWithDefenders(string _island)
-    {
-        islandID = _island;
-
-        if (clientInterface.queuedActions.dfnd == null && clientInterface.queuedActions.attk == null)
-            clientInterface.InitBattleSquads(mode == Mode.ATTACK, islandID);
-
-        if (mode == Mode.ATTACK)
-            StartWithDefendersWhileAttacking();
-        else if (mode == Mode.DEFEND)
-            StartWithDefendersWhileDefending();
-
-        LoadQueuedPlans();
-        InstantiateOppponentSquads();
-        InstantiateAllSquads();
+                for (int s = 0; s < squads.Count; s++)
+                {
+                    squads[squadNames[s]] = command.sqd[s].ToArray();
+                }
+            }
+        }
     }
 
     public void StartWithDefendersWhileAttacking()
@@ -218,6 +204,7 @@ public class BattlePlanInteraction : Interaction
         opponentNames = new List<string>();
         opponentCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         opponentPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
+        clientInterface.SetFullBattlePlan(true, islandID, opponentCounts, opponentPlans);
 
         for (int o = 0; o < opponentCounts.Count; o++)
         {
@@ -231,23 +218,20 @@ public class BattlePlanInteraction : Interaction
     public void StartWithDefendersWhileDefending()
     {
         squads = new Dictionary<string, int[]>();
-        
+
         List<List<int>> defenderCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
-        clientInterface.SetFullBattlePlan(mode == Mode.ATTACK, islandID, defenderCounts, squadPlans);
+        clientInterface.SetFullBattlePlan(false, islandID, defenderCounts, squadPlans);
 
         for (int s = 0; s < defenderCounts.Count; s++)
         {
             string defenderName = string.Format("Defender {0}", s.ToString());
-            if (!squads.ContainsKey(defenderName))
-            {
-                squads.Add(defenderName, defenderCounts[s].ToArray());
-                clientInterface.ownedDefendersOnIsland++;
-            }
+
+            squads.Add(defenderName, defenderCounts[s].ToArray());
+            clientInterface.ownedDefendersOnIsland++;
         }
 
         hud.SetDeployedSquads(squads);
-        
     }
 
     void InstantiateAllSquads()
@@ -259,8 +243,8 @@ public class BattlePlanInteraction : Interaction
             int unitDisplayType = GetUnitTypeByHighestHealth(pair.Value);
             squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squad = squadIndex;
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = string.Format("Defender {0}", squadIndex.ToString());
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, true);
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = pair.Key;
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, false);
             currentSquad = squadIndex;
             selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
             ViewCurrentSquad();
@@ -685,13 +669,41 @@ public class BattlePlanInteraction : Interaction
                 Island island = clientInterface.GetIsland(islandID);
                 hexIsland.SetActive(true);
                 PlaceTiles(island);
-
-                if (clientInterface.IslandHasDefenders(islandID))
-                    StartWithDefenders(islandID);
-                else if ((clientInterface.queuedActions.dfnd == null && mode == Mode.DEFEND) || (clientInterface.queuedActions.attk == null && mode == Mode.ATTACK))
-                    clientInterface.InitBattleSquads(mode == Mode.ATTACK, islandID);
-                else if (clientInterface.queuedActions.dfnd != null || clientInterface.queuedActions.attk != null)
-                    StartWithQueuedPlan();
+                
+                if (mode == Mode.ATTACK)
+                {
+                    if (clientInterface.queuedActions.attk != null)
+                    {
+                        LoadQueuedPlans();
+                    }
+                    else
+                    {
+                        if (clientInterface.IslandHasDefenders(islandID))
+                        {
+                            clientInterface.InitBattleSquads(true, islandID);
+                            StartWithDefendersWhileAttacking();
+                        }
+                    }
+                    
+                    InstantiateOppponentSquads();
+                }
+                else if (mode == Mode.DEFEND)
+                {
+                    if (clientInterface.queuedActions.dfnd != null)
+                    {
+                        LoadQueuedPlans();
+                    }
+                    else
+                    {
+                        if (clientInterface.IslandHasDefenders(islandID))
+                        {
+                            clientInterface.InitBattleSquads(false, islandID);
+                            StartWithDefendersWhileDefending();
+                        }
+                    }
+                }
+                
+                InstantiateAllSquads();
 
                 return true;
             }
