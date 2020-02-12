@@ -13,6 +13,7 @@ public class SquadGUI : MonoBehaviour
     public Text[] totalCounts;
     public Text[] totalLabels;
     public InputField[] unitInputs;
+    public GameObject[] categoryGraphics;
     public Dropdown squadList;
     public GameObject removeMenu;
     public CommandIslandInteraction commandScript;
@@ -68,6 +69,17 @@ public class SquadGUI : MonoBehaviour
         totalCounts[convertedType].text = (commandScript.clientInterface.playerUnits[type] - totalUnitsInSquad[type] - allSquadCounts[type]).ToString();
     }
 
+    void SwapGraphics(int type)
+    {
+        for (int i = 0; i < categoryGraphics.Length; i++)
+        {
+            if(i != type)
+                categoryGraphics[i].SetActive(false);
+        }
+
+        categoryGraphics[type].SetActive(true);
+    }
+
     public void SwitchTotalNames(int category)
     {
         switch (category)
@@ -79,6 +91,7 @@ public class SquadGUI : MonoBehaviour
                 UpdateTotalCounts(0);
                 UpdateTotalCounts(1);
                 UpdateTotalCounts(2);
+                SwapGraphics(0);
                 break;
             case 1:
                 totalLabels[0].text = "Light Tanks";
@@ -87,6 +100,7 @@ public class SquadGUI : MonoBehaviour
                 UpdateTotalCounts(3);
                 UpdateTotalCounts(4);
                 UpdateTotalCounts(5);
+                SwapGraphics(1);
                 break;
             case 2:
                 totalLabels[0].text = "Light Fighters";
@@ -95,6 +109,7 @@ public class SquadGUI : MonoBehaviour
                 UpdateTotalCounts(6);
                 UpdateTotalCounts(7);
                 UpdateTotalCounts(8);
+                SwapGraphics(2);
                 break;
             default:
                 break;

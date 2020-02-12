@@ -149,7 +149,7 @@ public class ClientInterface : MonoBehaviour
                 break;
             case 8:
                 if (cancel)
-                    notificationSystem.PushNotification(2, -1, "Your actions exceed the length of the Xaya json char limit. Please cancel an action.");
+                    notificationSystem.PushNotification(2, -1, "Your actions exceed the length of the Xaya limit. Please cancel an action.");
                 break;
             default:
                 break;
@@ -365,7 +365,7 @@ public class ClientInterface : MonoBehaviour
             }
             else
             {
-                message = string.Format("You can not build this {0}, check your resoruces.", bunkerName);
+                message = string.Format("You can not build this {0}, check your resources.", bunkerName);
                 notificationSystem.PushNotification(2, 1, message, "defenseSuccess");
             }
         }
@@ -479,7 +479,7 @@ public class ClientInterface : MonoBehaviour
         }
         else
         {
-            message = string.Format("You can not this many purchase {0}, check your resources.", GetUnitName(type));
+            message = string.Format("You can not purchase this many {0}, check your resources.", GetUnitName(type));
             notificationSystem.PushNotification(2, 1, message, "unitPurchaseFailure");
         }
     }
@@ -680,7 +680,7 @@ public class ClientInterface : MonoBehaviour
                 }
                 else
                 {
-                    message = "There is already anCancel island awaiting troop withdrawl. Submit you actions then proceed.";
+                    message = "There is already an island awaiting troop withdrawl. Submit you actions then proceed.";
                     notificationSystem.PushNotification(2, 1, message, "withdrawlFailure");
                 }
             }
@@ -956,7 +956,7 @@ public class ClientInterface : MonoBehaviour
         queuedActions.dep.Clear();
         queuedActions.dep = null;
 
-        notificationSystem.PushNotification(2, 2, "Warbuck contributions have been canceled.", "warbucksCancel");
+        notificationSystem.PushNotification(2, 2, "Warbux contributions have been canceled.", "warbucksCancel");
         gui.SetGUIContents();
     }
 
