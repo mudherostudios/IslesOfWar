@@ -678,9 +678,9 @@ public class BattlePlanInteraction : Interaction
                     }
                     else
                     {
+                        clientInterface.InitBattleSquads(true, islandID);
                         if (clientInterface.IslandHasDefenders(islandID))
                         {
-                            clientInterface.InitBattleSquads(true, islandID);
                             StartWithDefendersWhileAttacking();
                         }
                     }
@@ -695,9 +695,9 @@ public class BattlePlanInteraction : Interaction
                     }
                     else
                     {
+                        clientInterface.InitBattleSquads(false, islandID);
                         if (clientInterface.IslandHasDefenders(islandID))
                         {
-                            clientInterface.InitBattleSquads(false, islandID);
                             StartWithDefendersWhileDefending();
                         }
                     }
