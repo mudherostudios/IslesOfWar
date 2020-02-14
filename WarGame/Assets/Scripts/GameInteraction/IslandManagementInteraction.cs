@@ -581,8 +581,11 @@ public class IslandManagementInteraction : Interaction
         for (int t = 0; t < islandTiles.Count; t++)
         {
             char blockerChar = clientInterface.playerIslands[islandIndex].defenses[t];
-            int blockerType = EncodeUtility.GetYType(blockerChar);
-            islandTiles[t].ToggleSpecificBlocker(on, blockerType);
+            if (blockerChar != ')')
+            {
+                int blockerType = EncodeUtility.GetYType(blockerChar);
+                islandTiles[t].ToggleSpecificBlocker(on, blockerType);
+            }
         }
     }
 
@@ -591,9 +594,12 @@ public class IslandManagementInteraction : Interaction
         for (int t = 0; t < islandTiles.Count; t++)
         {
             char bunkerChar = clientInterface.playerIslands[islandIndex].defenses[t];
-            int bunkerType = EncodeUtility.GetXType(bunkerChar);
-            int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
-            islandTiles[t].TurnOnValidBunkers(existingBunkers);
+            if (bunkerChar != ')')
+            {
+                int bunkerType = EncodeUtility.GetXType(bunkerChar);
+                int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
+                islandTiles[t].ToggleBunkers(on);
+            }
         }
     }
 
