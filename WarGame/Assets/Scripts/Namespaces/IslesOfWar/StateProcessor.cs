@@ -1098,6 +1098,7 @@ namespace IslesOfWar
                     state.islands[attackPlan.id].owner = player;
                     state.islands[attackPlan.id].squadPlans = null;
                     state.islands[attackPlan.id].squadCounts = null;
+                    state.islands[attackPlan.id].attackingPlayers.Remove(player);
                     state.players[player].attackableIsland = "";
 
                     state.players[previousOwner].islands.Remove(attackPlan.id);
