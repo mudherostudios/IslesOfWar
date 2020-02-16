@@ -543,6 +543,41 @@ namespace IslesOfWar
                 return isValid;
             }
 
+            public static bool CanCapture(string defenses, List<List<int>> defenderCounts)
+            {
+                bool hasBunkers = false;
+                bool hasTroops = true;
+                char[] defenseTiles = defenses.ToCharArray();
+
+                for (int t = 0; t < defenseTiles.Length; t++)
+                {
+                    hasBunkers = hasBunkers || !")0aA".Contains(defenseTiles[t].ToString());
+                }
+
+                if (hasTroops)
+                    hasTroops = defenderCounts != null;
+                if (hasTroops)
+                    hasTroops = defenderCounts.Count > 0;
+                
+                int count = 0;
+
+                if (hasTroops)
+                {
+                    for (int s = 0; s < defenderCounts.Count; s++)
+                    {
+                        for (int u = 0; u < defenderCounts[s].Count; u++)
+                        {
+                            count += defenderCounts[s][u];
+                        }
+                        if (count > 0)
+                            break;
+                    }
+                }
+
+                hasTroops = hasTroops && count > 0;
+                return !(hasBunkers || hasTroops);
+            }
+
             public static bool HasEnoughResources(double[] spend, double[] has)
             {
                 return spend[0] <= has[0] && spend[1] <= has[1] && spend[2] <= has[2] && spend[3] <= has[3];

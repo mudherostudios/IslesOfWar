@@ -21,8 +21,35 @@ public class MarketOrderTesting : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ResetState();
-            UnitDefend();
+            CheckCanCaptureStates();
         }
+    }
+
+    void CheckCanCaptureStates()
+    {
+        List<List<int>> singleSquad = new List<List<int>>() { new List<int>() { 0,0,1,0,0,1,0,0,0}};
+        List<List<int>> singleEmptySquad = new List<List<int>>() { new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 } }; 
+        List<List<int>> doubleSquad = new List<List<int>>() { new List<int>() { 0, 0, 1, 0, 0, 1, 0, 0, 0 }, new List<int>() { 0, 0, 1, 0, 0, 3, 0, 0, 0 } }; 
+        List<List<int>> doubleEmptySquad = new List<List<int>>() { new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        List<List<int>> doubleSquadFirstEmpty = new List<List<int>>() { new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, new List<int>() { 0, 2, 0, 0, 0, 0, 0, 0, 0 } }; ;
+        List<List<int>> doubleSquadSecondEmpty = new List<List<int>>() { new List<int>() { 0, 0, 0, 3, 0, 0, 0, 0, 0 }, new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+
+        Debug.Log(Validity.CanCapture("))))))))))))", null));
+        Debug.Log(!Validity.CanCapture("))3)))))))))", null));
+        Debug.Log(!Validity.CanCapture("))#)))))))))", null));
+        Debug.Log(!Validity.CanCapture("))D)))))))))", null));
+        Debug.Log(!Validity.CanCapture("))d)))))))))", null));
+        Debug.Log(!Validity.CanCapture("2)3)))))))))", null));
+        Debug.Log(!Validity.CanCapture("@)#)))))))))", null));
+        Debug.Log(!Validity.CanCapture("C)D)))))))))", null));
+        Debug.Log(!Validity.CanCapture("c)d)))))))))", null));
+        Debug.Log(!Validity.CanCapture("c)3)))))))))", null));
+        Debug.Log(!Validity.CanCapture("))))))))))))", singleSquad));
+        Debug.Log(Validity.CanCapture("))))))))))))", singleEmptySquad));
+        Debug.Log(!Validity.CanCapture("))))))))))))", doubleSquad));
+        Debug.Log(Validity.CanCapture("))))))))))))", doubleEmptySquad));
+        Debug.Log(!Validity.CanCapture("))))))))))))", doubleSquadFirstEmpty));
+        Debug.Log(!Validity.CanCapture("))))))))))))", doubleSquadSecondEmpty));
     }
 
     void RewardPool()

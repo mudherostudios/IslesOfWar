@@ -47,17 +47,25 @@ namespace IslesOfWar
                     dynamic admin = data["admin"];
                     string rng = data["block"]["rngseed"];
                     int height = data["block"]["height"];
-                    StateProcessor processor;
+                    dynamic processor = new StateProcessorV0();
                     int seed = HexToInt.Get(rng.Substring(0,8));
                     MudHeroRandom random = new MudHeroRandom(seed);
 
                     if (currentState.Length > 2)
-                        processor = new StateProcessor(JsonConvert.DeserializeObject<State>(currentState));
+                    {
+                        State state = JsonConvert.DeserializeObject<State>(currentState);
+
+                        if (state.currentConstants.version[0] == 0)
+                            processor = new StateProcessorV0(state);
+                        else if (state.currentConstants.version[0] == 1)
+                            processor = new StateProcessor(state);
+                    }
                     else
                     {
-                        processor = new StateProcessor(new State());
+                        processor = new StateProcessorV0(new State());
                         processor.state.Init();
                     }
+
 
                     //Admin commands would be processed here first.
                     string adminCommands = JsonConvert.SerializeObject(admin);

@@ -14,8 +14,8 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 0, 0, 0 };  //Hand set these here every release
-            public bool isCorrectVersion { get { return state.currentConstants.version[0] == version[0]; } }
+            public readonly int[] version = { 1, 0, 0};  //Hand set these here every release
+            public bool isCorrectVersion { get { return state.currentConstants.version[0] <= version[0]; } }
             public bool isInMaintenanceMode { get { return state.currentConstants.isInMaintenanceMode; } }
             public StateProcessor() { }
 
@@ -819,9 +819,7 @@ namespace IslesOfWar
                 bool capturedIsland = false;
 
                 if (canAttack)
-                    capturedIsland = state.islands[attackPlan.id].squadCounts == null;
-                if(canAttack && !capturedIsland)
-                    capturedIsland = state.islands[attackPlan.id].squadCounts.Count == 0;
+                    capturedIsland = Validity.CanCapture(state.islands[attackPlan.id].defenses, state.islands[attackPlan.id].squadCounts);
 
                 if (!capturedIsland && canAttack)
                 {
@@ -839,6 +837,9 @@ namespace IslesOfWar
 
                     List<List<int>> defenderCounts = state.islands[attackPlan.id].squadCounts;
                     List<List<int>> attackerCounts = attackPlan.sqd;
+                    
+                    if (defenderCounts == null)
+                        defenderCounts = new List<List<int>>();
 
                     bool[] defendersCanContinue = new bool[defenderCounts.Count];
                     bool[] attackerCanContinue = new bool[attackerCounts.Count];
@@ -869,8 +870,9 @@ namespace IslesOfWar
 
                     int attackersLeft = attackerSquads.Length;
                     int defendersLeft = defenderSquads.Length;
+                    bool hasBunkers = state.islands[attackPlan.id].defenses != "))))))))))))";
 
-                    for (int p = 0; p < 6 && attackersLeft > 0 && defendersLeft > 0; p++)
+                    for (int p = 0; p < 6 && attackersLeft > 0 && (defendersLeft > 0 || hasBunkers); p++)
                     {
                         //All Attackers Move First
                         for (int a = 0; a < attackerSquads.Length; a++)
@@ -883,13 +885,29 @@ namespace IslesOfWar
                                 int[] bunkers = EncodeUtility.GetBaseTypes(EncodeUtility.GetXType(defenses[battleTile]));
                                 int blockerType = EncodeUtility.GetYType(defenses[battleTile]);
 
-                                if (defender > -1)
-                                {
-                                    double[] aUnits = attackerSquads[a].onlyUnits;
-                                    double[] dUnits = defenderSquads[defender].onlyUnits;
+                                double[] aUnits = attackerSquads[a].onlyUnits;
+                                double[] dUnits = new double[9];
 
-                                    double[] aReserve = new double[9];
-                                    double[] dReserve = new double[9];
+                                double[] aReserve = new double[9];
+                                double[] dReserve = new double[9];
+
+                                EngagementHistory history = new EngagementHistory();
+
+                                if (defender == -1 && bunkers != new int[3])
+                                {
+                                    //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
+                                    attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, false, out aReserve));
+                                    Squad bunkerSquad = new Squad(dUnits);
+                                    bunkerSquad.AddBunkers(bunkers);
+
+                                    //Fight
+                                    engagement = new Engagement(bunkerSquad, attackerSquads[a], state.currentConstants);
+                                    history = engagement.ResolveEngagement(ref random, state.currentConstants);
+                                }
+                                else if (defender > -1 || bunkers != new int[3])
+                                {
+                                    if (defender > -1)
+                                        dUnits = defenderSquads[defender].onlyUnits;
 
                                     //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
                                     attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, false, out aReserve));
@@ -898,12 +916,20 @@ namespace IslesOfWar
 
                                     //Fight
                                     engagement = new Engagement(defenderSquads[defender], attackerSquads[a], state.currentConstants);
-                                    EngagementHistory history = engagement.ResolveEngagement(ref random, state.currentConstants);
+                                    history = engagement.ResolveEngagement(ref random, state.currentConstants);
+                                }
+                                else
+                                {
+                                    state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
+                                }
 
+                                if (history.winner != null && history.winner != "")
+                                {
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
                                     {
-                                        defenderSquads[defender] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
+                                        if(defenderSquads.Length > 0)
+                                            defenderSquads[defender] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
                                         int bunkerCombo = EncodeUtility.GetDecodeIndex(history.remainingSquad.bunkers);
                                         state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(blockerType, bunkerCombo));
                                         attackerSquads[a] = new Squad(aReserve);
@@ -913,8 +939,11 @@ namespace IslesOfWar
                                     else if (history.winner == "opfor")
                                     {
                                         attackerSquads[a] = new Squad(Add(history.remainingSquad.onlyUnits, aReserve));
-                                        defenderSquads[defender] = new Squad(dReserve);
-                                        defendersCanContinue[defender] = false;
+                                        if (defenderSquads.Length > 0)
+                                        {
+                                            defenderSquads[defender] = new Squad(dReserve);
+                                            defendersCanContinue[defender] = false;
+                                        }
                                         state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
                                         defendersLeft--;
                                     }
@@ -924,14 +953,13 @@ namespace IslesOfWar
                                         attackerSquads[a] = new Squad(aReserve);
                                         attackerCanContinue[a] = false;
                                         attackersLeft--;
-                                        defenderSquads[defender] = new Squad(dReserve);
-                                        defendersCanContinue[defender] = false;
+                                        if (defenderSquads.Length > 0)
+                                        {
+                                            defenderSquads[defender] = new Squad(dReserve);
+                                            defendersCanContinue[defender] = false;
+                                        }
                                         defendersLeft--;
                                     }
-                                }
-                                else
-                                {
-                                    state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
                                 }
                             }
                         }
@@ -1007,7 +1035,8 @@ namespace IslesOfWar
                     //Defenders retain island if even only one squad is left or if both teams lost all squads.
                     if (defendersLeft == 0 && attackersLeft > 0)
                     {
-                        capturedIsland = true;
+                        //Only use empty list, because up until this point we have not set the squadCounts on the island yet.
+                        capturedIsland = Validity.CanCapture(state.islands[attackPlan.id].defenses, new List<List<int>>());
                     }
                     else
                     {
