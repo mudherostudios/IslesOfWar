@@ -1092,17 +1092,22 @@ namespace IslesOfWar
 
                 }
 
-                if (capturedIsland && canAttack)
+                if (canAttack)
                 {
-                    string previousOwner = state.islands[attackPlan.id].owner;
-                    state.islands[attackPlan.id].owner = player;
-                    state.islands[attackPlan.id].squadPlans = null;
-                    state.islands[attackPlan.id].squadCounts = null;
+                    if (capturedIsland)
+                    {
+                        string previousOwner = state.islands[attackPlan.id].owner;
+                        state.islands[attackPlan.id].owner = player;
+                        state.islands[attackPlan.id].squadPlans = null;
+                        state.islands[attackPlan.id].squadCounts = null;
+
+                        state.players[previousOwner].islands.Remove(attackPlan.id);
+                        state.players[player].islands.Add(attackPlan.id);
+                    }
+
+                    //New rule, can only attack once.
                     state.islands[attackPlan.id].attackingPlayers.Remove(player);
                     state.players[player].attackableIsland = "";
-
-                    state.players[previousOwner].islands.Remove(attackPlan.id);
-                    state.players[player].islands.Add(attackPlan.id);
                 }
             }
 

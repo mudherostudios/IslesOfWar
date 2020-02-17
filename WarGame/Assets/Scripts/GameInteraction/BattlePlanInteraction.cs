@@ -204,7 +204,6 @@ public class BattlePlanInteraction : Interaction
         opponentNames = new List<string>();
         opponentCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         opponentPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
-        clientInterface.SetFullBattlePlan(true, islandID, opponentCounts, opponentPlans);
 
         for (int o = 0; o < opponentCounts.Count; o++)
         {
