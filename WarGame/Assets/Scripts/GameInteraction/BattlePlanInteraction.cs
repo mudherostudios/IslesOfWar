@@ -52,7 +52,6 @@ public class BattlePlanInteraction : Interaction
     private List<GameObject> squadMarkers;
     public Dictionary<string, int[]> squads;
     private List<List<int>> squadPlans;
-    private List<List<int>> defenderPlans;
     private List<GameObject> opponentMarkers;
     private List<List<int>> opponentCounts;
     private List<List<int>> opponentPlans;
@@ -220,7 +219,6 @@ public class BattlePlanInteraction : Interaction
 
         List<List<int>> defenderCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
         squadPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
-        clientInterface.SetFullBattlePlan(false, islandID, defenderCounts, squadPlans);
 
         for (int s = 0; s < defenderCounts.Count; s++)
         {
@@ -243,7 +241,7 @@ public class BattlePlanInteraction : Interaction
             squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squad = squadIndex;
             squadMarkers[squadIndex].GetComponent<SquadMarker>().squadName = pair.Key;
-            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, false);
+            squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, pair.Key.Contains("Defender"));
             currentSquad = squadIndex;
             selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
             ViewCurrentSquad();
@@ -486,8 +484,10 @@ public class BattlePlanInteraction : Interaction
         GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
         planMarker.GetComponentInChildren<PlanMarker>().index = planMarkers.Count;
         planMarkers.Add(planMarker);
-
-        clientInterface.UpdatePlan(mode == Mode.ATTACK, currentSquad, indexPosition);
+        
+        int defenderCount = squadMarkers.Count - clientInterface.queuedActions.dfnd.pln.Count;
+        int squadIndex = defenderCount - currentSquad;
+        clientInterface.UpdatePlan(mode == Mode.ATTACK, squadIndex, indexPosition);
 
         CloseCurrentSquad();
         ViewCurrentSquad();

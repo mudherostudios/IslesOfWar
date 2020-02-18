@@ -1422,25 +1422,11 @@ public class ClientInterface : MonoBehaviour
 
         if (queuedActions.dfnd != null)
         {
-            List<List<int>> tempSqds = new List<List<int>>();
-
-            if (ownedDefendersOnIsland == 0)
-                tempSqds = queuedActions.dfnd.sqd;
-            else
-            {
-                for (int s = ownedDefendersOnIsland; s < queuedActions.dfnd.sqd.Count; s++)
-                {
-                    tempSqds.Add(queuedActions.dfnd.sqd[s]);
-                }
-            }
-
-            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(tempSqds, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
+            defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
             && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
 
             if (!defend)
                 queuedActions.dfnd = null;
-            else
-                queuedActions.dfnd.sqd = tempSqds;
         }
 
         if (queuedActions.opn != null)
