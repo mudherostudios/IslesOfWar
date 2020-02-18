@@ -484,9 +484,14 @@ public class BattlePlanInteraction : Interaction
         GameObject planMarker = Instantiate(planMarkerPrefab, position, Quaternion.Euler(spawnRotation.x, spawnRotation.y, spawnRotation.z));
         planMarker.GetComponentInChildren<PlanMarker>().index = planMarkers.Count;
         planMarkers.Add(planMarker);
-        
-        int defenderCount = squadMarkers.Count - clientInterface.queuedActions.dfnd.pln.Count;
-        int squadIndex = defenderCount - currentSquad;
+
+        int squadIndex = currentSquad;
+        if (mode == Mode.DEFEND)
+        {
+            int defenderCount = squadMarkers.Count - clientInterface.queuedActions.dfnd.pln.Count;
+            squadIndex = defenderCount - currentSquad;
+        }
+
         clientInterface.UpdatePlan(mode == Mode.ATTACK, squadIndex, indexPosition);
 
         CloseCurrentSquad();

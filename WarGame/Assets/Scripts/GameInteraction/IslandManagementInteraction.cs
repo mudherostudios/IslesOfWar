@@ -598,7 +598,10 @@ public class IslandManagementInteraction : Interaction
             {
                 int bunkerType = EncodeUtility.GetXType(bunkerChar);
                 int[] existingBunkers = EncodeUtility.GetBaseTypes(bunkerType);
-                islandTiles[t].ToggleBunkers(on);
+                if (on)
+                    islandTiles[t].TurnOnValidBunkers(existingBunkers);
+                else
+                    islandTiles[t].ToggleBunkers(on);
             }
         }
     }

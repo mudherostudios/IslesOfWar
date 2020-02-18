@@ -893,7 +893,7 @@ namespace IslesOfWar
 
                                 EngagementHistory history = new EngagementHistory();
 
-                                if (defender == -1 && bunkers != new int[3])
+                                if (defender == -1 && !bunkers.SequenceEqual(new int[3]))
                                 {
                                     //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
                                     attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, false, out aReserve));
@@ -904,18 +904,25 @@ namespace IslesOfWar
                                     engagement = new Engagement(bunkerSquad, attackerSquads[a], state.currentConstants);
                                     history = engagement.ResolveEngagement(ref random, state.currentConstants);
                                 }
-                                else if (defender > -1 || bunkers != new int[3])
+                                else if (defender > -1 || !bunkers.SequenceEqual(new int[3]))
                                 {
-                                    if (defender > -1)
-                                        dUnits = defenderSquads[defender].onlyUnits;
 
                                     //Find out which units can fight on this tile and add any bunker defenses to the defender squad.
                                     attackerSquads[a] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], aUnits, false, out aReserve));
-                                    defenderSquads[defender] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], dUnits, true, out dReserve));
-                                    defenderSquads[defender].AddBunkers(bunkers);
-
-                                    //Fight
-                                    engagement = new Engagement(defenderSquads[defender], attackerSquads[a], state.currentConstants);
+                                    if (defender > -1)
+                                    {
+                                        dUnits = defenderSquads[defender].onlyUnits;
+                                        defenderSquads[defender] = new Squad(TryPlaceUnitsOnFeature(island[battleTile], defenses[battleTile], dUnits, true, out dReserve));
+                                        defenderSquads[defender].AddBunkers(bunkers);
+                                        engagement = new Engagement(defenderSquads[defender], attackerSquads[a], state.currentConstants);
+                                    }
+                                    else
+                                    {
+                                        Squad bunkerSquad = new Squad(dUnits);
+                                        bunkerSquad.AddBunkers(bunkers);
+                                        engagement = new Engagement(bunkerSquad, attackerSquads[a], state.currentConstants);
+                                    }
+                                    
                                     history = engagement.ResolveEngagement(ref random, state.currentConstants);
                                 }
                                 else
@@ -930,6 +937,7 @@ namespace IslesOfWar
                                     {
                                         if(defenderSquads.Length > 0)
                                             defenderSquads[defender] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
+
                                         int bunkerCombo = EncodeUtility.GetDecodeIndex(history.remainingSquad.bunkers);
                                         state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(blockerType, bunkerCombo));
                                         attackerSquads[a] = new Squad(aReserve);
