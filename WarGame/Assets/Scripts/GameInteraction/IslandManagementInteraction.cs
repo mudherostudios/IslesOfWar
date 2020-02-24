@@ -262,7 +262,7 @@ public class IslandManagementInteraction : Interaction
 
         }
     }
-
+    
     string GetName(int category, int type)
     {
         switch (category)
@@ -510,6 +510,7 @@ public class IslandManagementInteraction : Interaction
                 currentStats.animator.SetTrigger("Left");
             }
 
+            islandCount = clientInterface.chainState.players[clientInterface.player].islands.Count; 
             int possibleIndexes = islandCount;
 
             if (islandIndex + increment >= possibleIndexes)
@@ -520,10 +521,13 @@ public class IslandManagementInteraction : Interaction
                 islandIndex += increment;
 
             Island island = new Island();
-            islandID = clientInterface.chainState.players[clientInterface.player].islands[islandIndex];
+
 
             if (islandIndex < islandCount)
+            { 
+                islandID = clientInterface.chainState.players[clientInterface.player].islands[islandIndex];
                 island = clientInterface.chainState.islands[islandID];
+            }
 
             PlaceTiles(island, bufferedStats, bufferedIsland.transform);
             SetEditButtons();
