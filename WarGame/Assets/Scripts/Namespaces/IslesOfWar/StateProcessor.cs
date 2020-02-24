@@ -14,7 +14,7 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 1, 0, 0};  //Hand set these here every release
+            public readonly int[] version = { 2, 0, 0};  //Hand set these here every release
             public bool isCorrectVersion { get { return state.currentConstants.version[0] <= version[0]; } }
             public bool isInMaintenanceMode { get { return state.currentConstants.isInMaintenanceMode; } }
             public StateProcessor() { }
@@ -870,7 +870,7 @@ namespace IslesOfWar
 
                     int attackersLeft = attackerSquads.Length;
                     int defendersLeft = defenderSquads.Length;
-                    bool hasBunkers = state.islands[attackPlan.id].defenses != "))))))))))))";
+                    bool hasBunkers = Validity.HasBunkers(state.islands[attackPlan.id].defenses);
 
                     for (int p = 0; p < 6 && attackersLeft > 0 && (defendersLeft > 0 || hasBunkers); p++)
                     {
@@ -1037,11 +1037,14 @@ namespace IslesOfWar
                                 }
                             }
                         }
+
+                        //Check to see if bunkers have been destroyed after every loop.
+                        hasBunkers = Validity.HasBunkers(state.islands[attackPlan.id].defenses);
                     }
 
                     //Update Players and Island Ownership
                     //Defenders retain island if even only one squad is left or if both teams lost all squads.
-                    if (defendersLeft == 0 && attackersLeft > 0)
+                    if (defendersLeft <= 0 && attackersLeft > 0)
                     {
                         //Only use empty list, because up until this point we have not set the squadCounts on the island yet.
                         capturedIsland = Validity.CanCapture(state.islands[attackPlan.id].defenses, new List<List<int>>());

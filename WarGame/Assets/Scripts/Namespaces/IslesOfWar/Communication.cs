@@ -583,6 +583,21 @@ namespace IslesOfWar
                 return spend[0] <= has[0] && spend[1] <= has[1] && spend[2] <= has[2] && spend[3] <= has[3];
             }
 
+            public static bool HasBunkers(string defenses)
+            {
+                bool hasBunkers = false;
+
+                char[] defenseTiles = defenses.ToCharArray();
+
+                for (int t = 0; t < defenseTiles.Length && !hasBunkers; t++)
+                {
+                    int defenseType = EncodeUtility.GetXType(defenseTiles[t]);
+                    hasBunkers = defenseType != 0;
+                }
+
+                return hasBunkers;
+            }
+
             public static bool UpdateSize(PlayerActions actions)
             {
                 bool isLessThanOrEqualTo2048 = false;

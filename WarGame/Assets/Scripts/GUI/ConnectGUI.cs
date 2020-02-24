@@ -17,7 +17,7 @@ public class ConnectGUI : MonoBehaviour
     public Image walletUnderscore;
     public Dropdown usernamesList;
     public Color onColor, offColor;
-    public GameObject connectionPanel, connectionButton, blockCount, blockLabel, creationPanel, userPanel, loginButton;
+    public GameObject connectionPanel, connectionButton, centerConnectButton, basicButton, advancedButton, blockCount, blockLabel, creationPanel, userPanel, loginButton;
     public GameObject cam;
     public Vector3 loginPosition;
     public float traverseTime = 1.0f;
@@ -162,6 +162,9 @@ public class ConnectGUI : MonoBehaviour
         {
             connectionPanel.SetActive(false);
             connectionButton.SetActive(false);
+            centerConnectButton.SetActive(false);
+            basicButton.SetActive(false);
+            advancedButton.SetActive(false);
             blockCount.SetActive(true);
             blockLabel.SetActive(true);
             comms.progressMessage = log.message;
