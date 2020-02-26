@@ -32,15 +32,28 @@ public class BattleIslandsGUI : MonoBehaviour
 
     public void DefendIsland()
     {
+        hud.battleScript = battleScript;
         int islandIndex = islandList.value;
         string islandID = technicalNames[islandIndex];
-        hud.battleScript = battleScript;
-        navigator.SetBattleMode(islandID);
 
-        if (battleScript.enabled)
+        if (islandID != null && islandID != "")
         {
-            defendMenu.SetActive(false);
-            hud.Show();
+            bool success = navigator.SetBattleMode(islandID);
+
+            if (success)
+            {
+                defendMenu.SetActive(false);
+                hud.Show();
+            }
+            else
+            {
+                bool hasDefensePlan = navigator.clientInterface.queuedActions.dfnd != null;
+
+                if(hasDefensePlan)
+                    navigator.PushNotification(2, 1, "Please submit existing defense plans first.");
+                else
+                    navigator.PushNotification(2, 1, "Please submit existing attack plans first.");
+            }
         }
     }
 
@@ -48,11 +61,30 @@ public class BattleIslandsGUI : MonoBehaviour
     {
         hud.battleScript = battleScript;
         string attackID = battleScript.GetAttackableIsland();
-        if ( attackID != "" && attackID != null)
+
+        if (attackID != "" && attackID != null)
         {
-            navigator.SetBattleMode(attackID);
-            attackMenu.SetActive(false);
-            hud.Show();
+            bool success = navigator.SetBattleMode(attackID);
+
+            if(success)
+            {
+                attackMenu.SetActive(false);
+                hud.Show();
+            }
+            else
+            {
+                bool attackIslandHasChanged = navigator.clientInterface.queuedActions.attk != null;
+
+                if (attackIslandHasChanged)
+                    attackIslandHasChanged = navigator.clientInterface.queuedActions.attk.id != attackID;
+
+                if (attackIslandHasChanged)
+                {
+                    navigator.PushNotification(2, 1, "Our last attackable island has changed, cancelling old plans.");
+                }
+                else
+                    navigator.PushNotification(2, 1, "Please submit existing defense plans first.");
+            }
         }
     }
 
@@ -66,7 +98,7 @@ public class BattleIslandsGUI : MonoBehaviour
     {
         attackMenu.SetActive(true);
         string islandName = battleScript.GetAttackableIsland();
-        string ownerName = battleScript.GetOwnerOfAttackableIsland();//Get owner name.
+        string ownerName = battleScript.GetOwnerOfAttackableIsland();
 
         if (islandName == null || islandName == "")
             attackableIslandName.text = "No Island to Attack";

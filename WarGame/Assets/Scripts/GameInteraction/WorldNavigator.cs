@@ -330,9 +330,17 @@ public class WorldNavigator : MonoBehaviour
         }
     }
 
-    public void SetBattleMode(string islandID)
+    public bool SetBattleMode(string islandID)
     {
-        if (!clientInterface.hasDefendPlanInQueue || clientInterface.IslandIsBeingDefended(islandID))
+        bool success = false;
+        bool canDefend = (!clientInterface.hasDefendPlanInQueue || clientInterface.IslandIsBeingDefended(islandID)) 
+        && clientInterface.queuedActions.attk == null;
+        bool canAttack = !clientInterface.hasDefendPlanInQueue && clientInterface.queuedActions.attk != null;
+
+        if (canAttack)
+            canAttack = clientInterface.queuedActions.attk.id == islandID;
+
+        if (canDefend || canAttack)
         {
             traversing = true;
 
@@ -352,7 +360,10 @@ public class WorldNavigator : MonoBehaviour
             battleScript.TurnOnIsland(islandID);
             battleScript.GotToObservePoint();
             sceneCleanTimer = battleCleanTimer;
+            success = true;
         }
+
+        return success;
     }
 
     bool isClean()
@@ -390,7 +401,7 @@ public class WorldNavigator : MonoBehaviour
         if (transmitted)
         {
             sateliteEffects.TransmissionEffect();
-            battleIslandsGUI.hud.ClearDeployedSquads();
+            battleScript.Clean();
             HideActions();
         }
     }

@@ -93,12 +93,14 @@ public class BattleHUD : MonoBehaviour
     {
         battleScript.CancelPlans();
         deployedSquads.Clear();
+        deployedDefenders.Clear();
     }
 
     //Clean the hud of squads, but keep them in settings for later use.
     public void CleanSquads()
     {
         deployedSquads.Clear();
+        deployedDefenders.Clear();
     }
 
     public void SetUnitCounts(string squadName)

@@ -48,7 +48,7 @@ public class BattlePlanInteraction : Interaction
     private SquadMarker selectedSquad;
     private List<TileStats> islandTiles;
 
-    //Variables used to submit actions.
+    //Temporary variables used to submit actions.
     private List<GameObject> squadMarkers;
     public Dictionary<string, int[]> squads;
     private List<List<int>> squadPlans;
@@ -142,7 +142,7 @@ public class BattlePlanInteraction : Interaction
         clientInterface.InitBattleSquads(isAttack, islandID);
     }
 
-    public void Clean(bool saveSquadInfo)
+    public void Clean(bool saveSquadInfo=false)
     {
         CloseCurrentSquad();
 
@@ -171,6 +171,15 @@ public class BattlePlanInteraction : Interaction
             opponentMarkers.Clear();
             opponentPlans.Clear();
         }
+
+        for (int m = 0; m < planMarkers.Count; m++)
+        {
+            Destroy(planMarkers[m]);
+        }
+        planMarkers.Clear();
+
+        hud.ClearDeployedSquads();
+        hud.CleanSquads();
     }
 
     public void LoadQueuedPlans()
@@ -507,12 +516,13 @@ public class BattlePlanInteraction : Interaction
         else if (option == 2)
             isAttack = false;
 
-        Clean(false);
+        Clean();
         clientInterface.CancelPlan(isAttack);
         mode = Mode.NONE;
-        hud.CleanSquads();
-        if(travelToHQ)
+
+        if (travelToHQ)
             navigator.SetCommandMode();
+
     }
 
     //------------------------------------------------------------------------------
