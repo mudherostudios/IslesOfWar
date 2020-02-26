@@ -396,12 +396,18 @@ public class WorldNavigator : MonoBehaviour
 
     public void SubmitQueuedActions()
     {
+        bool hasBattlePlans = clientInterface.queuedActions.dfnd != null || clientInterface.queuedActions.attk != null;
         bool transmitted = clientInterface.SubmitQueuedActions();
 
         if (transmitted)
         {
+            if (hasBattlePlans)
+            {
+                battleScript.Clean();
+                battleScript.CleanSquads();
+            }
+
             sateliteEffects.TransmissionEffect();
-            battleScript.Clean();
             HideActions();
         }
     }
@@ -446,6 +452,7 @@ public class WorldNavigator : MonoBehaviour
     public void CancelPlans(bool isActionIdentifier=false, int option=0)
     {
         battleScript.CancelPlans(!isActionIdentifier, option);
+        ShowActions();
 
         if (battleScript.mode == BattlePlanInteraction.Mode.ATTACK)
         {

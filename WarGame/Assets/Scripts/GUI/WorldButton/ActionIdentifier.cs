@@ -38,6 +38,8 @@ public class ActionIdentifier : MonoBehaviour
     {
         if (condition)
             Show();
+        else
+            Hide();
     }
 
     public void ChangeValidityTo(bool valid)

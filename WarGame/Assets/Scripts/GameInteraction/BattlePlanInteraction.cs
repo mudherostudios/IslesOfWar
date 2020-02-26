@@ -171,13 +171,10 @@ public class BattlePlanInteraction : Interaction
             opponentMarkers.Clear();
             opponentPlans.Clear();
         }
+    }
 
-        for (int m = 0; m < planMarkers.Count; m++)
-        {
-            Destroy(planMarkers[m]);
-        }
-        planMarkers.Clear();
-
+    public void CleanSquads()
+    {
         hud.ClearDeployedSquads();
         hud.CleanSquads();
     }
@@ -185,10 +182,7 @@ public class BattlePlanInteraction : Interaction
     public void LoadQueuedPlans()
     {
         BattleCommand command = new BattleCommand();
-        if (mode == Mode.ATTACK)
-            command = clientInterface.queuedActions.attk;
-        else
-            command = clientInterface.queuedActions.dfnd;
+        command = clientInterface.queuedActions.attk;
 
         islandID = command.id;
 
@@ -202,6 +196,43 @@ public class BattlePlanInteraction : Interaction
                 for (int s = 0; s < squads.Count; s++)
                 {
                     squads[squadNames[s]] = command.sqd[s].ToArray();
+                }
+            }
+        }
+    }
+
+    public void LoadQueuedPlansAndDefenders()
+    {
+        BattleCommand command = clientInterface.queuedActions.dfnd;
+        islandID = command.id;
+        List<List<int>> existingCounts = clientInterface.GetDefenderCountsFromIsland(islandID);
+        List<List<int>> existingPlans = clientInterface.GetDefenderPlansFromIsland(islandID);
+        squadPlans = new List<List<int>>();
+
+        int existingDefenders = 0;
+
+        if (existingCounts != null)
+            existingDefenders = existingCounts.Count;
+
+        if (squads != null)
+        {
+            if (squads.Count > 0)
+            {
+                string[] squadNames = squads.Keys.ToArray();
+                
+                //Load Existing Defenders
+                for (int d = 0; d < existingDefenders; d++)
+                {
+                    squads[squadNames[d]] = existingCounts[d].ToArray();
+                    squadPlans.Add(existingPlans[d]);
+                }
+
+                //Load Squads
+                for (int s = 0; s < command.pln.Count; s++)
+                {
+                    int index = s + existingDefenders;
+                    squads[squadNames[index]] = command.sqd[s].ToArray();
+                    squadPlans.Add(command.pln[s]);
                 }
             }
         }
@@ -356,12 +387,14 @@ public class BattlePlanInteraction : Interaction
 
     void CloseCurrentSquad()
     {
-        foreach (GameObject marker in planMarkers)
+        if (planMarkers != null)
         {
-            Destroy(marker);
+            foreach (GameObject marker in planMarkers)
+            {
+                Destroy(marker);
+            }
+            planMarkers.Clear();
         }
-        planMarkers.Clear();
-
     }
 
     void ViewCurrentSquad()
@@ -522,7 +555,6 @@ public class BattlePlanInteraction : Interaction
 
         if (travelToHQ)
             navigator.SetCommandMode();
-
     }
 
     //------------------------------------------------------------------------------
@@ -688,6 +720,7 @@ public class BattlePlanInteraction : Interaction
                 {
                     if (clientInterface.queuedActions.attk != null)
                     {
+                        StartWithDefendersWhileAttacking();
                         LoadQueuedPlans();
                     }
                     else
@@ -705,7 +738,7 @@ public class BattlePlanInteraction : Interaction
                 {
                     if (clientInterface.queuedActions.dfnd != null)
                     {
-                        LoadQueuedPlans();
+                        LoadQueuedPlansAndDefenders();
                     }
                     else
                     {

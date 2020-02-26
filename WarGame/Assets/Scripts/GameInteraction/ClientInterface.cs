@@ -1053,8 +1053,11 @@ public class ClientInterface : MonoBehaviour
     {
         if (isAttackPlan)
         {
-            notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 8)), "attackCancel");
-            queuedActions.attk = null;
+            if (queuedActions.attk != null)
+            {
+                notificationSystem.PushNotification(2, 2, string.Format("Attack plans for {0}... have been canceled.", queuedActions.attk.id.Substring(0, 8)), "attackCancel");
+                queuedActions.attk = null;
+            }
         }
         else
         {
