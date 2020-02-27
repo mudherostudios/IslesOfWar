@@ -469,7 +469,8 @@ namespace IslesOfWar
                 
                 for (int s = 0; s < remove.sqds.Length && canRemove; s++)
                 {
-                    canRemove = remove.sqds[s] < remove.sqds.Length && remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
+                    canRemove = remove.sqds[s] <= remove.sqds.Length && remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
+                    //canRemove = remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
                 }
 
                 if (canRemove)

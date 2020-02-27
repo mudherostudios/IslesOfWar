@@ -21,7 +21,7 @@ public class Notifications : MonoBehaviour
     {
         if (Time.time - lastTime >= stayTimer && !doneTiming)
         {
-            Close();
+            Close(true);
         }
     }
 
@@ -29,12 +29,12 @@ public class Notifications : MonoBehaviour
     {
         if (simple)
         {
-            lastTime = Time.time;
-            doneTiming = false;
-            simpleMessage.transform.position = new Vector3(simpleOnPosition.x, simpleOnPosition.y, 0);
-
-            //Off
-            transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+            if (onButton.activeSelf)
+            {
+                lastTime = Time.time;
+                doneTiming = false;
+                simpleMessage.transform.position = new Vector3(simpleOnPosition.x, simpleOnPosition.y, 0);
+            }
         }
         else
         {
@@ -47,13 +47,18 @@ public class Notifications : MonoBehaviour
         }
     }
 
-    public void Close()
+    public void Close(bool onlySimple=false)
     {
-        transform.position = new Vector3(offPosition.x, transform.position.y, 0);
-        simpleMessage.transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+        if (onlySimple)
+            simpleMessage.transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+        else
+        {
+            transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+            simpleMessage.transform.position = new Vector3(offPosition.x, transform.position.y, 0);
+            offButton.SetActive(false);
+            onButton.SetActive(true);
+        }
         doneTiming = true;
-        offButton.SetActive(false);
-        onButton.SetActive(true);
     }
 
     public void PushNotification(int type, int soundType, string message, string notificationName=null)

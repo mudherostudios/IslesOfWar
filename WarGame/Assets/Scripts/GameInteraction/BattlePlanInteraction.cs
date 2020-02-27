@@ -357,7 +357,8 @@ public class BattlePlanInteraction : Interaction
                 squadMarkers.RemoveAt(s);
                 squadPlans.RemoveAt(s);
                 RenumberSquads(s);
-                clientInterface.RemoveSquad(mode == Mode.ATTACK, s);
+                if(!squadName.Contains("Defender"))
+                    clientInterface.RemoveSquad(mode == Mode.ATTACK, s);
 
                 break;
             }

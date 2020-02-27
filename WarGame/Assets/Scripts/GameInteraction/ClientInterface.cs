@@ -1077,8 +1077,6 @@ public class ClientInterface : MonoBehaviour
                 notificationSystem.PushNotification(2, 2, string.Format("Defense plans for {0}... have been canceled.", queuedActions.dfnd.id.Substring(0, 8)), "defendCancel");
                 queuedActions.dfnd = null;
             }
-
-            //notificationSystem.PushNotification(2, -1, string.Format("Defensive Plans have changed for {0}...", id.Substring(0, 8)), null);
         }
 
         gui.SetGUIContents();
