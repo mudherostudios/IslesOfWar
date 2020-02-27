@@ -365,8 +365,24 @@ public class ClientInterface : MonoBehaviour
             }
             else
             {
-                message = string.Format("You can not build this {0}, check your resources.", bunkerName);
-                notificationSystem.PushNotification(2, 1, message, "defenseSuccess");
+                int queuedType = EncodeUtility.GetXType(queuedActions.bld.def[tileIndex]);
+                int existingType = EncodeUtility.GetXType(chainState.islands[islandID].defenses[tileIndex]);
+                int[] queuedBunkers = EncodeUtility.GetBaseTypes(queuedType);
+                int[] existingBunkers = EncodeUtility.GetBaseTypes(existingType);
+
+                int bunkerCount = 0;
+                for (int b = 0; b < 3; b++)
+                {
+                    if (queuedBunkers[b] > 0 || existingBunkers[b] > 0)
+                        bunkerCount++;
+                }
+
+                if (bunkerCount < 2)
+                    message = string.Format("You can not build this {0}, check your resources.", bunkerName);
+                else
+                    message = "This tile already has two bunkers.";
+
+                notificationSystem.PushNotification(2, 1, message, "defenseFailure");
             }
         }
         else
