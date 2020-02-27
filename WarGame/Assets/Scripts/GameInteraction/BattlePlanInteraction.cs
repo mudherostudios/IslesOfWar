@@ -532,7 +532,8 @@ public class BattlePlanInteraction : Interaction
         if (mode == Mode.DEFEND)
         {
             int defenderCount = squadMarkers.Count - clientInterface.queuedActions.dfnd.pln.Count;
-            squadIndex = defenderCount - currentSquad;
+            if(defenderCount > 0)
+                squadIndex = defenderCount - currentSquad;
         }
 
         clientInterface.UpdatePlan(mode == Mode.ATTACK, squadIndex, indexPosition);
