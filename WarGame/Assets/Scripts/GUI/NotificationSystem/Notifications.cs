@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -101,9 +103,12 @@ public class Notifications : MonoBehaviour
 
     void BuildList()
     {
+        GameObject[] reversedNotifications = notifications.ToArray();
+        Array.Reverse(reversedNotifications);
+
         for (int n = 0; n < notifications.Count; n++)
         {
-            notifications[n].transform.localPosition = new Vector3(136, (n * -32) - 24, 0);
+            reversedNotifications[n].transform.localPosition = new Vector3(136, (n * -32) - 24, 0);
         }
     }
 
