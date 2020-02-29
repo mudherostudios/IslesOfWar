@@ -94,13 +94,17 @@ namespace MudHero
                 if (xayaService == null || networkBlockCount == 0)
                 {
                     log.success = false;
-                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya Daemon";
+                    log.message = "Xaya Service is not connected. \nPlease try reconnecting or restart the game and Xaya Daemon.";
                     return log;
                 }
                 else
                 {
-                    log.success = true;
-                    log.message = string.Format("Pretending to create p/{0}...", name);
+                    log.message = xayaService.RegisterName("p/"+name, "{}", null);
+
+                    if (log.message.Contains("Failed"))
+                        log.success = false;
+                    else
+                        log.success = true;
                 }
 
                 return log;

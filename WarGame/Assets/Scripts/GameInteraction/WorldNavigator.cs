@@ -45,6 +45,7 @@ public class WorldNavigator : MonoBehaviour
     public Vector3 markerPositionOffset;
     public Vector3 markerRotationOffset;
     public GameObject[] squadMarkerPrefabs;
+    public GameObject squadLandingShip;
     public GameObject planMarkerPrefab;
 
     [Header("Command Island GUIs and Variables")]
@@ -195,7 +196,7 @@ public class WorldNavigator : MonoBehaviour
         battleScript.SetVariables(clientInterface, cam, orbital, screenGUI, buttonTypes);
         battleScript.SetObservationPoints(battleObservationPoint, battleFocusPoint);
         battleScript.SetIslandVariables(battleIslandGenerationPrefabs.ToArray(), battleIslandStats, tileVariations, offset);
-        battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefabs, planMarkerPrefab);
+        battleScript.SetBattleVariables(markerPositionOffset, markerRotationOffset, squadMarkerWaitPositions, squadMarkerPrefabs, squadLandingShip, planMarkerPrefab);
 
         if (tutorial != null)
         {

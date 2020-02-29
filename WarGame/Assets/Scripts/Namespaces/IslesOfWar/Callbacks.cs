@@ -60,13 +60,15 @@ namespace IslesOfWar
                         else if (state.currentConstants.version[0] == 1 && height >= 1601297)
                             processor = new StateProcessorV1(state);
                         else if (state.currentConstants.version[0] == 2)
+                            processor = new StateProcessorV2(state);
+                        else if (state.currentConstants.version[0] == 3)
                             processor = new StateProcessor(state);
                         else
                             processor = new StateProcessorV0(state);
                     }
                     else
                     {
-                        processor = new StateProcessorV1(new State());
+                        processor = new StateProcessor(new State());
                         processor.state.Init();
                     }
 

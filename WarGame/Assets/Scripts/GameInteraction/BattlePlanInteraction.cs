@@ -22,6 +22,7 @@ public class BattlePlanInteraction : Interaction
     [Header("Marker Interaction Variables")]
     public Mode mode = Mode.NONE;
     public GameObject[] squadMarkerPrefabs;
+    public GameObject squadLandingShip;
     public GameObject planMarkerPrefab;
     public BattleHUD hud;
 
@@ -50,6 +51,7 @@ public class BattlePlanInteraction : Interaction
 
     //Temporary variables used to submit actions.
     private List<GameObject> squadMarkers;
+    private List<GameObject> landingShips;
     public Dictionary<string, int[]> squads;
     private List<List<int>> squadPlans;
     private List<GameObject> opponentMarkers;
@@ -274,8 +276,8 @@ public class BattlePlanInteraction : Interaction
     void InstantiateAllSquads()
     {
         int squadIndex = 0;
-
-        foreach(KeyValuePair<string, int[]> pair in squads)
+        
+        foreach (KeyValuePair<string, int[]> pair in squads)
         {
             int unitDisplayType = GetUnitTypeByHighestHealth(pair.Value);
             squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], squadMarkerWaitPositions[squadIndex].position, Quaternion.identity));
@@ -284,6 +286,10 @@ public class BattlePlanInteraction : Interaction
             squadMarkers[squadIndex].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, pair.Key.Contains("Defender"));
             currentSquad = squadIndex;
             selectedSquad = squadMarkers[squadIndex].GetComponent<SquadMarker>();
+
+            if (!selectedSquad.name.Contains("Defender"))
+                AddLandingShip(selectedSquad.displayType, squadMarkerWaitPositions[squadIndex]);
+
             ViewCurrentSquad();
             CloseCurrentSquad();
             squadIndex++;
@@ -325,36 +331,66 @@ public class BattlePlanInteraction : Interaction
             int unitDisplayType = GetUnitTypeByHighestHealth(counts);
 
             if (squadMarkers.Count > 0)
-                positionIndex = squadMarkers.Count - 1;
+                positionIndex = squadMarkers.Count;
 
             Vector3 markerPosition = squadMarkerWaitPositions[positionIndex].position;
-            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], markerPosition, Quaternion.Euler(spawnRotation.x,spawnRotation.y,spawnRotation.z)));
-            squadMarkers[squadMarkers.Count - 1].transform.position = squadMarkerWaitPositions[squadMarkers.Count - 1].position;
+            Quaternion markerRotation = squadMarkerWaitPositions[positionIndex].rotation;
+            squadMarkers.Add(Instantiate(squadMarkerPrefabs[unitDisplayType], markerPosition, markerRotation));
             squadMarkers[squadMarkers.Count - 1].name = string.Format("{0} Squad", squadName);
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squad = squadMarkers.Count - 1;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().squadName = squadName;
             squadMarkers[squadMarkers.Count - 1].GetComponent<SquadMarker>().SetNameAndType(unitDisplayType, true, false);
             squads.Add(squadName, counts);
             squadPlans.Add(new List<int>());
-            
+
+            AddLandingShip(unitDisplayType, squadMarkerWaitPositions[positionIndex]);
+
             clientInterface.AddSquad(mode == Mode.ATTACK, new List<int>(counts));
         }
+    }
+
+    void AddLandingShip(int unitType, Transform targetTransform)
+    {
+        if (unitType < 6)
+        {
+            Vector3 adjustedShipPosition = GetLandingShipPosition(targetTransform);
+            landingShips.Add(Instantiate(squadLandingShip, adjustedShipPosition, targetTransform.rotation * new Quaternion(0, 180, 0, 0)));
+        }
+        else
+            landingShips.Add(null);
+    }
+
+    Vector3 GetLandingShipPosition(Transform targetTransform)
+    {
+        Vector3 adjustedShipPosition = targetTransform.position;
+
+        //Adjust based on landingShip height
+        Vector3 direction = targetTransform.rotation * new Vector3(0, 3f, 0);
+        adjustedShipPosition -= direction;
+
+        return adjustedShipPosition;
     }
 
     public void RemoveSquad(string squadName)
     {
         squads.Remove(squadName);
+        int tempSquad = 0;
 
         for (int s = 0; s < squadMarkers.Count; s++)
         {
             if (squadMarkers[s].GetComponent<SquadMarker>().squadName == squadName)
             {
                 if (currentSquad == s)
+                {
                     CloseCurrentSquad();
+                    tempSquad = s;
+                }
 
                 squadMarkers[s].GetComponent<SquadMarker>().RemoveFromBattleField(offset);
                 Destroy(squadMarkers[s]);
                 squadMarkers.RemoveAt(s);
+                Destroy(landingShips[s]);
+                landingShips.RemoveAt(s);
                 squadPlans.RemoveAt(s);
                 RenumberSquads(s);
                 if(!squadName.Contains("Defender"))
@@ -381,8 +417,6 @@ public class BattlePlanInteraction : Interaction
                 CloseCurrentSquad();
                 ViewCurrentSquad();
             }
-
-            currentSquad = 0;
         }
     }
 
@@ -430,7 +464,13 @@ public class BattlePlanInteraction : Interaction
             if (index >= 0)
                 selectedSquad.SetCurrentTile(islandTiles[index], offset);
             else
+            {
                 selectedSquad.transform.position = squadMarkerWaitPositions[currentSquad].position;
+                selectedSquad.transform.rotation = squadMarkerWaitPositions[currentSquad].rotation;
+            }
+
+            if (selectedSquad.displayType < 6)
+                landingShips[currentSquad].transform.position = GetLandingShipPosition(squadMarkerWaitPositions[currentSquad]);
         }
     }
 
@@ -687,6 +727,12 @@ public class BattlePlanInteraction : Interaction
         {
             Destroy(stats.gameObject);
         }
+
+        foreach (GameObject ship in landingShips)
+        {
+            if (ship != null)
+                Destroy(ship);
+        }
         
         islandTiles.Clear();
         hexIsland.SetActive(false);
@@ -700,6 +746,7 @@ public class BattlePlanInteraction : Interaction
             squadPlans = new List<List<int>>();
             planMarkers = new List<GameObject>();
             islandTiles = new List<TileStats>();
+            landingShips = new List<GameObject>();
 
             if (squads == null)
                 squads = new Dictionary<string, int[]>();
@@ -763,6 +810,17 @@ public class BattlePlanInteraction : Interaction
         return false;
     }
 
+    void LoadLandingShips()
+    {
+        for (int s = 0; s < squadMarkers.Count; s++)
+        {
+            SquadMarker squad = squadMarkers[s].GetComponent<SquadMarker>();
+
+            if (!squad.name.Contains("Defender"))
+                AddLandingShip(squad.displayType, squadMarkerWaitPositions[s]);
+        }
+    }
+
     //------------------------------------------------------------------------------
     //Setup Section
     //------------------------------------------------------------------------------
@@ -775,10 +833,11 @@ public class BattlePlanInteraction : Interaction
         offset = generationOffset;
     }
 
-    public void SetBattleVariables(Vector3 markerOffset, Vector3 markerRotation, Transform[] squadWaitPositions, GameObject[] _squadMarkerPrefab, GameObject _planMarkerPrefab)
+    public void SetBattleVariables(Vector3 markerOffset, Vector3 markerRotation, Transform[] squadWaitPositions, GameObject[] _squadMarkerPrefab, GameObject _squadLandingShip, GameObject _planMarkerPrefab)
     {
         squadMarkerWaitPositions = squadWaitPositions;
         squadMarkerPrefabs = _squadMarkerPrefab;
+        squadLandingShip = _squadLandingShip;
         planMarkerPrefab = _planMarkerPrefab;
         spawnOffset = markerOffset;
         spawnRotation = markerRotation;

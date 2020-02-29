@@ -121,7 +121,8 @@ public class ConnectGUI : MonoBehaviour
 
     public void CreateName()
     {
-        comms.CreateName(createNameInput.text);
+        //comms.CreateName(createNameInput.text);
+        Application.Quit();
     }
 
     public void Login()
