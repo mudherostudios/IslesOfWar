@@ -11,15 +11,15 @@ namespace IslesOfWar
 {
     namespace GameStateProcessing
     {
-        public class StateProcessor : MonoBehaviour
+        public class StateProcessorV2 : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 3, 0, 0};  //Hand set these here every release
+            public readonly int[] version = { 2, 0, 0};  //Hand set these here every release
             public bool isCorrectVersion { get { return state.currentConstants.version[0] <= version[0]; } }
             public bool isInMaintenanceMode { get { return state.currentConstants.isInMaintenanceMode; } }
-            public StateProcessor() { }
+            public StateProcessorV2() { }
 
-            public StateProcessor(State _state)
+            public StateProcessorV2(State _state)
             {
                 state = _state;
 
@@ -469,7 +469,7 @@ namespace IslesOfWar
                 
                 for (int s = 0; s < remove.sqds.Length && canRemove; s++)
                 {
-                    canRemove = remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
+                    canRemove = remove.sqds[s] <= remove.sqds.Length && remove.sqds[s] < state.islands[remove.id].squadCounts.Count;
                 }
 
                 if (canRemove)
