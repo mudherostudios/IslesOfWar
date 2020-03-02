@@ -28,7 +28,6 @@ public class TileStats : MonoBehaviour
     public Transform spawnCollectionParent;
 
     private List<SquadMarker> squadMarkers;
-    private int[] opponentSquadCounts = new int[2]; //Squads not unit counts. Checking for opfor and blufor squads on tile.
 
     void ToggleAllCollection(bool on, bool toggleChildren, GameObject[] collection)
     {
@@ -177,10 +176,6 @@ public class TileStats : MonoBehaviour
         if (squadMarkers == null)
             squadMarkers = new List<SquadMarker>();
 
-        int owner = 0; //0 is players
-        if (!squadMarker.isPlayers)
-            owner = 1;
-        opponentSquadCounts[owner]++;
         squadMarkers.Add(squadMarker);
         squadMarkers[squadMarkers.Count - 1].transform.position = spawnCollectionParent.GetChild(squadMarkers.Count - 1).position + offset;
         SetRotations();
@@ -188,11 +183,7 @@ public class TileStats : MonoBehaviour
 
     public void MoveMarkerOffTile(SquadMarker squadMarker, Vector3 offset)
     {
-        int owner = 0; //0 is players
-        if (!squadMarker.isPlayers)
-            owner = 1;
         squadMarkers.Remove(squadMarker);
-        opponentSquadCounts[owner]--;
 
         for (int m = 0; m < squadMarkers.Count; m++)
         {
@@ -208,14 +199,8 @@ public class TileStats : MonoBehaviour
         {
             if (squadMarkers[m].displayType < 3 && squadMarkers[m].displayType > 5) // Exclude Tank Types
             {
-                if (opponentSquadCounts[0] > 0 && opponentSquadCounts[1] > 0) //If there are two opposing forces
-                {
-                    FindEnemy(m);
-                }
-                else
-                {
-                    squadMarkers[m].transform.Rotate(Vector3.up, Random.value * 360);
-                }
+                //Add Options for aiming at other units with FindEnemy later.
+               squadMarkers[m].transform.Rotate(Vector3.up, Random.value * 360);
             }
             else // Tanks
             {

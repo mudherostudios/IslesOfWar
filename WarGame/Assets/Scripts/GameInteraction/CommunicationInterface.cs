@@ -239,4 +239,6 @@ public class CommunicationInterface : MonoBehaviour
         stateRetriever = null;
         xayaCommands = null;
     }
+
+    
 }

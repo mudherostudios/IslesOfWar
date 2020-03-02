@@ -48,6 +48,8 @@ public class SquadMarker : WorldButton
     {
         if(currentTile != null)
             currentTile.MoveMarkerOffTile(this, offset);
+
+        currentTile = null;
     }
 
     public void ShowWithdrawlOption()

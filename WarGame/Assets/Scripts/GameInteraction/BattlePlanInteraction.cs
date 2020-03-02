@@ -434,7 +434,7 @@ public class BattlePlanInteraction : Interaction
 
     void ViewCurrentSquad()
     {
-        int index = 0;
+        int index = -1;
 
         if (squadPlans.Count > 0)
         {
@@ -446,9 +446,6 @@ public class BattlePlanInteraction : Interaction
                 planMarker.GetComponentInChildren<PlanMarker>().index = p;
                 planMarkers.Add(planMarker);
             }
-
-
-            index = -1;
 
             if (squadPlans[currentSquad].Count > 0)
             {
@@ -551,12 +548,15 @@ public class BattlePlanInteraction : Interaction
     void RemoveSquadPoint(int index)
     {
         if (mode == Mode.ATTACK || index == 0)
+        {
             squadPlans[currentSquad].RemoveRange(index, squadPlans[currentSquad].Count - index);
+            squadMarkers[currentSquad].GetComponent<SquadMarker>().RemoveFromBattleField(offset);
+        }
         else if (mode == Mode.DEFEND)
             squadPlans[currentSquad].RemoveAt(index);
 
         clientInterface.ChangePlan(mode == Mode.ATTACK, currentSquad, squadPlans[currentSquad]);
-
+        
         CloseCurrentSquad();
         ViewCurrentSquad();
     }
