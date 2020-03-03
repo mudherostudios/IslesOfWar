@@ -153,7 +153,7 @@ namespace MudHero
                 try
                 {
                     string userCURL = string.Format("http://{0}:{1}@{2}:{3}", username, password, hostIP, hostPort);
-                    ConnectToTheDaemon_CSharp(gamenamespace, userCURL, int.Parse(gamePort), -1, int.Parse(chain_s), storage_s, databasePath, "XayaGLOG", glogsPath);
+                    ConnectToTheDaemon_CSharp(gamenamespace, userCURL, int.Parse(gamePort), 5000, int.Parse(chain_s), storage_s, databasePath, "XayaGLOG", glogsPath);
                 }
                 catch (ThreadAbortException)
                 {
