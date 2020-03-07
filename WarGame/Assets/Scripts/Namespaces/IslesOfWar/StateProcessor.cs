@@ -947,7 +947,7 @@ namespace IslesOfWar
                                     else if (history.winner == "opfor")
                                     {
                                         attackerSquads[a] = new Squad(Add(history.remainingSquad.onlyUnits, aReserve));
-                                        if (defenderSquads.Length > 0)
+                                        if (defenderSquads.Length > 0 && defender > -1)
                                         {
                                             defenderSquads[defender] = new Squad(dReserve);
                                             defendersCanContinue[defender] = false;

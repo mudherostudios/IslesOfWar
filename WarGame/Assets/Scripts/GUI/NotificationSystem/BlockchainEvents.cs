@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
+using IslesOfWar.ClientSide;
+using MudHero;
 
 public class UserMessageStates
 {
@@ -47,12 +49,16 @@ public class BlockchainEvents : MonoBehaviour
     int frameCounter;
     double lastBlock;
     UserMessageStates messageStates;
+    State lastState;
+    PendingActions pendingActions;
+    string player;
 
     private void Start()
     {
         lastBlock = SaveLoad.lastBlock;
         frameCounter = 1;
         messageStates = new UserMessageStates();
+        player = clientInterface.player;
     }
 
     private void Update()
@@ -74,6 +80,202 @@ public class BlockchainEvents : MonoBehaviour
             }
             frameCounter++;
         }
+    }
+
+    void CheckChanges()
+    {
+        bool hasChanged = false;
+        if (commsInterface.state.players.ContainsKey(commsInterface.player))
+        {
+            bool newAttackableIsland = HasNewAttackableIsland();
+            List<string> newIslands = HasNewIslands();
+            if (newIslands.Count > 0)
+            {
+                List<bool> newIslandIsUndiscovered = IslandIsUndiscovered(newIslands);
+                for (int i = 0; i < newIslands.Count; i++)
+                {
+                    string message = "";
+                    string islandName = SaveLoad.GetIslandName(newIslands[i]);
+
+                    if (islandName == newIslands[i])
+                        islandName = string.Format("Island {0}", islandName);
+
+                    if (newIslandIsUndiscovered[i])
+                        message = string.Format("We have discovered {0}.", islandName);
+                    else
+                        message = string.Format("We have captured {0}.", islandName);
+
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
+            }
+
+            List<string> lostIslands = HasLostIsland();
+            if (lostIslands.Count > 0)
+            {
+                List<bool> islandWasCaptured = IslandWasCaptured(lostIslands);
+                for (int i = 0; i < lostIslands.Count; i++)
+                {
+                    string message = "";
+                    string islandName = SaveLoad.GetIslandName(lostIslands[i]);
+
+                    if (islandName == lostIslands[i])
+                        islandName = string.Format("Island {0}", islandName);
+
+                    if (islandWasCaptured[i])
+                        message = string.Format("Our island, {0}, has been captured.", islandName);
+                    else
+                        message = string.Format("Our island, {0}, has been put up for auction.", islandName);
+
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
+            }
+
+            bool[] submittedToPool = HasSubmittedResources();
+            if(submittedToPool[0])
+                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Oil are in the pool.");
+            if (submittedToPool[1])
+                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Metal are in the pool.");
+            if (submittedToPool[2])
+                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Concrete are in the pool.");
+            
+            if (NewMarketOrder())
+                clientInterface.notificationSystem.PushNotification(0, 0, "We have new orders on the market.");
+
+            List<string> missingOrders = MissingMarketOrders();
+            if (missingOrders.Count > 0)
+            {
+                foreach (string order in missingOrders)
+                {
+                    string message = string.Format("Our order {0} has been accepted or removed from the market.", order);
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
+            }
+
+            if (lastBlock % clientInterface.chainState.currentConstants.warbucksRewardBlocks == 0)
+            {
+                string message = string.Format("All warbux pool rewards have been paid out!");
+                clientInterface.notificationSystem.PushNotification(0, 0, message);
+            }
+
+            if (lastBlock % clientInterface.chainState.currentConstants.poolRewardBlocks == 0)
+            {
+                string message = string.Format("All resource pool rewards have been paid out!");
+                clientInterface.notificationSystem.PushNotification(0, 0, message);
+            }
+
+            List<string> islandsWithTroopChanges = TroopsHaveChanged();
+            if (hasChanged)
+                lastState = Deep.CopyObject<State>(clientInterface.chainState);
+        }
+    }
+
+    bool HasNewAttackableIsland()
+    {
+        return lastState.players[player].attackableIsland != clientInterface.attackableIslandID && clientInterface.attackableIslandID != "";
+    }
+
+    List<string> HasNewIslands()
+    {
+        List<string> newIslands = new List<string>();
+
+        foreach (string island in clientInterface.playerIslandIDs)
+        {
+            if (!lastState.players[player].islands.Contains(island))
+                newIslands.Add(island);
+        }
+
+        return newIslands;
+    }
+
+    List<bool> IslandIsUndiscovered(List<string> islandIDs)
+    {
+        List<bool> areUndiscovered = new List<bool>();
+        List<string> existingIslands = new List<string>(clientInterface.chainState.islands.Keys);
+        foreach (string island in islandIDs)
+        {
+            if (!existingIslands.Contains(island))
+                areUndiscovered.Add(true);
+            else
+                areUndiscovered.Add(false);
+        }
+
+        return areUndiscovered;
+    }
+
+    List<string> HasLostIsland()
+    {
+        List<string> lostIslands = new List<string>();
+
+        foreach (string island in lastState.players[player].islands)
+        {
+            if (!clientInterface.playerIslandIDs.Contains(island))
+                lostIslands.Add(island);
+        }
+
+        return lostIslands;
+    }
+
+    List<bool> IslandWasCaptured(List<string> lostIslands)
+    {
+        List<bool> areCaptured = new List<bool>();
+        List<string> depletedIslands = new List<string>(lastState.depletedContributions[player]);
+
+        foreach (string island in lostIslands)
+        {
+            if (!depletedIslands.Contains(island))
+                areCaptured.Add(true);
+            else
+                areCaptured.Add(false);
+        }
+
+        return areCaptured;
+    }
+
+    List<string> TroopsHaveChanged()
+    {
+        return null;
+    }
+
+    bool[] HasSubmittedResources()
+    {
+        bool[] submittedToPool = new bool[] { false, false, false };
+
+        for (int p = 0; p < 3; p++)
+        {
+            for (int r = 0; r < 3 && !submittedToPool[p]; r++)
+            {
+                if (clientInterface.chainState.resourceContributions[player][p][r] > lastState.resourceContributions[player][p][r])
+                    submittedToPool[p] = true;
+            }
+        }
+
+        return submittedToPool;
+    }
+
+    bool NewMarketOrder()
+    {
+        bool newOrder = false;
+
+        for (int o = 0; o < clientInterface.chainState.resourceMarket[player].Count && !newOrder; o++)
+        {
+            if (!lastState.resourceMarket[player].Contains(clientInterface.chainState.resourceMarket[player][o]))
+                newOrder = false;
+        }
+
+        return newOrder;
+    }
+
+    List<string> MissingMarketOrders()
+    {
+        List<string> missingOrders = new List<string>();
+
+        for (int o = 0; o < lastState.resourceMarket[player].Count; o++)
+        {
+            if (!clientInterface.chainState.resourceMarket[player].Contains(lastState.resourceMarket[player][o]))
+                missingOrders.Add(lastState.resourceMarket[player][o].orderID);
+        }
+
+        return missingOrders;
     }
 
     void CheckChanges(int block, out UserMessageStates lastStates)
@@ -151,7 +353,6 @@ public class BlockchainEvents : MonoBehaviour
                     states.allPreviousUnitCounts.Add(island, squadCounts);
             }
         }
-    
         return states;
     }
 
