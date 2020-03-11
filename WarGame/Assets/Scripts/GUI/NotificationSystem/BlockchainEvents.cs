@@ -98,7 +98,7 @@ public class BlockchainEvents : MonoBehaviour
                     string islandName = SaveLoad.GetIslandName(newIslands[i]);
 
                     if (islandName == newIslands[i])
-                        islandName = string.Format("Island {0}", islandName);
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
 
                     if (newIslandIsUndiscovered[i])
                         message = string.Format("We have discovered {0}.", islandName);
@@ -122,7 +122,7 @@ public class BlockchainEvents : MonoBehaviour
                         string islandName = SaveLoad.GetIslandName(island);
 
                         if (islandName == island)
-                            islandName = string.Format("Island {0}", islandName);
+                            islandName = string.Format("Island {0}", islandName.Substring(0, 8));
                         string message = string.Format("Our troops from depleted {0} have returned.", islandName);
                         clientInterface.notificationSystem.PushNotification(0, 0, message);
                     }
@@ -136,7 +136,7 @@ public class BlockchainEvents : MonoBehaviour
                         string islandName = SaveLoad.GetIslandName(changedTypes[1][i]);
 
                         if (islandName == changedTypes[1][i])
-                            islandName = string.Format("Island {0}", islandName);
+                            islandName = string.Format("Island {0}", islandName.Substring(0, 8));
                         string message = string.Format("Our troops on {0} have been attacked by {1}.", islandName, changedTypes[2][i]);
                         clientInterface.notificationSystem.PushNotification(0, 0, message);
                     }
@@ -150,7 +150,7 @@ public class BlockchainEvents : MonoBehaviour
                         string islandName = SaveLoad.GetIslandName(changedTypes[3][i]);
 
                         if (islandName == changedTypes[3][i])
-                            islandName = string.Format("Island {0}", islandName);
+                            islandName = string.Format("Island {0}", islandName.Substring(0, 8));
                         string message = string.Format("{0} has been attacked and captured by {1}.", islandName, changedTypes[4][i]);
                         clientInterface.notificationSystem.PushNotification(0, 0, message);
                     }
@@ -164,7 +164,7 @@ public class BlockchainEvents : MonoBehaviour
                         string islandName = SaveLoad.GetIslandName(island);
 
                         if (islandName == island)
-                            islandName = string.Format("Island {0}", islandName);
+                            islandName = string.Format("Island {0}", islandName.Substring(0, 8));
                         string message = string.Format("Units at {0} have been updated.", islandName);
                         clientInterface.notificationSystem.PushNotification(0, 0, message);
                     }
@@ -181,7 +181,7 @@ public class BlockchainEvents : MonoBehaviour
                     string islandName = SaveLoad.GetIslandName(lostIslands[i]);
 
                     if (islandName == lostIslands[i])
-                        islandName = string.Format("Island {0}", islandName);
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
 
                     if (islandWasCaptured[i] && !islandsWithTroopChanges.Contains(lostIslands[i]))
                     {
@@ -226,6 +226,47 @@ public class BlockchainEvents : MonoBehaviour
             {
                 string message = string.Format("All resource pool rewards have been paid out!");
                 clientInterface.notificationSystem.PushNotification(0, 0, message);
+            }
+
+            if (NewTroopsAvailableForAssignment())
+                clientInterface.notificationSystem.PushNotification(0, 0, "We have new units ready for assignment.");
+
+            List<List<string>> changedIslandStructures = IslandsWithChangedStructures();
+            //Collectors Updated
+            if (changedIslandStructures[0].Count > 0)
+            {
+                foreach (string island in changedIslandStructures[0])
+                {
+                    string islandName = SaveLoad.GetIslandName(island);
+                    if (islandName == island)
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
+                    string message = string.Format("New collectors on {0} have been developed.", islandName);
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
+            }
+            //Defenses Added
+            if (changedIslandStructures[1].Count > 0)
+            {
+                foreach (string island in changedIslandStructures[1])
+                {
+                    string islandName = SaveLoad.GetIslandName(island);
+                    if (islandName == island)
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
+                    string message = string.Format("Defenses on {0} have been developed.", islandName);
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
+            }
+            //DefensesDestroyed
+            if (changedIslandStructures[2].Count > 0)
+            {
+                foreach (string island in changedIslandStructures[3])
+                {
+                    string islandName = SaveLoad.GetIslandName(island);
+                    if (islandName == island)
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
+                    string message = string.Format("Defenses on {0} have been destroyed.", islandName);
+                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                }
             }
 
             if (hasChanged)
@@ -425,6 +466,87 @@ public class BlockchainEvents : MonoBehaviour
             return attackers[0];
         else
             return string.Format("{0} and {1} {2}", attackers[0], attackers.Count-1, other);
+    }
+
+    bool NewTroopsAvailableForAssignment()
+    {
+        bool newTroops = false;
+
+        for (int u = 0; u < lastState.players[player].units.Count && !newTroops; u++)
+        {
+            if (lastState.players[player].units[u] < clientInterface.chainState.players[player].units[u])
+                newTroops = true;
+        }
+
+        return newTroops;
+    }
+
+    List<List<string>> IslandsWithChangedStructures()
+    {
+        List<string> changedCollectors = new List<string>();
+        List<string> addedDefenses = new List<string>();
+        List<string> destroyedDefenses = new List<string>();
+
+        foreach (string island in lastState.players[player].islands)
+        {
+            if (clientInterface.chainState.players[player].islands.Contains(island))
+            {
+                string lastCollectors = lastState.islands[island].collectors;
+                string currentCollectors = clientInterface.chainState.islands[island].collectors;
+                string lastDefenses = lastState.islands[island].defenses;
+                string currentDefenses = clientInterface.chainState.islands[island].defenses;
+
+                if (lastCollectors != currentCollectors)
+                    changedCollectors.Add(island);
+
+                if (lastDefenses != currentDefenses)
+                {
+                    bool defensesAdded = false;
+                    bool defensesDestroyed = false;
+                    for (int t = 0; t < currentDefenses.Length && (!defensesDestroyed || !defensesAdded); t++)
+                    {
+                        if (currentDefenses[t] != ')' || lastDefenses[t] != ')')
+                        {
+                            if (lastDefenses[t] == ')')
+                            {
+                                if (!defensesAdded)
+                                {
+                                    addedDefenses.Add(island);
+                                    defensesAdded = true;
+                                }
+                            }
+                            else
+                            {
+                                int lastBunkerType = EncodeUtility.GetXType(lastDefenses[t]);
+                                int lastBlockerType = EncodeUtility.GetYType(lastDefenses[t]);
+                                int currentBunkerType = EncodeUtility.GetXType(currentDefenses[t]);
+                                int currentBlockerType = EncodeUtility.GetYType(currentDefenses[t]);
+
+                                if (currentBunkerType > lastBunkerType || currentBlockerType > lastBlockerType)
+                                {
+                                    if (!defensesAdded)
+                                    {
+                                        addedDefenses.Add(island);
+                                        defensesAdded = true;
+                                    }
+                                }
+
+                                if (currentBunkerType < lastBunkerType || currentBlockerType < lastBlockerType)
+                                {
+                                    if (!defensesDestroyed)
+                                    {
+                                        destroyedDefenses.Add(island);
+                                        defensesDestroyed = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return new List<List<string>>() { changedCollectors, addedDefenses, destroyedDefenses };
     }
 
     void CheckChanges(int block, out UserMessageStates lastStates)
