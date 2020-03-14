@@ -13,6 +13,7 @@ public class SaveState
     public bool useCookies;
     public bool useAdvanced;
     public int selectedName;
+    public string selectedNameString;
     public int daemonPort;
     public int gspPort;
     public string walletName;
@@ -29,6 +30,7 @@ public class SaveState
         useCookies = true;
         useAdvanced = false;
         selectedName = 0;
+        selectedNameString = "";
         daemonPort = 0;
         gspPort = 0;
         walletName = "game.dat";

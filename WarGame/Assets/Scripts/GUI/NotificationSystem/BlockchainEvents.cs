@@ -45,6 +45,7 @@ public class BlockchainEvents : MonoBehaviour
     public int frameToCheck;
     public bool doneSyncing;
     public bool resetBlockEvents;
+    public bool checkedForUsername;
     bool canCheck;
     int frameCounter;
     double lastBlock;
@@ -52,17 +53,21 @@ public class BlockchainEvents : MonoBehaviour
     State lastState;
     PendingActions pendingActions;
     string player;
+    List<string> existingIslands;
 
     private void Start()
     {
         lastBlock = SaveLoad.lastBlock;
         frameCounter = 1;
+        checkedForUsername = false;
         messageStates = new UserMessageStates();
-        player = clientInterface.player;
     }
 
     private void Update()
     {
+        if (!checkedForUsername)
+            CheckForUsername();
+
         if (!canCheck)
         {
             canCheck = commsInterface.blockCount > 0;
@@ -73,7 +78,7 @@ public class BlockchainEvents : MonoBehaviour
             {
                 if (lastBlock < commsInterface.blockProgress)
                 {
-                    CheckChanges(commsInterface.blockProgress, out messageStates);
+                    CheckChanges(commsInterface.blockProgress);
                     lastBlock = commsInterface.blockProgress;
                 }
                 frameCounter = 0;
@@ -82,10 +87,13 @@ public class BlockchainEvents : MonoBehaviour
         }
     }
 
-    void CheckChanges()
+    void CheckChanges(int blockProgress)
     {
-        bool hasChanged = false;
-        List<string> existingIslands = new List<string>(clientInterface.chainState.islands.Keys);
+        if(lastState == null)
+            lastState = Deep.CopyObject<State>(clientInterface.chainState);
+
+        existingIslands = new List<string>(lastState.islands.Keys);
+
         if (commsInterface.state.players.ContainsKey(commsInterface.player))
         {
             List<string> newIslands = HasNewIslands();
@@ -183,15 +191,11 @@ public class BlockchainEvents : MonoBehaviour
                     if (islandName == lostIslands[i])
                         islandName = string.Format("Island {0}", islandName.Substring(0, 8));
 
-                    if (islandWasCaptured[i] && !islandsWithTroopChanges.Contains(lostIslands[i]))
+                    if (!islandWasCaptured[i])
                     {
-                        List<string> missing = GetMissingAttackers(lostIslands[i]);
-                        message = string.Format("Our island, {0}, has been captured by {1}.", islandName, FormatListOfAttackers(missing));
-                    }
-                    else
                         message = string.Format("Our island, {0}, has been put up for auction.", islandName);
-
-                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                        clientInterface.notificationSystem.PushNotification(0, 0, message);
+                    }
                 }
             }
 
@@ -272,26 +276,30 @@ public class BlockchainEvents : MonoBehaviour
             if(AttackableIslandIsDifferent())
             {
                 string attackableIsland = lastState.players[player].attackableIsland;
-                string islandName = SaveLoad.GetIslandName(attackableIsland);
-                if (islandName == attackableIsland)
-                    islandName = string.Format("Island {0}", islandName.Substring(0, 8));
 
-                bool attackSuccessful = clientInterface.chainState.players[player].islands.Contains(attackableIsland);
-                if (attackSuccessful)
+                if (attackableIsland != "" && attackableIsland != null)
                 {
-                    string message = string.Format("We have captured {0} from {1}.", islandName, lastState.islands[attackableIsland].owner);
-                    clientInterface.notificationSystem.PushNotification(0, 0, message);
-                }
-                else if (!attackSuccessful && clientInterface.chainState.players[player].attackableIsland == null || clientInterface.chainState.players[player].attackableIsland == null)
-                {
-                    string message = string.Format("We have lost the battle at {0} with {1}.", islandName, lastState.islands[attackableIsland].owner);
-                    clientInterface.notificationSystem.PushNotification(0, 0, message);
-                }
-                else
-                {
-                    string currentAttackableIsland = clientInterface.chainState.players[player].attackableIsland;
-                    string message = string.Format("We have discovered one of {0}'s islands.", clientInterface.chainState.islands[currentAttackableIsland].owner);
-                    clientInterface.notificationSystem.PushNotification(0, 0, message);
+                    string islandName = SaveLoad.GetIslandName(attackableIsland);
+                    if (islandName == attackableIsland)
+                        islandName = string.Format("Island {0}", islandName.Substring(0, 8));
+
+                    bool attackSuccessful = clientInterface.chainState.players[player].islands.Contains(attackableIsland);
+                    if (attackSuccessful)
+                    {
+                        string message = string.Format("We have captured {0} from {1}.", islandName, lastState.islands[attackableIsland].owner);
+                        clientInterface.notificationSystem.PushNotification(0, 0, message);
+                    }
+                    else if (!attackSuccessful && (clientInterface.chainState.players[player].attackableIsland == null || clientInterface.chainState.players[player].attackableIsland == ""))
+                    {
+                        string message = string.Format("We have lost the battle at {0} with {1}.", islandName, lastState.islands[attackableIsland].owner);
+                        clientInterface.notificationSystem.PushNotification(0, 0, message);
+                    }
+                    else if (clientInterface.chainState.players[player].attackableIsland != null || clientInterface.chainState.players[player].attackableIsland != "")
+                    {
+                        string currentAttackableIsland = clientInterface.chainState.players[player].attackableIsland;
+                        string message = string.Format("We have discovered one of {0}'s islands.", clientInterface.chainState.islands[currentAttackableIsland].owner);
+                        clientInterface.notificationSystem.PushNotification(0, 0, message);
+                    }
                 }
             }
 
@@ -305,8 +313,7 @@ public class BlockchainEvents : MonoBehaviour
                 clientInterface.notificationSystem.PushNotification(0,0,message);
             }
 
-            if (hasChanged)
-                lastState = Deep.CopyObject<State>(clientInterface.chainState);
+            lastState = Deep.CopyObject<State>(clientInterface.chainState);
         }
     }
 
@@ -358,14 +365,16 @@ public class BlockchainEvents : MonoBehaviour
     List<bool> IslandWasCaptured(List<string> lostIslands)
     {
         List<bool> areCaptured = new List<bool>();
-        List<string> depletedIslands = new List<string>(lastState.depletedContributions[player]);
+        List<string> depletedIslands;
+
+        if (clientInterface.chainState.depletedContributions.ContainsKey(player))
+            depletedIslands = new List<string>(clientInterface.chainState.depletedContributions[player]);
+        else
+            depletedIslands = new List<string>();
 
         foreach (string island in lostIslands)
         {
-            if (!depletedIslands.Contains(island))
-                areCaptured.Add(true);
-            else
-                areCaptured.Add(false);
+            areCaptured.Add(!depletedIslands.Contains(island));
         }
 
         return areCaptured;
@@ -413,11 +422,23 @@ public class BlockchainEvents : MonoBehaviour
     bool NewMarketOrder()
     {
         bool newOrder = false;
+        bool newPlayer = clientInterface.chainState.resourceMarket.ContainsKey(player) && !lastState.resourceMarket.ContainsKey(player);
 
-        for (int o = 0; o < clientInterface.chainState.resourceMarket[player].Count && !newOrder; o++)
+        if (newPlayer)
+            newOrder = true;
+
+        if (!newOrder && clientInterface.chainState.resourceMarket.ContainsKey(player))
         {
-            if (!lastState.resourceMarket[player].Contains(clientInterface.chainState.resourceMarket[player][o]))
-                newOrder = false;
+            if (lastState.resourceMarket.ContainsKey(player))
+                newOrder = true;
+            else
+            {
+                for (int o = 0; o < clientInterface.chainState.resourceMarket[player].Count && !newOrder; o++)
+                {
+                    if (!lastState.resourceMarket[player].Contains(clientInterface.chainState.resourceMarket[player][o]))
+                        newOrder = true;
+                }
+            }
         }
 
         return newOrder;
@@ -427,10 +448,25 @@ public class BlockchainEvents : MonoBehaviour
     {
         List<string> missingOrders = new List<string>();
 
-        for (int o = 0; o < lastState.resourceMarket[player].Count; o++)
+        if (clientInterface.chainState.resourceMarket.ContainsKey(player))
         {
-            if (!clientInterface.chainState.resourceMarket[player].Contains(lastState.resourceMarket[player][o]))
-                missingOrders.Add(lastState.resourceMarket[player][o].orderID);
+            string currentMarket = JsonConvert.SerializeObject(clientInterface.chainState.resourceMarket[player]);
+
+            if (lastState.resourceMarket.ContainsKey(player))
+            {
+                for (int o = 0; o < lastState.resourceMarket[player].Count; o++)
+                {
+                    if (!currentMarket.Contains(lastState.resourceMarket[player][o].orderID))
+                        missingOrders.Add(lastState.resourceMarket[player][o].orderID);
+                }
+            }
+        }
+        else if(lastState.resourceMarket.ContainsKey(player))
+        {
+            foreach (MarketOrder order in lastState.resourceMarket[player])
+            {
+                missingOrders.Add(order.orderID);
+            }
         }
 
         return missingOrders;
@@ -611,185 +647,21 @@ public class BlockchainEvents : MonoBehaviour
         }
     }
 
-    void CheckChanges(int block, out UserMessageStates lastStates)
+    void CheckForUsername()
     {
-        UserMessageStates currentStates = GetUpdatedUserMessageState();
-        bool hasChanged = false;
-        if (commsInterface.state.players.ContainsKey(commsInterface.player))
+        if (SaveLoad.state.selectedNameString != "")
         {
-            bool attackableIsland = HasDiscoveredAttackableIsland(currentStates.lastAttackableIsland, messageStates.lastAttackableIsland);
-            List<AffectedIsland> newIslands = new List<AffectedIsland>();
-            List<AffectedIsland> lostIslands = new List<AffectedIsland>();
-            List<AffectedIsland> unitTracking = new List<AffectedIsland>();
-            
-            newIslands = HasDiscoveredOrCapturedIsland(currentStates.lastIslands, messageStates.lastIslands, messageStates.allPreviousIslandsList);
-            lostIslands = HasLostIslands(currentStates.lastIslands, messageStates.lastIslands, messageStates.allPreviousIslandsList);
-            unitTracking = UnitsOnIslandsHaveBeenAltered(currentStates.allPreviousUnitCounts, messageStates.allPreviousUnitCounts);
-            
-            if (attackableIsland)
-            {
-                string message = "We have found a new attackable island.";
-                clientInterface.notificationSystem.PushNotification(0, 0, message);
-            }
-
-            foreach (AffectedIsland island in newIslands)
-            {
-                string message = string.Format("We have {0} island {1}.", island.affect, SaveLoad.GetIslandName(island.island.Substring(0, 8)));
-                clientInterface.notificationSystem.PushNotification(0, 0, message);
-            }
-
-            foreach (AffectedIsland island in lostIslands)
-            {
-                string message = string.Format("We have {0} our island {1}.", island.affect, SaveLoad.GetIslandName(island.island.Substring(0, 8)));
-                clientInterface.notificationSystem.PushNotification(0, 0, message);
-            }
-
-            foreach (AffectedIsland island in unitTracking)
-            {
-                if (island.affect == "altered")
-                {
-                    string message = string.Format("Island {0} is reporting changes in squad numbers.", SaveLoad.GetIslandName(island.island.Substring(0, 8)));
-                    clientInterface.notificationSystem.PushNotification(0, 0, message);
-                }
-            }
-
-            hasChanged = attackableIsland || newIslands.Count > 0 || lostIslands.Count > 0 || unitTracking.Count > 0;
+            player = SaveLoad.state.selectedNameString;
+            checkedForUsername = true;
         }
-        
-        lastStates = currentStates;
-        if (hasChanged)
-        {
-            SaveLoad.state.userMessageStates[clientInterface.player] = lastStates;
-            SaveLoad.SavePreferences();
-        }
-    }
-
-    UserMessageStates GetUpdatedUserMessageState()
-    {
-        UserMessageStates states = JsonConvert.DeserializeObject<UserMessageStates>(JsonConvert.SerializeObject(messageStates));
-        states.allPreviousIslandsList = commsInterface.state.islands.Keys.ToList();
-
-        if (commsInterface.state.players.ContainsKey(commsInterface.player))
-        {
-            states.lastAttackableIsland = commsInterface.state.players[commsInterface.player].attackableIsland;
-            states.lastIslands = commsInterface.state.players[commsInterface.player].islands.ToList();
-            foreach (string island in states.lastIslands)
-            {
-                List<List<int>> squadCounts = new List<List<int>>();
-
-                if (commsInterface.state.islands[island].squadCounts != null)
-                    squadCounts = commsInterface.state.islands[island].squadCounts.ToList();
-
-                if (states.allPreviousUnitCounts.ContainsKey(island))
-                    states.allPreviousUnitCounts[island] = squadCounts;
-                else
-                    states.allPreviousUnitCounts.Add(island, squadCounts);
-            }
-        }
-        return states;
-    }
-
-    bool HasDiscoveredAttackableIsland(string currentAttackableIsland, string lastAttackableIsland)
-    {
-        bool isDifferent = currentAttackableIsland != lastAttackableIsland && currentAttackableIsland != "";
-        return isDifferent;
-    }
-
-    bool IslandsHaveChanged(List<string> currentIslands, List<string> lastIslands)
-    {
-        int count = currentIslands.Intersect(lastIslands).Count();
-        if ( count != currentIslands.Count || count != lastIslands.Count )
-            return true;
         else
-            return false;
-    }
-
-    IEnumerable<string> GetNewIslands(List<string> currentIslands, List<string> lastIslands)
-    {
-        IEnumerable<string> missingFromLast = currentIslands.Except(lastIslands);
-        return missingFromLast;
-    }
-
-    IEnumerable<string> GetMissingIslands(List<string> currentIslands, List<string> lastIslands)
-    {
-        IEnumerable<string> missingFromCurrent = lastIslands.Except(currentIslands);
-        return missingFromCurrent;
-    }
-    
-    List<AffectedIsland> HasDiscoveredOrCapturedIsland(List<string> currentIslands, List<string> lastIslands, List<string> allLastIslands)
-    {
-        List<AffectedIsland> acquiredIslands = new List<AffectedIsland>();
-
-        if (IslandsHaveChanged(currentIslands, lastIslands))
         {
-            IEnumerable<string> newIslands = GetNewIslands(currentIslands, lastIslands);
-            
-            if (newIslands.Count() > 0)
+            if (player == null && clientInterface != null)
             {
-                foreach (string island in newIslands)
-                {
-                    bool captured = allLastIslands.Contains(island);
-                    string affect = "captured";
-
-                    if (!captured)
-                        affect = "discovered";
-
-                    AffectedIsland islandInfo = new AffectedIsland(island, affect);
-                    acquiredIslands.Add(islandInfo);
-                }
+                player = clientInterface.player;
+                checkedForUsername = true;
             }
         }
-
-        return acquiredIslands;
-    }
-
-    List<AffectedIsland> HasLostIslands(List<string> currentIslands, List<string> lastIslands, List<string> allCurrentIslands)
-    {
-        List<AffectedIsland> missingIslands = new List<AffectedIsland>();
-
-        if (IslandsHaveChanged(currentIslands, lastIslands))
-        {
-            IEnumerable<string> missing = GetMissingIslands(currentIslands, lastIslands);
-
-            if (missing.Count() > 0)
-            {
-                foreach(string island in missing)
-                {
-                    bool lostIsland = allCurrentIslands.Contains(island);
-                    string affect = "lost";
-
-                    if (!lostIsland)
-                        affect = "sold";
-
-                    missingIslands.Add(new AffectedIsland(island, affect));
-                }
-            }
-        }
-
-        return missingIslands;
-    }
-
-    List<AffectedIsland> UnitsOnIslandsHaveBeenAltered(Dictionary<string, List<List<int>>> currentIslandSquads, Dictionary<string, List<List<int>>> lastIslandSquads)
-    {
-        List<AffectedIsland> alteredIslands = new List<AffectedIsland>();
-
-        foreach (KeyValuePair<string, List<List<int>>> pair in currentIslandSquads)
-        {
-            if (lastIslandSquads.ContainsKey(pair.Key))
-            {
-                string current = JsonConvert.SerializeObject(pair.Value);
-                string last = JsonConvert.SerializeObject(lastIslandSquads[pair.Key]);
-                bool altered = current != last;
-                string affect = "altered";
-
-                if (!altered)
-                    affect = "unchanged";
-
-                alteredIslands.Add(new AffectedIsland(pair.Key, affect));
-            }
-        }
-
-        return alteredIslands;
     }
 
     void OnEnable()

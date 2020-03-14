@@ -953,6 +953,7 @@ namespace IslesOfWar
                                             defendersCanContinue[defender] = false;
                                         }
                                         state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
+                                        //Change Here to inside if at line 951
                                         defendersLeft--;
                                     }
                                     else

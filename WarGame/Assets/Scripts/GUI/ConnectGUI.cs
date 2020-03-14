@@ -128,6 +128,7 @@ public class ConnectGUI : MonoBehaviour
     public void Login()
     {
         SaveLoad.state.selectedName = usernamesList.value;
+        SaveLoad.state.selectedNameString = usernamesList.options[usernamesList.value].text;
         SaveLoad.SavePreferences();
         comms.SelectUser(comms.nameList[usernamesList.value]);
         messages.text = "Loading...";
