@@ -9,26 +9,6 @@ namespace IslesOfWar
 {
     namespace ClientSide
     {
-        class PendingActions
-        {
-            public bool build;
-            public bool buyTroops;
-            public bool removeTroops;
-            public bool resourcePot;
-            public bool closeOrder;
-            public bool purchasePacks;
-
-            public PendingActions()
-            {
-                build = false;
-                buyTroops = false;
-                removeTroops = false;
-                resourcePot = false;
-                closeOrder = false;
-                purchasePacks = false;
-            }
-        }
-
         public static class PoolUtility
         {
             public static double GetPoolSize(Dictionary<string, List<List<double>>> contributions, int type)

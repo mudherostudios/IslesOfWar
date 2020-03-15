@@ -118,6 +118,7 @@ namespace MudHero
 
             private void OnApplicationQuit()
             {
+                SaveLoad.SavePreferences();
                 Disconnect();
             }
 

@@ -23,7 +23,7 @@ public class SaveState
     public RawSettings settings;
     public double lastSavedBlockInformation;
     public Dictionary<string, List<BlockInfo>> unseenBlockInformation;
-    public Dictionary<string, UserMessageStates> userMessageStates;
+    public string lastSavedState;
 
     public SaveState()
     {
@@ -40,7 +40,7 @@ public class SaveState
         settings = new RawSettings();
         lastSavedBlockInformation = 0;
         unseenBlockInformation = new Dictionary<string, List<BlockInfo>>();
-        userMessageStates = new Dictionary<string, UserMessageStates>();
+        lastSavedState = "";
     }
 }
 

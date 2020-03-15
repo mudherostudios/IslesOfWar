@@ -43,15 +43,11 @@ public class BlockchainEvents : MonoBehaviour
     public CommunicationInterface commsInterface;
     public ClientInterface clientInterface;
     public int frameToCheck;
-    public bool doneSyncing;
-    public bool resetBlockEvents;
-    public bool checkedForUsername;
+    public bool doneSyncing, resetBlockEvents, checkedForUsername, loaded;
     bool canCheck;
     int frameCounter;
     double lastBlock;
-    UserMessageStates messageStates;
     State lastState;
-    PendingActions pendingActions;
     string player;
     List<string> existingIslands;
 
@@ -60,7 +56,6 @@ public class BlockchainEvents : MonoBehaviour
         lastBlock = SaveLoad.lastBlock;
         frameCounter = 1;
         checkedForUsername = false;
-        messageStates = new UserMessageStates();
     }
 
     private void Update()
@@ -68,26 +63,29 @@ public class BlockchainEvents : MonoBehaviour
         if (!checkedForUsername)
             CheckForUsername();
 
-        if (!canCheck)
+        if (loaded)
         {
-            canCheck = commsInterface.blockCount > 0;
-        }
-        else
-        {
-            if (frameCounter % frameToCheck == 0 && doneSyncing)
+            if (canCheck)
             {
-                if (lastBlock < commsInterface.blockProgress)
+                if (frameCounter % frameToCheck == 0)
                 {
-                    CheckChanges(commsInterface.blockProgress);
-                    lastBlock = commsInterface.blockProgress;
+                    if (lastBlock < commsInterface.blockProgress)
+                    {
+                        CheckChanges();
+                        lastBlock = commsInterface.blockProgress;
+                    }
+                    frameCounter = 0;
                 }
-                frameCounter = 0;
+                frameCounter++;
             }
-            frameCounter++;
+            else
+            {
+                CheckForCurrentState();
+            }
         }
     }
 
-    void CheckChanges(int blockProgress)
+    void CheckChanges()
     {
         if(lastState == null)
             lastState = Deep.CopyObject<State>(clientInterface.chainState);
@@ -199,13 +197,16 @@ public class BlockchainEvents : MonoBehaviour
                 }
             }
 
-            bool[] submittedToPool = HasSubmittedResources();
-            if(submittedToPool[0])
-                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Oil are in the pool.");
-            if (submittedToPool[1])
-                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Metal are in the pool.");
-            if (submittedToPool[2])
-                clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Concrete are in the pool.");
+            if (clientInterface.chainState.resourceContributions.ContainsKey(player))
+            {
+                bool[] submittedToPool = HasSubmittedResources();
+                if (submittedToPool[0])
+                    clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Oil are in the pool.");
+                if (submittedToPool[1])
+                    clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Metal are in the pool.");
+                if (submittedToPool[2])
+                    clientInterface.notificationSystem.PushNotification(0, 0, "Our products for Concrete are in the pool.");
+            }
             
             if (NewMarketOrder())
                 clientInterface.notificationSystem.PushNotification(0, 0, "We have new orders on the market.");
@@ -220,13 +221,13 @@ public class BlockchainEvents : MonoBehaviour
                 }
             }
 
-            if (lastBlock % clientInterface.chainState.currentConstants.warbucksRewardBlocks == 0)
+            if (lastBlock % clientInterface.chainState.currentConstants.warbucksRewardBlocks == 0 && lastBlock != 0)
             {
                 string message = string.Format("All warbux pool rewards have been paid out!");
                 clientInterface.notificationSystem.PushNotification(0, 0, message);
             }
 
-            if (lastBlock % clientInterface.chainState.currentConstants.poolRewardBlocks == 0)
+            if (lastBlock % clientInterface.chainState.currentConstants.poolRewardBlocks == 0 && lastBlock != 0)
             {
                 string message = string.Format("All resource pool rewards have been paid out!");
                 clientInterface.notificationSystem.PushNotification(0, 0, message);
@@ -647,6 +648,29 @@ public class BlockchainEvents : MonoBehaviour
         }
     }
 
+    void CheckForCurrentState()
+    {
+        clientInterface = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<WorldNavigator>().clientInterface;
+
+        if (clientInterface != null)
+        {
+            if (SaveLoad.state.lastSavedState != "" && SaveLoad.state.lastSavedState != null && SaveLoad.state.lastSavedState != "null")
+            {
+                lastState = JsonConvert.DeserializeObject<State>(SaveLoad.state.lastSavedState);
+                CheckChanges();
+            }
+            else
+            {
+                SaveLoad.state.lastSavedState = JsonConvert.SerializeObject(clientInterface.chainState);
+                SaveLoad.SavePreferences();
+                lastState = JsonConvert.DeserializeObject<State>(SaveLoad.state.lastSavedState);
+            }
+
+            doneSyncing = true;
+            canCheck = true;
+        }
+    }
+
     void CheckForUsername()
     {
         if (SaveLoad.state.selectedNameString != "")
@@ -678,15 +702,7 @@ public class BlockchainEvents : MonoBehaviour
     {
         if (scene.name == "IslandMenu")
         {
-            clientInterface = GameObject.FindGameObjectWithTag("GameMaster").GetComponent<WorldNavigator>().clientInterface;
-            doneSyncing = true;
-            if (SaveLoad.state.userMessageStates.ContainsKey(commsInterface.player))
-                messageStates = SaveLoad.state.userMessageStates[commsInterface.player];
-            else
-            {
-                SaveLoad.state.userMessageStates.Add(commsInterface.player, messageStates);
-                SaveLoad.SavePreferences();
-            }
+            loaded = true;
         }
     }
 }
