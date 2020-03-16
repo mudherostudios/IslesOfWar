@@ -486,8 +486,11 @@ public class BlockchainEvents : MonoBehaviour
         {
             if (!clientInterface.chainState.players[player].islands.Contains(island))
             {
-                if (clientInterface.chainState.depletedContributions[player].Contains(island))
-                    returnedTroops.Add(island);
+                if (clientInterface.chainState.depletedContributions.ContainsKey(player))
+                {
+                    if (clientInterface.chainState.depletedContributions[player].Contains(island))
+                        returnedTroops.Add(island);
+                }
                 else
                 {
                     capturedIslands.Add(island);
@@ -515,11 +518,22 @@ public class BlockchainEvents : MonoBehaviour
     List<string> GetMissingAttackers(string island)
     {
         List<string> missing = new List<string>();
-        
-        for (int a = 0; a < lastState.islands[island].attackingPlayers.Count; a++)
+
+        if (lastState.islands[island].attackingPlayers.Count > 0)
         {
-            if(!clientInterface.chainState.islands[island].attackingPlayers.Contains(lastState.islands[island].attackingPlayers[a]))
-                missing.Add(lastState.islands[island].attackingPlayers[a]);
+            for (int a = 0; a < lastState.islands[island].attackingPlayers.Count; a++)
+            {
+                if (!clientInterface.chainState.islands[island].attackingPlayers.Contains(lastState.islands[island].attackingPlayers[a]))
+                    missing.Add(lastState.islands[island].attackingPlayers[a]);
+            }
+        }
+        else
+        {
+            foreach(KeyValuePair<string, List<string>> pair in clientInterface.chainState.depletedContributions)
+            {
+                if (pair.Value.Contains(island))
+                    missing.Add(pair.Key);
+            }
         }
         
         return missing;
@@ -534,8 +548,10 @@ public class BlockchainEvents : MonoBehaviour
 
         if (attackers.Count == 1)
             return attackers[0];
+        else if (attackers.Count > 1)
+            return string.Format("{0} and {1} {2}", attackers[0], attackers.Count - 1, other);
         else
-            return string.Format("{0} and {1} {2}", attackers[0], attackers.Count-1, other);
+            return "someone";
     }
 
     bool NewTroopsAvailableForAssignment()
@@ -703,6 +719,18 @@ public class BlockchainEvents : MonoBehaviour
         if (scene.name == "IslandMenu")
         {
             loaded = true;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (clientInterface != null)
+        {
+            if (clientInterface.chainState != null)
+            {
+                SaveLoad.state.lastSavedState = JsonConvert.SerializeObject(clientInterface.chainState);
+                SaveLoad.SavePreferences();
+            }
         }
     }
 }

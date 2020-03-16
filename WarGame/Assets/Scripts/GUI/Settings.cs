@@ -120,7 +120,7 @@ public class Settings : MonoBehaviour
     void LoadInGameGraphics()
     {
         if (mainCam != null)
-            mainCam = GameObject.FindGameObjectWithTag("MainCamera");
+            mainCam = GameObject.FindGameObjectWithTag("GameMaster").transform.Find("Camera").gameObject;
 
         if (mainCam != null)
         {
@@ -228,7 +228,7 @@ public class Settings : MonoBehaviour
     public void SetFPS()
     {
         settings.fps = (int)elements.fpsSlider.value;
-        SetFPS();
+        //SetFPS();
     }
 
     public void SetScreenResolution()

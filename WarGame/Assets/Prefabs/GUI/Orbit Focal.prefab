@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 927802199644661632}
   - component: {fileID: 7996353993229822772}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: GUIRenderer
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 0
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 32
@@ -768,7 +768,7 @@ MonoBehaviour:
   genericSuccess: {fileID: 8300000, guid: cba90806a7929824a86d50497fb19802, type: 3}
   genericFailure: {fileID: 8300000, guid: 64b1d206dc3a4aa40b605004f068126e, type: 3}
   nationSuccess: {fileID: 0}
-  collectorSuccess: {fileID: 0}
+  collectorSuccess: {fileID: 8300000, guid: 72f03a5e0cdf0bc44aea477b4f499f20, type: 3}
   collectorFailure: {fileID: 0}
   defenseSuccess: {fileID: 0}
   defenseFailure: {fileID: 0}
@@ -782,6 +782,8 @@ MonoBehaviour:
   warbucksFailure: {fileID: 0}
   submitSuccess: {fileID: 0}
   submitFailure: {fileID: 0}
+  resourcePackSuccess: {fileID: 8300000, guid: 2756de61868c4574ba11a936fe9bd687, type: 3}
+  resourcePackFailure: {fileID: 0}
   genericCancel: {fileID: 8300000, guid: 57dd9f760774d7a43878e25c35d496db, type: 3}
   troopCancel: {fileID: 0}
   tankCancel: {fileID: 0}
@@ -795,6 +797,7 @@ MonoBehaviour:
   nationCancel: {fileID: 0}
   attackCancel: {fileID: 0}
   defendCancel: {fileID: 0}
+  resourcePackCancel: {fileID: 0}
 --- !u!1 &8858845447865777003
 GameObject:
   m_ObjectHideFlags: 0
