@@ -14,7 +14,7 @@ namespace IslesOfWar
         public class StateProcessor : MonoBehaviour
         {
             public State state;
-            public readonly int[] version = { 3, 0, 0};  //Hand set these here every release
+            public readonly int[] version = { 4, 0, 0};  //Hand set these here every release
             public bool isCorrectVersion { get { return state.currentConstants.version[0] <= version[0]; } }
             public bool isInMaintenanceMode { get { return state.currentConstants.isInMaintenanceMode; } }
             public StateProcessor() { }
@@ -935,7 +935,7 @@ namespace IslesOfWar
                                     //Set the squads with any reserves they might have had
                                     if (history.winner == "blufor")
                                     {
-                                        if(defenderSquads.Length > 0)
+                                        if(defenderSquads.Length > 0 && defender > -1)
                                             defenderSquads[defender] = new Squad(Add(history.remainingSquad.onlyUnits, dReserve));
 
                                         int bunkerCombo = EncodeUtility.GetDecodeIndex(history.remainingSquad.bunkers);
@@ -951,10 +951,9 @@ namespace IslesOfWar
                                         {
                                             defenderSquads[defender] = new Squad(dReserve);
                                             defendersCanContinue[defender] = false;
+                                            defendersLeft--;
                                         }
                                         state.islands[attackPlan.id].SetDefenses(battleTile, EncodeUtility.GetDefenseCode(0, 0));
-                                        //Change Here to inside if at line 951
-                                        defendersLeft--;
                                     }
                                     else
                                     {
@@ -962,12 +961,12 @@ namespace IslesOfWar
                                         attackerSquads[a] = new Squad(aReserve);
                                         attackerCanContinue[a] = false;
                                         attackersLeft--;
-                                        if (defenderSquads.Length > 0)
+                                        if (defenderSquads.Length > 0 && defender > -1)
                                         {
                                             defenderSquads[defender] = new Squad(dReserve);
                                             defendersCanContinue[defender] = false;
+                                            defendersLeft--;
                                         }
-                                        defendersLeft--;
                                     }
                                 }
                             }

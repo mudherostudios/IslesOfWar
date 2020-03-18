@@ -62,6 +62,8 @@ namespace IslesOfWar
                         else if (state.currentConstants.version[0] == 2)
                             processor = new StateProcessorV2(state);
                         else if (state.currentConstants.version[0] == 3)
+                            processor = new StateProcessorV3(state);
+                        else if (state.currentConstants.version[0] == 4)
                             processor = new StateProcessor(state);
                         else
                             processor = new StateProcessorV0(state);
