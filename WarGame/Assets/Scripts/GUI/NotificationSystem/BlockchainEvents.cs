@@ -430,13 +430,16 @@ public class BlockchainEvents : MonoBehaviour
 
         if (!newOrder && clientInterface.chainState.resourceMarket.ContainsKey(player))
         {
-            if (lastState.resourceMarket.ContainsKey(player))
+            if (!lastState.resourceMarket.ContainsKey(player))
+            {
                 newOrder = true;
+            }
             else
             {
+                string lastOrders = JsonConvert.SerializeObject(lastState.resourceMarket[player]);
                 for (int o = 0; o < clientInterface.chainState.resourceMarket[player].Count && !newOrder; o++)
                 {
-                    if (!lastState.resourceMarket[player].Contains(clientInterface.chainState.resourceMarket[player][o]))
+                    if (!lastOrders.Contains(clientInterface.chainState.resourceMarket[player][o].orderID))
                         newOrder = true;
                 }
             }
