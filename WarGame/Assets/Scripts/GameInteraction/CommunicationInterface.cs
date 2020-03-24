@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar.ClientSide;
 using MudHero.XayaCommunication;
@@ -39,6 +38,7 @@ public class CommunicationInterface : MonoBehaviour
     private GameStateRetriever stateRetriever;
     private string selectedUser = "";
     private string gameState = "";
+    protected bool server = false;
 
     private void Awake()
     {
@@ -47,12 +47,15 @@ public class CommunicationInterface : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            Application.Quit();
-        if (Input.GetKeyDown(KeyCode.G))
+        if (!server)
         {
-            string currentDirectory = System.IO.Directory.GetCurrentDirectory();
-            System.IO.File.WriteAllText(currentDirectory+"\\gamestate.txt", gameState);
+            if (Input.GetKeyDown(KeyCode.Escape))
+                Application.Quit();
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+                System.IO.File.WriteAllText(currentDirectory + "\\gamestate.txt", gameState);
+            }
         }
     }
 
@@ -97,7 +100,6 @@ public class CommunicationInterface : MonoBehaviour
         blockCount = xayaCommands.networkBlockCount;
         gameState = _gameState;
     }
-    
 
     public ConnectionLog Connect(string user, string password, string _walletPassword)
     {
@@ -239,6 +241,4 @@ public class CommunicationInterface : MonoBehaviour
         stateRetriever = null;
         xayaCommands = null;
     }
-
-    
 }
