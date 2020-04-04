@@ -73,8 +73,7 @@ namespace WebSocketCommunication
     public class TransactionData
     {
         public TransactionPhase phase;
-        public object contractProposal;
-        public string contractHex;
+        public string contract;
     }
 
     public enum TransactionPhase
