@@ -1,40 +1,61 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Newtonsoft;
 using WebSocketSharp;
 
-namespace WebSocketCommunication
+namespace MudHero.WebSocketCommunication
 {
-    public static class Utility
+    public delegate void MessageCallback(SocketMessage socketData);
+    public delegate void ErrorCallback(Exception exception, string message);
+    public delegate void CloseCallback(ushort code, string reason);
+    public delegate void OpenCallback();
+
+    public class Handler
     {
-        public static void HandleSocketMessage(object sender, MessageEventArgs message)
+        MessageCallback messageCallback;
+        ErrorCallback errorCallback;
+        CloseCallback closeCallback;
+        OpenCallback openCallback;
+
+        public Handler(MessageCallback _messageCallback, ErrorCallback _errorCallback, CloseCallback _closeCallback, OpenCallback _openCallback)
+        {
+            messageCallback = _messageCallback;
+            errorCallback = _errorCallback;
+            closeCallback = _closeCallback;
+            openCallback = _openCallback;
+        }
+
+        public void HandleSocketMessage(object sender, MessageEventArgs message)
         {
             SocketMessage dataObject;
             if (TryJsonParse(message.Data, out dataObject))
             {
-                //Do something something here with data.
-                //Needs to give the data to unity if its transaction data.
-                //Trying to keep this generic though.
-                Console.WriteLine(message.Data);
+                if (dataObject.userID != null && dataObject.payload != null && dataObject.type != PayloadType.NONE)
+                    messageCallback(dataObject);
+                else
+                    BadData(message.Data);
             }
             else
             {
-                string badDataMessage = string.Format("Bad Data: {0}", message.Data);
-                Console.WriteLine(badDataMessage);
+                BadData(message.Data);
             }
         }
 
-        public static void HandleSocketError(object sender, ErrorEventArgs error)
+        public void HandleSocketError(object sender, ErrorEventArgs error)
         {
-            Console.WriteLine(error.Message);
+            errorCallback(error.Exception, error.Message);
         }
 
-        public static void HandleSocketClose(object sender, CloseEventArgs close)
+        public void HandleSocketClose(object sender, CloseEventArgs close)
         {
-            Console.WriteLine(close.Reason);
+            closeCallback(close.Code, close.Reason);
         }
 
-        public static bool TryJsonParse<T>(string data, out T obj)
+        public void HandleSocketOpen(object sender, EventArgs e)
+        {
+            openCallback();
+        }
+
+        private bool TryJsonParse<T>(string data, out T obj)
         {
             try
             {
@@ -54,6 +75,16 @@ namespace WebSocketCommunication
                 return false;
             }
         }
+
+        private void BadData(string badData)
+        {
+            string badDataMessage = string.Format("Bad Data: {0}", badData);
+            SocketMessage messageObject = new SocketMessage();
+            messageObject.userID = "BAD_DATA";
+            messageObject.payload = badDataMessage;
+            messageObject.type = PayloadType.FAILED;
+            messageCallback(messageObject);
+        }
     }
 
     public class SocketMessage
@@ -61,6 +92,8 @@ namespace WebSocketCommunication
         public string userID;       //WebSocket UserID for communication.
         public object payload;      //A generic object slot.
         public PayloadType type;    //A type to note how to handle the payload.
+
+        public SocketMessage(){}
 
         public SocketMessage(string _userID, object _payload, PayloadType _type)
         {
@@ -74,6 +107,16 @@ namespace WebSocketCommunication
     {
         public TransactionPhase phase;
         public string contract;
+        public string reason;
+
+        public TransactionData() { }
+
+        public TransactionData(TransactionPhase _phase, string _contract, string _reason)
+        {
+            phase = _phase;
+            contract = _contract;
+            reason = _reason;
+        }
     }
 
     public enum TransactionPhase
@@ -91,6 +134,7 @@ namespace WebSocketCommunication
     {
         NONE,
         TRANSACTION,
-        CHAT
+        CHAT,
+        FAILED
     }
 }
