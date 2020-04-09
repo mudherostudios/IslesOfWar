@@ -104,7 +104,17 @@ public static class SaveLoad
 
     public static string GetIslandName(string technicalName)
     {
-        string playerAssignedName = technicalName;
+        string playerAssignedName = "";
+
+        if (technicalName.Substring(0, 6) != "Island")
+        {
+            technicalName = string.Format("Island {0}", technicalName.Substring(0, 10));
+            playerAssignedName = technicalName;
+        }
+        else
+        {
+            playerAssignedName = technicalName;
+        }
 
         if (state.islandNames.ContainsKey(technicalName))
             playerAssignedName = state.islandNames[technicalName];

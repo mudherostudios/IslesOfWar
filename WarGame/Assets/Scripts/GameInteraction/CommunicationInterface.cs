@@ -31,6 +31,7 @@ public class CommunicationInterface : MonoBehaviour
     public int blockProgress = 0;
     public int blockCount = 0;
     public string progressMessage;
+    public TelemetryConnection telemetry;
     private ConnectionInfo daemonInfo;
     private ConnectionInfo gsrInfo;
     private StateProcessorPathInfo pathInfo;
@@ -226,9 +227,15 @@ public class CommunicationInterface : MonoBehaviour
         else
             progressMessage = "There is no State Retriever to Disconnect.";
 
+        telemetry.Disconnect();
         Debug.Log(progressMessage);
 
         CleanConnections();
+    }
+
+    private void OnApplicationQuit()
+    {
+        Disconnect();
     }
 
     public void UpdateProgressMessage(string message)

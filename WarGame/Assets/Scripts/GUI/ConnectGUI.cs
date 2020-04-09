@@ -22,6 +22,7 @@ public class ConnectGUI : MonoBehaviour
     public Vector3 loginPosition;
     public float traverseTime = 1.0f;
     public CommunicationInterface comms;
+    public TelemetryConnection telemetry;
     public Tutorial tutorial;
 
     private bool connected = false, prompted = false, traversing = false, neededCreation = false;
@@ -131,6 +132,7 @@ public class ConnectGUI : MonoBehaviour
         SaveLoad.state.selectedNameString = usernamesList.options[usernamesList.value].text;
         SaveLoad.SavePreferences();
         comms.SelectUser(comms.nameList[usernamesList.value]);
+        telemetry.ConnectToSocket(comms.player);
         messages.text = "Loading...";
         userPanel.SetActive(false);
         loginButton.SetActive(false);

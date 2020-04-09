@@ -343,10 +343,6 @@ public class BlockchainEvents : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            Debug.Log("No attackable change.");
-        }
     }
 
     void CheckDepleted()

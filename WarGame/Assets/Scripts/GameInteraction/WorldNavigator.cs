@@ -385,6 +385,11 @@ public class WorldNavigator : MonoBehaviour
         managementScript.IncrementIslandIndex(increment);
     }
 
+    public void GotoIslandInList(int index)
+    {
+        managementScript.GotoIslandIndex(index);
+    }
+
     public void ResumeIslandQueue()
     {
         managementScript.GotoObservationPoint();

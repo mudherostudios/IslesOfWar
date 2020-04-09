@@ -480,6 +480,11 @@ public class IslandManagementInteraction : Interaction
         defaultObservationFocus = focus;
     }
 
+    public void GotoIslandIndex(int index)
+    {
+        IncrementIslandIndex(index - islandIndex);
+    }
+
     public void IncrementIslandIndex(int increment)
     {
 
