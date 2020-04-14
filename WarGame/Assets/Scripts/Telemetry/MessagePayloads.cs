@@ -1,13 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace MudHero.WebSocketCommunication
 {
     public class Payload
-    {
-        public string game;         
+    {    
         public string playerName;   //Name of player sending message.
         public string toPlayer;     //WebSocket UserID for server routing.
     }
@@ -16,9 +17,8 @@ namespace MudHero.WebSocketCommunication
     {
         public TransactionData transactionData;
 
-        public TradePayload(string _game, string _toPlayer, string _fromPlayer, TransactionData _transactionData)
+        public TradePayload(string _toPlayer, string _fromPlayer, TransactionData _transactionData)
         {
-            game = _game;
             toPlayer = _toPlayer;
             playerName = _fromPlayer;
             transactionData = _transactionData;
@@ -28,29 +28,46 @@ namespace MudHero.WebSocketCommunication
     public class LoginPayload : Payload
     {
         public LoginPayload() { }
-        public LoginPayload(string _game, string _playerName)
+        public LoginPayload(string _playerName)
         {
-            game = _game;
             playerName = _playerName;
         }
     }
 
     public class OrderPayload : Payload
     {
-        public string item;
-        public decimal priceInChi;
+        [JsonProperty("Id")]
+        public Guid orderID { get; set; }
+        [JsonProperty("Item")]
+        public object item { get; set; }
+        [JsonProperty("Price")]
+        public decimal priceInChi { get; set; }
+        [JsonProperty("PlayerName")]
+        new public string playerName;
 
         public OrderPayload() { }
 
-        public OrderPayload(string _game, string _playerName, string _item, decimal _priceInChi)
+        public OrderPayload(string _playerName, object _item, decimal _priceInChi)
         {
-            game = _game;
             playerName = _playerName;
             item = _item;
             priceInChi = _priceInChi;
         }
     }
 
+    public class Item
+    {
+        public string name;
+        public float count;
+
+        public Item() { }
+        public Item(string _name, float _count)
+        {
+            name = _name;
+            count = _count;
+        }
+    }
+    
     public class ChatPayload : Payload
     {
         public string message;
@@ -116,10 +133,6 @@ namespace MudHero.WebSocketCommunication
     {
         [EnumMember(Value = "none")]
         NONE,
-        [EnumMember(Value = "getSells")]
-        GET_SELLS,        //Get list of all sell orders.
-        [EnumMember(Value = "postSells")]
-        POST_SELLS,       //Post a sell order.
         [EnumMember(Value = "chat")]
         CHAT,             //Send a chat to someone.
         [EnumMember(Value = "transaction")]
