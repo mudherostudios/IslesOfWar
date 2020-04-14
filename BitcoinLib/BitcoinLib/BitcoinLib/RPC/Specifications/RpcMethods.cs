@@ -124,6 +124,7 @@ namespace BitcoinLib.RPC.Specifications
         name_show,
         name_pending,
         name_scan,
+        namerawtransaction,
         sendtoname,
         name_history,
         waitforchange,

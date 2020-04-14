@@ -22,7 +22,7 @@ public class ConnectGUI : MonoBehaviour
     public Vector3 loginPosition;
     public float traverseTime = 1.0f;
     public CommunicationInterface comms;
-    public TelemetryConnection telemetry;
+    public Telemetry telemetry;
     public Tutorial tutorial;
 
     private bool connected = false, prompted = false, traversing = false, neededCreation = false;

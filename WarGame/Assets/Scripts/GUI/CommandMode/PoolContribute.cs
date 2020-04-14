@@ -45,15 +45,16 @@ public class PoolContribute: MonoBehaviour
 
         switch (poolType)
         {
-            case 0:
+            //Remember always WOMC
+            case 0: //Oil
                 resourceTypeA = 1;
                 resourceTypeB = 2;
                 break;
-            case 1:
+            case 1: //Metal
                 resourceTypeA = 0;
                 resourceTypeB = 2;
                 break;
-            case 2:
+            case 2: //Concerete
                 resourceTypeA = 0;
                 resourceTypeB = 1;
                 break;

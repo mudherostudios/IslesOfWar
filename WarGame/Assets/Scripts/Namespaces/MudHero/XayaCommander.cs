@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using BitcoinLib.Responses;
 using BitcoinLib.Services.Coins.XAYA;
+using BitcoinLib.Services.Coins.Base;
+using BitcoinLib.Requests.CreateRawTransaction;
 
 namespace MudHero
 {
@@ -12,6 +14,7 @@ namespace MudHero
         {
             public bool connected = false;
             public IXAYAService xayaService;
+            public ICoinService xayaCoinService;
 
             private ConnectionInfo cInfo;
             private string playerName = "";
@@ -108,6 +111,18 @@ namespace MudHero
                 }
 
                 return log;
+            }
+
+            //Warbux for Chi
+            string GetRawTransaction(string user, decimal chi)
+            {
+                GetShowNameResponse userShowName = xayaService.ShowName(string.Format("p/{0}",user));
+                CreateRawTransactionRequest transactionRequest = new CreateRawTransactionRequest();
+                transactionRequest.AddInput(userShowName.txid, userShowName.vout);
+                transactionRequest.AddOutput(userShowName.address, chi);
+                string rawTransaction = xayaService.CreateRawTransaction(transactionRequest);
+                GetFundRawTransactionResponse response = xayaService.GetFundRawTransaction(rawTransaction);
+                return response.Hex;
             }
 
             public bool HasSufficientChi(decimal spendAmount)

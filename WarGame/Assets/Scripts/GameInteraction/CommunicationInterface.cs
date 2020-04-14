@@ -31,7 +31,7 @@ public class CommunicationInterface : MonoBehaviour
     public int blockProgress = 0;
     public int blockCount = 0;
     public string progressMessage;
-    public TelemetryConnection telemetry;
+    public Telemetry telemetry;
     private ConnectionInfo daemonInfo;
     private ConnectionInfo gsrInfo;
     private StateProcessorPathInfo pathInfo;
@@ -46,7 +46,7 @@ public class CommunicationInterface : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void Update()
+    private void Update()
     {
         if (!server)
         {

@@ -591,7 +591,7 @@ public class ClientInterface : MonoBehaviour
             case 2:
                 return "Concrete";
             default:
-                return "Unkown";
+                return "Unknown";
         }
     }
     
