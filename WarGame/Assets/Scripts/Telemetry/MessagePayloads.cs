@@ -9,105 +9,102 @@ namespace MudHero.WebSocketCommunication
 {
     public class Payload
     {    
-        public string playerName;   //Name of player sending message.
-        public string toPlayer;     //WebSocket UserID for server routing.
+        public string PlayerName;   //Name of player sending message.
+        public string ToPlayer;     //WebSocket UserID for server routing.
     }
 
     public class TradePayload : Payload
     {
-        public TransactionData transactionData;
+        public TransactionData TransactionData;
 
-        public TradePayload(string _toPlayer, string _fromPlayer, TransactionData _transactionData)
+        public TradePayload(string toPlayer, string fromPlayer, TransactionData transactionData)
         {
-            toPlayer = _toPlayer;
-            playerName = _fromPlayer;
-            transactionData = _transactionData;
+            ToPlayer = toPlayer;
+            PlayerName = fromPlayer;
+            TransactionData = transactionData;
         }
     }
 
     public class LoginPayload : Payload
     {
         public LoginPayload() { }
-        public LoginPayload(string _playerName)
+        public LoginPayload(string playerName)
         {
-            playerName = _playerName;
+            PlayerName = playerName;
         }
     }
 
     public class OrderPayload : Payload
     {
-        [JsonProperty("Id")]
-        public Guid orderID { get; set; }
-        [JsonProperty("Item")]
-        public object item { get; set; }
-        [JsonProperty("Price")]
-        public decimal priceInChi { get; set; }
-        [JsonProperty("PlayerName")]
-        new public string playerName;
+        public Guid OrderId;
+        public object Item;
+        public float Amount;
+        [JsonProperty("price")]
+        public decimal PriceInChi;
 
         public OrderPayload() { }
 
-        public OrderPayload(string _playerName, object _item, decimal _priceInChi)
+        public OrderPayload(string playerName, object item, float amount, decimal priceInChi)
         {
-            playerName = _playerName;
-            item = _item;
-            priceInChi = _priceInChi;
+            PlayerName = playerName;
+            Item = item;
+            Amount = amount;
+            PriceInChi = priceInChi;
+            OrderId = new Guid();
         }
     }
 
     public class Item
     {
-        public string name;
-        public float count;
+        public string Name;
 
         public Item() { }
-        public Item(string _name, float _count)
+        public Item(string name)
         {
-            name = _name;
-            count = _count;
+            Name = name;
         }
     }
     
     public class ChatPayload : Payload
     {
-        public string message;
+        public string Message;
 
         public ChatPayload() { }
-        public ChatPayload(string _message)
+        public ChatPayload(string message)
         {
-            message = _message;
+            Message = message;
         }
     }
 
     public class BadDataPayload
     {
-        public string message;
-        public string connectionId;
-        public string requestId;
+        public string Message;
+        public string ConnectionId;
+        public string RequestId;
 
         public BadDataPayload()
         {
-            message = "Message never parsed.";
-            connectionId = "No Connection ID.";
-            requestId = "No Request ID.";
+            Message = "Message never parsed.";
+            ConnectionId = "No Connection ID.";
+            RequestId = "No Request ID.";
         }
     }
 
     public class TransactionData
     {
-        public TransactionPhase phase;
-        public string contract;
-        public string reason;
-        public uint orderID;
+        public TransactionPhase Phase;
+        public string Contract;
+        public string Reason;
+        public Guid Id;
 
         public TransactionData() { }
 
-        public TransactionData(TransactionPhase _phase, string _contract, string _reason, uint _orderID)
+        public TransactionData(TransactionPhase phase, string contract, string reason, Guid orderID)
         {
-            phase = _phase;
-            contract = _contract;
-            reason = _reason;
-            orderID = _orderID;
+            Phase = phase;
+            Contract = contract;
+            Reason = reason;
+            Id = orderID;
         }
     }
 

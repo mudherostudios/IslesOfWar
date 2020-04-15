@@ -10,10 +10,12 @@ using UnityEngine;
 using NativeWebSocket;
 using MudHero.WebSocketCommunication;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 public class Telemetry : MonoBehaviour
 {
     public string url = "wss://websocket.islesofwar.online";
+    public string orderIdToDelete;
     const string API_URL = "https://market-api.islesofwar.online";
     const string API_KEY = "WVxbDuafpi5Pv23wSVzep4KlWXnhP88sasrYvIxS";
     bool connected = false;
@@ -26,6 +28,7 @@ public class Telemetry : MonoBehaviour
         socket = new WebSocket(url);
         jsonSettings = new JsonSerializerSettings();
         jsonSettings.NullValueHandling = NullValueHandling.Ignore;
+        jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
     }
 
     private void Update()
@@ -39,6 +42,9 @@ public class Telemetry : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
             LoadOrders();
+
+        if (Input.GetKeyDown(KeyCode.D))
+            DeleteOrder(orderIdToDelete);
         #endif
     }
 
@@ -48,7 +54,7 @@ public class Telemetry : MonoBehaviour
         
         foreach (OrderPayload order in orders)
         {
-            Debug.Log(JsonConvert.SerializeObject(order));
+            Debug.Log(JsonConvert.SerializeObject(order, jsonSettings));
         }
     }
 
@@ -74,7 +80,7 @@ public class Telemetry : MonoBehaviour
 
     private async void SendFakeMessage()
     {
-        TransactionData data = new TransactionData(TransactionPhase.PROPOSAL, "HEX:OF:CONTRACT", null, 0);
+        TransactionData data = new TransactionData(TransactionPhase.PROPOSAL, "HEX:OF:CONTRACT", null, new Guid());
         TradePayload tradePayload = new TradePayload("Crash", username, data);
         SocketMessage message = new SocketMessage(WebSocketAction.TRANSACTION, tradePayload);
         string serialized = JsonConvert.SerializeObject(message, jsonSettings);
@@ -84,20 +90,22 @@ public class Telemetry : MonoBehaviour
 
     private async void SendFakeOrder(float amount, decimal price)
     {
-        Item warbux = new Item("warbux", amount);
-        await SendOrder(warbux, price);
+        Item warbux = new Item("warbux");
+        await SendOrder(warbux, amount, price);
     }
 
-    private async Task SendOrder(Item item, decimal price)
+    private async Task SendOrder(Item item, float amount, decimal price)
     {
-        OrderPayload order = new OrderPayload(username, item, price);
+        OrderPayload order = new OrderPayload(username, item, amount, price);
 
         using (var httpClient = new HttpClient())
         {
             httpClient.BaseAddress = new Uri(API_URL);
             httpClient.DefaultRequestHeaders.Add("x-api-key", API_KEY);
 
-            var content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json");
+            string serializedOrder = JsonConvert.SerializeObject(order, jsonSettings);
+            Debug.Log(serializedOrder);
+            var content = new StringContent(serializedOrder, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync("/market/orders", content);
 
             if (!response.IsSuccessStatusCode) Debug.LogError($"Unable to create order: {response.StatusCode}");
@@ -118,11 +126,26 @@ public class Telemetry : MonoBehaviour
             if (response.IsSuccessStatusCode)
             {
                 string ordersResponse = await response.Content.ReadAsStringAsync();
+                Debug.Log(ordersResponse);
                 return JsonConvert.DeserializeObject<List<OrderPayload>>(ordersResponse);
             }
             else Debug.LogError($"Unable to get orders: {response.StatusCode}");
 
             return orders;
+        }
+    }
+
+    static async void DeleteOrder(string orderID)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            httpClient.BaseAddress = new Uri(API_URL);
+            httpClient.DefaultRequestHeaders.Add("x-api-key", API_KEY);
+            HttpResponseMessage response = await httpClient.DeleteAsync($"/market/orders/{orderID}");
+
+            if (response.IsSuccessStatusCode) Debug.Log("Successfully deleted order!");
+            else Debug.LogError($"Unable to delete order: {response.StatusCode}");
+            
         }
     }
 
@@ -148,7 +171,7 @@ public class Telemetry : MonoBehaviour
         
         if (MessageHandler.TryJsonParse(message, out socketMessage))
         {
-            if (socketMessage.action == WebSocketAction.NONE || socketMessage.payload == null)
+            if (socketMessage.Action == WebSocketAction.NONE || socketMessage.Payload == null)
                messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
             else
                messageLog = GetSocketDebugMessage(socketMessage);
@@ -167,12 +190,12 @@ public class Telemetry : MonoBehaviour
     {
         string messageLog = "Error creating message.";
 
-        if (socketMessage.action == WebSocketAction.NONE)
+        if (socketMessage.Action == WebSocketAction.NONE)
         {
             BadDataPayload payload = new BadDataPayload(); 
             
-            if(socketMessage.payload is BadDataPayload)
-                payload = (BadDataPayload)socketMessage.payload;
+            if(socketMessage.Payload is BadDataPayload)
+                payload = (BadDataPayload)socketMessage.Payload;
             
             messageLog = string.Format
             (
@@ -180,9 +203,9 @@ public class Telemetry : MonoBehaviour
                 "Message: {0}\n" +
                 "Connection ID: {1}\n" +
                 "Request ID: {2}",
-                payload.message,
-                payload.connectionId.ToString(),
-                payload.requestId.ToString()
+                payload.Message,
+                payload.ConnectionId.ToString(),
+                payload.RequestId.ToString()
             );
         }
         else
@@ -190,7 +213,7 @@ public class Telemetry : MonoBehaviour
             messageLog = string.Format
             (
                 "Message: {0}\n",
-                socketMessage.payload
+                socketMessage.Payload
             );
         }
 

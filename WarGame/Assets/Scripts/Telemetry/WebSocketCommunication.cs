@@ -33,12 +33,12 @@ namespace MudHero.WebSocketCommunication
         {
             BadDataPayload badDataPayload = JsonConvert.DeserializeObject<BadDataPayload>(badData);
 
-            if (badDataPayload.message == null)
-                badDataPayload.message = badData;
-            if (badDataPayload.connectionId == null)
-                badDataPayload.connectionId = "No Connection ID";
-            if (badDataPayload.requestId == null)
-                badDataPayload.requestId = "No Request ID";
+            if (badDataPayload.Message == null)
+                badDataPayload.Message = badData;
+            if (badDataPayload.ConnectionId == null)
+                badDataPayload.ConnectionId = "No Connection ID";
+            if (badDataPayload.RequestId == null)
+                badDataPayload.RequestId = "No Request ID";
 
             SocketMessage messageObject = new SocketMessage(WebSocketAction.NONE, badDataPayload);
             return messageObject;
@@ -48,15 +48,15 @@ namespace MudHero.WebSocketCommunication
     public class SocketMessage
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public WebSocketAction action;  //Tells the wss server how to handle the data.
-        public object payload;          //Object to send to the server.
+        public WebSocketAction Action;  //Tells the wss server how to handle the data.
+        public object Payload;          //Object to send to the server.
 
         public SocketMessage() { }
 
-        public SocketMessage(WebSocketAction _action, object _payload)
+        public SocketMessage(WebSocketAction action, object payload)
         {
-            payload = _payload;
-            action = _action;
+            Payload = payload;
+            Action = action;
         }
     }
 }
