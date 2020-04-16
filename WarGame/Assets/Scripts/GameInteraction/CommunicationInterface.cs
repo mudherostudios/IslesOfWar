@@ -148,7 +148,7 @@ public class CommunicationInterface : MonoBehaviour
         {
             xayaCommands = gameObject.AddComponent<XayaCommander>();
             xayaCommands.SetConnection(daemonInfo);
-            resolver.commander = xayaCommands;
+            resolver.Commander = xayaCommands;
         }
 
         if (stateRetriever == null)

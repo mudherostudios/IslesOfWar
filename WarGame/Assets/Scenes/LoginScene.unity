@@ -10254,6 +10254,7 @@ GameObject:
   - component: {fileID: 1329419267}
   - component: {fileID: 1329419268}
   - component: {fileID: 1329419269}
+  - component: {fileID: 1329419270}
   m_Layer: 0
   m_Name: CommunicationInterface
   m_TagString: CommunicationInterface
@@ -10292,6 +10293,7 @@ MonoBehaviour:
   blockCount: 0
   progressMessage: 
   telemetry: {fileID: 1329419269}
+  resolver: {fileID: 1329419270}
 --- !u!4 &1329419266
 Transform:
   m_ObjectHideFlags: 0
@@ -10352,7 +10354,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6512c14a6b42b2f4b8de23151191e499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: wss://websocket.islesofwar.online
+  Url: wss://websocket.islesofwar.online
+  OrderIdToDelete: 
+--- !u!114 &1329419270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1329419264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c9d692c0bba74409cc70b6925cd93f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  commander: {fileID: 0}
 --- !u!1 &1331821623
 GameObject:
   m_ObjectHideFlags: 0

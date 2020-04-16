@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using BitcoinLib.Responses;
+using BitcoinLib.Responses.SharedComponents;
 using BitcoinLib.Services.Coins.XAYA;
 using BitcoinLib.Services.Coins.Base;
 using BitcoinLib.Requests.CreateRawTransaction;
+using Newtonsoft.Json;
 
 namespace MudHero
 {
@@ -114,48 +116,64 @@ namespace MudHero
             }
 
             //First Step in Atomic Transaction by Buyer
-            public string GetRawTransaction(string seller, decimal chi)
+            public string GetProposal(string seller, string warbuxTransferCommand, decimal chi, out string transactionPsbt)
             {
+                //Check to see if buyer has enough chi.
+                //Get buyer address and seller info.
                 string buyerAddress = xayaService.ShowName(playerName).address;
                 GetShowNameResponse sellerNameData = xayaService.ShowName(seller);
-                var outputs = new Dictionary<string, decimal>()
-                {
-                    {buyerAddress, 0.01m },
-                    {sellerNameData.address, chi}
-                };
 
-                var rawTransactionRequestA = new CreateRawTransactionRequest(new List<CreateRawTransactionInput>(), outputs);
-                var rawTransactionA = xayaService.CreateRawTransaction(rawTransactionRequestA);
-                var fundedTransactionA = xayaService.GetFundRawTransaction(rawTransactionA);
-                //options = {"feeRate":0.001,"changePosition": 2}
-                //part1b = fundRawTransaction(part1a,options)[hex]
-                //nameData = nameShow(user)
-                //part2 = createRawTransaction(nameData,[])
-                //raw1 = decodeRawTransaction(part1b)
-                //raw2 = decodeRawTransaction(part2)
-                //fullIns = raw1[vin] + raw2[vin];
-                //fullOuts = raw1[vout][addresses:values] + raw2[vout][addresses:values]
-                //combined = createrawtransaction(fullIns,fullOuts)
-                //nameOperation = {"op":"name_update","name":"seller","value":"Warbux Transfer Command"}"
-                //converted = convertToPsbt(combined, 0, nameOperation)
-                //signedBuyer = walletProcessPsbt(converted) With buyer wallet.
-                return buyerAddress;
+                //Create the first part of the atomic transaction.
+                var rawTransactionRequestA = new CreateRawTransactionRequest();
+                rawTransactionRequestA.AddOutput(buyerAddress, 0.01m);
+                rawTransactionRequestA.AddOutput(sellerNameData.address, chi);
+                string rawTransactionA = xayaService.CreateRawTransaction(rawTransactionRequestA);
+
+                //Fund the transaction and set some custom fee options.
+                string options = @"{ 'feeRate':0.001, 'changePosition': 2}";
+                rawTransactionA = xayaService.GetFundRawTransaction(rawTransactionA, options).Hex;
+
+                //Create the second part of the atomic transaction.
+                var rawTransactionRequestB = new CreateRawTransactionRequest();
+                rawTransactionRequestB.AddInput(sellerNameData.txid, sellerNameData.vout);
+                string rawTransactionB = xayaService.CreateRawTransaction(rawTransactionRequestB);
+
+                //Decode the two parts so we can create the vins and vouts for the combined new contract.
+                var rawDecodedTransactionA = xayaService.DecodeRawTransaction(rawTransactionA);
+                var rawDecodedTransactionB = xayaService.DecodeRawTransaction(rawTransactionB);
+                List<CreateRawTransactionInput> fullIns = new List<CreateRawTransactionInput>();
+                Dictionary<string, decimal> fullOuts = new Dictionary<string, decimal>();
+                foreach (Vin vin in rawDecodedTransactionA.Vin)
+                    fullIns.Add(new CreateRawTransactionInput() { TxId = vin.TxId, Vout = int.Parse(vin.Vout) });
+                foreach (Vin vin in rawDecodedTransactionB.Vin)
+                    fullIns.Add(new CreateRawTransactionInput() { TxId = vin.TxId, Vout = int.Parse(vin.Vout) });
+                foreach (Vout vout in rawDecodedTransactionA.Vout)
+                    fullOuts.Add(vout.ScriptPubKey.Addresses[0], vout.Value);
+                foreach (Vout vout in rawDecodedTransactionB.Vout)
+                    fullOuts.Add(vout.ScriptPubKey.Addresses[0], vout.Value);
+
+                //Create the combined atomic transaction with all of the previous data.
+                var combinedTransactionRequest = new CreateRawTransactionRequest(fullIns, fullOuts);
+                string combinedTransaction = xayaService.CreateRawTransaction(combinedTransactionRequest);
+                
+                //Add the name operation to the transaction and sign.
+                string nameOperation = $"{{\"op\":\"name_update\",\"name\":\"{sellerNameData.name}\",\"value\":\"{warbuxTransferCommand}\"}}";
+                string namedTransaction = xayaService.NameRawTransaction(combinedTransaction, nameOperation);
+                transactionPsbt = xayaService.ConvertToPsbt(namedTransaction);
+                return SignPsbt(transactionPsbt);
             }
 
             //Second Step in Atomic Transaction by Seller
-            public string SignPsbt()
+            public string SignPsbt(string transactionPsbt)
             {
-                //signedSeller = walletProcessPsbt(converted) With seller wallet.
-                return null;
+                return xayaService.WalletProcessPsbt(transactionPsbt).Psbt;
             }
 
             //Final Step in Atomic Transaction by Buyer
-            public string FinalizePsbt()
+            public string FinalizePsbt(List<string> transactionPsbts)
             {
-                //cosigned = combinePsbt([signedBuyer,signedSeller])
-                //finalized = finalizePsbt(cosigned)
-                //sendtransaction; returns error or hex string
-                return null;
+                string cosigned = xayaService.CombinePsbt(transactionPsbts);
+                return xayaService.FinalizePsbt(cosigned).Hex;
             }
 
             public bool HasSufficientChi(decimal spendAmount)
@@ -204,7 +222,6 @@ namespace MudHero
                     return nameList.ToArray();
                 }
             }
-
         }
     }
 }
