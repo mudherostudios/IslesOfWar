@@ -8,10 +8,13 @@ using MudHero.XayaCommunication;
 
 public class ContractResolver : MonoBehaviour
 {
-    XayaCommander commander;
+    public XayaCommander commander;
 
     private void Update()
     {
-        
+        #if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.A))
+            Debug.Log(commander.GetRawTransaction("qweqwe", 10.0m));
+        #endif
     }
 }

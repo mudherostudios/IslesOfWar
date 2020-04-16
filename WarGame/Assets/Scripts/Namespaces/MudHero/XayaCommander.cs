@@ -60,7 +60,7 @@ namespace MudHero
             public void SetPlayerWalletName(int index)
             {
                 string[] playerNames = names;
-                if(index < playerNames.Length)
+                if (index < playerNames.Length)
                     playerName = playerNames[index];
             }
 
@@ -102,7 +102,7 @@ namespace MudHero
                 }
                 else
                 {
-                    log.message = xayaService.RegisterName("p/"+name, "{}", null);
+                    log.message = xayaService.RegisterName("p/" + name, "{}", null);
 
                     if (log.message.Contains("Failed"))
                         log.success = false;
@@ -113,16 +113,49 @@ namespace MudHero
                 return log;
             }
 
-            //Warbux for Chi
-            string GetRawTransaction(string user, decimal chi)
+            //First Step in Atomic Transaction by Buyer
+            public string GetRawTransaction(string seller, decimal chi)
             {
-                GetShowNameResponse userShowName = xayaService.ShowName(string.Format("p/{0}",user));
-                CreateRawTransactionRequest transactionRequest = new CreateRawTransactionRequest();
-                transactionRequest.AddInput(userShowName.txid, userShowName.vout);
-                transactionRequest.AddOutput(userShowName.address, chi);
-                string rawTransaction = xayaService.CreateRawTransaction(transactionRequest);
-                GetFundRawTransactionResponse response = xayaService.GetFundRawTransaction(rawTransaction);
-                return response.Hex;
+                string buyerAddress = xayaService.ShowName(playerName).address;
+                GetShowNameResponse sellerNameData = xayaService.ShowName(seller);
+                var outputs = new Dictionary<string, decimal>()
+                {
+                    {buyerAddress, 0.01m },
+                    {sellerNameData.address, chi}
+                };
+
+                var rawTransactionRequestA = new CreateRawTransactionRequest(new List<CreateRawTransactionInput>(), outputs);
+                var rawTransactionA = xayaService.CreateRawTransaction(rawTransactionRequestA);
+                var fundedTransactionA = xayaService.GetFundRawTransaction(rawTransactionA);
+                //options = {"feeRate":0.001,"changePosition": 2}
+                //part1b = fundRawTransaction(part1a,options)[hex]
+                //nameData = nameShow(user)
+                //part2 = createRawTransaction(nameData,[])
+                //raw1 = decodeRawTransaction(part1b)
+                //raw2 = decodeRawTransaction(part2)
+                //fullIns = raw1[vin] + raw2[vin];
+                //fullOuts = raw1[vout][addresses:values] + raw2[vout][addresses:values]
+                //combined = createrawtransaction(fullIns,fullOuts)
+                //nameOperation = {"op":"name_update","name":"seller","value":"Warbux Transfer Command"}"
+                //converted = convertToPsbt(combined, 0, nameOperation)
+                //signedBuyer = walletProcessPsbt(converted) With buyer wallet.
+                return buyerAddress;
+            }
+
+            //Second Step in Atomic Transaction by Seller
+            public string SignPsbt()
+            {
+                //signedSeller = walletProcessPsbt(converted) With seller wallet.
+                return null;
+            }
+
+            //Final Step in Atomic Transaction by Buyer
+            public string FinalizePsbt()
+            {
+                //cosigned = combinePsbt([signedBuyer,signedSeller])
+                //finalized = finalizePsbt(cosigned)
+                //sendtransaction; returns error or hex string
+                return null;
             }
 
             public bool HasSufficientChi(decimal spendAmount)

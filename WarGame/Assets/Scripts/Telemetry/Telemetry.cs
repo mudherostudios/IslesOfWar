@@ -14,8 +14,8 @@ using Newtonsoft.Json.Serialization;
 
 public class Telemetry : MonoBehaviour
 {
-    public string url = "wss://websocket.islesofwar.online";
-    public string orderIdToDelete;
+    public string Url = "wss://websocket.islesofwar.online";
+    public string OrderIdToDelete;
     const string API_URL = "https://market-api.islesofwar.online";
     const string API_KEY = "WVxbDuafpi5Pv23wSVzep4KlWXnhP88sasrYvIxS";
     bool connected = false;
@@ -25,7 +25,7 @@ public class Telemetry : MonoBehaviour
 
     private void Start()
     {
-        socket = new WebSocket(url);
+        socket = new WebSocket(Url);
         jsonSettings = new JsonSerializerSettings();
         jsonSettings.NullValueHandling = NullValueHandling.Ignore;
         jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -44,7 +44,7 @@ public class Telemetry : MonoBehaviour
             LoadOrders();
 
         if (Input.GetKeyDown(KeyCode.D))
-            DeleteOrder(orderIdToDelete);
+            DeleteOrder(OrderIdToDelete);
         #endif
     }
 

@@ -32,6 +32,7 @@ public class CommunicationInterface : MonoBehaviour
     public int blockCount = 0;
     public string progressMessage;
     public Telemetry telemetry;
+    public ContractResolver resolver;
     private ConnectionInfo daemonInfo;
     private ConnectionInfo gsrInfo;
     private StateProcessorPathInfo pathInfo;
@@ -147,6 +148,7 @@ public class CommunicationInterface : MonoBehaviour
         {
             xayaCommands = gameObject.AddComponent<XayaCommander>();
             xayaCommands.SetConnection(daemonInfo);
+            resolver.commander = xayaCommands;
         }
 
         if (stateRetriever == null)
@@ -190,6 +192,7 @@ public class CommunicationInterface : MonoBehaviour
     public void SelectUser(string name)
     {
         selectedUser = name;
+        xayaCommands.SetPlayerWalletName(name);
     }
 
     public ConnectionLog SendCommand(string command)
