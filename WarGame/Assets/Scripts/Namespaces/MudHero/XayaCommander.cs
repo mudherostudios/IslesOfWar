@@ -155,18 +155,21 @@ namespace MudHero
                 //Create the combined atomic transaction with all of the previous data.
                 var combinedTransactionRequest = new CreateRawTransactionRequest(fullIns, fullOuts);
                 string combinedTransaction = xayaService.CreateRawTransaction(combinedTransactionRequest);
-                
+
                 //Add the name operation to the transaction and sign.
+                transactionPsbt = null;
                 string nameOperation = $"{{\"op\":\"name_update\",\"name\":\"{sellerNameData.name}\",\"value\":\"{warbuxTransferCommand}\"}}";
-                string namedTransaction = xayaService.NameRawTransaction(combinedTransaction, nameOperation);
-                transactionPsbt = xayaService.ConvertToPsbt(namedTransaction);
+                NameRawTransactionResponse namedResponse = xayaService.NameRawTransaction(combinedTransaction, nameOperation);
+                if (namedResponse == null) Debug.Log("Name Operation Failed.");
+                else transactionPsbt = xayaService.ConvertToPsbt(namedResponse.Hex);
                 return SignPsbt(transactionPsbt);
             }
 
             //Second Step in Atomic Transaction by Seller
             public string SignPsbt(string transactionPsbt)
             {
-                return xayaService.WalletProcessPsbt(transactionPsbt).Psbt;
+                WalletProcessPsbtResponse response = xayaService.WalletProcessPsbt(transactionPsbt);
+                return response == null ? null : response.Psbt;
             }
 
             //Final Step in Atomic Transaction by Buyer
@@ -182,15 +185,8 @@ namespace MudHero
                 return spendAmount <= currentBalance;
             }
 
-            public int GetBlockHeight(string hash)
-            {
-                return xayaService.GetBlock(hash).Height;
-            }
-
-            public decimal GetBalance()
-            {
-                return xayaService.GetBalance();
-            }
+            public int GetBlockHeight(string hash) { return xayaService.GetBlock(hash).Height; }
+            public decimal GetBalance() { return xayaService.GetBalance(); }
 
             public int networkBlockCount
             {
