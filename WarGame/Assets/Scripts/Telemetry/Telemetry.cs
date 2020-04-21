@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Text;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
@@ -16,6 +13,8 @@ public class Telemetry : MonoBehaviour
 {
     public string Url = "wss://websocket.islesofwar.online";
     public string OrderIdToDelete;
+    public TransactionResolver Resolver;
+
     const string API_URL = "https://market-api.islesofwar.online";
     const string API_KEY = "WVxbDuafpi5Pv23wSVzep4KlWXnhP88sasrYvIxS";
     bool connected = false;
@@ -34,9 +33,6 @@ public class Telemetry : MonoBehaviour
     private void Update()
     {
         #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.M))
-            SendFakeMessage();
-
         if (Input.GetKeyDown(KeyCode.O))
             SendFakeOrder(10000.0f, 10.0m);
 
@@ -78,13 +74,10 @@ public class Telemetry : MonoBehaviour
         await socket.SendText(serialized);
     }
 
-    private async void SendFakeMessage()
+    public async void SendSocketMessage(object payload, WebSocketAction socketAction)
     {
-        TransactionData data = new TransactionData(TransactionPhase.PROPOSAL, "HEX:OF:CONTRACT", null, new Guid());
-        TradePayload tradePayload = new TradePayload("Crash", username, data);
-        SocketMessage message = new SocketMessage(WebSocketAction.TRANSACTION, tradePayload);
+        SocketMessage message = new SocketMessage(socketAction, payload);
         string serialized = JsonConvert.SerializeObject(message, jsonSettings);
-        Debug.Log(serialized);
         await socket.SendText(serialized);
     }
 
@@ -104,12 +97,10 @@ public class Telemetry : MonoBehaviour
             httpClient.DefaultRequestHeaders.Add("x-api-key", API_KEY);
 
             string serializedOrder = JsonConvert.SerializeObject(order, jsonSettings);
-            Debug.Log(serializedOrder);
             var content = new StringContent(serializedOrder, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync("/market/orders", content);
 
             if (!response.IsSuccessStatusCode) Debug.LogError($"Unable to create order: {response.StatusCode}");
-            else Debug.Log("Successful Order Creation!");
         }
     }
 
@@ -126,7 +117,6 @@ public class Telemetry : MonoBehaviour
             if (response.IsSuccessStatusCode)
             {
                 string ordersResponse = await response.Content.ReadAsStringAsync();
-                Debug.Log(ordersResponse);
                 return JsonConvert.DeserializeObject<List<OrderPayload>>(ordersResponse);
             }
             else Debug.LogError($"Unable to get orders: {response.StatusCode}");
@@ -172,18 +162,16 @@ public class Telemetry : MonoBehaviour
         if (MessageHandler.TryJsonParse(message, out socketMessage))
         {
             if (socketMessage.Action == WebSocketAction.NONE || socketMessage.Payload == null)
-               messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
-            else
-               messageLog = GetSocketDebugMessage(socketMessage);
+                messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
+            else if (socketMessage.Action == WebSocketAction.TRANSACTION)
+                Debug.Log("Test");
         }
         else
         {
             socketMessage = MessageHandler.BadData(message);
             messageLog = GetSocketDebugMessage(socketMessage);
+            Debug.LogWarning(messageLog);
         }
-
-        Debug.Log(message);
-        Debug.Log(messageLog);
     }
 
     string GetSocketDebugMessage(SocketMessage socketMessage)
@@ -226,18 +214,16 @@ public class Telemetry : MonoBehaviour
         string closeLog = string.Format(
             "Disconnected.\n" +
             "Code: {0}\n", code.ToString());
-        Debug.Log(closeLog);
     }
 
     void OpenedConnection()
     {
         connected = true;
-        Debug.Log("Connected.");
     }
 
     void RecievedError(string errorMessage)
     {
-        Debug.Log(errorMessage);
+        Debug.LogWarning(errorMessage);
     }
 
     private void OnLevelWasLoaded(int level)
