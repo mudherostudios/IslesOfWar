@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MudHero.WebSocketCommunication;
@@ -112,7 +111,7 @@ public class TransactionResolver : MonoBehaviour
     }
 
     //Message rejecting proposal because of bad or incorrect data.
-    private TradePayload GetRejectProposal(string recipient, string reason, int rejectionType, Guid orderId)
+    public TradePayload GetRejectProposal(string recipient, string reason, int rejectionType, Guid orderId)
     {
         TransactionPhase rejectionPhase;
 

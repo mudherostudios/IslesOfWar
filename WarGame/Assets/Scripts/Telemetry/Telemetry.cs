@@ -22,12 +22,15 @@ public class Telemetry : MonoBehaviour
     JsonSerializerSettings jsonSettings;
     string username;
 
+    List<OrderPayload> orders;
+
     private void Start()
     {
         socket = new WebSocket(Url);
         jsonSettings = new JsonSerializerSettings();
         jsonSettings.NullValueHandling = NullValueHandling.Ignore;
         jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        orders = new List<OrderPayload>();
     }
 
     private void Update()
@@ -42,16 +45,6 @@ public class Telemetry : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
             DeleteOrder(OrderIdToDelete);
         #endif
-    }
-
-    public async void LoadOrders()
-    {
-        List<OrderPayload> orders = await GetOrders();
-        
-        foreach (OrderPayload order in orders)
-        {
-            Debug.Log(JsonConvert.SerializeObject(order, jsonSettings));
-        }
     }
 
     public async void ConnectToSocket(string _username)
@@ -87,21 +80,78 @@ public class Telemetry : MonoBehaviour
         await SendOrder(warbux, amount, price);
     }
 
-    private async Task SendOrder(Item item, float amount, decimal price)
+    public async void Disconnect()
     {
-        OrderPayload order = new OrderPayload(username, item, amount, price);
+        if(connected && socket.State == WebSocketState.Open)
+            await socket.Close();
+    }
 
-        using (var httpClient = new HttpClient())
+
+    //---------------------------------------------------------------------
+    //-------------------------Listening Functions-------------------------
+    //---------------------------------------------------------------------
+
+    void Listen(WebSocket _socket)
+    {
+        _socket.OnClose += ClosedConnection;
+        _socket.OnMessage += RecievedMessage;
+        _socket.OnError += RecievedError;
+        _socket.OnOpen += OpenedConnection;
+    }
+
+    void RecievedMessage(byte[] messageBytes)
+    {
+        string message = Encoding.UTF8.GetString(messageBytes);
+        string messageLog = "Log not created.";
+        SocketMessage socketMessage = new SocketMessage();
+
+        if (MessageHandler.TryJsonParse(message, out socketMessage))
         {
-            httpClient.BaseAddress = new Uri(API_URL);
-            httpClient.DefaultRequestHeaders.Add("x-api-key", API_KEY);
-
-            string serializedOrder = JsonConvert.SerializeObject(order, jsonSettings);
-            var content = new StringContent(serializedOrder, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("/market/orders", content);
-
-            if (!response.IsSuccessStatusCode) Debug.LogError($"Unable to create order: {response.StatusCode}");
+            if (socketMessage.Action == WebSocketAction.NONE || socketMessage.Payload == null)
+                messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
+            else if (socketMessage.Action == WebSocketAction.TRANSACTION)
+                TelemetryRecieved.RecieveTransactionData(socketMessage, orders, Resolver);
+            else
+                messageLog = GetSocketDebugMessage(socketMessage);
         }
+        else
+        {
+            socketMessage = MessageHandler.BadData(message);
+            messageLog = GetSocketDebugMessage(socketMessage);
+            Debug.LogWarning(messageLog);
+        }
+    }
+
+    void ClosedConnection(WebSocketCloseCode code)
+    {
+        connected = false;
+        string closeLog = string.Format(
+            "Disconnected.\n" +
+            "Code: {0}\n", code.ToString());
+    }
+
+    void OpenedConnection()
+    {
+        connected = true;
+    }
+
+    void RecievedError(string errorMessage)
+    {
+        Debug.LogWarning(errorMessage);
+    }
+
+    //---------------------------------------------------------------------
+    //--------------------Recieve Message Functions------------------------
+    //---------------------------------------------------------------------
+   
+
+
+    //---------------------------------------------------------------------
+    //-------------------------Order Functions-----------------------------
+    //---------------------------------------------------------------------
+    public async void LoadOrders()
+    {
+        orders = await GetOrders();
     }
 
     static async Task<List<OrderPayload>> GetOrders()
@@ -135,43 +185,35 @@ public class Telemetry : MonoBehaviour
 
             if (response.IsSuccessStatusCode) Debug.Log("Successfully deleted order!");
             else Debug.LogError($"Unable to delete order: {response.StatusCode}");
-            
+
         }
     }
 
-    public async void Disconnect()
+    private async Task SendOrder(Item item, float amount, decimal price)
     {
-        if(connected && socket.State == WebSocketState.Open)
-            await socket.Close();
-    }
+        OrderPayload order = new OrderPayload(username, item, amount, price);
 
-    void Listen(WebSocket _socket)
-    {
-        _socket.OnClose += ClosedConnection;
-        _socket.OnMessage += RecievedMessage;
-        _socket.OnError += RecievedError;
-        _socket.OnOpen += OpenedConnection;
-    }
-
-    void RecievedMessage(byte[] messageBytes)
-    {
-        string message = Encoding.UTF8.GetString(messageBytes);
-        string messageLog = "Log not created.";
-        SocketMessage socketMessage = new SocketMessage();
-        
-        if (MessageHandler.TryJsonParse(message, out socketMessage))
+        using (var httpClient = new HttpClient())
         {
-            if (socketMessage.Action == WebSocketAction.NONE || socketMessage.Payload == null)
-                messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
-            else if (socketMessage.Action == WebSocketAction.TRANSACTION)
-                Debug.Log("Test");
+            httpClient.BaseAddress = new Uri(API_URL);
+            httpClient.DefaultRequestHeaders.Add("x-api-key", API_KEY);
+
+            string serializedOrder = JsonConvert.SerializeObject(order, jsonSettings);
+            var content = new StringContent(serializedOrder, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("/market/orders", content);
+
+            if (!response.IsSuccessStatusCode) Debug.LogError($"Unable to create order: {response.StatusCode}");
         }
-        else
-        {
-            socketMessage = MessageHandler.BadData(message);
-            messageLog = GetSocketDebugMessage(socketMessage);
-            Debug.LogWarning(messageLog);
-        }
+    }
+
+    //---------------------------------------------------------------------
+    //-------------------------Misc Functions-----------------------------
+    //---------------------------------------------------------------------
+
+    private void OnLevelWasLoaded(int level)
+    {
+        if(level == 2) 
+            SendLoginNotice(username);
     }
 
     string GetSocketDebugMessage(SocketMessage socketMessage)
@@ -180,11 +222,11 @@ public class Telemetry : MonoBehaviour
 
         if (socketMessage.Action == WebSocketAction.NONE)
         {
-            BadDataPayload payload = new BadDataPayload(); 
-            
-            if(socketMessage.Payload is BadDataPayload)
+            BadDataPayload payload = new BadDataPayload();
+
+            if (socketMessage.Payload is BadDataPayload)
                 payload = (BadDataPayload)socketMessage.Payload;
-            
+
             messageLog = string.Format
             (
                 "Error: BAD DATA!\n" +
@@ -206,29 +248,5 @@ public class Telemetry : MonoBehaviour
         }
 
         return messageLog;
-    }
-
-    void ClosedConnection(WebSocketCloseCode code)
-    {
-        connected = false;
-        string closeLog = string.Format(
-            "Disconnected.\n" +
-            "Code: {0}\n", code.ToString());
-    }
-
-    void OpenedConnection()
-    {
-        connected = true;
-    }
-
-    void RecievedError(string errorMessage)
-    {
-        Debug.LogWarning(errorMessage);
-    }
-
-    private void OnLevelWasLoaded(int level)
-    {
-        if(level == 2) 
-            SendLoginNotice(username);
     }
 }

@@ -16,6 +16,7 @@ namespace IslesOfWar.Communication
         public BattleCommand attk;  //Attack Plan
         public BattleCommand dfnd;  //Defend Orders
         public SquadWithdrawl rmv;  //Remove Squads from Island.
-        public int igBuy;           //In game purchases. Pack count.
+        public int igBuy;           //In game purchases. Pack count
+        public TransferWarbux trns; //Transfer warbux from one player to another.
     }
 }
