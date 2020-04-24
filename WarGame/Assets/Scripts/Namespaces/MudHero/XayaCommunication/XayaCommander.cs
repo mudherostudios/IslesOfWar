@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using BitcoinLib.Responses;
+using BitcoinLib.Parameters;
 using BitcoinLib.Responses.SharedComponents;
 using BitcoinLib.Services.Coins.XAYA;
 using BitcoinLib.Services.Coins.Base;
@@ -112,7 +113,7 @@ namespace MudHero.XayaCommunication
         }
 
         //First Step in Atomic Transaction by Buyer
-        public string GetUnsignedProposal(string seller, string nameAddress, string paymentAddress, string warbuxTransferCommand, decimal chi)
+        public string GetUnsignedProposal(string seller, string nameAddress, string paymentAddress, string nameValue, decimal chi)
         {
             //Check to see if buyer has enough chi.
             //Get buyer address and seller info.
@@ -126,8 +127,9 @@ namespace MudHero.XayaCommunication
             string rawTransactionA = xayaService.CreateRawTransaction(rawTransactionRequestA);
 
             //Fund the transaction and set some custom fee options.
-            string options = @"{ 'feeRate':0.001, 'changePosition': 2}";
-            rawTransactionA = xayaService.GetFundRawTransaction(rawTransactionA, options).Hex;
+            FeeOptions options = new FeeOptions(0.001m, 2);
+            GetFundRawTransactionResponse response = xayaService.GetFundRawTransaction(rawTransactionA, options);
+            rawTransactionA = response.Hex;
 
             //Create the second part of the atomic transaction.
             var rawTransactionRequestB = new CreateRawTransactionRequest();
@@ -154,7 +156,7 @@ namespace MudHero.XayaCommunication
 
             //Add the name operation to the transaction and sign.
             string unsignedTransactionPsbt = "";
-            string nameOperation = $"{{\"op\":\"name_update\",\"name\":\"{sellerNameData.name}\",\"value\":\"{warbuxTransferCommand}\"}}";
+            NameOperation nameOperation = new NameOperation("name_update", sellerNameData.name, nameValue);
             NameRawTransactionResponse namedResponse = xayaService.NameRawTransaction(combinedTransaction, nameOperation);
 
             if (namedResponse == null) Debug.Log("Name Operation Failed.");
@@ -176,8 +178,8 @@ namespace MudHero.XayaCommunication
             return xayaService.FinalizePsbt(cosigned);
         }
 
-        public bool Unlocked { get { return xayaService.IsWalletEncrypted(); } }
-        public void UnlockWallet() { if (Unlocked) xayaService.WalletPassphrase(cInfo.walletPassword, 10); }
+        public bool Locked { get { return xayaService.IsWalletEncrypted(); } }
+        public void UnlockWallet() { if (Locked) xayaService.WalletPassphrase(cInfo.walletPassword, 10); }
 
         public bool HasSufficientChi(decimal spendAmount)
         {
@@ -199,7 +201,7 @@ namespace MudHero.XayaCommunication
             }
         }
 
-        public string GetPlayer() { return playerName; }
+        public string GetPlayer(bool removePrefix=true) { return removePrefix ? playerName.Remove(0,2) : playerName; }
         public string[] names
         {
             get

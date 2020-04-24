@@ -11,7 +11,7 @@ namespace IslesOfWar
 {
     namespace GameStateProcessing
     {
-        public class StateProcessorV0 : MonoBehaviour
+        public class StateProcessorV0
         {
             public State state;
             public readonly int[] version = { 0, 0, 0 };  //Hand set these here every release

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace IslesOfWar.GameStateProcessing
 {
-    public class StateProcessor : MonoBehaviour
+    public class StateProcessor
     {
         public State state;
         public readonly int[] version = { 4, 0, 0};  //Hand set these here every release

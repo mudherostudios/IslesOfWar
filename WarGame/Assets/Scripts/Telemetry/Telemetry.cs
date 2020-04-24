@@ -22,6 +22,7 @@ public class Telemetry : MonoBehaviour
     JsonSerializerSettings jsonSettings;
     string username;
 
+    object queuedPayload = null;
     List<OrderPayload> orders;
 
     private void Start()
@@ -44,7 +45,12 @@ public class Telemetry : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
             DeleteOrder(OrderIdToDelete);
+
+        if (Input.GetKeyDown(KeyCode.T))
+            SendSocketMessage(Resolver.GetSellerAddresses(username, new Guid()), WebSocketAction.TRANSACTION);
         #endif
+
+        
     }
 
     public async void ConnectToSocket(string _username)
@@ -69,15 +75,18 @@ public class Telemetry : MonoBehaviour
 
     public async void SendSocketMessage(object payload, WebSocketAction socketAction)
     {
+        if (payload == null) return;
+
+        orders = await GetOrders();
         SocketMessage message = new SocketMessage(socketAction, payload);
         string serialized = JsonConvert.SerializeObject(message, jsonSettings);
+        Debug.Log(serialized);
         await socket.SendText(serialized);
     }
 
     private async void SendFakeOrder(float amount, decimal price)
     {
-        Item warbux = new Item("warbux");
-        await SendOrder(warbux, amount, price);
+        await SendOrder("Warbux", amount, price);
     }
 
     public async void Disconnect()
@@ -110,7 +119,7 @@ public class Telemetry : MonoBehaviour
             if (socketMessage.Action == WebSocketAction.NONE || socketMessage.Payload == null)
                 messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
             else if (socketMessage.Action == WebSocketAction.TRANSACTION)
-                TelemetryRecieved.RecieveTransactionData(socketMessage, orders, Resolver);
+                SendSocketMessage(TelemetryRecieved.RecieveTransactionData(socketMessage, orders, Resolver), WebSocketAction.TRANSACTION);
             else
                 messageLog = GetSocketDebugMessage(socketMessage);
         }
@@ -139,19 +148,17 @@ public class Telemetry : MonoBehaviour
     {
         Debug.LogWarning(errorMessage);
     }
-
-    //---------------------------------------------------------------------
-    //--------------------Recieve Message Functions------------------------
-    //---------------------------------------------------------------------
-   
-
-
+    
     //---------------------------------------------------------------------
     //-------------------------Order Functions-----------------------------
     //---------------------------------------------------------------------
     public async void LoadOrders()
     {
         orders = await GetOrders();
+
+        //Can Delete Later
+        foreach (OrderPayload payload in orders)
+            Debug.Log(JsonConvert.SerializeObject(payload));
     }
 
     static async Task<List<OrderPayload>> GetOrders()
@@ -189,7 +196,7 @@ public class Telemetry : MonoBehaviour
         }
     }
 
-    private async Task SendOrder(Item item, float amount, decimal price)
+    private async Task SendOrder(object item, float amount, decimal price)
     {
         OrderPayload order = new OrderPayload(username, item, amount, price);
 

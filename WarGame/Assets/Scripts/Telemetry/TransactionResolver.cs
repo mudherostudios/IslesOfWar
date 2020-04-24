@@ -14,27 +14,30 @@ public class TransactionResolver : MonoBehaviour
     //Telemetry should only pass valid orderIds of online users.
     public TradePayload HandleTransactionData(TradePayload tradePayload, OrderPayload order = null, string command = null)
     {
-        switch (tradePayload.Data.Phase)
+        switch (tradePayload.TransactionData.Phase)
         {
             case TransactionPhase.ADDRESS_REQUEST:
-                return GetNameAndPaymentAddresses(tradePayload.PlayerName, tradePayload.Data.Id);
+                return GetNameAndPaymentAddresses(tradePayload.PlayerName, tradePayload.TransactionData.Id);
             case TransactionPhase.ADDRESS_RESPONSE:
-                return GetProposal(tradePayload.PlayerName, tradePayload.Data.InputAddresses, order, command);
+                return GetProposal(tradePayload.PlayerName, tradePayload.TransactionData.InputAddresses, order, command);
             case TransactionPhase.PROPOSAL:
-                return GetSellerSignedProposal(tradePayload.PlayerName, tradePayload.Data.Contract, tradePayload.Data.Id);
+                return GetSellerSignedProposal(tradePayload.PlayerName, tradePayload.TransactionData.Contract, tradePayload.TransactionData.Id);
             case TransactionPhase.SELLER_REJECT:
-                Debug.LogWarning("SELLER_REJECT:\n" + tradePayload.Data.Reason);
+                Debug.LogWarning("SELLER_REJECT:\n" + tradePayload.TransactionData.Reason);
                 return null;
             case TransactionPhase.SELLER_SIGN:
                 return GetFinalizedResponse(tradePayload);
             case TransactionPhase.BIDDER_REJECT_SIGN:
-                Debug.LogWarning("BIDDER_REJECT_SIGN:\n" + tradePayload.Data.Reason);
+                Debug.LogWarning("BIDDER_REJECT_SIGN:\n" + tradePayload.TransactionData.Reason);
                 return null;
             case TransactionPhase.BIDDER_CONFIRMED_SIGN:
-                completedTransactions.Add(tradePayload.Data.Id, tradePayload.Data.Contract);
+                if (!completedTransactions.ContainsKey(tradePayload.TransactionData.Id))
+                    completedTransactions.Add(tradePayload.TransactionData.Id, tradePayload.TransactionData.Contract);
+                else
+                    Debug.LogWarning("Already added this transaction. Are you negotiating with yourself?");
                 return null;
             case TransactionPhase.REJECT_PERMANENT:
-                Debug.LogWarning("REJECT_PERMANENT:\n" + tradePayload.Data.Reason);
+                Debug.LogWarning("REJECT_PERMANENT:\n" + tradePayload.TransactionData.Reason);
                 return null;
             default:
                 return null;
@@ -45,17 +48,17 @@ public class TransactionResolver : MonoBehaviour
 //-----------------------------------------------------------------------------------------------------------------
     public TradePayload GetFinalizedResponse(TradePayload tradePayload)
     {
-        FinalizePsbtResponse finalized = GetFinalizedProposal(unsignedProposals[tradePayload.Data.Id], tradePayload.Data.Contract);
+        FinalizePsbtResponse finalized = GetFinalizedProposal(unsignedProposals[tradePayload.TransactionData.Id], tradePayload.TransactionData.Contract);
         if (finalized.Complete)
         {
-            completedTransactions.Add(tradePayload.Data.Id, finalized.Hex);
-            unsignedProposals.Remove(tradePayload.Data.Id);
-            return GetConfirmationPayload(tradePayload.PlayerName, finalized.Hex, tradePayload.Data.Id);
+            completedTransactions.Add(tradePayload.TransactionData.Id, finalized.Hex);
+            unsignedProposals.Remove(tradePayload.TransactionData.Id);
+            return GetConfirmationPayload(tradePayload.PlayerName, finalized.Hex, tradePayload.TransactionData.Id);
         }
         else
         {
-            unsignedProposals.Remove(tradePayload.Data.Id);
-            return GetRejectProposal(tradePayload.PlayerName, "Finalizaiton Failed.", 2, tradePayload.Data.Id);
+            unsignedProposals.Remove(tradePayload.TransactionData.Id);
+            return GetRejectProposal(tradePayload.PlayerName, "Finalizaiton Failed.", 2, tradePayload.TransactionData.Id);
         }
     }
 //-----------------------------------------------------------------------------------------------------------------
@@ -72,9 +75,13 @@ public class TransactionResolver : MonoBehaviour
     private TradePayload GetNameAndPaymentAddresses(string recipient, Guid orderId)
     {
         Commander.UnlockWallet();
+        string addressA = Commander.xayaService.GetNewAddress(null);
+        string addressB = Commander.xayaService.GetNewAddress(null);
+
         TransactionData sellerNameInputs = new TransactionData(TransactionPhase.ADDRESS_RESPONSE, 0, null, null, orderId);
-        sellerNameInputs.InputAddresses.Add(Commander.xayaService.GetNewAddress(null));
-        sellerNameInputs.InputAddresses.Add(Commander.xayaService.GetNewAddress(null));
+        sellerNameInputs.InputAddresses = new List<string>();
+        sellerNameInputs.InputAddresses.Add(addressA);
+        sellerNameInputs.InputAddresses.Add(addressB);
         return new TradePayload(recipient, Commander.GetPlayer(), sellerNameInputs);
     }
 
@@ -82,7 +89,7 @@ public class TransactionResolver : MonoBehaviour
     private TradePayload GetProposal(string recipient, List<string> inputAddresses, OrderPayload order, string command)
     {
         Commander.UnlockWallet();
-        unsignedProposals.Add(order.OrderId,Commander.GetUnsignedProposal(Commander.GetPlayer(), inputAddresses[0], inputAddresses[1], command, order.PriceInChi));
+        unsignedProposals.Add(order.OrderId,Commander.GetUnsignedProposal(Commander.GetPlayer(false), inputAddresses[0], inputAddresses[1], command, order.PriceInChi));
         TransactionData unsignedProposalData = new TransactionData(TransactionPhase.PROPOSAL, TransactionType.PSBT, unsignedProposals[order.OrderId], null, order.OrderId);
         return new TradePayload(recipient, Commander.GetPlayer(), unsignedProposalData);
     }
