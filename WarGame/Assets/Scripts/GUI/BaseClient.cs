@@ -28,7 +28,7 @@ public class BaseClient : MonoBehaviour
     {
         queuedExpenditures = new double[4];
         settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }; 
-        commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>();
+        //commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>();
     }
 
     protected void CleanEmptyPlans()
