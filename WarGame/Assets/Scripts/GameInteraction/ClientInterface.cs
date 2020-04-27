@@ -101,13 +101,10 @@ public class ClientInterface : MonoBehaviour
             for (int v = 0; v < validities.Length; v++)
             {
                 CancelNewlyInvalidAction(v, !validities[v]);
-
-                if (!hasCancelled)
-                    hasCancelled = validities[v];
+                if (!hasCancelled) hasCancelled = validities[v];
             }
 
-            if (hasCancelled)
-                notificationSystem.PushNotification(2, 1, "An action on the network has invalidated some of your queued moves. Please check the log for more info.");
+            if (hasCancelled) notificationSystem.PushNotification(2, 1, "An action on the network has invalidated some of your queued moves. Please check the log for more info.");
         }
     }
 
@@ -116,40 +113,31 @@ public class ClientInterface : MonoBehaviour
         switch (type)
         {
             case 0:
-                if (cancel)
-                    CancelNationChange();
+                if (cancel) CancelNationChange();
                 break;
             case 1:
-                if (cancel)
-                    CancelIslandDevelopment();
+                if (cancel) CancelIslandDevelopment();
                 break;
             case 2:
-                if (cancel)
-                    CancelAllUnitPurchases();
+                if (cancel) CancelAllUnitPurchases();
                 break;
             case 3:
-                if (cancel)
-                    CancelIslandSearch();
+                if (cancel) CancelIslandSearch();
                 break;
             case 4:
-                if (cancel)
-                    CancelResourceDeposit();
+                if (cancel) CancelResourceDeposit();
                 break;
             case 5:
-                if (cancel)
-                    CancelWarbucksContribution();
+                if (cancel) CancelWarbucksContribution();
                 break;
             case 6:
-                if (cancel)
-                    CancelPlan(true);
+                if (cancel) CancelPlan(true);
                 break;
             case 7:
-                if (cancel)
-                    CancelPlan(false);
+                if (cancel) CancelPlan(false);
                 break;
             case 8:
-                if (cancel)
-                    notificationSystem.PushNotification(2, -1, "Your actions exceed the length of the Xaya limit. Please cancel an action.");
+                if (cancel) notificationSystem.PushNotification(2, -1, "Your actions exceed the length of the Xaya limit. Please cancel an action.");
                 break;
             default:
                 break;
@@ -163,8 +151,7 @@ public class ClientInterface : MonoBehaviour
     {
         string message = string.Format("We have submitted a proposal to join {0}.", NationConstants.countryCodes[nationCode]);
 
-        if (Validity.Nation(nationCode))
-            queuedActions.nat = nationCode;
+        if (Validity.Nation(nationCode)) queuedActions.nat = nationCode;
 
         if (immediately)
         {
@@ -182,20 +169,15 @@ public class ClientInterface : MonoBehaviour
             queuedActions.igBuy = count;
             notificationSystem.PushNotification(1, 0, "Resource Pack Purchase is ready for submission.", "resourcePackSuccess");
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, "Sorry, but you don't have sufficient funds.", "resourcePackFailure");
-        }
+        else notificationSystem.PushNotification(2, 1, "Sorry, but you don't have sufficient funds.", "resourcePackFailure");
     }
-
+    
     public void PlaceMarketOrder(double[] resourcesToSell, double[] resourcesToBuy)
     {
         double[] totalAfterFee = new double[4];
 
         for (int f = 0; f > totalAfterFee.Length; f++)
-        {
             totalAfterFee[f] = Math.Round(resourcesToSell[f] * (chainState.currentConstants.marketFeePrecent[f] + 1));
-        }
 
         if (Validity.HasEnoughResources(totalAfterFee, playerResources))
         {
@@ -203,10 +185,7 @@ public class ClientInterface : MonoBehaviour
             SpendResources(totalAfterFee);
             notificationSystem.PushNotification(1, 0, "Our resource order is waiting for approval.", "marketOpenSuccess");
         }
-        else 
-        {
-            notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketOpenFailure");
-        }
+        else  notificationSystem.PushNotification(2, 1, "We do not have sufficient resources.", "marketOpenFailure");
     }
 
     public void CloseMarketOrder(string id)
@@ -216,16 +195,12 @@ public class ClientInterface : MonoBehaviour
 
         foreach (MarketOrder order in chainState.resourceMarket[player])
         {
-            stillOrdered = order.orderID == id;
-
-            if (stillOrdered)
-                break;
+            stillOrdered = order.orderID == id; 
+            if (stillOrdered) break;
         }
 
-        if (stillOrdered)
-            notificationSystem.PushNotification(1, 0, "We will close the order after submission.", "marketCloseSuccess");
-        else
-            notificationSystem.PushNotification(1, 0, "We can not find the order, someone possibly accepted it.", "marketCloseFailure");
+        if (stillOrdered) notificationSystem.PushNotification(1, 0, "We will close the order after submission.", "marketCloseSuccess");
+        else notificationSystem.PushNotification(1, 0, "We can not find the order, someone possibly accepted it.", "marketCloseFailure");
     }
 
     public void AcceptMarketOrder(string seller, string id)
@@ -307,10 +282,7 @@ public class ClientInterface : MonoBehaviour
                 notificationSystem.PushNotification(2, 1, message, "collectorFailure");
             }
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message);
-        }
+        else notificationSystem.PushNotification(2, 1, message); 
 
         return successfulPurchase;
     }
@@ -319,14 +291,10 @@ public class ClientInterface : MonoBehaviour
     {
         switch (type)
         {
-            case 1:
-                return "Oil Pump";
-            case 2:
-                return "Metal Mine";
-            case 3:
-                return "Concrete Processor";
-            default:
-                return "Unkown Collector";
+            case 1:  return "Oil Pump";
+            case 2: return "Metal Mine";
+            case 3: return "Concrete Processor";
+            default: return "Unkown Collector";
         }
     }
     
@@ -371,24 +339,16 @@ public class ClientInterface : MonoBehaviour
                 int[] existingBunkers = EncodeUtility.GetBaseTypes(existingType);
 
                 int bunkerCount = 0;
-                for (int b = 0; b < 3; b++)
-                {
-                    if (queuedBunkers[b] > 0 || existingBunkers[b] > 0)
-                        bunkerCount++;
-                }
+                for (int b = 0; b < 3; b++) 
+                    if (queuedBunkers[b] > 0 || existingBunkers[b] > 0) bunkerCount++; 
 
-                if (bunkerCount < 2)
-                    message = string.Format("You can not build this {0}, check your resources.", bunkerName);
-                else
-                    message = "This tile already has two bunkers.";
+                if (bunkerCount < 2)  message = string.Format("You can not build this {0}, check your resources.", bunkerName);
+                else message = "This tile already has two bunkers.";
 
                 notificationSystem.PushNotification(2, 1, message, "defenseFailure");
             }
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message);
-        }
+        else notificationSystem.PushNotification(2, 1, message); 
 
         return successfulPurchase;
     }
@@ -397,14 +357,10 @@ public class ClientInterface : MonoBehaviour
     {
         switch (type)
         {
-            case 1:
-                return "Anti Troop Bunker";
-            case 2:
-                return "Anti Tank Bunker";
-            case 3:
-                return "Anti Air Bunker";
-            default:
-                return "Unkown Bunker";
+            case 1: return "Anti Troop Bunker";
+            case 2: return "Anti Tank Bunker";
+            case 3: return "Anti Air Bunker";
+            default: return "Unkown Bunker";
         }
     }
     
@@ -447,10 +403,7 @@ public class ClientInterface : MonoBehaviour
                 notificationSystem.PushNotification(2, 1, message, "defenseFailure");
             }
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message);
-        }
+        else notificationSystem.PushNotification(2, 1, message); 
         
 
         return successfulPurchase;
@@ -460,14 +413,10 @@ public class ClientInterface : MonoBehaviour
     {
         switch (type)
         {
-            case 1:
-                return "A Troop Blocker";
-            case 2:
-                return "A Tank Blocker";
-            case 3:
-                return "An Aircraft Blocker";
-            default:
-                return "An Unkown Blocker";
+            case 1: return "A Troop Blocker";
+            case 2: return "A Tank Blocker";
+            case 3: return "An Aircraft Blocker";
+            default: return "An Unkown Blocker";
         }
     }
     
@@ -486,8 +435,7 @@ public class ClientInterface : MonoBehaviour
         {
             SpendResources(spend);
 
-            if (queuedActions.buy == null)
-                queuedActions.buy = new List<int>(new int[9]);
+            if (queuedActions.buy == null) queuedActions.buy = new List<int>(new int[9]);
 
             queuedActions.buy[type] += amount;
             message = string.Format("{0} total {1} will be ordered after submission.", queuedActions.buy[type], GetUnitName(type));
@@ -504,26 +452,16 @@ public class ClientInterface : MonoBehaviour
     {
         switch (type)
         {
-            case 0:
-                return "Riflemen";
-            case 1:
-                return "Machine Gunners";
-            case 2:
-                return "Bazookamen";
-            case 3:
-                return "Light Tanks";
-            case 4:
-                return "Medium Tanks";
-            case 5:
-                return "Heavy Tanks";
-            case 6:
-                return "Light Fighters";
-            case 7:
-                return "Medium Fighters";
-            case 8:
-                return "Bombers";
-            default:
-                return "Invalid Type";
+            case 0: return "Riflemen";
+            case 1: return "Machine Gunners";
+            case 2: return "Bazookamen";
+            case 3: return "Light Tanks";
+            case 4: return "Medium Tanks";
+            case 5: return "Heavy Tanks";
+            case 6: return "Light Fighters";
+            case 7: return "Medium Fighters";
+            case 8: return "Bombers";
+            default: return "Invalid Type";
         }
     }
     
@@ -540,10 +478,7 @@ public class ClientInterface : MonoBehaviour
             message = "An expeditionary force is ready to depart on your command.";
             notificationSystem.PushNotification(1, 0, message, "searchSuccess");
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message, "searchFailure");
-        }
+        else notificationSystem.PushNotification(2, 1, message, "searchFailure");
         
     }
     
@@ -574,24 +509,17 @@ public class ClientInterface : MonoBehaviour
             message = string.Format("Adding resources to the {0} Market.", GetPoolName(type));
             notificationSystem.PushNotification(1, 0, message, "poolSuccess");
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message, "poolFailure");
-        }
+        else notificationSystem.PushNotification(2, 1, message, "poolFailure");
     }
 
     string GetPoolName(int type)
     {
         switch (type)
         {
-            case 0:
-                return "Oil";
-            case 1:
-                return "Metal";
-            case 2:
-                return "Concrete";
-            default:
-                return "Unknown";
+            case 0: return "Oil";
+            case 1: return "Metal";
+            case 2: return "Concrete";
+            default: return "Unknown";
         }
     }
     
@@ -607,28 +535,21 @@ public class ClientInterface : MonoBehaviour
             message = string.Format("Depleted Island {0}... is ready for auction.", island.Substring(0, 10));
             notificationSystem.PushNotification(1, 0, message, "warbucksSuccess");
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message, "warbucksFailure");
-        }
+        else notificationSystem.PushNotification(2, 1, message, "warbucksFailure");
     }
 
     //Battle Planning - Start
     //Remember in this battle planning section that you will need to update the clientState to reflect troop counts.
     public void InitBattleSquads(bool isAttack, string islandID)
     {
-        if (isAttack)
-            queuedActions.attk = new BattleCommand(islandID);
-        else
-            queuedActions.dfnd = new BattleCommand(islandID);
+        if (isAttack) queuedActions.attk = new BattleCommand(islandID);
+        else queuedActions.dfnd = new BattleCommand(islandID);
     }
     
     public void UpdatePlan(bool isAttack, int squad, int tile)
     {
-        if (isAttack)
-            queuedActions.attk.pln[squad].Add(tile);
-        else
-            queuedActions.dfnd.pln[squad].Add(tile);
+        if (isAttack) queuedActions.attk.pln[squad].Add(tile);
+        else queuedActions.dfnd.pln[squad].Add(tile);
     }
 
     public void ChangePlan(bool isAttack, int squad, List<int> plan)
@@ -701,18 +622,13 @@ public class ClientInterface : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            notificationSystem.PushNotification(2, 1, message, "withdrawlFailure");
-        }
+        else notificationSystem.PushNotification(2, 1, message, "withdrawlFailure");
     }
 
     public void SetFullBattlePlan(bool isAttack, string island, List<List<int>> counts, List<List<int>> plans)
     {
-        if (isAttack)
-            queuedActions.attk = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
-        else
-            queuedActions.dfnd = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
+        if (isAttack) queuedActions.attk = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
+        else queuedActions.dfnd = new BattleCommand(island, Deep.Convert(plans), Deep.Convert(counts));
     }
     //Battle Planning - End
 
@@ -728,16 +644,13 @@ public class ClientInterface : MonoBehaviour
         bool[] validities = QueueIsValid();
 
         for (int b = 0; b < validities.Length; b++)
-        {
             isValid = isValid && validities[b];
-        }
 
         if (isValid && !QueuedAreNull())
         {
             ConnectionLog log;
 
-            if (queuedActions.igBuy == 0)
-                log = communication.SendCommand(command);
+            if (queuedActions.igBuy == 0) log = communication.SendCommand(command);
             else
             {
                 Options options = new Options();
@@ -750,10 +663,7 @@ public class ClientInterface : MonoBehaviour
                     string serializesSendCoins = JsonConvert.SerializeObject(options);
                     log = communication.SendCommand(command, (JObject)JToken.FromObject(options));
                 }
-                else
-                {
-                    log = new ConnectionLog(false, "You do not have sufficient Chi for this action.");
-                }
+                else log = new ConnectionLog(false, "You do not have sufficient Chi for this action.");
             }
 
             if (log.success)
@@ -785,18 +695,15 @@ public class ClientInterface : MonoBehaviour
             List<List<int>> cleanedPlans = new List<List<int>>();
 
             for (int p = 0; p < queuedActions.dfnd.pln.Count; p++)
-            {
                 if (queuedActions.dfnd.pln[p].Count > 0)
                     cleanedPlans.Add(queuedActions.dfnd.pln[p].ToArray().ToList());
-            }
 
             if (cleanedPlans.Count > 0)
             {
                 queuedActions.dfnd.pln.Clear();
                 queuedActions.dfnd.pln = cleanedPlans;
             }
-            else
-                queuedActions.dfnd = null;
+            else queuedActions.dfnd = null;
         }
 
         if (queuedActions.attk != null)
@@ -804,18 +711,15 @@ public class ClientInterface : MonoBehaviour
             List<List<int>> cleanedPlans = new List<List<int>>();
 
             for (int p = 0; p < queuedActions.attk.pln.Count; p++)
-            {
                 if (queuedActions.attk.pln[p].Count > 0)
                     cleanedPlans.Add(queuedActions.attk.pln[p].ToArray().ToList());
-            }
 
             if (cleanedPlans.Count > 0)
             {
                 queuedActions.attk.pln.Clear();
                 queuedActions.attk.pln = cleanedPlans;
             }
-            else
-                queuedActions.attk = null;
+            else queuedActions.attk = null;
         }
     }
 
@@ -873,12 +777,8 @@ public class ClientInterface : MonoBehaviour
         double[] expenditureTotals = new double[4];
 
         for (int u = 0; u < 3; u++)
-        {
             for (int r = 0; r < 4; r++)
-            {
                 expenditureTotals[r] += chainState.currentConstants.unitCosts[u + type * 3, r] * queuedActions.buy[u + type * 3];
-            }
-        }
 
         UnspendResources(expenditureTotals);
 
@@ -916,17 +816,11 @@ public class ClientInterface : MonoBehaviour
         double[] expenditureTotals = new double[4];
 
         for (int u = 0; u < 9; u++)
-        {
             for (int r = 0; r < 4; r++)
-            {
-                expenditureTotals[r] += chainState.currentConstants.unitCosts[u, r] * queuedActions.buy[u]; 
-            }
-        }
-
+                expenditureTotals[r] += chainState.currentConstants.unitCosts[u, r] * queuedActions.buy[u];
+        
         for (int i = 0; i < 4; i++)
-        {
             queuedExpenditures[i] -= expenditureTotals[i];
-        }
 
         queuedActions.buy = null;
         notificationSystem.PushNotification(2, 2, "All unit purchases have been canceled.");
@@ -936,9 +830,7 @@ public class ClientInterface : MonoBehaviour
     public void CancelResourceDeposit()
     {
         for (int r = 0; r < queuedActions.pot.amnt.Count; r++)
-        {
             queuedExpenditures[r+1] -= queuedActions.pot.amnt[r];
-        }
 
         int poolType = queuedActions.pot.rsrc;
         queuedActions.pot = null;
@@ -982,9 +874,7 @@ public class ClientInterface : MonoBehaviour
         double[] resources = IslandSearchCostUtility.GetCost(chainState.players[player].islands.Count, chainState.currentConstants);
 
         for (int r = 0; r < resources.Length; r++)
-        {
-            queuedExpenditures[r] -= resources[r];
-        }
+            queuedExpenditures[r] -= resources[r]; 
 
         notificationSystem.PushNotification(2, 2, "Island search has been canceled.", "searchCancel");
         gui.SetGUIContents();
@@ -1009,46 +899,29 @@ public class ClientInterface : MonoBehaviour
 
                     for (int t = 0; t < collectors.Length; t++)
                     {
-                        if (collectors[t] != 0)
-                            collectorTypes.Add(collectors[t]);
-                        if (bunkers[t] != 0)
-                            bunkerTypes.Add(bunkers[t]);
+                        if (collectors[t] != 0) collectorTypes.Add(collectors[t]);
+                        if (bunkers[t] != 0) bunkerTypes.Add(bunkers[t]);
                     }
 
-                    if (blocker != 0)
-                        blockerTypes.Add(blocker);
+                    if (blocker != 0) blockerTypes.Add(blocker);
                 }
             }
         }
 
         for (int c = 0; c < collectorTypes.Count; c++)
-        {
             for (int r = 0; r < 4; r++)
-            {
                 expenditureTotals[r] += chainState.currentConstants.collectorCosts[collectorTypes[c] - 1, r];
-            }
-        }
 
         for (int b = 0; b < bunkerTypes.Count; b++)
-        {
             for (int r = 0; r < 4; r++)
-            {
                 expenditureTotals[r] += chainState.currentConstants.bunkerCosts[bunkerTypes[b] - 1, r];
-            }
-        }
 
         for (int b = 0; b < blockerTypes.Count; b++)
-        {
-            for (int r = 0; r < 4; r++)
-            {
+            for (int r = 0; r < 4; r++) 
                 expenditureTotals[r] += chainState.currentConstants.blockerCosts[blockerTypes[b] - 1, r];
-            }
-        }
 
         for (int r = 0; r < expenditureTotals.Length; r++)
-        {
-            queuedExpenditures[r] -= expenditureTotals[r];
-        }
+            queuedExpenditures[r] -= expenditureTotals[r]; 
 
 
         string islandID = queuedActions.bld.id;
@@ -1110,8 +983,7 @@ public class ClientInterface : MonoBehaviour
         bool doClean = true;
         for (int b = 0; b < queuedActions.buy.Count && doClean; b++)
         {
-            if (queuedActions.buy[b] > 0)
-                doClean = false;
+            if (queuedActions.buy[b] > 0) doClean = false;
         }
 
         if (doClean)
@@ -1139,14 +1011,10 @@ public class ClientInterface : MonoBehaviour
                 Island[] islands = new Island[playerIslandIDs.Count];
 
                 for (int i = 0; i < islands.Length; i++)
-                {
                     islands[i] = chainState.islands[playerIslandIDs[i]];
-                }
-
                 return islands;
             }
-            else
-                return new Island[0];
+            else return new Island[0];
         }
     }
 
@@ -1157,13 +1025,10 @@ public class ClientInterface : MonoBehaviour
             if (isPlaying)
             {
                 string attackableID = chainState.players[player].attackableIsland;
-                if (attackableIslandID != null && attackableIslandID != "")
-                    return chainState.islands[attackableID];
-                else
-                    return new Island();
+                if (attackableIslandID != null && attackableIslandID != "") return chainState.islands[attackableID];
+                else return new Island();
             }
-            else
-                return new Island();
+            else return new Island();
         }
     }
 
@@ -1171,10 +1036,8 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            if (isPlaying)
-                return chainState.players[player].islands;
-            else
-                return new List<string>();
+            if (isPlaying) return chainState.players[player].islands;
+            else return new List<string>();
         }
     }
 
@@ -1182,10 +1045,8 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            if (isPlaying)
-                return chainState.players[player].attackableIsland;
-            else
-                return "";
+            if (isPlaying) return chainState.players[player].attackableIsland;
+            else return "";
         }
     }
 
@@ -1200,10 +1061,7 @@ public class ClientInterface : MonoBehaviour
                 List<string> islands = chainState.players[player].islands;
 
                 foreach (string island in islands)
-                {
-                    if (chainState.islands[island].IsDepleted())
-                        depleted.Add(island);
-                }
+                    if (chainState.islands[island].IsDepleted()) depleted.Add(island);
             }
 
             return depleted;
@@ -1214,10 +1072,8 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            if (isPlaying)
-                return chainState.players[player].resources.ToArray();
-            else
-                return new double[4];
+            if (isPlaying) return chainState.players[player].resources.ToArray();
+            else return new double[4];
         }
     }
 
@@ -1225,10 +1081,8 @@ public class ClientInterface : MonoBehaviour
     {
         get
         {
-            if (isPlaying)
-                return chainState.players[player].units.ToArray();
-            else
-                return new double[9];
+            if (isPlaying) return chainState.players[player].units.ToArray();
+            else return new double[9];
         }
     }
 
@@ -1238,9 +1092,7 @@ public class ClientInterface : MonoBehaviour
 
         if (IslandExists(islandID))
         {
-            if (chainState.islands[islandID].squadCounts == null)
-                return false;
-
+            if (chainState.islands[islandID].squadCounts == null) return false; 
             hasDefenders = chainState.islands[islandID].squadCounts.Count > 0;
         }
 
@@ -1262,12 +1114,9 @@ public class ClientInterface : MonoBehaviour
     public bool hasDefendPlanInQueue { get { return queuedActions.dfnd != null; } }
     public bool IslandIsBeingDefended(string _islandID)
     {
-        if (queuedActions.dfnd == null)
-            return false;
-        else if (queuedActions.dfnd.id == _islandID)
-            return true;
-        else
-            return false;
+        if (queuedActions.dfnd == null) return false;
+        else if (queuedActions.dfnd.id == _islandID) return true;
+        else return false;
     } 
 
     public bool hasIslandDevelopmentInQueue { get { return queuedActions.bld != null; } }
@@ -1275,24 +1124,18 @@ public class ClientInterface : MonoBehaviour
 
     public bool IslandExists(string islandID)
     {
-        if (isPlaying)
-            return chainState.islands.ContainsKey(islandID);
-        else
-            return false;
+        if (isPlaying) return chainState.islands.ContainsKey(islandID);
+        else return false;
     }
 
     public Island GetIsland(string islandID)
     {
-        if (isPlaying)
-            return chainState.islands[islandID];
-        else
-            return new Island();
+        if (isPlaying) return chainState.islands[islandID];
+        else return new Island();
     }
 
     public double GetContributionSize(int type)
-    {
-       return PoolUtility.GetPoolSize(chainState.resourceContributions, type);
-    }
+    { return PoolUtility.GetPoolSize(chainState.resourceContributions, type); }
 
     public double[] GetAllPoolSizes()
     {
@@ -1327,10 +1170,8 @@ public class ClientInterface : MonoBehaviour
 
         foreach (KeyValuePair<string, List<List<double>>> pair in chainState.resourceContributions)
         {
-            if (pair.Key != player)
-                counter++;
-            else
-                continue;
+            if (pair.Key != player) counter++;
+            else continue;
         }
 
         return ownerships[counter][type]/totalPoints[type]; 
@@ -1345,16 +1186,12 @@ public class ClientInterface : MonoBehaviour
             playerAmount = chainState.depletedContributions[player].Count + queuedDepletedSubmissions.Count;
 
         foreach (KeyValuePair<string, List<string>> pair in chainState.depletedContributions)
-        {
             total += pair.Value.Count;
-        }
 
         double ownership = 1.0f;
 
-        if (playerAmount == 0.0f)
-            ownership = 0.0f;
-        else
-            ownership = playerAmount / total;
+        if (playerAmount == 0.0f) ownership = 0.0f;
+        else ownership = playerAmount / total;
             
         return ownership;
     }
@@ -1383,110 +1220,78 @@ public class ClientInterface : MonoBehaviour
         if (queuedActions.nat != null)
         {
             nation = Validity.Nation(queuedActions.nat);
-
-            if(!nation)
-                queuedActions.nat = null;
+            if(!nation) queuedActions.nat = null;
         }
 
         if (queuedActions.bld != null)
         {
             build = Validity.BuildOrder(queuedActions.bld, chainState, player);
-
-            if(!build)
-                queuedActions.bld = null;
+            if(!build) queuedActions.bld = null;
         }
 
         if (queuedActions.buy != null)
         {
             units = Validity.PurchaseUnits(queuedActions.buy, chainState.players[player].resources.ToArray(), chainState.currentConstants.unitCosts);
-
-            if (!units)
-                queuedActions.buy = null;
+            if (!units) queuedActions.buy = null;
         }
 
         if (queuedActions.srch != null)
         {
             search = Validity.IslandSearch(queuedActions.srch);
-
-            if (!search)
-                queuedActions.srch = null;
+            if (!search) queuedActions.srch = null;
         }
 
         if (queuedActions.pot != null)
         {
             resource = Validity.ResourceSubmissions(queuedActions.pot, chainState.players[player].resources.ToArray());
-
-            if (!resource)
-                queuedActions.pot = null;
+            if (!resource) queuedActions.pot = null;
         }
 
         if (queuedActions.dep != null)
         {
             depleted = Validity.DepletedSubmissions(queuedActions.dep, chainState, player);
-
-            if (!depleted)
-                queuedActions.dep = null;
+            if (!depleted) queuedActions.dep = null;
         }
 
         if (queuedActions.attk != null)
         {
             attack = Validity.AttackPlan(queuedActions.attk.pln) && Validity.AttackSquad(queuedActions.attk.sqd, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
             && chainState.players[player].attackableIsland == queuedActions.attk.id;
-
-            if (!attack)
-                queuedActions.attk = null;
+            if (!attack) queuedActions.attk = null;
         }
 
         if (queuedActions.dfnd != null)
         {
             defend = Validity.DefendPlan(queuedActions.dfnd.pln) && Validity.DefenseSquad(queuedActions.dfnd.sqd, chainState.players[player].units.ToArray(), chainState.currentConstants.unitHealths)
             && chainState.players[player].islands.Contains(queuedActions.dfnd.id);
-
-            if (!defend)
-                queuedActions.dfnd = null;
+            if (!defend) queuedActions.dfnd = null;
         }
 
         if (queuedActions.opn != null)
         {
-            if (queuedActions.opn.sell == new double[4])
-                openOrder = false;
-            if (queuedActions.opn.buy == new double[4])
-                openOrder = false;
-
-            if (!openOrder)
-                queuedActions.opn = null;
+            if (queuedActions.opn.sell == new double[4]) openOrder = false;
+            if (queuedActions.opn.buy == new double[4]) openOrder = false;
+            if (!openOrder) queuedActions.opn = null;
         }
 
         if (queuedActions.cls != null && queuedActions.cls != "")
         {
-            if (!Validity.PlayerCanCloseOrder(chainState.resourceMarket, player, queuedActions.cls))
-                closeOrder = false;
-
-            if (!closeOrder)
-                queuedActions.cls = null;
+            if (!Validity.PlayerCanCloseOrder(chainState.resourceMarket, player, queuedActions.cls)) closeOrder = false;
+            if (!closeOrder) queuedActions.cls = null;
         }
 
         if (queuedActions.rmv != null)
         {
             remove = queuedActions.rmv.id != null && queuedActions.rmv.sqds != null;
-
-            if (remove)
-                remove = chainState.players[player].islands.Contains(queuedActions.rmv.id);
-
-            if(remove)
-                remove =  queuedActions.rmv.sqds.Length <= 4 && queuedActions.rmv.sqds.Length > 0;
-
-            if (!remove)
-                queuedActions.rmv = null;
+            if (remove) remove = chainState.players[player].islands.Contains(queuedActions.rmv.id);
+            if (remove) remove =  queuedActions.rmv.sqds.Length <= 4 && queuedActions.rmv.sqds.Length > 0;
+            if (!remove) queuedActions.rmv = null;
         }
 
         if (queuedActions.acpt != null)
         {
-            if (!Validity.PlayerCanAcceptOrder(chainState.resourceMarket, queuedActions.acpt[0], queuedActions.acpt[1], player))
-                acceptOrder = false;
-
-            if (!acceptOrder)
-                queuedActions.acpt = null;
+            if (!Validity.PlayerCanAcceptOrder(chainState.resourceMarket, queuedActions.acpt[0], queuedActions.acpt[1], player))  acceptOrder = false;
+            if (!acceptOrder) queuedActions.acpt = null;
         }
 
         size = Validity.UpdateSize(queuedActions);
