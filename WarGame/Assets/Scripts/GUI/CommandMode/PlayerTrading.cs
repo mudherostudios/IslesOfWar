@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using IslesOfWar.ClientSide;
 using MudHero;
 
@@ -48,7 +46,7 @@ public class PlayerTrading : MonoBehaviour
     protected void AdjustOrderContentWindow(int count)
     {
         Rect oldRect = orderContent.GetComponent<RectTransform>().rect;
-        orderContent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, orderItemYOffset);
+        orderContent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, (orderItemHeight*count)+orderItemYOffset);
     }
 
     public void PopulateOrderList(string user)
@@ -67,7 +65,7 @@ public class PlayerTrading : MonoBehaviour
     void AddOrderToWindow(MarketOrder order, int index)
     {
         GameObject orderObject = Instantiate(orderItemPrefab);
-        orderObject.GetComponent<OrderItem>().SetOrder(order, this);
+        orderObject.GetComponent<OrderItem>().SetOrder(order, gameObject);
         orderObject.transform.parent = orderContent;
         orderObject.transform.localPosition = new Vector2(orderItemXOffset, (orderItemHeight * -index) - orderItemYOffset);
         orderItems.Add(orderObject);
@@ -98,5 +96,4 @@ public class PlayerTrading : MonoBehaviour
             }
         }
     }
-
 }

@@ -12,6 +12,9 @@ public class BaseClient : MonoBehaviour
     protected PlayerActions queuedActions;
     protected string player;
     protected JsonSerializerSettings settings;
+    
+    public State State { get { return gameState; } }
+    public string Player { get { return player; } }
 
     protected double[] queuedExpenditures;
 

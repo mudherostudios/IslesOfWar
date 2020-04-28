@@ -1,29 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using IslesOfWar.ClientSide;
 using MudHero;
-using Newtonsoft.Json;
 
+//Make Sure to phase out PlayerTrading
 public class OrderItem : MonoBehaviour, IPointerClickHandler
 {
-    public PlayerTrading master;
-    public Text orderID;
+    public GameObject master;
+    public Text orderID, orderOwner;
     public Text sellWarbucks, sellOil, sellMetal, sellConcrete;
     public Text buyWarbucks, buyOil, buyMetal, buyConcrete;
     public MarketOrder order;
+    public string Owner;
 
     public OrderItem(){ }
     public OrderItem(MarketOrder _order){ SetOrder(_order, null); }
-    public OrderItem(MarketOrder _order, PlayerTrading trading){ SetOrder(_order, trading); }
-
-    public void SetOrder(MarketOrder _order, PlayerTrading trading)
+    public OrderItem(MarketOrder _order, GameObject trading){ SetOrder(_order, trading); }
+    public OrderItem(MarketOrder _order, GameObject trading, string owner)
+    {
+        SetOrder(_order, trading);
+        Owner = owner;
+    }
+    
+    public void SetOrder(MarketOrder _order, GameObject trading, string owner=null)
     {
         master = trading;
         order = Deep.CopyObject<MarketOrder>(_order);
-        SetOrderID(order.orderID);
+        SetMetaData(order.orderID, owner);
         SetSells(order.selling);
         SetBuys(order.buying);
     }
@@ -44,9 +49,10 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
         buyConcrete.text = buys[3].ToString("G8");
     }
 
-    void SetOrderID(string ID)
+    void SetMetaData(string ID, string owner=null)
     {
         orderID.text = ID;
+        if (owner != null) orderOwner.text = owner;
     }
 
     public void SetTextColor(Color color)
@@ -56,6 +62,10 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData data)
     {
-        master.SetSelected(gameObject);
+        MarketTrading marketTrading = master.GetComponent<MarketTrading>();
+        PlayerTrading playerTrading = master.GetComponent<PlayerTrading>();
+
+        if(playerTrading != null) playerTrading.SetSelected(gameObject);
+        if(marketTrading != null) marketTrading.SetSelected(gameObject);
     }
 }

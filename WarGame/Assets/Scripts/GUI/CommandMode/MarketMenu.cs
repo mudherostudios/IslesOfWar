@@ -44,8 +44,7 @@ public class MarketMenu : PlayerTrading
 
     public void Show()
     {
-        if (userItems == null)
-            userItems = new List<GameObject>();
+        if (userItems == null) userItems = new List<GameObject>();
 
         gameObject.SetActive(true);
         RescanMarket(true);
@@ -59,8 +58,7 @@ public class MarketMenu : PlayerTrading
             CleanLists();
             PopulateLists();
         }
-        else
-            RescanMarket();
+        else  RescanMarket();
     }
 
     void PopulateLists()
@@ -117,9 +115,7 @@ public class MarketMenu : PlayerTrading
     void CleanUsers()
     {
         foreach (GameObject item in userItems)
-        {
-            Destroy(item);
-        }
+            Destroy(item); 
 
         userItems.Clear();
         AdjustUserContentWindow(0);
@@ -139,8 +135,7 @@ public class MarketMenu : PlayerTrading
         {
             count = marketData[user].Count;
             string temp = string.Copy(user);
-            if (temp.Length > 24)
-                temp = user.Substring(0, 24);
+            if (temp.Length > 24) temp = user.Substring(0, 24);
 
             userChunk = string.Format("{0}'s", temp);
         }
@@ -159,13 +154,10 @@ public class MarketMenu : PlayerTrading
         RescanMarket(false);
         bool parsed = double.TryParse(quantity.text, out evaluationValue);
 
-        if (!parsed)
-            evaluationValue = 0;
+        if (!parsed) evaluationValue = 0;
 
-        foreach (KeyValuePair<string, List<MarketOrder>> orderList in marketData)
-        {
-            orderList.Value.RemoveAll(Filter);
-        }
+        foreach (KeyValuePair<string, List<MarketOrder>> orderList in marketData) 
+            orderList.Value.RemoveAll(Filter); 
         
         CleanLists();
         PopulateLists();
@@ -183,10 +175,8 @@ public class MarketMenu : PlayerTrading
             bool hasSellResource = !FilterByEvaluator(remainingSells[resourceType]);
             bool hasBuyResource = !FilterByEvaluator(remainingBuys[resourceType]);
 
-            if (!hasSellResource)
-                remainingSells.Clear();
-            if (!hasBuyResource)
-                remainingBuys.Clear();
+            if (!hasSellResource) remainingSells.Clear();
+            if (!hasBuyResource)  remainingBuys.Clear();
         }
         else
         {
@@ -194,12 +184,9 @@ public class MarketMenu : PlayerTrading
             remainingBuys.RemoveAll(FilterByEvaluator);
         }
 
-        if (bothOrders)
-            hasTarget = remainingSells.Count > 0 || remainingBuys.Count > 0;
-        else if (sellOrders)
-            hasTarget = remainingSells.Count > 0;
-        else if (buyOrders)
-            hasTarget = remainingBuys.Count > 0;
+        if (bothOrders) hasTarget = remainingSells.Count > 0 || remainingBuys.Count > 0;
+        else if (sellOrders)  hasTarget = remainingSells.Count > 0;
+        else if (buyOrders) hasTarget = remainingBuys.Count > 0;
 
         //For readability
         bool filter = !hasTarget;
@@ -210,16 +197,11 @@ public class MarketMenu : PlayerTrading
     {
         switch (quantityType.value)
         {
-            case 0:
-                return value == 0; //Filter out if value is zero
-            case 1:
-                return value != evaluationValue; //Filter out if value is not equal to the user input
-            case 2:
-                return value < evaluationValue || value == 0; //Filter out if value is less than user input or is zero
-            case 3:
-                return value > evaluationValue || value == 0; //Filter out if value is greater than the user input or is zero
-            default:
-                return true;
+            case 0: return value == 0; //Filter out if value is zero
+            case 1: return value != evaluationValue; //Filter out if value is not equal to the user input
+            case 2: return value < evaluationValue || value == 0; //Filter out if value is less than user input or is zero
+            case 3: return value > evaluationValue || value == 0; //Filter out if value is greater than the user input or is zero
+            default: return true;
         }
     }
 
