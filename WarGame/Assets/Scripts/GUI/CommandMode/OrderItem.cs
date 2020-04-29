@@ -49,15 +49,20 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
         buyConcrete.text = buys[3].ToString("G8");
     }
 
-    void SetMetaData(string ID, string owner=null)
+    public void SetMetaData(string ID, string owner=null)
     {
         orderID.text = ID;
-        if (owner != null) orderOwner.text = owner;
+        if (owner != null) { orderOwner.text = owner; Owner = owner; }
     }
 
     public void SetTextColor(Color color)
     {
         orderID.color = color;
+    }
+
+    public void SetColor(Color color)
+    {
+        gameObject.GetComponent<Image>().color = color;
     }
 
     public void OnPointerClick(PointerEventData data)

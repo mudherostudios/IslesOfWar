@@ -10,7 +10,7 @@ public class BaseClient : MonoBehaviour
     protected State gameState;
     protected CommunicationInterface commsInterface;
     protected PlayerActions queuedActions;
-    protected string player;
+    public string player;
     protected JsonSerializerSettings settings;
     
     public State State { get { return gameState; } }

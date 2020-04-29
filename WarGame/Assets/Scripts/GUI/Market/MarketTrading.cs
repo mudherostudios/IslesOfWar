@@ -16,11 +16,10 @@ public class MarketTrading : MonoBehaviour
     protected Dictionary<string, OrderItem> orderItems = new Dictionary<string, OrderItem>();
     protected Dictionary<string,List<MarketOrder>> marketData = new Dictionary<string, List<MarketOrder>>();
     protected GameObject selectedGameObject;
+    protected bool hasSelected = false;
 
-    public void Hide()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Hide() { gameObject.SetActive(false); }
+    public void Show() { gameObject.SetActive(true); }
 
     protected void RescanMarket()
     {
@@ -35,6 +34,7 @@ public class MarketTrading : MonoBehaviour
         orderObjects.Clear();
         orderItems.Clear();
         marketData.Clear();
+        AdjustOrderContentWindow(0);
     }
     
     public void PopulateOrderList()
@@ -57,6 +57,7 @@ public class MarketTrading : MonoBehaviour
 
         OrderItem orderItem = orderObject.GetComponent<OrderItem>();
         orderItem.SetOrder(order, null, owner);
+        orderItem.master = gameObject;
         orderItems.Add(order.orderID, orderItem);
     }
 
@@ -78,6 +79,20 @@ public class MarketTrading : MonoBehaviour
 
     public void SetSelected(GameObject selected)
     {
-        if(selected.tag == "OrderItem") selectedGameObject = selected;
+        GameObject lastSelected = selectedGameObject;
+        if (selected.tag == "OrderItem") selectedGameObject = selected;
+
+        if (lastSelected != selected)
+        {
+            selectedGameObject.GetComponent<OrderItem>().SetColor(SelectedColor);
+            if (lastSelected != null) lastSelected.GetComponent<OrderItem>().SetColor(Unselected);
+        }
+        else
+        {
+            selectedGameObject.GetComponent<OrderItem>().SetColor(Unselected);
+            selectedGameObject = null;
+        }
+
+        hasSelected = true;
     }
 }

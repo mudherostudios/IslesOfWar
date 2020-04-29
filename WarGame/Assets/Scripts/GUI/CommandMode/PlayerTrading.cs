@@ -22,10 +22,7 @@ public class PlayerTrading : MonoBehaviour
         orderItems = new List<GameObject>();
     }
 
-    public void Hide()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Hide() { gameObject.SetActive(false); }
 
     protected void RescanMarket()
     {
@@ -35,9 +32,7 @@ public class PlayerTrading : MonoBehaviour
     protected void CleanOrders()
     {
         foreach (GameObject item in orderItems)
-        {
             Destroy(item);
-        }
 
         orderItems.Clear();
         AdjustOrderContentWindow(0);
@@ -54,9 +49,7 @@ public class PlayerTrading : MonoBehaviour
         if (marketData.ContainsKey(user))
         {
             for (int d = 0; d < marketData[user].Count; d++)
-            {
                 AddOrderToWindow(marketData[user][d], d);
-            }
 
             AdjustOrderContentWindow(marketData[user].Count);
         }
