@@ -33,7 +33,6 @@ public class MarketTrading : MonoBehaviour
         
         orderObjects.Clear();
         orderItems.Clear();
-        marketData.Clear();
         AdjustOrderContentWindow(0);
     }
     
@@ -66,15 +65,15 @@ public class MarketTrading : MonoBehaviour
         for (int k = 0; k < sortedKeys.Count; k++)
         {
             float yPos = (OrderItemHeight*k) + OrderItemYOffset;
-            Vector2 position = new Vector2(OrderItemXOffset, yPos);
-            orderObjects[sortedKeys[k]].transform.position = position;
+            Vector2 position = new Vector2(OrderItemXOffset, -yPos);
+            orderObjects[sortedKeys[k]].transform.localPosition = position;
         }
     }
 
     protected void AdjustOrderContentWindow(int count)
     {
         Rect oldRect = OrderContent.GetComponent<RectTransform>().rect;
-        OrderContent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.size.x, (OrderItemHeight * count) + OrderItemYOffset);
+        OrderContent.GetComponent<RectTransform>().sizeDelta = new Vector2(oldRect.x, (OrderItemHeight * count) + OrderItemYOffset + OrderItemHeight);
     }
 
     public void SetSelected(GameObject selected)

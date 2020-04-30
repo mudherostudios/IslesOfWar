@@ -24,6 +24,7 @@ public class ConnectGUI : MonoBehaviour
     public CommunicationInterface comms;
     public Telemetry telemetry;
     public Tutorial tutorial;
+    public int sceneToLoad;
 
     private bool connected = false, prompted = false, traversing = false, neededCreation = false;
     private float totalDistance, lastTime, lastBlock;
@@ -35,12 +36,9 @@ public class ConnectGUI : MonoBehaviour
 
     private void Start()
     {
-        if (SaveLoad.state.username != null)
-            username.text = SaveLoad.state.username;
-        if (SaveLoad.state.password != null)
-            password.text = SaveLoad.state.password;
-        if (SaveLoad.state.walletPassword != null)
-            walletPassword.text = SaveLoad.state.walletPassword;
+        if (SaveLoad.state.username != null) username.text = SaveLoad.state.username;
+        if (SaveLoad.state.password != null) password.text = SaveLoad.state.password;
+        if (SaveLoad.state.walletPassword != null) walletPassword.text = SaveLoad.state.walletPassword;
 
         useCookie.isOn = SaveLoad.state.useCookies;
         CookieToggleUpdate();
@@ -62,10 +60,8 @@ public class ConnectGUI : MonoBehaviour
             if (progress[1] - progress[0] <= 100 && progress[1] > 0 && !prompted && !neededCreation)
             {
                 List<string> names = new List<string>(comms.nameList);
-                if (names.Count > 0)
-                    PromptForUser(names);
-                else
-                    PromptCreation();
+                if (names.Count > 0) PromptForUser(names);
+                else PromptCreation();
             }
 
             if (traversing)
@@ -83,8 +79,7 @@ public class ConnectGUI : MonoBehaviour
             if (lastBlock != comms.blockCount && neededCreation)
             {
                 List<string> names = new List<string>(comms.nameList);
-                if (names.Count > 0)
-                    PromptForUser(names);
+                if (names.Count > 0) PromptForUser(names);
             }
 
         }
@@ -92,10 +87,8 @@ public class ConnectGUI : MonoBehaviour
 
     public void PromptForUser(List<string> names)
     {
-        for(int n = 0; n < names.Count; n++)
-        {
-            names[n] = names[n].Substring(2);
-        }
+        for(int n = 0; n < names.Count; n++) 
+            names[n] = names[n].Substring(2); 
 
         usernamesList.ClearOptions();
         usernamesList.AddOptions(names);
@@ -136,15 +129,14 @@ public class ConnectGUI : MonoBehaviour
         messages.text = "Loading...";
         userPanel.SetActive(false);
         loginButton.SetActive(false);
-        SceneManager.LoadSceneAsync(2);
+        SceneManager.LoadSceneAsync(sceneToLoad);
     }
 
     public void Connect()
     {
         ConnectionLog log = new ConnectionLog(false, "Could not even attempt to connect.");
 
-        if (SaveLoad.state.useAdvanced)
-            SetAdvancedOptionsAndPrefs();
+        if (SaveLoad.state.useAdvanced) SetAdvancedOptionsAndPrefs();
 
         if (!useCookie.isOn)
         {
@@ -173,18 +165,14 @@ public class ConnectGUI : MonoBehaviour
             blockLabel.SetActive(true);
             comms.progressMessage = log.message;
         }
-        else
-        {
-            messages.text = log.message;
-        }
+        else messages.text = log.message; 
 
         connected = log.success;
     }
 
     public void CompleteTutorial(string tutorialName)
     {
-        if(tutorial != null)
-            tutorial.AutoCompleteTutorial(tutorialName);
+        if(tutorial != null) tutorial.AutoCompleteTutorial(tutorialName);
     }
 
     void SetAdvancedOptionsAndPrefs()
@@ -205,8 +193,7 @@ public class ConnectGUI : MonoBehaviour
         daemonPort.text = SaveLoad.state.daemonPort.ToString();
         gsrPort.text = SaveLoad.state.gspPort.ToString();
 
-        if(SaveLoad.state.walletName != null)
-            walletName.text = SaveLoad.state.walletName;
+        if(SaveLoad.state.walletName != null) walletName.text = SaveLoad.state.walletName;
     }
 
     string GetCookiePassword()
@@ -218,10 +205,8 @@ public class ConnectGUI : MonoBehaviour
         string filePath = Path.Combine(folderPath, cookieFolder);
         string parsedValue = "";
 
-        if (File.Exists(filePath))
-            parsedValue = File.ReadAllText(filePath);
-        if (parsedValue.Contains(":"))
-            cookiePassword = parsedValue.Split(':')[1];
+        if (File.Exists(filePath)) parsedValue = File.ReadAllText(filePath);
+        if (parsedValue.Contains(":")) cookiePassword = parsedValue.Split(':')[1];
 
         return cookiePassword;
     }
@@ -241,13 +226,11 @@ public class ConnectGUI : MonoBehaviour
         {
             username.enabled = true;
             username.placeholder.GetComponent<Text>().text = "Enter RPC Username...";
-            if (SaveLoad.state.username != null)
-                username.text = SaveLoad.state.username;
+            if (SaveLoad.state.username != null) username.text = SaveLoad.state.username;
 
             password.enabled = true;
             password.placeholder.GetComponent<Text>().text = "Enter RPC Password...";
-            if (SaveLoad.state.password != null)
-                password.text = SaveLoad.state.password;
+            if (SaveLoad.state.password != null) password.text = SaveLoad.state.password;
         }
     }
 
@@ -261,8 +244,7 @@ public class ConnectGUI : MonoBehaviour
         Color selectedColor = onColor;
         SaveLoad.state.useAdvanced = isAdvanced;
 
-        if (!isAdvanced)
-            selectedColor = offColor;
+        if (!isAdvanced) selectedColor = offColor;
 
         daemonPort.transform.Find("Text").GetComponent<Text>().color = selectedColor;
         daemonPort.transform.Find("Title").GetComponent<Text>().color = selectedColor;

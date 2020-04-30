@@ -10356,6 +10356,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Url: wss://websocket.islesofwar.online
   OrderIdToDelete: 
+  Resolver: {fileID: 0}
 --- !u!114 &1329419270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10368,7 +10369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21c9d692c0bba74409cc70b6925cd93f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  commander: {fileID: 0}
+  Commander: {fileID: 0}
 --- !u!1 &1331821623
 GameObject:
   m_ObjectHideFlags: 0
@@ -15135,6 +15136,7 @@ MonoBehaviour:
   comms: {fileID: 1329419265}
   telemetry: {fileID: 1329419269}
   tutorial: {fileID: 472039781}
+  sceneToLoad: 3
 --- !u!1 &2100830465
 GameObject:
   m_ObjectHideFlags: 0

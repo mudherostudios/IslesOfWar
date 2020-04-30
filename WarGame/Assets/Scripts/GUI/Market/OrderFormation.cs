@@ -92,7 +92,7 @@ public class OrderFormation : MonoBehaviour
         SetInputs(null, -1);
         
         stage = -1;
-        Phase.text = "-------";
+        Phase.text = "Order Formation";
 
         buys = null;
         sells = null;

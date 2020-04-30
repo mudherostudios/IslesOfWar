@@ -8,16 +8,16 @@ using Newtonsoft.Json;
 public class BaseClient : MonoBehaviour
 {
     protected State gameState;
-    protected CommunicationInterface commsInterface;
+    public CommunicationInterface commsInterface;
     protected PlayerActions queuedActions;
-    public string player;
+    protected string player;
     protected JsonSerializerSettings settings;
     
     public State State { get { return gameState; } }
     public string Player { get { return player; } }
 
     protected double[] queuedExpenditures;
-
+    
     public double[] PlayerResources
     {
         get
@@ -31,7 +31,7 @@ public class BaseClient : MonoBehaviour
     {
         queuedExpenditures = new double[4];
         settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }; 
-        //commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>();
+        commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>();
     }
 
     protected void CleanEmptyPlans()
@@ -82,7 +82,11 @@ public class BaseClient : MonoBehaviour
         //commsInterface.SendCommand(command);
     }
 
-    protected void ClearQueuedActions() { queuedActions = new PlayerActions(); }
+    public bool HasComms { get { return commsInterface != null; } }
+    public int Progress { get { return commsInterface.blockProgress; } }
 
-    
+    protected void ClearQueuedActions() { queuedActions = new PlayerActions(); }
+    public void FindCommsInterface() { commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>(); }
+    public void SetPlayer() { if(HasComms) player = commsInterface.player; }
+    public void UpdateState() { if (HasComms) gameState = JsonConvert.DeserializeObject<State>(JsonConvert.SerializeObject(commsInterface.state)); }
 }
