@@ -14,7 +14,6 @@ public class ResourceMarket : MarketTrading
 
     private string selectedOrderID = "";
     private double evaluationValue = 0;
-    public OrderItem testOtherItem, testOurItem;
 
     private void Start()
     {
@@ -24,12 +23,6 @@ public class ResourceMarket : MarketTrading
         Client.UpdateState();
         LastBlockProgress = Client.Progress;
         RescanMarket(true);
-        /*
-        orderItems.Add("0ab7c8dF", testOtherItem);
-        orderItems.Add("13377331", testOurItem);
-        orderItems["0ab7c8dF"].SetMetaData("0ab7c8dF", "0123456789ABCDEF7");
-        orderItems["13377331"].SetMetaData("13377331", Client.Player);
-        */
     }
 
     private void Update()
@@ -42,16 +35,37 @@ public class ResourceMarket : MarketTrading
             SetOrderButtons(selectedOrderID != "");
             hasSelected = false;
         }
+
+        UpdateMarketOnProgress();
+    }
+
+    private void UpdateMarketOnProgress()
+    {
+        if (LastBlockProgress != Client.Progress)
+        {
+            LastBlockProgress = Client.Progress;
+            RescanMarket(true);
+        }
     }
 
     public void AcceptOrder()
     {
-        Debug.Log($"acpt:[\"{selectedOrderID}\",\"{orderItems[selectedOrderID].Owner}\"]");
+        bool canAccept = Client.AcceptMarketOrder(orderItems[selectedOrderID].Owner, selectedOrderID);
+        if (canAccept)
+        {
+            Client.SendOrderToBlockchain();
+            orderItems[selectedOrderID].SetPending(PendingColor, PendingTextColor);
+        }
     }
 
     public void RemoveOrder()
     {
-        Debug.Log($"rmv:\"{selectedOrderID}\"");
+        bool canClose = Client.CloseMarketOrder(selectedOrderID);
+        if (canClose)
+        {
+            Client.SendOrderToBlockchain();
+            orderItems[selectedOrderID].SetPending(PendingColor, PendingTextColor);
+        }
     }
 
     private void SetOrderButtons(bool interactable)
@@ -72,7 +86,7 @@ public class ResourceMarket : MarketTrading
         }
     }
     
-    private void RescanMarket(bool refreshWindow)
+    public void RescanMarket(bool refreshWindow)
     {
         RescanMarket();
 

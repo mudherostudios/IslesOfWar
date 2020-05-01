@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,13 +37,14 @@ public class ResourceMonitor : MonoBehaviour
 
     string GetOrderOfMagnitudeString(double amount)
     {
+        double absolute = Math.Abs(amount);
         double converted = 0;
         string place = "";
 
-        if (amount >= 1000000000000) { converted = amount / 1000000000000; place = "T"; }
-        else if (amount >= 1000000000) { converted = amount / 1000000000; place = "B"; }
-        else if (amount >= 1000000) { converted = amount / 1000000; place = "M"; }
-        else if (amount >= 1000) { converted = amount / 1000; place = "K"; }
+        if (absolute >= 1000000000000) { converted = amount / 1000000000000; place = "T"; }
+        else if (absolute >= 1000000000) { converted = amount / 1000000000; place = "B"; }
+        else if (absolute >= 1000000) { converted = amount / 1000000; place = "M"; }
+        else if (absolute >= 1000) { converted = amount / 1000; place = "K"; }
         else { converted = amount; place = ""; }
 
         return string.Format("{0:F1} {1}", converted, place);

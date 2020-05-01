@@ -9,7 +9,7 @@ public class BaseClient : MonoBehaviour
 {
     protected State gameState;
     protected CommunicationInterface commsInterface;
-    protected PlayerActions queuedActions;
+    protected PlayerActions queuedActions = new PlayerActions();
     protected string player;
     protected JsonSerializerSettings settings;
     
@@ -84,12 +84,13 @@ public class BaseClient : MonoBehaviour
         return subtracted;
     }
 
-    protected void SendOrderToBlockchain()
+    public void SendOrderToBlockchain()
     {
         string action = JsonConvert.SerializeObject(queuedActions, Formatting.None, settings);
-        Debug.Log(action);
-        //string command = string.Format("{{\"g\":{{\"iow\":{0}}}}}", action);
-        //commsInterface.SendCommand(command);
+        string command = string.Format("{{\"g\":{{\"iow\":{0}}}}}", action);
+        Debug.Log(command);
+        commsInterface.SendCommand(command);
+        queuedActions = new PlayerActions();
     }
 
     public bool HasComms { get { return commsInterface != null; } }

@@ -10,7 +10,7 @@ public class MarketTrading : MonoBehaviour
     public Transform OrderContent;
     public GameObject OrderItemPrefab;
     public float OrderItemHeight, OrderItemXOffset, OrderItemYOffset;
-    public Color SelectedColor, Unselected;
+    public Color SelectedColor, Unselected, PendingColor, PendingTextColor;
 
     protected Dictionary<string, GameObject> orderObjects = new Dictionary<string, GameObject>();
     protected Dictionary<string, OrderItem> orderItems = new Dictionary<string, OrderItem>();

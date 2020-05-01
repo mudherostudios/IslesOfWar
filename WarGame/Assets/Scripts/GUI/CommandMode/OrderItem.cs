@@ -14,6 +14,7 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
     public Text buyWarbucks, buyOil, buyMetal, buyConcrete;
     public MarketOrder order;
     public string Owner;
+    private bool isPending;
 
     public OrderItem(){ }
     public OrderItem(MarketOrder _order){ SetOrder(_order, null); }
@@ -55,14 +56,22 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
         if (owner != null) { orderOwner.text = owner; Owner = owner; }
     }
 
-    public void SetTextColor(Color color)
+    public void SetTextColor(Color color) { orderID.color = color; }
+    public void SetColor(Color color) { if (!isPending) gameObject.GetComponent<Image>().color = color; }
+    public void SetPending(Color backgroundColor, Color textColor)
     {
-        orderID.color = color;
-    }
-
-    public void SetColor(Color color)
-    {
-        gameObject.GetComponent<Image>().color = color;
+        gameObject.GetComponent<Image>().color = backgroundColor;
+        orderID.color = textColor;
+        orderOwner.color = textColor;
+        sellWarbucks.color = textColor;
+        sellOil.color = textColor;
+        sellMetal.color = textColor;
+        sellConcrete.color = textColor;
+        buyWarbucks.color = textColor;
+        buyOil.color = textColor;
+        buyMetal.color = textColor;
+        buyConcrete.color = textColor;
+        isPending = true;
     }
 
     public void OnPointerClick(PointerEventData data)
