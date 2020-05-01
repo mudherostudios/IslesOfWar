@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 public class BaseClient : MonoBehaviour
 {
     protected State gameState;
-    public CommunicationInterface commsInterface;
+    protected CommunicationInterface commsInterface;
     protected PlayerActions queuedActions;
     protected string player;
     protected JsonSerializerSettings settings;
@@ -17,7 +17,7 @@ public class BaseClient : MonoBehaviour
     public string Player { get { return player; } }
 
     protected double[] queuedExpenditures;
-    
+
     public double[] PlayerResources
     {
         get
@@ -72,6 +72,16 @@ public class BaseClient : MonoBehaviour
         queuedExpenditures[1] -= resources[1];
         queuedExpenditures[2] -= resources[2];
         queuedExpenditures[3] -= resources[3];
+    }
+
+    public double[] GetSubtractedResources()
+    {
+        double[] subtracted = PlayerResources;
+        subtracted[0] -= queuedExpenditures[0];
+        subtracted[1] -= queuedExpenditures[1];
+        subtracted[2] -= queuedExpenditures[2];
+        subtracted[3] -= queuedExpenditures[3];
+        return subtracted;
     }
 
     protected void SendOrderToBlockchain()

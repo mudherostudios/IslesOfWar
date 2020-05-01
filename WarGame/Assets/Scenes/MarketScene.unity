@@ -5305,6 +5305,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 962625249}
+  - component: {fileID: 962625250}
   m_Layer: 5
   m_Name: Resources
   m_TagString: Untagged
@@ -5335,6 +5336,23 @@ RectTransform:
   m_AnchoredPosition: {x: -572, y: 0}
   m_SizeDelta: {x: -1066, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &962625250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962625248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9656b1e29ca02a4dbc6a943e190a241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WarbuxAmount: {fileID: 1156314406}
+  OilAmount: {fileID: 1961333618}
+  MetalAmount: {fileID: 2080839786}
+  ConcreteAmount: {fileID: 1715140844}
+  Client: {fileID: 198007146}
 --- !u!1 &968580991
 GameObject:
   m_ObjectHideFlags: 0

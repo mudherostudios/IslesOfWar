@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class ScreenGUI : MonoBehaviour
@@ -27,29 +24,16 @@ public class ScreenGUI : MonoBehaviour
             bool isLeft = false;
             bool isTop = false;
 
-            if (toolTip.activeSelf == false)
-                toolTip.SetActive(true);
+            if (toolTip.activeSelf == false) toolTip.SetActive(true);
+            if (pos.x < Screen.width / 2) isLeft = true;
+            if (pos.y < Screen.height / 2) isTop = true;
 
-            if (pos.x < Screen.width / 2)
-                isLeft = true;
-
-            if (pos.y < Screen.height / 2)
-                isTop = true;
-
-            if (isLeft && isTop)
-                toolTip.transform.position = pos + topLeftTipOffset;
-            else if (!isLeft && isTop)
-                toolTip.transform.position = pos + topRightTipOffset;
-            else if (isLeft && !isTop)
-                toolTip.transform.position = pos + bottomLeftTipOffset;
-            else if (!isLeft && !isTop)
-                toolTip.transform.position = pos + bottomRightTipOffset;
+            if (isLeft && isTop) toolTip.transform.position = pos + topLeftTipOffset;
+            else if (!isLeft && isTop) toolTip.transform.position = pos + topRightTipOffset;
+            else if (isLeft && !isTop) toolTip.transform.position = pos + bottomLeftTipOffset;
+            else if (!isLeft && !isTop) toolTip.transform.position = pos + bottomRightTipOffset;
         }
-        else if (!isTipping)
-        {
-            if (toolTip.activeSelf)
-                toolTip.SetActive(false);
-        }
+        else if (!isTipping && toolTip.activeSelf) toolTip.SetActive(false);
     }
 
     public void SetGUIContents()
@@ -66,31 +50,11 @@ public class ScreenGUI : MonoBehaviour
         double converted = 0;
         string place = "";
 
-        if (amount >= 1000000000000)
-        {
-            converted = amount / 1000000000000;
-            place = "T";
-        }
-        else if (amount >= 1000000000)
-        {
-            converted = amount / 1000000000;
-            place = "B";
-        }
-        else if (amount >= 1000000)
-        {
-            converted = amount / 1000000;
-            place = "M";
-        }
-        else if (amount >= 1000)
-        {
-            converted = amount / 1000;
-            place = "K";
-        }
-        else
-        {
-            converted = amount;
-            place = "";
-        }
+        if (amount >= 1000000000000){converted = amount / 1000000000000; place = "T"; }
+        else if (amount >= 1000000000){ converted = amount / 1000000000; place = "B"; }
+        else if (amount >= 1000000){ converted = amount / 1000000; place = "M"; }
+        else if (amount >= 1000){ converted = amount / 1000; place = "K"; }
+        else{ converted = amount; place = ""; }
 
         return string.Format("{0:F1} {1}", converted, place);
     }
@@ -102,9 +66,6 @@ public class ScreenGUI : MonoBehaviour
             toolTip.GetComponent<Text>().text = content;
             isTipping = true;
         }
-        else
-        {
-            isTipping = false;
-        }
+        else isTipping = false;
     }
 }

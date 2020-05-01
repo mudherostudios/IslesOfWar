@@ -7,6 +7,9 @@ using MudHero;
 public class MarketClient : BaseClient
 {
     private double[] queuedBuyOrder = new double[4];
+    private int lastBlockProgress;
+
+    private void Update() { if (lastBlockProgress != Progress) lastBlockProgress = Progress; UpdateState(); }
 
     public void CloseMarketOrder(string id)
     {
