@@ -11,6 +11,7 @@ public class ResourceMarket : MarketTrading
     public Toggle IsMine;
     public Button AcceptButton, RemoveButton;
     public AcceptOrderPrompt orderPrompt;
+    public RemoveOrderPrompt removePrompt;
     public int LastBlockProgress = 0;
 
     private string selectedOrderID = "";
@@ -53,6 +54,12 @@ public class ResourceMarket : MarketTrading
     {
         OrderItem order = orderItems[selectedOrderID];
         orderPrompt.Prompt(selectedOrderID, order.Owner, order.order.selling, order.order.buying);
+    }
+
+    public void PromptRemove()
+    {
+        MarketOrder order = orderItems[selectedOrderID].order;
+        removePrompt.Prompt(selectedOrderID, order.selling, order.buying);
     }
 
     public void AcceptOrder()

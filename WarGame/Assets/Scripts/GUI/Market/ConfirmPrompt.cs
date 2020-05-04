@@ -39,4 +39,9 @@ public class ConfirmPrompt : MonoBehaviour
             default: return null;
         }
     }
+
+    public void Close()
+    {
+        gameObject.SetActive(false);
+    }
 }

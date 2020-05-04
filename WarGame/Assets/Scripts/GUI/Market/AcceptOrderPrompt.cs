@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class AcceptOrderPrompt : ConfirmPrompt
 {
-    public ResourceMarket market;
+    public ResourceMarket Market;
     public Text Message;
 
     const int maxNameLength = 16;
@@ -18,13 +18,13 @@ public class AcceptOrderPrompt : ConfirmPrompt
 
     public void Ok()
     {
-        market.AcceptOrder();
-        gameObject.SetActive(false);
+        Market.AcceptOrder();
+        Close();
     }
 
     public void Cancel()
     {
-        market.RescanMarket(true);
-        gameObject.SetActive(false);
+        Market.RescanMarket(true);
+        Close();
     }
 }

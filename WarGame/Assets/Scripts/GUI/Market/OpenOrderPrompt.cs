@@ -9,13 +9,13 @@ public class OpenOrderPrompt : ConfirmPrompt
     public void Ok()
     {
         former.CreateMarketOrder();
-        gameObject.SetActive(false);
+        Close();
     }
 
     public void Cancel()
     {
         former.CancelOffer();
-        gameObject.SetActive(false);
+        Close();
     }
 
     public void Prompt(double[] amounts, double[] prices, double[] fees)
