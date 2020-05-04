@@ -1,18 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
-public class AcceptOrderPrompt : MonoBehaviour
+public class AcceptOrderPrompt : ConfirmPrompt
 {
-    // Start is called before the first frame update
-    void Start()
+    public ResourceMarket market;
+    public Text Message;
+
+    const int maxNameLength = 16;
+
+    public void Prompt(string id, string name, double[] amounts, double[] prices)
     {
-        
+        Prompt(amounts, prices);
+        int length = name.Length <= maxNameLength ? name.Length : maxNameLength;
+        string question = $"Are you sure you want to accept order {id} from {name.Substring(0, length)}?";
+        Message.text = question;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Ok()
     {
-        
+        market.AcceptOrder();
+        gameObject.SetActive(false);
+    }
+
+    public void Cancel()
+    {
+        market.RescanMarket(true);
+        gameObject.SetActive(false);
     }
 }

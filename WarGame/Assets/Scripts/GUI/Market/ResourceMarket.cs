@@ -10,6 +10,7 @@ public class ResourceMarket : MarketTrading
     public InputField Quantity;
     public Toggle IsMine;
     public Button AcceptButton, RemoveButton;
+    public AcceptOrderPrompt orderPrompt;
     public int LastBlockProgress = 0;
 
     private string selectedOrderID = "";
@@ -46,6 +47,12 @@ public class ResourceMarket : MarketTrading
             LastBlockProgress = Client.Progress;
             RescanMarket(true);
         }
+    }
+
+    public void PromptConfirm()
+    {
+        OrderItem order = orderItems[selectedOrderID];
+        orderPrompt.Prompt(selectedOrderID, order.Owner, order.order.selling, order.order.buying);
     }
 
     public void AcceptOrder()
