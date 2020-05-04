@@ -16,7 +16,7 @@ public class BaseClient : MonoBehaviour
     public State State { get { return gameState; } }
     public string Player { get { return player; } }
 
-    protected double[] queuedExpenditures;
+    private double[] queuedExpenditures = new double[4];
 
     public double[] PlayerResources
     {
@@ -29,7 +29,6 @@ public class BaseClient : MonoBehaviour
 
     private void Start()
     {
-        queuedExpenditures = new double[4];
         settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }; 
         commsInterface = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<CommunicationInterface>();
     }
@@ -60,27 +59,23 @@ public class BaseClient : MonoBehaviour
 
     protected void SpendResources(double[] resources)
     {
-        queuedExpenditures[0] += resources[0];
-        queuedExpenditures[1] += resources[1];
-        queuedExpenditures[2] += resources[2];
-        queuedExpenditures[3] += resources[3];
+        for (int r = 0; r < resources[r]; r++)
+            queuedExpenditures[r] += resources[r];
     }
 
     protected void UnspendResources(double[] resources)
     {
-        queuedExpenditures[0] -= resources[0];
-        queuedExpenditures[1] -= resources[1];
-        queuedExpenditures[2] -= resources[2];
-        queuedExpenditures[3] -= resources[3];
+        for(int r = 0; r < resources[r]; r++)
+            queuedExpenditures[r] -= resources[r];
     }
 
     public double[] GetSubtractedResources()
     {
         double[] subtracted = PlayerResources;
-        subtracted[0] -= queuedExpenditures[0];
-        subtracted[1] -= queuedExpenditures[1];
-        subtracted[2] -= queuedExpenditures[2];
-        subtracted[3] -= queuedExpenditures[3];
+
+        for (int q = 0; q < queuedExpenditures[q]; q++)
+            subtracted[q] -= queuedExpenditures[q];
+
         return subtracted;
     }
 

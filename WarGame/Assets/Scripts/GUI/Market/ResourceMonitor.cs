@@ -35,7 +35,7 @@ public class ResourceMonitor : MonoBehaviour
         ConcreteAmount.text = GetOrderOfMagnitudeString(playerResources[3]);
     }
 
-    string GetOrderOfMagnitudeString(double amount)
+    public static string GetOrderOfMagnitudeString(double amount)
     {
         double absolute = Math.Abs(amount);
         double converted = 0;

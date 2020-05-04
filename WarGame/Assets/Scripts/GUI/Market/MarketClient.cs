@@ -6,8 +6,14 @@ using UnityEngine;
 
 public class MarketClient : BaseClient
 {
-    public ResourceMonitor Monitor;
-    private double[] queuedBuyOrder = new double[4];
+    public double[] Buys { get { return queuedBuys; } }
+    public double[] Sells { get { return queuedSells; } }
+    public double[] Fees { get { return queuedFees; } }
+
+    private double[] queuedBuys = new double[4];
+    private double[] queuedSells = new double[4];
+    private double[] queuedFees = new double[4];
+
     private int lastBlockProgress;
 
     private void Update()
@@ -51,22 +57,49 @@ public class MarketClient : BaseClient
         return acceptOrder;
     }
 
-    public void PlaceMarketOrder(double[] resourcesToSell, double[] resourcesToBuy)
+    public bool PlaceMarketOrder()
     {
-        double[] totalAfterFee;
-        if (CanPlaceMarketOrder(resourcesToSell, resourcesToBuy, out totalAfterFee))
+        bool success = false;
+
+        if (CanPlaceMarketOrder())
         {
-            queuedActions.opn = new MarketOrderAction(resourcesToSell, resourcesToBuy);
-            SpendResources(totalAfterFee);
+            queuedActions.opn = new MarketOrderAction(queuedSells, queuedBuys);
+            SendOrderToBlockchain();
+            success = true;
+        }
+
+        return success;
+    }
+
+    public void AddSells(double[] sells)
+    {
+        for (int s = 0; s < sells.Length; s++)
+        {
+            queuedSells[s] += sells[s];
+            queuedFees[s] = Math.Round(sells[s] * gameState.currentConstants.marketFeePrecent[s]);
         }
     }
 
-    private bool CanPlaceMarketOrder(double[] resourcesToSell, double[] resourcesToBuy, out double[] totalAfterFee)
+    public void AddBuys(double[] buys)
     {
-        totalAfterFee = new double[4];
+        for (int b = 0; b < buys.Length; b++)
+            queuedBuys[b] += buys[b];
+    }
 
+    public void ClearOpenOrderBuffer()
+    {
+        queuedBuys = new double[4];
+        queuedSells = new double[4];
+        queuedFees = new double[4];
+        queuedActions.opn = null;
+    }
+
+    private bool CanPlaceMarketOrder()
+    {
+        double[] totalAfterFee = new double[4];
+        
         for (int f = 0; f > totalAfterFee.Length; f++)
-            totalAfterFee[f] = Math.Round(resourcesToSell[f] * (gameState.currentConstants.marketFeePrecent[f] + 1));
+            totalAfterFee[f] = Math.Round(queuedSells[f] * (gameState.currentConstants.marketFeePrecent[f]+1));
         
         if (Validity.HasEnoughResources(totalAfterFee, PlayerResources)) return true;
         else return false;
