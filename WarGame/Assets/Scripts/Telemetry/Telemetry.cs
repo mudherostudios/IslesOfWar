@@ -15,6 +15,8 @@ public class Telemetry : MonoBehaviour
     public string OrderIdToDelete;
     public TransactionResolver Resolver;
 
+    public OrderPayload[] Orders { get { return orders.ToArray(); } }
+
     const string API_URL = "https://market-api.islesofwar.online";
     const string API_KEY = "WVxbDuafpi5Pv23wSVzep4KlWXnhP88sasrYvIxS";
     bool connected = false;
@@ -49,8 +51,6 @@ public class Telemetry : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
             SendSocketMessage(Resolver.GetSellerAddresses(username, new Guid()), WebSocketAction.TRANSACTION);
         #endif
-
-        
     }
 
     public async void ConnectToSocket(string _username)
@@ -77,30 +77,21 @@ public class Telemetry : MonoBehaviour
     {
         if (payload == null) return;
 
-        orders = await GetOrders();
         SocketMessage message = new SocketMessage(socketAction, payload);
         string serialized = JsonConvert.SerializeObject(message, jsonSettings);
         Debug.Log(serialized);
         await socket.SendText(serialized);
     }
 
-    private async void SendFakeOrder(float amount, decimal price)
-    {
-        await SendOrder("Warbux", amount, price);
-    }
-
-    public async void Disconnect()
-    {
-        if(connected && socket.State == WebSocketState.Open)
-            await socket.Close();
-    }
+    private async void SendFakeOrder(float amount, decimal price) { await SendOrder("Warbux", amount, price); }
+    public async void Disconnect() { if(connected && socket.State == WebSocketState.Open) await socket.Close(); }
 
 
     //---------------------------------------------------------------------
     //-------------------------Listening Functions-------------------------
     //---------------------------------------------------------------------
 
-    void Listen(WebSocket _socket)
+    private void Listen(WebSocket _socket)
     {
         _socket.OnClose += ClosedConnection;
         _socket.OnMessage += RecievedMessage;
@@ -108,7 +99,7 @@ public class Telemetry : MonoBehaviour
         _socket.OnOpen += OpenedConnection;
     }
 
-    void RecievedMessage(byte[] messageBytes)
+    private void RecievedMessage(byte[] messageBytes)
     {
         string message = Encoding.UTF8.GetString(messageBytes);
         string messageLog = "Log not created.";
@@ -120,8 +111,7 @@ public class Telemetry : MonoBehaviour
                 messageLog = GetSocketDebugMessage(MessageHandler.BadData(message));
             else if (socketMessage.Action == WebSocketAction.TRANSACTION)
                 SendSocketMessage(TelemetryRecieved.RecieveTransactionData(socketMessage, orders, Resolver), WebSocketAction.TRANSACTION);
-            else
-                messageLog = GetSocketDebugMessage(socketMessage);
+            else  messageLog = GetSocketDebugMessage(socketMessage);
         }
         else
         {
@@ -131,7 +121,7 @@ public class Telemetry : MonoBehaviour
         }
     }
 
-    void ClosedConnection(WebSocketCloseCode code)
+    private void ClosedConnection(WebSocketCloseCode code)
     {
         connected = false;
         string closeLog = string.Format(
@@ -139,15 +129,8 @@ public class Telemetry : MonoBehaviour
             "Code: {0}\n", code.ToString());
     }
 
-    void OpenedConnection()
-    {
-        connected = true;
-    }
-
-    void RecievedError(string errorMessage)
-    {
-        Debug.LogWarning(errorMessage);
-    }
+    private void OpenedConnection() { connected = true; } 
+    private void RecievedError(string errorMessage) { Debug.LogWarning(errorMessage); }
     
     //---------------------------------------------------------------------
     //-------------------------Order Functions-----------------------------
@@ -161,7 +144,7 @@ public class Telemetry : MonoBehaviour
             Debug.Log(JsonConvert.SerializeObject(payload));
     }
 
-    static async Task<List<OrderPayload>> GetOrders()
+    private static async Task<List<OrderPayload>> GetOrders()
     {
         List<OrderPayload> orders = new List<OrderPayload>();
 
@@ -182,7 +165,7 @@ public class Telemetry : MonoBehaviour
         }
     }
 
-    static async void DeleteOrder(string orderID)
+    private static async void DeleteOrder(string orderID)
     {
         using (var httpClient = new HttpClient())
         {
@@ -219,11 +202,10 @@ public class Telemetry : MonoBehaviour
 
     private void OnLevelWasLoaded(int level)
     {
-        if(level == 2) 
-            SendLoginNotice(username);
+        if(level == 2) SendLoginNotice(username);
     }
 
-    string GetSocketDebugMessage(SocketMessage socketMessage)
+    private string GetSocketDebugMessage(SocketMessage socketMessage)
     {
         string messageLog = "Error creating message.";
 
@@ -231,8 +213,7 @@ public class Telemetry : MonoBehaviour
         {
             BadDataPayload payload = new BadDataPayload();
 
-            if (socketMessage.Payload is BadDataPayload)
-                payload = (BadDataPayload)socketMessage.Payload;
+            if (socketMessage.Payload is BadDataPayload) payload = (BadDataPayload)socketMessage.Payload;
 
             messageLog = string.Format
             (
