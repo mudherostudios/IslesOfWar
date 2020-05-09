@@ -25,6 +25,8 @@ public class MarketClient : BaseClient
         }
     }
 
+    public decimal GetWalletFunds() { return commsInterface.GetFunds(); }
+
     public bool CloseMarketOrder(string id)
     {
         queuedActions.cls = id;

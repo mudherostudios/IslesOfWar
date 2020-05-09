@@ -40,17 +40,17 @@ public class OrderFormation : MonoBehaviour
     {
         double converted = 0;
 
-        if (field == 0) converted = double.Parse(WarbuxField.text);
-        else if (field == 1) converted = double.Parse(OilField.text);
-        else if (field == 2) converted = double.Parse(MetalField.text);
-        else if (field == 3) converted = double.Parse(ConcreteField.text);
+        if (field == 0 && WarbuxField.text != null) converted = double.Parse(WarbuxField.text);
+        else if (field == 1 && OilField.text != null) converted = double.Parse(OilField.text);
+        else if (field == 2 && MetalField.text != null) converted = double.Parse(MetalField.text);
+        else if (field == 3 && ConcreteField.text != null) converted = double.Parse(ConcreteField.text);
 
         if (converted > Client.PlayerResources[field])
         {
             if (field == 0) WarbuxField.text = Client.PlayerResources[field].ToString();
-            if (field == 1) OilField.text = Client.PlayerResources[field].ToString();
-            if (field == 2) MetalField.text = Client.PlayerResources[field].ToString();
-            if (field == 3) ConcreteField.text = Client.PlayerResources[field].ToString();
+            else if (field == 1) OilField.text = Client.PlayerResources[field].ToString();
+            else if (field == 2) MetalField.text = Client.PlayerResources[field].ToString();
+            else if (field == 3) ConcreteField.text = Client.PlayerResources[field].ToString();
         }
     }
 
@@ -79,9 +79,9 @@ public class OrderFormation : MonoBehaviour
     void SetInputs(string value, int initiator)
     {
         if (initiator != 0) WarbuxField.text = value;
-        if (initiator != 1) OilField.text = value;
-        if (initiator != 2) MetalField.text = value;
-        if (initiator != 3) ConcreteField.text = value;
+        else if (initiator != 1) OilField.text = value;
+        else if (initiator != 2) MetalField.text = value;
+        else if (initiator != 3) ConcreteField.text = value;
     }
 
     void InteractableInputs(bool interactable)

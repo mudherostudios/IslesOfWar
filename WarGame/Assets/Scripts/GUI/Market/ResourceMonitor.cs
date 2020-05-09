@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ResourceMonitor : MonoBehaviour
 {
-    public Text WarbuxAmount, OilAmount, MetalAmount, ConcreteAmount;
+    public Text WarbuxAmount, OilAmount, MetalAmount, ConcreteAmount, XayaAmount;
     public MarketClient Client;
 
     private int lastBlockProgress;
@@ -33,6 +33,7 @@ public class ResourceMonitor : MonoBehaviour
         OilAmount.text = GetOrderOfMagnitudeString(playerResources[1]);
         MetalAmount.text = GetOrderOfMagnitudeString(playerResources[2]);
         ConcreteAmount.text = GetOrderOfMagnitudeString(playerResources[3]);
+        XayaAmount.text = GetOrderOfMagnitudeString((double)Client.GetWalletFunds());
     }
 
     public static string GetOrderOfMagnitudeString(double amount)
@@ -47,6 +48,8 @@ public class ResourceMonitor : MonoBehaviour
         else if (absolute >= 1000) { converted = amount / 1000; place = "K"; }
         else { converted = amount; place = ""; }
 
-        return string.Format("{0:F1} {1}", converted, place);
+        if (place != "") return string.Format("{0:F2} {1}", converted, place);
+        else if(amount - Math.Floor(amount) == 0.0) return Mathf.FloorToInt((float)amount).ToString();
+        else return string.Format("{0:F4}", converted);
     }
 }
