@@ -14,7 +14,6 @@ public class ResourceMarket : MarketTrading
     public RemoveOrderPrompt removePrompt;
     public int LastBlockProgress = 0;
 
-    private string selectedOrderID = "";
     private double evaluationValue = 0;
 
     private void Start()
@@ -31,13 +30,9 @@ public class ResourceMarket : MarketTrading
     {
         if (hasSelected)
         {
-            if (selectedGameObject != null)
-                selectedOrderID = selectedGameObject.GetComponent<OrderItem>().orderID.text;
-            else selectedOrderID = "";
             SetOrderButtons(selectedOrderID != "");
             hasSelected = false;
         }
-
         UpdateMarketOnProgress();
     }
 
@@ -108,6 +103,7 @@ public class ResourceMarket : MarketTrading
         {
             CleanOrders();
             PopulateOrderList();
+            SelectObjectByID(selectedOrderID);
         }
     }
 
