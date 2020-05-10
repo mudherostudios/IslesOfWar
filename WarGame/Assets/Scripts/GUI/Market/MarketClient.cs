@@ -9,10 +9,14 @@ public class MarketClient : BaseClient
     public double[] Buys { get { return queuedBuys; } }
     public double[] Sells { get { return queuedSells; } }
     public double[] Fees { get { return queuedFees; } }
+    public decimal ChiPrice { get { return queuedChiPrice; } }
+    public int WarbuxAmount { get { return queuedWarbuxAmount; } }
 
     private double[] queuedBuys = new double[4];
     private double[] queuedSells = new double[4];
     private double[] queuedFees = new double[4];
+    private decimal queuedChiPrice;
+    private int queuedWarbuxAmount;
 
     private int lastBlockProgress;
 
@@ -105,5 +109,20 @@ public class MarketClient : BaseClient
         
         if (Validity.HasEnoughResources(totalAfterFee, PlayerResources)) return true;
         else return false;
+    }
+
+    //-------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------Chi Functions--------------------------------------
+    public void AddChiOrder(decimal chi, int warbux)
+    {
+        queuedChiPrice = chi;
+        queuedWarbuxAmount = warbux;
+    }
+
+    public void ClearChiOrder()
+    {
+        queuedChiPrice = 0.0m;
+        queuedWarbuxAmount = 0;
     }
 }

@@ -3,11 +3,11 @@ using UnityEngine.UI;
 
 public class OrderFormation : MonoBehaviour
 {
-    public MarketClient Client;
-    public OpenOrderPrompt PromptWindow;
-    public InputField WarbuxField, OilField, MetalField, ConcreteField;
-    public Button NextButton, CancelButton;
-    public Text Phase;
+    public MarketClient client;
+    public OpenOrderPrompt promptWindow;
+    public InputField warbuxField, oilField, metalField, concreteField;
+    public Button nextButton, cancelButton;
+    public Text phase;
 
     private int stage = -2;
     private bool successful = true;
@@ -22,15 +22,15 @@ public class OrderFormation : MonoBehaviour
             SetInputs("0", -1);
         }
 
-        if (stage == 1) Phase.text = "Buying";
+        if (stage == 1) phase.text = "Buying";
         if (stage == 2)
         {
-            PromptWindow.Prompt(Client.Sells, Client.Buys, Client.Fees);
-            Phase.text = "Confirm";
-            NextButton.transform.GetChild(0).GetComponent<Text>().text = "Confirm";
+            promptWindow.Prompt(client.Sells, client.Buys, client.Fees);
+            phase.text = "Confirm";
+            nextButton.transform.GetChild(0).GetComponent<Text>().text = "Confirm";
             InteractableInputs(false);
-            NextButton.interactable = false;
-            CancelButton.interactable = false;
+            nextButton.interactable = false;
+            cancelButton.interactable = false;
         }
     }
 
@@ -40,23 +40,23 @@ public class OrderFormation : MonoBehaviour
     {
         double converted = 0;
 
-        if (field == 0 && WarbuxField.text != null) converted = double.Parse(WarbuxField.text);
-        else if (field == 1 && OilField.text != null) converted = double.Parse(OilField.text);
-        else if (field == 2 && MetalField.text != null) converted = double.Parse(MetalField.text);
-        else if (field == 3 && ConcreteField.text != null) converted = double.Parse(ConcreteField.text);
+        if (field == 0 && warbuxField.text != null) converted = double.Parse(warbuxField.text);
+        else if (field == 1 && oilField.text != null) converted = double.Parse(oilField.text);
+        else if (field == 2 && metalField.text != null) converted = double.Parse(metalField.text);
+        else if (field == 3 && concreteField.text != null) converted = double.Parse(concreteField.text);
 
-        if (converted > Client.PlayerResources[field])
+        if (converted > client.PlayerResources[field])
         {
-            if (field == 0) WarbuxField.text = Client.PlayerResources[field].ToString();
-            else if (field == 1) OilField.text = Client.PlayerResources[field].ToString();
-            else if (field == 2) MetalField.text = Client.PlayerResources[field].ToString();
-            else if (field == 3) ConcreteField.text = Client.PlayerResources[field].ToString();
+            if (field == 0) warbuxField.text = client.PlayerResources[field].ToString();
+            else if (field == 1) oilField.text = client.PlayerResources[field].ToString();
+            else if (field == 2) metalField.text = client.PlayerResources[field].ToString();
+            else if (field == 3) concreteField.text = client.PlayerResources[field].ToString();
         }
     }
 
     public void CreateMarketOrder()
     {
-        bool success = Client.PlaceMarketOrder();
+        bool success = client.PlaceMarketOrder();
         Debug.Log($"Placed Order:{success}");
         CancelOffer();
     }
@@ -65,31 +65,31 @@ public class OrderFormation : MonoBehaviour
     {
         double[] values = new double[4];
 
-        successful &= double.TryParse(WarbuxField.text, out values[0]);
-        successful &= double.TryParse(OilField.text, out values[1]);
-        successful &= double.TryParse(MetalField.text, out values[2]);
-        successful &= double.TryParse(ConcreteField.text, out values[3]);
+        successful &= double.TryParse(warbuxField.text, out values[0]);
+        successful &= double.TryParse(oilField.text, out values[1]);
+        successful &= double.TryParse(metalField.text, out values[2]);
+        successful &= double.TryParse(concreteField.text, out values[3]);
 
-        if (stage == 0) Client.AddSells(values);
-        else if (stage == 1) Client.AddBuys(values);
+        if (stage == 0) client.AddSells(values);
+        else if (stage == 1) client.AddBuys(values);
 
         stage++;
     }
 
     void SetInputs(string value, int initiator)
     {
-        if (initiator != 0) WarbuxField.text = value;
-        else if (initiator != 1) OilField.text = value;
-        else if (initiator != 2) MetalField.text = value;
-        else if (initiator != 3) ConcreteField.text = value;
+        if (initiator != 0) warbuxField.text = value;
+        if (initiator != 1) oilField.text = value;
+        if (initiator != 2) metalField.text = value;
+        if (initiator != 3) concreteField.text = value;
     }
 
     void InteractableInputs(bool interactable)
     {
-        WarbuxField.interactable = interactable;
-        OilField.interactable = interactable;
-        MetalField.interactable = interactable;
-        ConcreteField.interactable = interactable;
+        warbuxField.interactable = interactable;
+        oilField.interactable = interactable;
+        metalField.interactable = interactable;
+        concreteField.interactable = interactable;
     }
 
     public void StartOffer(int initiator)
@@ -97,9 +97,9 @@ public class OrderFormation : MonoBehaviour
         if (stage == -1)
         {
             stage++;
-            Phase.text = "Selling";
-            NextButton.interactable = true;
-            CancelButton.interactable = true;
+            phase.text = "Selling";
+            nextButton.interactable = true;
+            cancelButton.interactable = true;
             SetInputs("0", initiator);
         }
     }
@@ -109,13 +109,13 @@ public class OrderFormation : MonoBehaviour
         SetInputs(null, -1);
         
         stage = -1;
-        Phase.text = "Order Formation";
+        phase.text = "Order Formation";
 
-        Client.ClearOpenOrderBuffer();
+        client.ClearOpenOrderBuffer();
 
-        NextButton.transform.GetChild(0).GetComponent<Text>().text = "Next";
-        NextButton.interactable = false;
-        CancelButton.interactable = false;
+        nextButton.transform.GetChild(0).GetComponent<Text>().text = "Next";
+        nextButton.interactable = false;
+        cancelButton.interactable = false;
         InteractableInputs(true);
     }
 }

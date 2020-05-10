@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class AcceptOrderPrompt : ConfirmPrompt
 {
-    public ResourceMarket Market;
-    public Text Message;
+    public ResourceMarket market;
+    public Text message;
 
     const int maxNameLength = 16;
 
@@ -13,18 +13,18 @@ public class AcceptOrderPrompt : ConfirmPrompt
         Prompt(amounts, prices);
         int length = name.Length <= maxNameLength ? name.Length : maxNameLength;
         string question = $"Are you sure you want to accept order {id} from {name.Substring(0, length)}?";
-        Message.text = question;
+        message.text = question;
     }
 
     public void Ok()
     {
-        Market.AcceptOrder();
+        market.AcceptOrder();
         Close();
     }
 
     public void Cancel()
     {
-        Market.RescanMarket(true);
+        market.RescanMarket(true);
         Close();
     }
 }

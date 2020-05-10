@@ -3,25 +3,25 @@ using UnityEngine.UI;
 
 public class RemoveOrderPrompt : ConfirmPrompt
 {
-    public ResourceMarket Market;
-    public Text Message;
+    public ResourceMarket market;
+    public Text message;
 
     public void Prompt(string id, double[] amounts, double[] prices)
     {
         Prompt(amounts, prices);
         string question = $"Are you sure you want to remove {id} from the market.";
-        Message.text = question;
+        message.text = question;
     }
 
     public void Ok()
     {
-        Market.RemoveOrder();
+        market.RemoveOrder();
         Close();
     }
 
     public void Cancel()
     {
-        Market.RescanMarket(true);
+        market.RescanMarket(true);
         Close();
     }
 }

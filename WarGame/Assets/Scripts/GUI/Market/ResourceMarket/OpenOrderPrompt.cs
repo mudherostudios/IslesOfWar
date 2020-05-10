@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class OpenOrderPrompt : ConfirmPrompt
 {
     public OrderFormation former;
-    public Text Fee;
+    public Text fee;
 
     public void Ok()
     {
@@ -30,7 +30,7 @@ public class OpenOrderPrompt : ConfirmPrompt
                 promptedFee += $"{indexName}:{ResourceMonitor.GetOrderOfMagnitudeString(fees[f])}  ";
         }
 
-        if (promptedFee != "") Fee.text = promptedFee;
-        else Fee.text = "None";
+        if (promptedFee != "") fee.text = promptedFee;
+        else fee.text = "None";
     }
 }

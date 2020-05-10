@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ConfirmPrompt : MonoBehaviour
 {
-    public Text Amount, Price;
+    public Text amount, price;
 
     public void Prompt(double[] amounts, double[] prices)
     {
@@ -21,11 +21,11 @@ public class ConfirmPrompt : MonoBehaviour
                 promptedPrice += $"{indexName}:{ResourceMonitor.GetOrderOfMagnitudeString(prices[r])}  ";
         }
 
-        if (promptedAmount != "") Amount.text = promptedAmount;
-        else Amount.text = "None";
+        if (promptedAmount != "") amount.text = promptedAmount;
+        else amount.text = "None";
 
-        if (promptedPrice != "") Price.text = promptedPrice;
-        else Price.text = "None";
+        if (promptedPrice != "") price.text = promptedPrice;
+        else price.text = "None";
     }
 
     protected string GetResourceByIndex(int index)
@@ -40,8 +40,5 @@ public class ConfirmPrompt : MonoBehaviour
         }
     }
 
-    public void Close()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Close() { gameObject.SetActive(false); }
 }
