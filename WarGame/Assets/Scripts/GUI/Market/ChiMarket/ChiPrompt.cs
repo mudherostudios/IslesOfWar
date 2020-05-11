@@ -12,7 +12,7 @@ public class ChiPrompt : MonoBehaviour
         gameObject.SetActive(true);
 
         string promptedAmount = $"{ResourceMonitor.GetOrderOfMagnitudeString(warbuxAmount)}";
-        string promptedPrice = $"{ResourceMonitor.GetOrderOfMagnitudeString((double)chiPrice)}";
+        string promptedPrice = $"{ResourceMonitor.GetOrderOfMagnitudeString((double)chiPrice, true)}";
 
         if (promptedAmount != "") amount.text = promptedAmount;
         else amount.text = "None";

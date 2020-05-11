@@ -12,7 +12,6 @@ public class MarketTrading : MonoBehaviour
     protected Dictionary<string, GameObject> orderObjects = new Dictionary<string, GameObject>();
     protected GameObject selectedGameObject;
     protected string selectedOrderID;
-    protected bool hasSelected = false;
 
     public void Hide() { gameObject.SetActive(false); }
     public void Show() { gameObject.SetActive(true); }
@@ -59,8 +58,6 @@ public class MarketTrading : MonoBehaviour
             selectedGameObject = null;
             selectedOrderID = null;
         }
-
-        hasSelected = true;
     }
 
     public void SelectObjectByID(string ID)

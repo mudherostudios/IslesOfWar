@@ -31,11 +31,6 @@ public class ResourceMarket : MarketTrading
 
     private void Update()
     {
-        if (hasSelected)
-        {
-            SetOrderButtons(selectedOrderID != "");
-            hasSelected = false;
-        }
         UpdateMarketOnProgress();
     }
 
@@ -80,16 +75,22 @@ public class ResourceMarket : MarketTrading
         }
     }
 
+    public void SetSelectedObject(GameObject selected)
+    {
+        SetSelected(selected);
+        SetOrderButtons(selectedOrderID != "");
+    }
+
     private void SetOrderButtons(bool interactable)
     {
-        if (interactable == false)
+        if (!interactable)
         {
             AcceptButton.interactable = interactable;
             RemoveButton.interactable = interactable;
         }
-        else
+        else 
         {
-            bool containsOrder = orderItems.Keys.Contains(selectedOrderID);
+            bool containsOrder = selectedOrderID != null ? orderItems.ContainsKey(selectedOrderID) : false;
             if (containsOrder)
             {
                 AcceptButton.interactable = orderItems[selectedOrderID].owner != Client.Player;
@@ -143,6 +144,7 @@ public class ResourceMarket : MarketTrading
     public void RefreshFilteredResults()
     {
         RescanMarket(false);
+        
         bool parsed = double.TryParse(Quantity.text, out evaluationValue);
 
         if (!parsed) evaluationValue = 0;
@@ -162,7 +164,7 @@ public class ResourceMarket : MarketTrading
         foreach (KeyValuePair<string, List<MarketOrder>> orderList in marketData)
             orderList.Value.RemoveAll(Filter);
 
-        CleanOrders();
+        CleanResourceOrders();
         PopulateOrderList();
     }
 

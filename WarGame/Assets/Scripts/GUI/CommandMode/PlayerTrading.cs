@@ -49,16 +49,16 @@ public class PlayerTrading : MonoBehaviour
         if (marketData.ContainsKey(user))
         {
             for (int d = 0; d < marketData[user].Count; d++)
-                AddOrderToWindow(marketData[user][d], d);
+                AddOrderToWindow(marketData[user][d], user, d);
 
             AdjustOrderContentWindow(marketData[user].Count);
         }
     }
 
-    void AddOrderToWindow(MarketOrder order, int index)
+    void AddOrderToWindow(MarketOrder order, string owner, int index)
     {
         GameObject orderObject = Instantiate(orderItemPrefab);
-        orderObject.GetComponent<OrderItem>().SetOrder(order, gameObject);
+        orderObject.GetComponent<OrderItem>().SetOrder(order, gameObject, owner);
         orderObject.transform.parent = orderContent;
         orderObject.transform.localPosition = new Vector2(orderItemXOffset, (orderItemHeight * -index) - orderItemYOffset);
         orderItems.Add(orderObject);

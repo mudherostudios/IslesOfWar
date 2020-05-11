@@ -17,15 +17,15 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
     private bool isPending;
 
     public OrderItem(){ }
-    public OrderItem(MarketOrder _order){ SetOrder(_order, null); }
-    public OrderItem(MarketOrder _order, GameObject trading){ SetOrder(_order, trading); }
+    public OrderItem(MarketOrder _order){ SetOrder(_order, null, null); }
+    public OrderItem(MarketOrder _order, GameObject trading){ SetOrder(_order, trading, null); }
     public OrderItem(MarketOrder _order, GameObject trading, string _owner)
     {
-        SetOrder(_order, trading);
+        SetOrder(_order, trading, _owner);
         owner = _owner;
     }
     
-    public void SetOrder(MarketOrder _order, GameObject trading, string owner=null)
+    public void SetOrder(MarketOrder _order, GameObject trading, string owner)
     {
         master = trading;
         order = Deep.CopyObject<MarketOrder>(_order);
@@ -50,10 +50,10 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
         buyConcrete.text = buys[3].ToString("G8");
     }
 
-    public void SetMetaData(string ID, string _owner=null)
+    private void SetMetaData(string ID, string _owner=null)
     {
         orderID.text = ID;
-        if (owner != null) { orderOwner.text = owner; owner = _owner; }
+        if (owner != null) { orderOwner.text = _owner; owner = _owner; }
     }
 
     public void SetTextColor(Color color) { orderID.color = color; }
@@ -76,10 +76,10 @@ public class OrderItem : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData data)
     {
-        MarketTrading marketTrading = master.GetComponent<MarketTrading>();
+        ResourceMarket marketTrading = master.GetComponent<ResourceMarket>();
         PlayerTrading playerTrading = master.GetComponent<PlayerTrading>();
 
         if(playerTrading != null) playerTrading.SetSelected(gameObject);
-        if(marketTrading != null) marketTrading.SetSelected(gameObject);
+        if(marketTrading != null) marketTrading.SetSelectedObject(gameObject);
     }
 }

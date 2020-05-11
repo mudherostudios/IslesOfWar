@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class ChiOrderFormation : MonoBehaviour
 {
+    public Telemetry telemetry;
     public MarketClient client;
     public InputField chiInput, warbuxInput;
     public Button submitButton, cancelButton;
@@ -12,7 +11,12 @@ public class ChiOrderFormation : MonoBehaviour
 
     private bool offering;
 
-    private void Start() { offering = true;  CancelChiOffer(); }
+    private void Start()
+    {
+        offering = true;
+        CancelChiOffer();
+        telemetry = GameObject.FindGameObjectWithTag("CommunicationInterface").GetComponent<Telemetry>();
+    }
 
     public void PromptForConfirmation()
     {
@@ -31,6 +35,7 @@ public class ChiOrderFormation : MonoBehaviour
 
     public void CreateChiOrder()
     {
+        telemetry.SendWarbuxOrder(client.WarbuxAmount, client.ChiPrice);
         CancelChiOffer();
     }
 
@@ -56,7 +61,7 @@ public class ChiOrderFormation : MonoBehaviour
         {
             offering = true;
             SetInputs("0", field);
-            submitButton.interactable = true;
+            InteractableButtons(true);
         }
     }
 

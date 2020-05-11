@@ -19,13 +19,14 @@ public class Telemetry : MonoBehaviour
 
     const string API_URL = "https://market-api.islesofwar.online";
     const string API_KEY = "WVxbDuafpi5Pv23wSVzep4KlWXnhP88sasrYvIxS";
-    bool connected = false;
-    WebSocket socket;
-    JsonSerializerSettings jsonSettings;
-    string username;
 
-    object queuedPayload = null;
-    List<OrderPayload> orders;
+    private bool connected = false;
+    private WebSocket socket;
+    private JsonSerializerSettings jsonSettings;
+    private string username;
+
+    private object queuedPayload = null;
+    private List<OrderPayload> orders;
 
     private void Start()
     {
@@ -39,12 +40,6 @@ public class Telemetry : MonoBehaviour
     private void Update()
     {
         #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.O))
-            SendFakeOrder(10000.0f, 10.0m);
-
-        if (Input.GetKeyDown(KeyCode.G))
-            LoadOrders();
-
         if (Input.GetKeyDown(KeyCode.D))
             DeleteOrder(OrderIdToDelete);
 
@@ -83,7 +78,7 @@ public class Telemetry : MonoBehaviour
         await socket.SendText(serialized);
     }
 
-    private async void SendFakeOrder(float amount, decimal price) { await SendOrder("Warbux", amount, price); }
+    public async void SendWarbuxOrder(int amount, decimal price) { await SendOrder("Warbux", amount, price); }
     public async void Disconnect() { if(connected && socket.State == WebSocketState.Open) await socket.Close(); }
 
 
@@ -138,13 +133,9 @@ public class Telemetry : MonoBehaviour
     public async void LoadOrders()
     {
         orders = await GetOrders();
-
-        //Can Delete Later
-        foreach (OrderPayload payload in orders)
-            Debug.Log(JsonConvert.SerializeObject(payload));
     }
 
-    private static async Task<List<OrderPayload>> GetOrders()
+    public static async Task<List<OrderPayload>> GetOrders()
     {
         List<OrderPayload> orders = new List<OrderPayload>();
 
@@ -175,11 +166,10 @@ public class Telemetry : MonoBehaviour
 
             if (response.IsSuccessStatusCode) Debug.Log("Successfully deleted order!");
             else Debug.LogError($"Unable to delete order: {response.StatusCode}");
-
         }
     }
 
-    private async Task SendOrder(object item, float amount, decimal price)
+    private async Task SendOrder(object item, int amount, decimal price)
     {
         OrderPayload order = new OrderPayload(username, item, amount, price);
 
@@ -199,7 +189,6 @@ public class Telemetry : MonoBehaviour
     //---------------------------------------------------------------------
     //-------------------------Misc Functions-----------------------------
     //---------------------------------------------------------------------
-
     private void OnLevelWasLoaded(int level)
     {
         if(level == 2) SendLoginNotice(username);
@@ -226,14 +215,7 @@ public class Telemetry : MonoBehaviour
                 payload.RequestId.ToString()
             );
         }
-        else
-        {
-            messageLog = string.Format
-            (
-                "Message: {0}\n",
-                socketMessage.Payload
-            );
-        }
+        else messageLog = string.Format ("Message: {0}\n",socketMessage.Payload);
 
         return messageLog;
     }

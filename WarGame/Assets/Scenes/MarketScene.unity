@@ -3552,6 +3552,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 840765636}
+        m_MethodName: PlayGUISound
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 8300000, guid: 8925f3518cb12a542be5b7d0d7275edf,
+            type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &422899889
@@ -3785,146 +3797,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 437431704}
   m_CullTransparentMesh: 0
---- !u!1001 &462720170
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 2007923781}
-    m_Modifications:
-    - target: {fileID: 6099394539654450277, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_Name
-      value: ChiOrderItem
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_Pivot.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_Pivot.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7904572646369726268, guid: 7c64b7a5ac6e43e4e891108b14802922,
-        type: 3}
-      propertyPath: m_Text
-      value: Amount
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 7c64b7a5ac6e43e4e891108b14802922, type: 3}
---- !u!224 &462720171 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7161622246659527138, guid: 7c64b7a5ac6e43e4e891108b14802922,
-    type: 3}
-  m_PrefabInstance: {fileID: 462720170}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &468182866
 GameObject:
   m_ObjectHideFlags: 0
@@ -9429,6 +9301,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 840765636}
+        m_MethodName: PlayGUISound
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 8300000, guid: 8925f3518cb12a542be5b7d0d7275edf,
+            type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1080895275
@@ -13439,7 +13323,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1582647727}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 25586417}
+        m_MethodName: Refresh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1582647727
@@ -14022,7 +13917,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1348352304}
   m_HandleRect: {fileID: 1348352303}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17890,14 +17785,13 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 462720171}
+  m_Children: []
   m_Father: {fileID: 1614674655}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000032155196}
+  m_AnchoredPosition: {x: 0, y: 0.0000036651159}
   m_SizeDelta: {x: 0, y: 626.05}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &2020784526
@@ -18809,6 +18703,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 510010fb72118f9479c2c6808258aacc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  telemetry: {fileID: 0}
   client: {fileID: 198007146}
   chiInput: {fileID: 1402084288}
   warbuxInput: {fileID: 677878602}

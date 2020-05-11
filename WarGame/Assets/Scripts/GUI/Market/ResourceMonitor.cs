@@ -36,7 +36,7 @@ public class ResourceMonitor : MonoBehaviour
         XayaAmount.text = GetOrderOfMagnitudeString((double)Client.GetWalletFunds());
     }
 
-    public static string GetOrderOfMagnitudeString(double amount)
+    public static string GetOrderOfMagnitudeString(double amount, bool chi = false)
     {
         double absolute = Math.Abs(amount);
         double converted = 0;
@@ -48,8 +48,7 @@ public class ResourceMonitor : MonoBehaviour
         else if (absolute >= 1000) { converted = amount / 1000; place = "K"; }
         else { converted = amount; place = ""; }
 
-        if (place != "") return string.Format("{0:F2} {1}", converted, place);
-        else if(amount - Math.Floor(amount) == 0.0) return Mathf.FloorToInt((float)amount).ToString();
+        if(!chi) return string.Format("{0:F2} {1}", converted, place);
         else return string.Format("{0:F4}", converted);
     }
 }

@@ -249,7 +249,7 @@ GameObject:
   - component: {fileID: 1978119553509769463}
   - component: {fileID: 7904572646369726268}
   m_Layer: 5
-  m_Name: WarbucksSell
+  m_Name: WarbucksAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -406,9 +406,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7161622246659527138}
-  - component: {fileID: 3604899924716275367}
   - component: {fileID: 8264141476543700963}
   - component: {fileID: 2241806097596061986}
+  - component: {fileID: 2257632478306166391}
   m_Layer: 5
   m_Name: ChiOrderItem
   m_TagString: OrderItem
@@ -443,30 +443,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 64}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &3604899924716275367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6099394539654450277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29803a163d66ce14e9f0ac0979eeae05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  master: {fileID: 0}
-  orderID: {fileID: 5761612751296978770}
-  orderOwner: {fileID: 3884044908633754792}
-  sellWarbucks: {fileID: 7904572646369726268}
-  sellOil: {fileID: 0}
-  sellMetal: {fileID: 0}
-  sellConcrete: {fileID: 0}
-  buyWarbucks: {fileID: 8467376225267262042}
-  buyOil: {fileID: 0}
-  buyMetal: {fileID: 0}
-  buyConcrete: {fileID: 0}
-  Owner: 
 --- !u!222 &8264141476543700963
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -504,6 +480,32 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
+--- !u!114 &2257632478306166391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6099394539654450277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7980753943d473d4cba2bb835a9d8b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  master: {fileID: 0}
+  idLabel: {fileID: 2441983764962391847}
+  ownerLabel: {fileID: 7340787736469812490}
+  id: {fileID: 5761612751296978770}
+  owner: {fileID: 3884044908633754792}
+  selectedColor: {r: 0.45882356, g: 0.40784317, b: 0.30588236, a: 1}
+  unselectedColor: {r: 0, g: 0, b: 0, a: 0}
+  pendingColor: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 1}
+  pendingTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  trader: {fileID: 0}
+  chiLabel: {fileID: 264042007}
+  warbuxLabel: {fileID: 778283698}
+  chiAmount: {fileID: 8467376225267262042}
+  warbuxAmount: {fileID: 7904572646369726268}
 --- !u!1 &7278383761607439765
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,7 +518,7 @@ GameObject:
   - component: {fileID: 193141100834691219}
   - component: {fileID: 8467376225267262042}
   m_Layer: 5
-  m_Name: WarbucksBuy
+  m_Name: ChiPrice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

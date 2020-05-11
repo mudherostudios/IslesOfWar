@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using IslesOfWar.ClientSide;
 using MudHero.WebSocketCommunication;
+using System.Collections;
 
 public class ChiTrading : Trading
 {
     public Telemetry telemetry;
     protected Dictionary<string, ChiOrderItem> orderItems = new Dictionary<string, ChiOrderItem>();
     protected Dictionary<string, ChiOrderData> marketData = new Dictionary<string, ChiOrderData>();
-
+    
     public void SelectChiOrderByID(string ID)
     {
         if (ID == null) return;
@@ -44,12 +45,17 @@ public class ChiTrading : Trading
             selectedGameObject = null;
             selectedOrderID = null;
         }
-
-        hasSelected = true;
     }
 
-    public void RescanMarket(bool refreshWindow)
+    public void Refresh()
     {
+        StartCoroutine(RescanMarket(true));
+    }
+
+    private IEnumerator RescanMarket(bool refreshWindow)
+    {
+        telemetry.LoadOrders();
+        yield return new WaitForSeconds(2);
         marketData = GetMarketData();
 
         if (refreshWindow)
@@ -63,7 +69,6 @@ public class ChiTrading : Trading
     protected Dictionary<string, ChiOrderData> GetMarketData()
     {
         Dictionary<string, ChiOrderData> freshMarketData = new Dictionary<string, ChiOrderData>();
-        telemetry.LoadOrders();
         OrderPayload[] orders = telemetry.Orders;
 
         foreach (OrderPayload payload in orders)
@@ -99,8 +104,7 @@ public class ChiTrading : Trading
         orderObjects.Add(order.ID, orderObject);
 
         ChiOrderItem orderItem = orderObject.GetComponent<ChiOrderItem>();
-        orderItem.SetOrder(order);
-        orderItem.master = gameObject;
+        orderItem.SetOrder(order, gameObject);
         orderItems.Add(order.ID, orderItem);
     }
 }

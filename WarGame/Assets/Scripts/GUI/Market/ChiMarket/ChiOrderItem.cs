@@ -1,17 +1,20 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using IslesOfWar.ClientSide;
 
 public class ChiOrderItem : BaseOrderItem, IPointerClickHandler
 {
-    public ChiTrading trader;
+    public ChiMarket trader;
     public Text chiLabel, warbuxLabel;
     public Text chiAmount, warbuxAmount;
     public ChiOrderData order;
 
-    public void SetOrder(ChiOrderData _order)
-    {
+    public void SetOrder(ChiOrderData _order, GameObject _master)
+    { 
         order = _order;
+        master = _master;
+        trader = master.GetComponent<ChiMarket>();
         id.text = order.id.ToString();
         owner.text = order.owner;
         chiAmount.text = order.price.ToString();
@@ -29,6 +32,6 @@ public class ChiOrderItem : BaseOrderItem, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData data)
     {
-        trader.SetSelected(gameObject);
+        trader.SetSelectedChiObject(gameObject);
     }
 }
