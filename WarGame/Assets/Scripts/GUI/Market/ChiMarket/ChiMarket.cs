@@ -1,9 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
+using IslesOfWar.ClientSide;
 
 public class ChiMarket : ChiTrading
 {
     public Button acceptButton, removeButton;
+    public RemoveChiOrderPrompt removePrompt;
     //Prompters
     //Search Elements
     //Make Physical Interface/GUI
@@ -39,5 +44,30 @@ public class ChiMarket : ChiTrading
                 removeButton.interactable = orderItems[selectedOrderID].owner.text == client.Player;
             }
         }
+    }
+
+    public void PromptRemoveOrder()
+    {
+        Refresh();
+        if (!marketData.ContainsKey(selectedOrderID)) return;
+
+        ChiOrderData data = marketData[selectedOrderID];
+        removePrompt.PromptRemove(selectedOrderID, data.price, (int)data.warbux);
+    }
+
+    public void DeleteChiOrder(string ID)
+    {
+        if (!marketData.ContainsKey(ID)) return;
+        orderItems[selectedOrderID].SetOrderToPending();
+        pendingRemovals.Add(selectedOrderID);
+        telemetry.DeleteOrder(ID);
+        StartCoroutine(Wait(4));
+        Refresh();
+    }
+
+    public void AddPendingAddition(Guid id, decimal price, int warbux)
+    {
+        ChiOrderData data = new ChiOrderData(id, client.Player, price, warbux);
+        pendingAdditions.Add(data.ID, data);
     }
 }

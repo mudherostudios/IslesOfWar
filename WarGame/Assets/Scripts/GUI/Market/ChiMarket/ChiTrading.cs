@@ -10,6 +10,8 @@ public class ChiTrading : Trading
     public Telemetry telemetry;
     protected Dictionary<string, ChiOrderItem> orderItems = new Dictionary<string, ChiOrderItem>();
     protected Dictionary<string, ChiOrderData> marketData = new Dictionary<string, ChiOrderData>();
+    protected Dictionary<string, ChiOrderData> pendingAdditions = new Dictionary<string, ChiOrderData>();
+    protected List<string> pendingRemovals = new List<string>();
     
     public void SelectChiOrderByID(string ID)
     {
@@ -47,15 +49,12 @@ public class ChiTrading : Trading
         }
     }
 
-    public void Refresh()
-    {
-        StartCoroutine(RescanMarket(true));
-    }
+    public void Refresh(int waitTime = 2) { StartCoroutine(RescanMarket(true, waitTime)); }
 
-    private IEnumerator RescanMarket(bool refreshWindow)
+    private IEnumerator RescanMarket(bool refreshWindow, int waitTime = 2)
     {
         telemetry.LoadOrders();
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(waitTime);
         marketData = GetMarketData();
 
         if (refreshWindow)
@@ -66,15 +65,20 @@ public class ChiTrading : Trading
         }
     }
 
+    public IEnumerator Wait(int waitTime = 2) { yield return new WaitForSeconds(waitTime); }
+
     protected Dictionary<string, ChiOrderData> GetMarketData()
     {
         Dictionary<string, ChiOrderData> freshMarketData = new Dictionary<string, ChiOrderData>();
         OrderPayload[] orders = telemetry.Orders;
+        List<string> bufferedRemovals = new List<string>();
 
         foreach (OrderPayload payload in orders)
         {
             ChiOrderData data = new ChiOrderData(payload.OrderId, payload.PlayerName, payload.PriceInChi, payload.Amount);
             freshMarketData.Add(data.ID, data);
+            if (pendingRemovals.Contains(data.ID)) bufferedRemovals.Add(data.ID);
+            if (pendingAdditions.ContainsKey(data.ID)) pendingAdditions.Remove(data.ID);
         }
 
         return freshMarketData;
@@ -89,7 +93,10 @@ public class ChiTrading : Trading
     private void PopulateOrderList()
     {
         foreach (KeyValuePair<string, ChiOrderData> pair in marketData)
-                AddOrderToWindow(pair.Key, pair.Value);
+                if(!pendingRemovals.Contains(pair.Key)) AddOrderToWindow(pair.Key, pair.Value);
+
+        foreach (KeyValuePair<string, ChiOrderData> pair in pendingAdditions)
+            AddOrderToWindow(pair.Key, pair.Value);
 
         List<string> sortedKeys = orderItems.Keys.ToList();
         sortedKeys.Sort();

@@ -24,8 +24,6 @@ public class Telemetry : MonoBehaviour
     private WebSocket socket;
     private JsonSerializerSettings jsonSettings;
     private string username;
-
-    private object queuedPayload = null;
     private List<OrderPayload> orders;
 
     private void Start()
@@ -78,7 +76,6 @@ public class Telemetry : MonoBehaviour
         await socket.SendText(serialized);
     }
 
-    public async void SendWarbuxOrder(int amount, decimal price) { await SendOrder("Warbux", amount, price); }
     public async void Disconnect() { if(connected && socket.State == WebSocketState.Open) await socket.Close(); }
 
 
@@ -156,7 +153,7 @@ public class Telemetry : MonoBehaviour
         }
     }
 
-    private static async void DeleteOrder(string orderID)
+    public async void DeleteOrder(string orderID)
     {
         using (var httpClient = new HttpClient())
         {
@@ -169,7 +166,7 @@ public class Telemetry : MonoBehaviour
         }
     }
 
-    private async Task SendOrder(object item, int amount, decimal price)
+    public async Task<OrderPayload> SendOrder(object item, int amount, decimal price)
     {
         OrderPayload order = new OrderPayload(username, item, amount, price);
 
@@ -184,6 +181,8 @@ public class Telemetry : MonoBehaviour
 
             if (!response.IsSuccessStatusCode) Debug.LogError($"Unable to create order: {response.StatusCode}");
         }
+
+        return order;
     }
 
     //---------------------------------------------------------------------

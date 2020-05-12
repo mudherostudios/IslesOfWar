@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
+using MudHero.WebSocketCommunication;
 
 public class ChiOrderFormation : MonoBehaviour
 {
     public Telemetry telemetry;
     public MarketClient client;
+    public ChiMarket market;
     public InputField chiInput, warbuxInput;
     public Button submitButton, cancelButton;
     public CreateChiOrderPrompt orderPrompt;
@@ -33,9 +36,10 @@ public class ChiOrderFormation : MonoBehaviour
         InteractableInputs(false);
     }
 
-    public void CreateChiOrder()
+    public async void CreateChiOrder()
     {
-        telemetry.SendWarbuxOrder(client.WarbuxAmount, client.ChiPrice);
+        OrderPayload order = await telemetry.SendOrder("Warbux", client.WarbuxAmount, client.ChiPrice);
+        market.AddPendingAddition(order.OrderId, order.PriceInChi, order.Amount);
         CancelChiOffer();
     }
 
