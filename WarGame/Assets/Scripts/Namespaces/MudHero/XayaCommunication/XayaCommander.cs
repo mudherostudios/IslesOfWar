@@ -18,10 +18,7 @@ namespace MudHero.XayaCommunication
         private ConnectionInfo cInfo;
         private string playerName = "";
 
-        public void SetConnection(ConnectionInfo info)
-        {
-            cInfo = info;
-        }
+        public void SetConnection(ConnectionInfo info) { cInfo = info; }
 
         public ConnectionLog Connect()
         {
@@ -32,16 +29,11 @@ namespace MudHero.XayaCommunication
 
                 xayaService = new XAYAService(cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword, cInfo.walletPassword);
 
-                if (xayaService.GetBlockCount() > 0)
-                    connected = true;
-                else
-                    connected = false;
+                if (xayaService.GetBlockCount() > 0) connected = true;
+                else connected = false;
 
-                if (connected)
-                    log.message = string.Format("Connected to XayaServices with {0}.", cInfo.GetHTTPCompatibleURL(true));
-                else if (!connected)
-                    log.message = string.Format("Could not make connection to {0} with {1} & {2}.", cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword);
-
+                if (connected) log.message = string.Format("Connected to XayaServices with {0}.", cInfo.GetHTTPCompatibleURL(true));
+                else log.message = string.Format("Could not make connection to {0} with {1} & {2}.", cInfo.GetHTTPCompatibleURL(true), cInfo.username, cInfo.userpassword);
 
                 log.success = connected;
                 return log;
@@ -51,16 +43,12 @@ namespace MudHero.XayaCommunication
             return log;
         }
 
-        public void SetPlayerWalletName(string name)
-        {
-            playerName = name;
-        }
+        public void SetPlayerWalletName(string name) { playerName = name; }
 
         public void SetPlayerWalletName(int index)
         {
             string[] playerNames = names;
-            if (index < playerNames.Length)
-                playerName = playerNames[index];
+            if (index < playerNames.Length) playerName = playerNames[index];
         }
 
         public ConnectionLog ExecutePlayerCommand(string player, string command, object options)
@@ -81,10 +69,7 @@ namespace MudHero.XayaCommunication
                     log.message = "Did not recieve a response from the Xaya Daemon.";
                     log.success = false;
                 }
-                else
-                {
-                    log.success = true;
-                }
+                else log.success = true;
 
                 return log;
             }
@@ -103,10 +88,8 @@ namespace MudHero.XayaCommunication
             {
                 log.message = xayaService.RegisterName("p/" + name, "{}", null);
 
-                if (log.message.Contains("Failed"))
-                    log.success = false;
-                else
-                    log.success = true;
+                if (log.message.Contains("Failed")) log.success = false;
+                else log.success = true;
             }
 
             return log;
@@ -194,10 +177,8 @@ namespace MudHero.XayaCommunication
         {
             get
             {
-                if (xayaService == null)
-                    return 0;
-                else
-                    return (int)xayaService.GetBlockCount();
+                if (xayaService == null)  return 0;
+                else return (int)xayaService.GetBlockCount();
             }
         }
 
@@ -209,14 +190,10 @@ namespace MudHero.XayaCommunication
                 List<string> nameList = new List<string>();
                 List<GetNameListResponse> responses = xayaService.GetNameList();
                     
-                if (responses == null || xayaService == null)
-                    return new string[0];
+                if (responses == null || xayaService == null) return new string[0];
 
                 foreach (GetNameListResponse response in responses)
-                {
-                    if (response.ismine)
-                        nameList.Add(response.name);
-                }
+                    if (response.ismine)  nameList.Add(response.name); 
                    
                 return nameList.ToArray();
             }

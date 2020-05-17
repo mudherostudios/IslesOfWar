@@ -38,9 +38,6 @@ public class Telemetry : MonoBehaviour
     private void Update()
     {
         #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.D))
-            DeleteOrder(OrderIdToDelete);
-
         if (Input.GetKeyDown(KeyCode.T))
             SendSocketMessage(Resolver.GetSellerAddresses(username, new Guid()), WebSocketAction.TRANSACTION);
         #endif
@@ -66,7 +63,7 @@ public class Telemetry : MonoBehaviour
         await socket.SendText(serialized);
     }
 
-    public async void SendSocketMessage(object payload, WebSocketAction socketAction)
+    private async void SendSocketMessage(object payload, WebSocketAction socketAction)
     {
         if (payload == null) return;
 
@@ -82,7 +79,6 @@ public class Telemetry : MonoBehaviour
     //---------------------------------------------------------------------
     //-------------------------Listening Functions-------------------------
     //---------------------------------------------------------------------
-
     private void Listen(WebSocket _socket)
     {
         _socket.OnClose += ClosedConnection;
@@ -127,10 +123,7 @@ public class Telemetry : MonoBehaviour
     //---------------------------------------------------------------------
     //-------------------------Order Functions-----------------------------
     //---------------------------------------------------------------------
-    public async void LoadOrders()
-    {
-        orders = await GetOrders();
-    }
+    public async void LoadOrders() { orders = await GetOrders(); }
 
     public static async Task<List<OrderPayload>> GetOrders()
     {
@@ -185,13 +178,16 @@ public class Telemetry : MonoBehaviour
         return order;
     }
 
+    public void AcceptOrder(string toPlayer, string ID)
+    {
+        TradePayload payload = Resolver.GetSellerAddresses(toPlayer, new Guid(ID));
+        SendSocketMessage(payload, WebSocketAction.TRANSACTION);
+    }
+
     //---------------------------------------------------------------------
     //-------------------------Misc Functions-----------------------------
     //---------------------------------------------------------------------
-    private void OnLevelWasLoaded(int level)
-    {
-        if(level == 2) SendLoginNotice(username);
-    }
+    private void OnLevelWasLoaded(int level) { if (level == 2) SendLoginNotice(username); }
 
     private string GetSocketDebugMessage(SocketMessage socketMessage)
     {

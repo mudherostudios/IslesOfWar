@@ -93,7 +93,7 @@ public class ChiTrading : Trading
     private void PopulateOrderList()
     {
         foreach (KeyValuePair<string, ChiOrderData> pair in marketData)
-                if(!pendingRemovals.Contains(pair.Key)) AddOrderToWindow(pair.Key, pair.Value);
+            if(!pendingRemovals.Contains(pair.Key)) AddOrderToWindow(pair.Key, pair.Value);
 
         foreach (KeyValuePair<string, ChiOrderData> pair in pendingAdditions)
             AddOrderToWindow(pair.Key, pair.Value);

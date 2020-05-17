@@ -19,7 +19,7 @@ public class RemoveChiOrderPrompt : ChiPrompt
     public void Ok()
     {
         market.DeleteChiOrder(orderID);
-        Close();
+        Cancel();
     }
 
     public void Cancel()

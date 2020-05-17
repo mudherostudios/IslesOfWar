@@ -8,10 +8,9 @@ using IslesOfWar.ClientSide;
 public class ChiMarket : ChiTrading
 {
     public Button acceptButton, removeButton;
+    public AcceptChiOrderPrompt acceptPrompt;
     public RemoveChiOrderPrompt removePrompt;
-    //Prompters
     //Search Elements
-    //Make Physical Interface/GUI
 
     private void Start()
     {
@@ -63,6 +62,24 @@ public class ChiMarket : ChiTrading
         telemetry.DeleteOrder(ID);
         StartCoroutine(Wait(4));
         Refresh();
+    }
+
+    public void PromptAcceptOrder()
+    {
+        Refresh();
+        if (!marketData.ContainsKey(selectedOrderID)) return;
+
+        ChiOrderData data = marketData[selectedOrderID];
+        acceptPrompt.PromptAccept(selectedOrderID, data.price, (int)data.warbux);
+    }
+
+    public void AcceptChiOrder(string ID)
+    {
+        Refresh();
+        if (!marketData.ContainsKey(ID)) return;
+
+        ChiOrderData data = marketData[ID];
+        telemetry.AcceptOrder(data.owner, data.ID);
     }
 
     public void AddPendingAddition(Guid id, decimal price, int warbux)

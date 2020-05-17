@@ -42,13 +42,14 @@ public class ResourceMonitor : MonoBehaviour
         double converted = 0;
         string place = "";
 
+        if(chi) return string.Format("{0:F4}", amount);
+
         if (absolute >= 1000000000000) { converted = amount / 1000000000000; place = "T"; }
         else if (absolute >= 1000000000) { converted = amount / 1000000000; place = "B"; }
         else if (absolute >= 1000000) { converted = amount / 1000000; place = "M"; }
         else if (absolute >= 1000) { converted = amount / 1000; place = "K"; }
         else { converted = amount; place = ""; }
 
-        if(!chi) return string.Format("{0:F2} {1}", converted, place);
-        else return string.Format("{0:F4}", converted);
+        return string.Format("{0:F2} {1}", converted, place);
     }
 }
