@@ -8,6 +8,7 @@ namespace MudHero.WebSocketCommunication
         [JsonConverter(typeof(StringEnumConverter))]
         public WebSocketAction Action;  //Tells the wss server how to handle the data.
         public object Payload;          //Object to send to the server.
+        public Error Error;
 
         public SocketMessage() { }
 

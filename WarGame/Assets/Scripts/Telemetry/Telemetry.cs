@@ -14,6 +14,7 @@ public class Telemetry : MonoBehaviour
     public string Url = "wss://websocket.islesofwar.online";
     public string OrderIdToDelete;
     public TransactionResolver Resolver;
+    public int levelToSendLoginNotice;
 
     public OrderPayload[] Orders { get { return orders.ToArray(); } }
 
@@ -90,7 +91,7 @@ public class Telemetry : MonoBehaviour
     private void RecievedMessage(byte[] messageBytes)
     {
         string message = Encoding.UTF8.GetString(messageBytes);
-        string messageLog = "Log not created.";
+        string messageLog = null;
         SocketMessage socketMessage = new SocketMessage();
 
         if (MessageHandler.TryJsonParse(message, out socketMessage))
@@ -105,8 +106,9 @@ public class Telemetry : MonoBehaviour
         {
             socketMessage = MessageHandler.BadData(message);
             messageLog = GetSocketDebugMessage(socketMessage);
-            Debug.LogWarning(messageLog);
         }
+        
+        if(messageLog != null) Debug.LogWarning(messageLog);
     }
 
     private void ClosedConnection(WebSocketCloseCode code)
@@ -187,7 +189,7 @@ public class Telemetry : MonoBehaviour
     //---------------------------------------------------------------------
     //-------------------------Misc Functions-----------------------------
     //---------------------------------------------------------------------
-    private void OnLevelWasLoaded(int level) { if (level == 2) SendLoginNotice(username); }
+    private void OnLevelWasLoaded(int level) { if (level == levelToSendLoginNotice) SendLoginNotice(username); }
 
     private string GetSocketDebugMessage(SocketMessage socketMessage)
     {

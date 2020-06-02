@@ -438,7 +438,7 @@ namespace NativeWebSocket
 
 			while (m_Socket.State == System.Net.WebSockets.WebSocketState.Open)
 			{
-				WebSocketReceiveResult result = null;
+                WebSocketReceiveResult result = null;
 
 				using (var ms = new MemoryStream())
 				{

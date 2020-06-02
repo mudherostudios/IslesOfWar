@@ -129,6 +129,7 @@ public class ConnectGUI : MonoBehaviour
         messages.text = "Loading...";
         userPanel.SetActive(false);
         loginButton.SetActive(false);
+        telemetry.levelToSendLoginNotice = sceneToLoad;
         SceneManager.LoadSceneAsync(sceneToLoad);
     }
 
